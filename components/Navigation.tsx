@@ -4,9 +4,9 @@ import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site.config";
+import { Logo } from "@/components/Logo";
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -50,7 +50,7 @@ export function Navigation() {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  const { nav, primaryCta, logo } = siteConfig;
+  const { nav, primaryCta } = siteConfig;
 
   return (
     <>
@@ -76,19 +76,12 @@ export function Navigation() {
         >
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" aria-label={logo.alt}>
+            <Link href="/" aria-label="FineVu home">
               <motion.div
                 className="flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
               >
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={120}
-                  height={32}
-                  className={`${logo.heightClass} w-auto`}
-                  priority
-                />
+                <Logo className="text-2xl" />
               </motion.div>
             </Link>
 

@@ -40,23 +40,23 @@ export function BrandMarquee() {
           {duplicatedBrands.map((brand, index) => (
             <div
               key={index}
-              className="flex-shrink-0 flex items-center justify-center"
+              className="flex-shrink-0 flex items-center justify-center gap-6"
               style={{ minWidth: "80px" }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={brand.url}
-                alt={brand.name}
-                className="h-6 md:h-7 w-auto object-contain opacity-40"
-                style={{ filter: brand.invert ? "brightness(0) invert(1)" : "none" }}
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  const parent = target.parentElement;
-                  if (parent) {
-                    parent.innerHTML = `<span class="text-white/40 tracking-wider uppercase text-lg md:text-xl font-light">${brand.name}</span>`;
-                  }
-                }}
-              />
+              {brand.url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={brand.url}
+                  alt={brand.name}
+                  className="h-6 md:h-7 w-auto object-contain opacity-40"
+                  style={{ filter: brand.invert ? "brightness(0) invert(1)" : "none" }}
+                />
+              ) : (
+                <span className="text-white/40 tracking-[0.2em] uppercase text-xs md:text-sm font-mono whitespace-nowrap">
+                  {brand.name}
+                </span>
+              )}
+              <span className="text-[var(--finevu-orange)]/40 text-xs">/</span>
             </div>
           ))}
         </motion.div>

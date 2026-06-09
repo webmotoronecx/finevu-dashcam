@@ -1,378 +1,227 @@
 "use client";
 
 import { Footer } from '@/components/Footer';
-import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
-import { motion } from 'motion/react';
-import { MessageCircle, Phone, Mail, FileText, Calendar, CheckCircle } from 'lucide-react';
 import { ScrollProgress } from '@/components/ScrollProgress';
+import { motion } from 'motion/react';
+import {
+  Wrench,
+  Smartphone,
+  Settings,
+  ParkingCircle,
+  ShieldCheck,
+  AlertTriangle,
+  Phone,
+  ArrowRight,
+  HelpCircle,
+} from 'lucide-react';
 import Link from "next/link";
 
 export default function Page() {
-  const supportOptions = [
+  const topics = [
     {
-      icon: Phone,
-      title: "Phone Support",
-      description: "Speak directly with our team",
-      details: "1300 EV 360 (1300 383 360)",
-      hours: "Mon-Sun, 8:00 AM - 8:00 PM AEST",
-      cta: "Call Now",
-      link: "tel:1300383360"
+      icon: Wrench,
+      title: "Installation guides",
+      description:
+        "Step-by-step DIY setup for your front + rear FineVu, or book a professional fit. Hardwiring, cable routing and best camera placement.",
+      links: [
+        { label: "Installation services", href: "/services" },
+        { label: "Book a fit", href: "/booking" },
+      ],
     },
     {
-      icon: Mail,
-      title: "Email Support",
-      description: "Send us a detailed inquiry",
-      details: "hello@ev360.com.au",
-      hours: "Response within 24 hours",
-      cta: "Send Email",
-      link: "mailto:hello@ev360.com.au"
+      icon: Smartphone,
+      title: "FineVu app & pairing",
+      description:
+        "Connect over Wi-Fi, set up GPS, and view, save and share footage straight from your phone. Pair your GX4K or GX35 in minutes.",
+      links: [
+        { label: "GX4K", href: "/gx4k" },
+        { label: "GX35", href: "/gx35" },
+      ],
     },
     {
-      icon: MessageCircle,
-      title: "Live Chat",
-      description: "Chat with our support team",
-      details: "Available on our website",
-      hours: "Mon-Fri, 9:00 AM - 6:00 PM AEST",
-      cta: "Start Chat",
-      link: "#"
+      icon: Settings,
+      title: "Firmware & settings",
+      description:
+        "Keep your camera current with the latest firmware, adjust recording quality, loop length, time and date, and SONY STARVIS exposure.",
+      links: [{ label: "How it works", href: "/how-it-works" }],
     },
     {
-      icon: Calendar,
-      title: "Book a Call",
-      description: "Schedule a consultation",
-      details: "30-minute technical consultation",
-      hours: "Flexible scheduling available",
-      cta: "Schedule Call",
-      link: "/booking"
-    }
-  ];
-
-  const commonIssues = [
-    {
-      title: "Booking & Scheduling",
-      questions: [
-        "How do I book an appointment?",
-        "Can I reschedule my appointment?",
-        "What if I need to cancel?",
-        "How quickly can you come to me?"
-      ]
+      icon: ParkingCircle,
+      title: "Parking mode setup",
+      description:
+        "Enable motion and impact detection while parked. Set buffered recording, low-voltage cut-off, and protect your car around the clock.",
+      links: [{ label: "Learn more", href: "/learn" }],
     },
     {
-      title: "Reports & Results",
-      questions: [
-        "When will I receive my report?",
-        "How do I interpret my results?",
-        "Can I share my report with others?",
-        "What format is the report in?"
-      ]
+      icon: ShieldCheck,
+      title: "Warranty & repairs",
+      description:
+        "Every FineVu comes with a 3-Year Australian Warranty. Lodge a claim or arrange a repair through Auto Xtreme on 1800 818 288.",
+      links: [
+        { label: "Call 1800 818 288", href: "tel:1800818288" },
+        { label: "Contact us", href: "/contact" },
+      ],
     },
     {
-      title: "Service Questions",
-      questions: [
-        "Which service do I need?",
-        "What's included in each package?",
-        "Do you service my EV model?",
-        "Is mobile service available in my area?"
-      ]
+      icon: AlertTriangle,
+      title: "Troubleshooting",
+      description:
+        "Not recording? App won't connect? SD card errors? Work through the common fixes, or reach the team for hands-on help.",
+      links: [{ label: "Read the FAQ", href: "/faq" }],
     },
-    {
-      title: "Technical Support",
-      questions: [
-        "Understanding State of Health (SOH)",
-        "Battery warranty questions",
-        "Interpreting diagnostic codes",
-        "Vehicle-specific battery issues"
-      ]
-    }
-  ];
-
-  const resources = [
-    {
-      title: "Frequently Asked Questions",
-      description: "Find answers to the most common questions about our services",
-      icon: FileText,
-      link: "/faq"
-    },
-    {
-      title: "Battery Health Guide",
-      description: "Learn everything about EV battery health and maintenance",
-      icon: CheckCircle,
-      link: "/battery-guide"
-    },
-    {
-      title: "Contact Us",
-      description: "Get in touch with our team for personalized assistance",
-      icon: MessageCircle,
-      link: "/contact"
-    }
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <ScrollProgress />
-      
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <motion.div 
-          className="absolute inset-0"
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5 }}
-        >
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1496152658208-d41635783718?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXN0b21lciUyMHNlcnZpY2UlMjBoZWxwJTIwZGVza3xlbnwxfHx8fDE3NjQxMzA3MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-            alt="Customer support"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
-        </motion.div>
 
+      {/* Hero */}
+      <section
+        className="relative pt-32 md:pt-40 pb-24 overflow-hidden brand-gradient"
+        data-nav-theme="dark"
+      >
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
           <motion.div
-            className="space-y-6 max-w-4xl mx-auto"
+            className="space-y-6 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
           >
-            <h1 className="text-5xl md:text-6xl font-light text-white tracking-tight leading-[1.1]">
-              We're Here to Help
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--finevu-orange)]">
+              FineVu Support
+            </span>
+            <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-[1.05]">
+              Help &amp; support.
             </h1>
-            <p className="text-base md:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed">
-              Get support from our certified EV battery specialists
+            <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
+              Everything you need to install, set up and get the most from your FineVu dash cam.
+              Backed by Auto Xtreme and a 3-Year Australian Warranty.
             </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Support Options */}
-      <section className="py-32 bg-white">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-6">
-              Get Support Your Way
-            </h2>
-            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-              Choose the support channel that works best for you
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {supportOptions.map((option, index) => {
-              const Icon = option.icon;
-              const isLink = option.link && option.link !== "#";
-              
-              const CardContent = (
-                <motion.div
-                  className="p-8 rounded-2xl border border-zinc-200 smooth-transition hover:border-[var(--electric-green)] hover:shadow-lg space-y-6 h-full flex flex-col"
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
-                >
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--electric-green)]/10 to-[var(--electric-blue)]/10 flex items-center justify-center">
-                    <Icon className="w-7 h-7 text-[var(--electric-green)]" />
-                  </div>
-                  
-                  <div className="flex-grow">
-                    <h3 className="text-2xl mb-2">{option.title}</h3>
-                    <p className="text-zinc-600 mb-4">{option.description}</p>
-                    <p className="text-zinc-900 mb-2">{option.details}</p>
-                    <p className="text-sm text-zinc-500">{option.hours}</p>
-                  </div>
-
-                  <motion.button
-                    className="w-full py-3 rounded-full border-2 border-zinc-300 smooth-transition hover:border-[var(--electric-green)] hover:text-[var(--electric-green)]"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {option.cta}
-                  </motion.button>
-                </motion.div>
-              );
-
-              return isLink ? (
-                <Link key={index} href={option.link}>
-                  {CardContent}
-                </Link>
-              ) : (
-                <div key={index}>
-                  {CardContent}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Common Issues */}
-      <section className="py-32 bg-zinc-50">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-6">
-              Common Support Topics
-            </h2>
-            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-              Quick links to frequently requested help topics
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {commonIssues.map((category, index) => (
-              <motion.div
-                key={index}
-                className="space-y-4"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <h3 className="text-xl text-zinc-900 pb-3 border-b border-zinc-200">
-                  {category.title}
-                </h3>
-                <ul className="space-y-3">
-                  {category.questions.map((question, qIdx) => (
-                    <li key={qIdx} className="text-zinc-600 text-sm leading-relaxed flex items-start gap-2">
-                      <span className="text-[var(--electric-green)] mt-1">•</span>
-                      <span>{question}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Self-Service Resources */}
-      <section className="py-32 bg-white">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-6">
-              Self-Service Resources
-            </h2>
-            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-              Find answers instantly with our comprehensive guides
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {resources.map((resource, index) => {
-              const Icon = resource.icon;
-              return (
-                <Link key={index} href={resource.link}>
-                  <motion.div
-                    className="p-10 rounded-2xl border border-zinc-200 smooth-transition hover:border-[var(--electric-green)] hover:shadow-lg space-y-6 h-full"
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    whileHover={{ y: -8 }}
-                  >
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--electric-green)]/10 to-[var(--electric-blue)]/10 flex items-center justify-center">
-                      <Icon className="w-8 h-8 text-[var(--electric-green)]" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl mb-3">{resource.title}</h3>
-                      <p className="text-zinc-600 leading-relaxed">
-                        {resource.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Emergency Support */}
-      <section className="py-32 bg-zinc-50">
-        <div className="max-w-4xl mx-auto px-8 lg:px-16">
-          <motion.div
-            className="bg-white rounded-3xl p-12 border border-zinc-200"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="text-center space-y-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--electric-green)] to-[var(--electric-blue)] flex items-center justify-center mx-auto">
-                <Phone className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-light tracking-tight">
-                Need Immediate Assistance?
-              </h2>
-              <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-                For urgent pre-purchase inspections or same-day service, call us directly
-              </p>
-              <div className="pt-4">
-                <a href="tel:1300383360">
-                  <motion.button
-                    className="px-8 py-3 rounded-full bg-[#334AFF] text-white smooth-transition electric-glow text-lg"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Call 1300 EV 360
-                  </motion.button>
-                </a>
-              </div>
-              <p className="text-sm text-zinc-500">
-                Available 7 days a week, 8:00 AM - 8:00 PM AEST
-              </p>
+            <div className="flex flex-wrap justify-center gap-3 pt-4">
+              <span className="finevu-capsule">Made in Korea</span>
+              <span className="finevu-capsule">SONY STARVIS sensors</span>
+              <span className="finevu-capsule">4 million+ sold worldwide</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Support Hours */}
-      <section className="py-32 bg-white">
-        <div className="max-w-4xl mx-auto px-8 lg:px-16">
+      {/* Help topics grid */}
+      <section className="py-24 md:py-32 bg-white" data-nav-theme="light">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
           <motion.div
-            className="text-center space-y-8"
+            className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7 }}
           >
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight">
-              Support Hours
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+              Browse help topics
             </h2>
-            <div className="grid md:grid-cols-2 gap-8 text-left">
-              <div className="p-8 rounded-2xl bg-zinc-50">
-                <h3 className="text-xl text-zinc-900 mb-4">Phone Support</h3>
-                <div className="space-y-2 text-zinc-600">
-                  <p>Monday - Sunday</p>
-                  <p className="text-2xl font-light text-zinc-900">8:00 AM - 8:00 PM</p>
-                  <p className="text-sm text-zinc-500">Australian Eastern Standard Time</p>
-                </div>
-              </div>
-              <div className="p-8 rounded-2xl bg-zinc-50">
-                <h3 className="text-xl text-zinc-900 mb-4">Email Support</h3>
-                <div className="space-y-2 text-zinc-600">
-                  <p>24/7 Submission</p>
-                  <p className="text-2xl font-light text-zinc-900">24 Hour Response</p>
-                  <p className="text-sm text-zinc-500">Typically faster during business hours</p>
-                </div>
-              </div>
+            <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+              Pick a topic to get going, or jump straight to the team.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {topics.map((topic, index) => {
+              const Icon = topic.icon;
+              return (
+                <motion.div
+                  key={index}
+                  className="p-8 rounded-[2rem] border border-zinc-200 transition-all hover:border-[var(--finevu-orange)] hover:shadow-lg space-y-5 h-full flex flex-col"
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+                  whileHover={{ y: -6 }}
+                >
+                  <div className="w-14 h-14 rounded-full bg-[var(--finevu-orange)]/10 flex items-center justify-center">
+                    <Icon className="w-7 h-7 text-[var(--finevu-orange)]" />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold mb-2 text-zinc-900">{topic.title}</h3>
+                    <p className="text-zinc-600 leading-relaxed">{topic.description}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-x-5 gap-y-2 pt-2">
+                    {topic.links.map((link, lIdx) =>
+                      link.href.startsWith("/") ? (
+                        <Link
+                          key={lIdx}
+                          href={link.href}
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-900 hover:text-[var(--finevu-orange)] transition-colors"
+                        >
+                          {link.label}
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      ) : (
+                        <a
+                          key={lIdx}
+                          href={link.href}
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-900 hover:text-[var(--finevu-orange)] transition-colors"
+                        >
+                          {link.label}
+                          <ArrowRight className="w-4 h-4" />
+                        </a>
+                      )
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Talk to support band */}
+      <section className="py-24 md:py-32 bg-zinc-50" data-nav-theme="light">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+          <motion.div
+            className="rounded-[2rem] brand-gradient p-10 md:p-16 text-center overflow-hidden"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="w-16 h-16 rounded-full bg-[var(--finevu-orange)] flex items-center justify-center mx-auto mb-6">
+              <Phone className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
+              Talk to support
+            </h2>
+            <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">
+              Still stuck? Auto Xtreme, FineVu's Australian distributor, can help with setup,
+              warranty and repairs. Call us during support hours, Mon–Fri 9:00 AM – 5:00 PM AEST.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a href="tel:1800818288">
+                <motion.button
+                  className="px-8 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-lg transition-transform"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  Call 1800 818 288
+                </motion.button>
+              </a>
+              <Link href="/contact">
+                <motion.button
+                  className="px-8 py-3.5 rounded-full border-2 border-white/40 text-white font-semibold text-lg transition-colors hover:border-white"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  Send a message
+                </motion.button>
+              </Link>
+            </div>
+            <div className="pt-8">
+              <Link
+                href="/faq"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-[var(--finevu-orange)] transition-colors"
+              >
+                <HelpCircle className="w-4 h-4" /> Prefer to read first? Check the FAQ
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </motion.div>
         </div>

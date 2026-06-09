@@ -82,7 +82,7 @@ export default function Page() {
         <p className="text-zinc-600 mb-8">The article you are looking for does not exist.</p>
         <Link href="/learn">
           <button className="px-8 py-4 rounded-full bg-zinc-900 text-white hover:scale-105 transition-transform">
-            Back to Education Hub
+            Back to Learn
           </button>
         </Link>
       </div>
@@ -156,7 +156,7 @@ export default function Page() {
               <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3 group-hover:bg-white/20 transition-colors backdrop-blur-sm">
                 <ArrowLeft className="w-4 h-4" />
               </div>
-              <span className="font-medium tracking-wide text-sm uppercase">Back to Hub</span>
+              <span className="font-medium tracking-wide text-sm uppercase">Back to Learn</span>
             </Link>
             
             <motion.div
@@ -192,8 +192,8 @@ export default function Page() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-white font-medium">{article.author || "EV360 Team"}</p>
-                  <p className="text-white/60 text-sm">Battery Health Specialist</p>
+                  <p className="text-white font-medium">{article.author || "FineVu Team"}</p>
+                  <p className="text-white/60 text-sm">Dash Cam Specialist</p>
                 </div>
               </div>
             </motion.div>
@@ -310,16 +310,16 @@ export default function Page() {
           <div className="hidden lg:block lg:col-span-3">
              <div className="sticky top-32">
                 <div className="bg-zinc-900 text-white p-8 rounded-3xl relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--electric-blue)] rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity" />
-                  
-                  <h3 className="text-2xl font-light mb-4 relative z-10">Is your battery healthy?</h3>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--finevu-orange)] rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity" />
+
+                  <h3 className="text-2xl font-bold mb-4 relative z-10">Choosing your FineVu?</h3>
                   <p className="text-zinc-400 mb-8 relative z-10 text-sm leading-relaxed">
-                    Don't guess. Know for sure. Get a certified EV360 battery health report today.
+                    Explore the GX4K and GX35. True 4K and 2K, both with SONY STARVIS, front &amp; rear and a 3-Year Australian Warranty.
                   </p>
-                  
-                  <Link href="/booking" className="block relative z-10">
-                    <button className="w-full py-4 rounded-xl bg-[var(--electric-green)] text-zinc-900 font-bold hover:bg-[#a0f075] transition-colors flex items-center justify-center group-hover:scale-[1.02] active:scale-[0.98] duration-200">
-                      Check My Battery
+
+                  <Link href="/gx4k" className="block relative z-10">
+                    <button className="w-full py-4 rounded-xl bg-[var(--finevu-orange)] text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center group-hover:scale-[1.02] active:scale-[0.98] duration-200">
+                      Explore the range
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </button>
                   </Link>

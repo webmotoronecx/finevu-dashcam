@@ -61,13 +61,13 @@ export function ServiceCard({ name, price, duration, features, recommended, dela
           <motion.button
             className={`w-full py-4 rounded-full smooth-transition font-medium tracking-wide ${
               recommended
-                ? 'bg-[var(--brand-primary)] text-white electric-glow hover:bg-[#2030cc]'
+                ? 'bg-[var(--brand-primary)] text-white electric-glow hover:opacity-90'
                 : 'border border-zinc-200 text-zinc-900 hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'
             }`}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Check My EV
+            Book Now
           </motion.button>
         </Link>
       </div>

@@ -36,12 +36,14 @@ export function Hero() {
           className="w-full h-full object-cover"
         />
         {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+        {/* FineVu brand gradient design layer */}
+        <div className="absolute inset-0 opacity-50 mix-blend-soft-light brand-gradient" />
         <div
-          className="absolute inset-0 opacity-40 mix-blend-overlay"
+          className="absolute inset-0 opacity-30 mix-blend-screen"
           style={{
             background:
-              "radial-gradient(circle at center, var(--brand-primary) 0%, transparent 70%)",
+              "radial-gradient(circle at 70% 30%, var(--finevu-blue) 0%, transparent 60%)",
           }}
         />
       </motion.div>
@@ -50,7 +52,7 @@ export function Hero() {
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-8 lg:px-16 text-center pt-28 md:pt-20 pb-32">
         <div className="space-y-6 md:space-y-8 max-w-4xl mx-auto">
           <motion.h1
-            className="text-4xl sm:text-5xl md:text-6xl font-light text-white tracking-tight leading-[1.1]"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.1]"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}

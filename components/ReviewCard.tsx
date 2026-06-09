@@ -28,7 +28,7 @@ export function ReviewCard({ name, location, vehicle, review, rating, image, ver
       {verified && (
         <div className="absolute top-8 right-8">
           <motion.div 
-            className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#334AFF] border border-[#334AFF] font-mono"
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--finevu-orange)] border border-[var(--finevu-orange)] font-mono"
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
             transition={{ delay: 0.5 + delay, type: "spring" }}

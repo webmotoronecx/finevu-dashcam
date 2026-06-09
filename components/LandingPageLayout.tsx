@@ -4,7 +4,6 @@ import { motion } from 'motion/react';
 import { ChevronRight } from 'lucide-react';
 import Link from "next/link";
 import { Footer } from '@/components/Footer';
-import { Navigation } from '@/components/Navigation';
 import { ReportPreview } from '@/components/ReportPreview';
 import { TiltCard } from '@/components/TiltCard';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
@@ -44,8 +43,6 @@ export function LandingPageLayout({
 }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
-      
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 bg-black overflow-hidden" data-nav-theme="dark">
         {/* Abstract Background */}
@@ -64,7 +61,7 @@ export function LandingPageLayout({
               <div className="inline-block px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-sm font-mono uppercase tracking-wider text-[var(--brand-primary)] mb-6">
                 For {audience}
               </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-white tracking-tight leading-[1.1] mb-6">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1] mb-6">
                 {title}
               </h1>
               <p className="text-xl text-zinc-400 max-w-xl leading-relaxed mb-10">
@@ -177,11 +174,11 @@ export function LandingPageLayout({
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <h2 className="text-4xl md:text-5xl font-light text-white mb-6 tracking-tight leading-tight">
-                  The Proof You Need.
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">
+                  Your footage, anywhere.
                 </h2>
                 <p className="text-lg text-zinc-400 mb-8 leading-relaxed">
-                  Our independent EV360 Certificate provides the data-backed assurance required for high-value transactions, insurance policies, and fleet management decisions.
+                  The FineVu app puts every recording in your pocket. View, save and share footage over Wi-Fi and GPS — no need to remove the memory card.
                 </p>
                 <Link href={ctaLink}>
                   <button className="px-8 py-3 rounded-full bg-white text-zinc-900 font-medium hover:bg-zinc-200 transition-colors">

@@ -1,13 +1,13 @@
 /**
  * site.config.ts — per-client content configuration
  *
- * This is the single source of truth for all site content that varies per client:
- * navigation, hero copy, CTAs, brand logos, etc.
+ * Single source of truth for site content that varies per client:
+ * navigation, hero copy, CTAs, trust marquee, etc.
  *
  * To rebrand for another client:
- *   1. Fork this file
- *   2. Override tokens in app/globals.css (colors, fonts)
- *   3. Replace /public/brand/logo.svg
+ *   1. Edit this file
+ *   2. Override tokens in app/globals.css (colours, fonts)
+ *   3. Replace the wordmark in components/Logo.tsx / public/brand/logo.svg
  *
  * No component code changes required.
  */
@@ -29,6 +29,15 @@ export type SiteConfig = {
   name: string;
   tagline: string;
   description: string;
+
+  /** Contact / distributor details */
+  contact: {
+    phone: string;
+    distributor: string;
+    distributorUrl: string;
+    warranty: string;
+    origin: string;
+  };
 
   /** Logo in /public */
   logo: {
@@ -56,7 +65,7 @@ export type SiteConfig = {
     theme: "dark" | "light";
   };
 
-  /** Brand marquee — logos of supported brands/partners */
+  /** Trust marquee — scrolling proof points */
   brandMarquee: {
     eyebrow: string;
     brands: BrandLogo[];
@@ -64,51 +73,54 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "EV360",
-  tagline: "360° EV battery health checks",
+  name: "FineVu",
+  tagline: "Global leader in dash cam technology",
   description:
-    "Complete battery assessments, delivered at your home, workplace, or our service centre.",
+    "Premium 4K & 2K front and rear dash cams with SONY STARVIS image sensors. Engineered in Korea, backed by a 3-year Australian warranty.",
+
+  contact: {
+    phone: "1800 818 288",
+    distributor: "Auto Xtreme",
+    distributorUrl: "https://autoxtreme.com.au",
+    warranty: "3-Year Australian Warranty",
+    origin: "Made in Korea",
+  },
 
   logo: {
     src: "/brand/logo.svg",
-    alt: "EV360",
+    alt: "FineVu",
     heightClass: "h-8",
   },
 
   nav: [
-    { href: "/how-it-works", label: "How It Works" },
-    { href: "/services", label: "Services" },
-    { href: "/learn", label: "Learn" },
-    { href: "/partners", label: "Partners" },
+    { href: "/gx4k", label: "GX4K" },
+    { href: "/gx35", label: "GX35 2K" },
+    { href: "/about", label: "About" },
+    { href: "/faq", label: "FAQs" },
   ],
 
-  primaryCta: { href: "/booking", label: "Check My EV" },
-  secondaryCta: { href: "/how-it-works", label: "How It Works" },
+  primaryCta: { href: "/where-to-buy", label: "Where to Buy" },
+  secondaryCta: { href: "/gx4k", label: "Explore the Range" },
 
   hero: {
-    headline: "360° EV battery health checks. Starting from $199*",
-    sub: "Complete battery assessments, delivered at your home, workplace, or our service centre.",
-    backgroundImage: "/assets/a1d6942ee887e7e369119006a92beb2d4a36fb01.png",
+    headline: "Global leader in dash cam technology.",
+    sub: "What if your dash camera could make your drive safer? 4K brilliance with unrivalled safety — front & rear cameras with SONY STARVIS image sensors.",
+    backgroundImage:
+      "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920",
     theme: "dark",
   },
 
   brandMarquee: {
-    eyebrow: "Supporting all EV brands",
+    eyebrow: "Trusted by drivers worldwide — 4 million+ sold",
     brands: [
-      { name: "Tesla", url: "https://cdn.simpleicons.org/tesla/ffffff" },
-      { name: "BYD", url: "https://www.carlogos.org/logo/BYD-logo-2007-2560x1440.png", invert: true },
-      { name: "MG", url: "https://cdn.simpleicons.org/mg/ffffff" },
-      { name: "Hyundai", url: "https://cdn.simpleicons.org/hyundai/ffffff" },
-      { name: "Kia", url: "https://cdn.simpleicons.org/kia/ffffff" },
-      { name: "Nissan", url: "https://cdn.simpleicons.org/nissan/ffffff" },
-      { name: "BMW", url: "https://cdn.simpleicons.org/bmw/ffffff" },
-      { name: "Mercedes", url: "https://www.carlogos.org/logo/Mercedes-Benz-logo-2011-1920x1080.png", invert: true },
-      { name: "Audi", url: "https://cdn.simpleicons.org/audi/ffffff" },
-      { name: "Volkswagen", url: "https://cdn.simpleicons.org/volkswagen/ffffff" },
-      { name: "Polestar", url: "https://cdn.simpleicons.org/polestar/ffffff" },
-      { name: "Volvo", url: "https://cdn.simpleicons.org/volvo/ffffff" },
-      { name: "Porsche", url: "https://cdn.simpleicons.org/porsche/ffffff" },
-      { name: "Ford", url: "https://cdn.simpleicons.org/ford/ffffff" },
+      { name: "SONY STARVIS", url: "" },
+      { name: "TRUE 4K UHD", url: "" },
+      { name: "MADE IN KOREA", url: "" },
+      { name: "3-YEAR WARRANTY", url: "" },
+      { name: "ADAS SAFETY", url: "" },
+      { name: "BUILT-IN GPS & WI-FI", url: "" },
+      { name: "24/7 PARKING MODE", url: "" },
+      { name: "4 MILLION+ SOLD", url: "" },
     ],
   },
 };

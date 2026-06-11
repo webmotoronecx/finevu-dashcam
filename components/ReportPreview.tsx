@@ -17,7 +17,7 @@ export function ReportPreview({ className = "" }: { className?: string }) {
 
         {/* App header */}
         <div className="bg-zinc-900 px-6 py-5 flex justify-between items-center text-white border-b border-white/5">
-          <Logo className="text-lg" />
+          <Logo className="h-5" />
           <span className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-400">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--finevu-orange)] animate-pulse" />
             CONNECTED

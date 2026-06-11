@@ -31,14 +31,12 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-// NOTE: All product and lifestyle imagery below uses Unsplash placeholders.
-// Swap for official FineVu product photography when available.
+// Official FineVu GX4K product photography.
+const productHero = '/products/gx4k-hero.jpg';
+const productStudio = '/products/gx4k-studio.jpg';
+// Lifestyle/footage imagery (Unsplash placeholder — swap for FineVu footage stills).
 const roadImage =
   'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920';
-const nightDriveImage =
-  'https://images.unsplash.com/photo-1502877338535-766e1452684a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920';
-const highwayImage =
-  'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920';
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -89,17 +87,15 @@ export default function GX4KPage() {
         data-nav-theme="dark"
         className="relative brand-gradient text-white pt-32 md:pt-40 pb-24 md:pb-32 overflow-hidden"
       >
-        {/* Giant typographic 4K watermark */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-end pr-4 lg:pr-20 select-none">
-          <span className="text-[16rem] leading-none font-bold text-white opacity-20">4K</span>
-        </div>
-        {/* Optional dark studio image layer */}
-        <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
+        {/* GX4K product hero image (right side, blends into the brand gradient) */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[58%]">
           <ImageWithFallback
-            src={highwayImage}
-            alt=""
-            className="w-full h-full object-cover"
+            src={productHero}
+            alt="FineVu GX4K front and rear dash cam"
+            className="w-full h-full object-cover object-center"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a16] via-[#0a0a16]/55 to-transparent" />
+          <div className="absolute inset-0 lg:hidden bg-black/45" />
         </div>
 
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16">
@@ -418,8 +414,8 @@ export default function GX4KPage() {
             <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
               <div className="relative rounded-[2rem] overflow-hidden border border-white/10 aspect-[4/3]">
                 <ImageWithFallback
-                  src={nightDriveImage}
-                  alt="GX4K dash cam ready for installation"
+                  src={productStudio}
+                  alt="FineVu GX4K front and rear cameras"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />

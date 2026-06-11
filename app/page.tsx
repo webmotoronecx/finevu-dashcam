@@ -4,7 +4,7 @@ import { Footer } from '@/components/Footer';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 import {
   ShieldCheck, Users, Award, ChevronRight, ArrowUpRight, ArrowRight,
-  Wifi, MapPin, Moon, Radio, Camera, Cpu, Zap, CheckCircle
+  Wifi, MapPin, Moon, Radio, Cpu, Zap, CheckCircle
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from "next/link";
@@ -56,10 +56,8 @@ export default function Page() {
       <div className="relative z-10 bg-white">
 
         {/* Choose your FineVu — product range */}
-        <section className="py-24 bg-[#080808] relative overflow-hidden" data-nav-theme="dark">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] brand-gradient rounded-full blur-[140px] pointer-events-none opacity-40" />
-
-          <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
+        <section className="py-24 bg-zinc-50" data-nav-theme="light">
+          <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
             <motion.div
               className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
               initial={{ opacity: 0, y: 20 }}
@@ -68,10 +66,10 @@ export default function Page() {
             >
               <div>
                 <span className="finevu-capsule mb-4">FRONT &amp; REAR · 2CH</span>
-                <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-2">
+                <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight mb-2">
                   Choose your FineVu.
                 </h2>
-                <p className="text-zinc-400 text-lg max-w-xl">
+                <p className="text-zinc-600 text-lg max-w-xl">
                   A simple, focused range — no fluff, no confusion. Ultimate 4K clarity or dependable 2K value.
                 </p>
               </div>
@@ -85,28 +83,24 @@ export default function Page() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
               >
-                <Link href="/gx4k" className="block group">
-                  <div className="relative h-[480px] rounded-[2rem] overflow-hidden border border-white/10 brand-gradient">
-                    <div className="absolute inset-0 flex items-center justify-center opacity-25 select-none">
-                      <span className="text-[14rem] font-bold text-white leading-none tracking-tighter">4K</span>
+                <Link href="/gx4k" className="block group h-full">
+                  <div className="rounded-[2rem] overflow-hidden border border-zinc-200 bg-white hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+                    <div className="relative aspect-[4/3] bg-zinc-100 overflow-hidden">
+                      <ImageWithFallback
+                        src="/products/gx4k-studio.jpg"
+                        alt="FineVu GX4K 4K front and rear dash cam"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <span className="absolute top-5 left-5 finevu-capsule">4K UHD</span>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
-                    <div className="relative h-full p-8 md:p-12 flex flex-col justify-between z-10">
-                      <div className="flex justify-between items-start">
-                        <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                          <Camera className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="finevu-capsule">4K UHD</span>
-                      </div>
-                      <div>
-                        <h3 className="text-4xl md:text-5xl font-bold text-white mb-3">GX4K</h3>
-                        <p className="text-zinc-200 text-lg max-w-md mb-6">
-                          Crystal clear 4K recording for every drive. True 4K Ultra HD that captures licence plates and street signs.
-                        </p>
-                        <div className="flex items-center gap-3 text-white group-hover:text-[var(--finevu-orange)] transition-colors">
-                          <span className="text-sm font-semibold uppercase tracking-widest">Explore GX4K</span>
-                          <ArrowUpRight className="w-4 h-4" />
-                        </div>
+                    <div className="p-8 md:p-10 flex flex-col flex-grow">
+                      <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-2">GX4K</h3>
+                      <p className="text-zinc-600 leading-relaxed mb-6 flex-grow">
+                        Crystal clear 4K recording for every drive. True 4K Ultra HD captures licence plates and street signs with SONY STARVIS clarity.
+                      </p>
+                      <div className="flex items-center gap-3 text-zinc-900 group-hover:text-[var(--finevu-orange)] transition-colors">
+                        <span className="text-sm font-semibold uppercase tracking-widest">Explore GX4K</span>
+                        <ArrowUpRight className="w-4 h-4" />
                       </div>
                     </div>
                   </div>
@@ -120,29 +114,24 @@ export default function Page() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
-                <Link href="/gx35" className="block group">
-                  <div className="relative h-[480px] rounded-[2rem] overflow-hidden border border-white/10 bg-[var(--finevu-charcoal)]">
-                    <div className="absolute inset-0 brand-gradient-soft opacity-30" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-20 select-none">
-                      <span className="text-[14rem] font-bold text-white leading-none tracking-tighter">2K</span>
+                <Link href="/gx35" className="block group h-full">
+                  <div className="rounded-[2rem] overflow-hidden border border-zinc-200 bg-white hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+                    <div className="relative aspect-[4/3] bg-zinc-100 overflow-hidden">
+                      <ImageWithFallback
+                        src="/products/gx35-hero.jpg"
+                        alt="FineVu GX35 2K front and rear dash cam"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <span className="absolute top-5 left-5 px-4 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider">2K · Best Value</span>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
-                    <div className="relative h-full p-8 md:p-12 flex flex-col justify-between z-10">
-                      <div className="flex justify-between items-start">
-                        <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                          <Camera className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold uppercase tracking-wider">2K · Best Value</span>
-                      </div>
-                      <div>
-                        <h3 className="text-4xl md:text-5xl font-bold text-white mb-3">GX35 2K</h3>
-                        <p className="text-zinc-300 text-lg max-w-md mb-6">
-                          Record every moment in 2K. Premium FineVu protection and features at a more accessible price point.
-                        </p>
-                        <div className="flex items-center gap-3 text-white group-hover:text-[var(--finevu-orange)] transition-colors">
-                          <span className="text-sm font-semibold uppercase tracking-widest">Explore GX35</span>
-                          <ArrowUpRight className="w-4 h-4" />
-                        </div>
+                    <div className="p-8 md:p-10 flex flex-col flex-grow">
+                      <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-2">GX35 2K</h3>
+                      <p className="text-zinc-600 leading-relaxed mb-6 flex-grow">
+                        Record every moment in 2K. Premium FineVu protection and features at a more accessible price point — the same trusted engineering.
+                      </p>
+                      <div className="flex items-center gap-3 text-zinc-900 group-hover:text-[var(--finevu-orange)] transition-colors">
+                        <span className="text-sm font-semibold uppercase tracking-widest">Explore GX35</span>
+                        <ArrowUpRight className="w-4 h-4" />
                       </div>
                     </div>
                   </div>
@@ -375,8 +364,8 @@ export default function Page() {
                 transition={{ duration: 0.6 }}
               >
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1280"
-                  alt="Car on a mountain road at sunrise"
+                  src="/products/gx4k-hero.jpg"
+                  alt="FineVu GX4K front and rear cameras"
                   className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />

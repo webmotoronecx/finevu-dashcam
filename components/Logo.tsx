@@ -1,29 +1,28 @@
 interface LogoProps {
-  /** Tailwind size/spacing classes — controls the wordmark size via font-size */
+  /** Tailwind height class — controls the wordmark size, e.g. "h-7", "h-8" */
   className?: string;
   /**
-   * "primary" — orange FINE + grey Vu (use on dark, gradient or white)
-   * "white"   — all white (use on orange or busy imagery)
+   * "primary" — official orange FINE + grey Vu wordmark (use on dark, gradient or white)
+   * "white"   — all-white wordmark (use on orange or busy imagery)
    */
   variant?: "primary" | "white";
 }
 
 /**
- * FineVu wordmark. Rendered as live text in the brand font (Inter) so it always
- * matches the site typography and recolours cleanly per background.
- * "FINE" in FineVu orange, "Vu" in FineVu grey.
+ * FineVu wordmark — official brand logo asset (public/brand/).
+ * "primary" = orange/grey master logo; "white" = reversed white logo.
  */
-export function Logo({ className = "text-2xl", variant = "primary" }: LogoProps) {
-  const fine = variant === "white" ? "text-white" : "text-[var(--finevu-orange)]";
-  const vu = variant === "white" ? "text-white" : "text-[var(--finevu-grey)]";
+export function Logo({ className = "h-7", variant = "primary" }: LogoProps) {
+  const src =
+    variant === "white" ? "/brand/finevu-logo-white.png" : "/brand/finevu-logo.png";
 
   return (
-    <span
-      className={`font-sans font-bold tracking-tight leading-none select-none ${className}`}
-      aria-label="FineVu"
-    >
-      <span className={fine}>FINE</span>
-      <span className={vu}>Vu</span>
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt="FineVu"
+      className={`${className} w-auto select-none`}
+      draggable={false}
+    />
   );
 }

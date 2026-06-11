@@ -81,7 +81,7 @@ export function Navigation() {
                 className="flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
               >
-                <Logo className="text-2xl" />
+                <Logo className="h-7 md:h-8" />
               </motion.div>
             </Link>
 

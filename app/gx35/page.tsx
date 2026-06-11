@@ -38,9 +38,9 @@ const fadeUp = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-/* Placeholder lifestyle imagery — road/driving Unsplash (no real product photos) */
-const adasImage =
-  "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920";
+/* Official FineVu GX35 product photography */
+const productHero = "/products/gx35-hero.jpg";
+const productStudio = "/products/gx35-studio.jpg";
 
 const keySpecs = [
   { icon: Camera, title: "HD 2K front camera", desc: "Sharp 2K capture of the road ahead, day and night." },
@@ -170,6 +170,18 @@ export default function GX35Page() {
             </p>
           </motion.div>
 
+          {/* Product showcase */}
+          <motion.div
+            {...fadeUp}
+            className="mb-14 overflow-hidden rounded-[2rem] bg-white ring-1 ring-zinc-200"
+          >
+            <ImageWithFallback
+              src={productHero}
+              alt="FineVu GX35 2K front and rear dash cam"
+              className="w-full aspect-[16/7] object-cover"
+            />
+          </motion.div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {keySpecs.map((spec, i) => (
               <motion.div
@@ -254,10 +266,9 @@ export default function GX35Page() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <motion.div {...fadeUp} className="relative">
               <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-zinc-200">
-                {/* Placeholder lifestyle image — driving on the road */}
                 <ImageWithFallback
-                  src={adasImage}
-                  alt="Driving along an open road"
+                  src={productStudio}
+                  alt="FineVu GX35 front and rear cameras"
                   className="aspect-[4/3] w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

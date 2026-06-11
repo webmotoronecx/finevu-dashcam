@@ -105,8 +105,7 @@ export const siteConfig: SiteConfig = {
   hero: {
     headline: "Global leader in dash cam technology.",
     sub: "What if your dash camera could make your drive safer? 4K brilliance with unrivalled safety — front & rear cameras with SONY STARVIS image sensors.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920",
+    backgroundImage: "/brand/finevu-hero.jpg",
     theme: "dark",
   },
 

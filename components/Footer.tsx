@@ -6,8 +6,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { siteConfig } from "@/config/site.config";
 
-const roadImage =
-  "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920";
+const roadImage = "/brand/finevu-hero.jpg";
 
 export function Footer() {
   const { contact } = siteConfig;
@@ -90,7 +89,7 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-16 mb-16">
             {/* Brand */}
             <div className="space-y-6 md:col-span-2">
-              <Logo className="text-2xl" />
+              <Logo className="h-8" />
               <p className="text-zinc-400 leading-relaxed text-sm max-w-xs">
                 Premium 4K &amp; 2K front and rear dash cams with SONY STARVIS image
                 sensors. {contact.origin}, trusted by drivers worldwide.

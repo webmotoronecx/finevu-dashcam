@@ -57,10 +57,9 @@ export default function Page() {
           animate={{ scale: 1 }}
           transition={{ duration: 1.5 }}
         >
-          {/* Placeholder image — road/driving Unsplash, not a product photo */}
           <ImageWithFallback
-            src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1600"
-            alt="Open road at dusk"
+            src="/brand/finevu-hero.jpg"
+            alt="FineVu — trusted by drivers on the open road"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 brand-gradient mix-blend-multiply" />

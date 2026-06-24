@@ -1,486 +1,467 @@
 "use client";
 
-import Link from "next/link";
-import { motion } from "motion/react";
-import {
-  ArrowRight,
-  Camera,
-  Cpu,
-  MapPin,
-  HardDrive,
-  ShieldCheck,
-  Moon,
-  Gauge,
-  Thermometer,
-  ParkingCircle,
-  BatteryCharging,
-  Wifi,
-  ScanEye,
-  CarFront,
-  PersonStanding,
-  Smartphone,
-  Globe,
-  Share2,
-  Package,
-  CheckCircle2,
-  Award,
-} from "lucide-react";
 import { Footer } from "@/components/Footer";
-import { ReportPreview } from "@/components/ReportPreview";
-import { TiltCard } from "@/components/TiltCard";
-import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
+import { motion } from "motion/react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
-/* Shared motion presets */
+/* ============================================================================
+   GX35 — FineVu GX35 Cloud product page (Figma node 32:1989)
+   Apple-style light scrolling page. Image blocks are solid #656565 placeholders
+   per the Figma (client to supply photography/footage).
+   ============================================================================ */
+
 const fadeUp = {
-  initial: { opacity: 0, y: 24 },
+  initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-80px" },
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-/* Official FineVu GX35 product photography */
-const productHero = "/products/gx35-hero.jpg";
-const productStudio = "/products/gx35-studio.jpg";
+const EYEBROW = "text-[#d9670f] text-xs font-semibold uppercase tracking-[0.2em]";
+const HEAD = "text-[#1a1a1f] text-3xl md:text-4xl lg:text-[2.6rem] font-bold uppercase leading-[1.05] tracking-tight";
+const BODY = "text-[#5c6478] text-base md:text-lg leading-relaxed";
 
-const keySpecs = [
-  { icon: Camera, title: "HD 2K front camera", desc: "Sharp 2K capture of the road ahead, day and night." },
-  { icon: Camera, title: "Full HD rear camera", desc: "1080p coverage watching everything behind you." },
-  { icon: Cpu, title: "SONY STARVIS sensor", desc: "Premium low-light imaging for clearer night footage." },
-  { icon: Wifi, title: "Built-in GPS & Wi-Fi", desc: "Location, speed and route data, synced to your phone." },
-  { icon: HardDrive, title: "64GB SD card included", desc: "Ready to record straight out of the box." },
-  { icon: ScanEye, title: "ADAS Plus programmed", desc: "Driver-assist alerts configured and ready to go." },
-  { icon: BatteryCharging, title: "Car battery protection", desc: "Smart voltage cut-off keeps your battery safe." },
-  { icon: Moon, title: "Auto night vision", desc: "Automatically adapts exposure for low-light driving." },
-  { icon: Gauge, title: "Speed camera alerts", desc: "Stay aware of fixed speed and red-light cameras." },
-  { icon: Thermometer, title: "Heat monitoring", desc: "Protects the cam in high-temperature conditions." },
-  { icon: ParkingCircle, title: "Park mode recording*", desc: "Guards your car while you're away from it." },
+const gradientText = {
+  backgroundImage: "linear-gradient(135deg, #1a1a1f 0%, #f68428 100%)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text" as const,
+  color: "transparent",
+};
+const statGradient = {
+  backgroundImage: "linear-gradient(120deg, #f68428 0%, #d9670f 100%)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text" as const,
+  color: "transparent",
+};
+
+function ImgBlock({
+  ratio = "aspect-[16/9]",
+  label,
+  className = "",
+}: {
+  ratio?: string;
+  label?: string;
+  className?: string;
+}) {
+  return (
+    <div className={`relative w-full overflow-hidden rounded-[22px] bg-[#656565] ${ratio} ${className}`}>
+      {label && (
+        <span className="absolute inset-0 flex items-center justify-center px-8 text-center text-sm text-white/70">
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+const opticsCols = [
+  {
+    label: "Front",
+    heading: "QHD wide",
+    specs: ["SONY STARVIS 2 IMX675", "5.1 MP sensor", "2560 × 1440 (QHD 2K)", "147.4° field of view"],
+  },
+  {
+    label: "Rear",
+    heading: "Full-HD wide",
+    specs: ["2.1 MP CMOS sensor", "1920 × 1080 (Full HD)", "143.2° field of view", "swivel mount"],
+  },
+  {
+    label: "Core",
+    heading: "Dual-core engine",
+    specs: ["Allwinner V536 dual-core", "HDR auto night vision", "supercapacitor power", "microSD up to 256 GB"],
+  },
 ];
 
-const adasFeatures = [
-  { icon: ScanEye, title: "Lane departure warning", desc: "Alerts you if you drift out of your lane unintentionally." },
-  { icon: CarFront, title: "Forward collision warning", desc: "Warns when you're closing in too fast on the car ahead." },
-  { icon: PersonStanding, title: "Pedestrian detection", desc: "Flags people detected in your forward path." },
-  { icon: Camera, title: "Blind-spot awareness", desc: "Extra eyes on the areas you can't easily see." },
+const smarterCards = [
+  {
+    eyebrow: "Built-in 5GHz Wi-Fi",
+    title: "Your footage, on your phone",
+    body: "Live view, download clips and update firmware in the FineVu app — no cables, no card removal.",
+    wide: true,
+  },
+  {
+    eyebrow: "GPS included",
+    title: "Speed & location, logged",
+    body: "External GPS in the box, plus speed-camera alerts.",
+  },
+  {
+    eyebrow: "Smart time-lapse",
+    title: "10fps idle, 30fps on event",
+    body: "Compresses long drives, full frame rate when it counts.",
+  },
+  {
+    eyebrow: "One-touch lock",
+    title: "Protect a clip instantly",
+    body: "A dedicated button saves the moment so it's never overwritten.",
+  },
+  {
+    eyebrow: "Format Free 2.0",
+    title: "No reformatting, ever",
+    body: "Extends card life and reliability.",
+  },
+  {
+    eyebrow: "Low voltage cut-off",
+    title: "Battery protection built in",
+    body: "Powers down before your car battery runs low.",
+  },
 ];
 
-const appFeatures = [
-  { icon: Smartphone, title: "View, download & share", desc: "Pull clips straight to your phone and share in a tap." },
-  { icon: ParkingCircle, title: "Parking mode control", desc: "Arm, disarm and review park-mode events remotely." },
-  { icon: Globe, title: "Full web browser access", desc: "Everything from the app, also available on the web." },
+const specRows: [string, string][] = [
+  ["Front camera", "SONY STARVIS 2 IMX675 · 5.1 MP · 2560 × 1440 (QHD 2K) · 147.4° FOV · 30fps"],
+  ["Rear camera", "2.1 MP CMOS · 1920 × 1080 (Full HD) · 143.2° FOV · swivel mount"],
+  ["Processor", "Allwinner V536 dual-core"],
+  ["Cloud", "FineVu Cloud — live view, push impact alerts, automatic event upload"],
+  ["Night vision", "HDR auto night vision (AI-controlled)"],
+  ["Recording modes", "Continuous · Impact · Emergency · Parking (motion & impact)"],
+  ["Parking mode", "Power Saving Parking — up to 98% less power, +13,950 hrs of standby watch"],
+  ["Driver assistance", "ADAS Plus — LDWS (lane departure) · FVDA (front vehicle departure)"],
+  ["Connectivity", "Built-in 5 GHz Wi-Fi · External GPS (included)"],
+  ["Power", "Supercapacitor · Low voltage cut-off · AI heat monitoring"],
+  ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
+  ["Audio", "Built-in microphone and speaker"],
+  ["Safety database", "Speed-camera alerts — updated regularly"],
 ];
 
-const boxContents = [
-  "2K front camera",
-  "Full HD rear camera",
-  "micro SD card & adapter",
-  "plug & play front cable",
-  "hardwire power rear cable",
-  "user manual",
-];
-
-const trustMarks = ["Made in Korea", "3-Year Australian Warranty^", "4 million+ sold worldwide", "SONY STARVIS sensor"];
+const bentoCard =
+  "rounded-[22px] border border-[#e6e6eb] bg-white p-6 md:p-7 shadow-[0_8px_30px_rgba(20,22,40,0.06)]";
 
 export default function GX35Page() {
   return (
-    <main className="bg-white">
+    <main className="bg-white overflow-x-hidden">
       {/* ===================================================================
           1. HERO
       =================================================================== */}
-      <section
-        data-nav-theme="dark"
-        className="brand-gradient-soft relative overflow-hidden pt-32 md:pt-40 pb-24 md:pb-32"
-      >
-        {/* Giant 2K watermark */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-end overflow-hidden">
-          <span className="text-[16rem] font-bold text-white opacity-20 leading-none -mr-8 select-none">
-            2K
-          </span>
-        </div>
-
-        <div className="relative max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div {...fadeUp} className="max-w-3xl">
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="finevu-capsule font-mono text-xs tracking-wider">
-                FRONT &amp; REAR · 2CH
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white ring-1 ring-white/20">
-                <Award className="w-3.5 h-3.5 text-[var(--finevu-orange)]" />
-                Best Value
-              </span>
-            </div>
-
-            <p className="text-white/70 text-lg font-medium mb-3">
-              Front &amp; Rear GX35 2K Dash Cam 2CH
-            </p>
-            <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
-              GX35 2K
-            </h1>
-            <p className="text-2xl md:text-3xl font-bold text-white/90 mb-8">
-              Record Every Moment in 2K.
-            </p>
-            <p className="text-lg text-white/70 max-w-xl mb-10">
-              Premium FineVu protection and smart features at a more accessible price.
-              The same trusted FineVu engineering — a smart choice for upgrading from basic HD.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/where-to-buy"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-4 font-bold text-white transition-transform hover:scale-[1.03]"
-              >
-                Where to Buy
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/booking"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-8 py-4 font-bold text-white ring-1 ring-white/25 backdrop-blur transition-colors hover:bg-white/20"
-              >
-                Book Installation
-              </Link>
-            </div>
-
-            {/* Trust row */}
-            <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3">
-              {trustMarks.map((mark) => (
-                <span key={mark} className="flex items-center gap-2 text-sm text-white/70">
-                  <CheckCircle2 className="w-4 h-4 text-[var(--finevu-orange)]" />
-                  {mark}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ===================================================================
-          2. KEY SPECS GRID
-      =================================================================== */}
-      <section data-nav-theme="light" className="bg-zinc-50 py-24 md:py-32">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div {...fadeUp} className="max-w-2xl mb-14">
-            <p className="font-mono text-xs tracking-wider text-[var(--finevu-orange)] uppercase mb-4">
-              Key specs
-            </p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black">
-              Everything you need, packed in.
-            </h2>
-            <p className="mt-4 text-lg text-[var(--finevu-grey)]">
-              The GX35 ships ready to protect — premium imaging, smart driver alerts
-              and a 64GB card in the box.
-            </p>
-          </motion.div>
-
-          {/* Product showcase */}
-          <motion.div
-            {...fadeUp}
-            className="mb-14 overflow-hidden rounded-[2rem] bg-white ring-1 ring-zinc-200"
+      <section data-nav-theme="light" className="bg-white pt-32 md:pt-40 pb-16 md:pb-20">
+        <motion.div
+          className="max-w-[1100px] mx-auto px-6 text-center"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <p className={EYEBROW}>FineVu GX35 Cloud · 2K QHD · 2-Channel</p>
+          <h1
+            className="mt-5 text-5xl sm:text-6xl md:text-7xl font-bold uppercase tracking-tight leading-[1.02]"
+            style={gradientText}
           >
-            <ImageWithFallback
-              src={productHero}
-              alt="FineVu GX35 2K front and rear dash cam"
-              className="w-full aspect-[16/7] object-cover"
-            />
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {keySpecs.map((spec, i) => (
-              <motion.div
-                key={spec.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="group h-full rounded-[2rem] bg-white p-7 ring-1 ring-zinc-200 transition-all hover:ring-[var(--finevu-orange)] hover:shadow-lg">
-                  <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--finevu-orange)]/10 text-[var(--finevu-orange)]">
-                    <spec.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-black">{spec.title}</h3>
-                  <p className="mt-2 text-sm text-[var(--finevu-grey)]">{spec.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================
-          3. WHY 2K
-      =================================================================== */}
-      <section data-nav-theme="dark" className="brand-gradient relative overflow-hidden py-24 md:py-32">
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-start overflow-hidden">
-          <span className="text-[16rem] font-bold text-white opacity-20 leading-none -ml-8 select-none">
-            2K
-          </span>
-        </div>
-
-        <div className="relative max-w-[1440px] mx-auto px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <motion.div {...fadeUp}>
-              <p className="font-mono text-xs tracking-wider text-[var(--finevu-orange)] uppercase mb-4">
-                Why 2K
-              </p>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-                Premium protection. <span className="text-[var(--finevu-orange)]">Smarter price.</span>
-              </h2>
-              <p className="mt-6 text-lg text-white/70">
-                The GX35 balances clarity, features and value — ideal for everyday drivers
-                who still want premium protection. You get sharp 2K front footage, Full HD
-                rear coverage and the full suite of FineVu smart alerts, without paying for 4K.
-              </p>
-              <p className="mt-4 text-lg text-white/70">
-                Same trusted FineVu engineering. A smarter way to step up from basic HD.
-              </p>
-            </motion.div>
-
-            <motion.div
-              {...fadeUp}
-              className="grid grid-cols-2 gap-5"
+            Eyes everywhere.
+          </h1>
+          <p className={`mt-6 mx-auto max-w-xl ${BODY}`}>
+            QHD 2K clarity in a camera smaller than a credit card — now with a live view of your car
+            from anywhere in the world.
+          </p>
+          <div className="mt-8 flex justify-center">
+            <Link
+              href="/where-to-buy"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-3.5 text-sm font-semibold uppercase tracking-wider text-white transition-transform hover:scale-[1.03]"
             >
-              {[
-                { value: "2K", label: "Front resolution" },
-                { value: "1080p", label: "Rear resolution" },
-                { value: "64GB", label: "SD card included" },
-                { value: "3-Yr", label: "Aus warranty^" },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-[2rem] bg-white/5 p-7 ring-1 ring-white/10 backdrop-blur"
-                >
-                  <p className="text-4xl md:text-5xl font-bold text-brand-gradient bg-white bg-clip-text">
-                    <span className="text-white">{stat.value}</span>
-                  </p>
-                  <p className="mt-2 text-sm text-white/60">{stat.label}</p>
-                </div>
-              ))}
-            </motion.div>
+              Find a retailer
+            </Link>
           </div>
-        </div>
+        </motion.div>
+
+        <motion.div className="mt-12 md:mt-16 max-w-[1180px] mx-auto px-6" {...fadeUp}>
+          <ImgBlock ratio="aspect-[16/9]" label="GX35 — front & rear cameras" />
+        </motion.div>
       </section>
 
       {/* ===================================================================
-          4. SAFETY / ADAS
+          2. CLOUD
       =================================================================== */}
-      <section data-nav-theme="light" className="bg-white py-24 md:py-32">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <motion.div {...fadeUp} className="relative">
-              <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-zinc-200">
-                <ImageWithFallback
-                  src={productStudio}
-                  alt="FineVu GX35 front and rear cameras"
-                  className="aspect-[4/3] w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <div className="absolute bottom-6 left-6">
-                  <span className="finevu-capsule font-mono text-xs tracking-wider">
-                    ADAS PLUS
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div {...fadeUp}>
-              <p className="font-mono text-xs tracking-wider text-[var(--finevu-orange)] uppercase mb-4">
-                Safety &amp; driver assist
-              </p>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black">
-                Smart alerts that watch your back.
-              </h2>
-              <p className="mt-4 text-lg text-[var(--finevu-grey)]">
-                The GX35 carries the same ADAS feature set as the rest of the FineVu range,
-                helping you stay aware on every drive.
-              </p>
-
-              <div className="mt-10 grid sm:grid-cols-2 gap-6">
-                {adasFeatures.map((f) => (
-                  <div key={f.title} className="flex gap-4">
-                    <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--finevu-orange)]/10 text-[var(--finevu-orange)]">
-                      <f.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-black">{f.title}</h3>
-                      <p className="mt-1 text-sm text-[var(--finevu-grey)]">{f.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <p className="mt-8 flex items-start gap-2 text-sm text-[var(--finevu-grey)]">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--finevu-orange)]" />
-                Hardwiring is required for all ADAS features to function.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================
-          5. APP
-      =================================================================== */}
-      <section data-nav-theme="dark" className="brand-gradient relative overflow-hidden py-24 md:py-32">
-        <div className="relative max-w-[1440px] mx-auto px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <motion.div {...fadeUp}>
-              <p className="font-mono text-xs tracking-wider text-[var(--finevu-orange)] uppercase mb-4">
-                FineVu app
-              </p>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-                Seamless access via the FineVu app.
-              </h2>
-              <p className="mt-4 text-lg text-white/70">
-                Connect over Wi-Fi to view, manage and share your footage — from your phone
-                or any web browser.
-              </p>
-
-              <div className="mt-10 space-y-6">
-                {appFeatures.map((f) => (
-                  <div key={f.title} className="flex gap-4">
-                    <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-[var(--finevu-orange)] ring-1 ring-white/15">
-                      <f.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white">{f.title}</h3>
-                      <p className="mt-1 text-sm text-white/60">{f.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div {...fadeUp} className="flex justify-center lg:justify-end">
-              <div className="w-full max-w-sm">
-                <ReportPreview />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================
-          6. WHAT'S IN THE BOX
-      =================================================================== */}
-      <section
-        data-nav-theme="dark"
-        className="bg-[var(--finevu-charcoal)] py-24 md:py-32"
-      >
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div {...fadeUp} className="max-w-2xl mb-14">
-            <p className="font-mono text-xs tracking-wider text-[var(--finevu-orange)] uppercase mb-4">
-              In the box
+      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div className="text-center max-w-2xl mx-auto" {...fadeUp}>
+            <p className={EYEBROW}>FineVu Cloud</p>
+            <h2 className={`mt-4 ${HEAD}`}>Your car, live, from anywhere.</h2>
+            <p className={`mt-5 ${BODY}`}>
+              Connect over Wi-Fi and the GX35 streams a live view to your phone, pushes impact alerts
+              and uploads events automatically — so you always know what&apos;s happening to your car.
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-              What&apos;s in the box.
-            </h2>
+          </motion.div>
+          <motion.div className="mt-12" {...fadeUp}>
+            <ImgBlock ratio="aspect-[16/9]" label="FineVu Cloud — live view on a phone" />
+          </motion.div>
+          <p className="mt-5 text-center text-sm text-[#9aa0ad]">
+            Cloud features require an in-car Wi-Fi connection.
+          </p>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          3. 2K QUAD HD
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-zinc-50 py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div className="text-center max-w-2xl mx-auto" {...fadeUp}>
+            <p className={EYEBROW}>2K Quad HD</p>
+            <h2 className={`mt-4 ${HEAD}`}>Small camera. Serious detail.</h2>
+            <p className={`mt-5 ${BODY}`}>
+              The front camera records 2560 × 1440 QHD at 30fps through a SONY STARVIS 2 sensor —
+              sharp number plates, clear road signs and true-to-life colour, day or night.
+            </p>
+          </motion.div>
+          <motion.div className="mt-12" {...fadeUp}>
+            <ImgBlock ratio="aspect-[16/9]" label="2K QHD footage still" />
+          </motion.div>
+          <p className="mt-5 text-center text-sm text-[#9aa0ad]">
+            Footage shown is representative. Recording quality varies with conditions.
+          </p>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          4. THE OPTICS
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div className="max-w-2xl" {...fadeUp}>
+            <p className={EYEBROW}>The optics</p>
+            <h2 className={`mt-4 ${HEAD}`}>A SONY STARVIS 2 front sensor.</h2>
+            <p className={`mt-5 ${BODY}`}>
+              The latest-generation SONY STARVIS 2 IMX675 captures more light, more detail and cleaner
+              night footage — paired with a Full HD rear camera and a dual-core processing engine.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {boxContents.map((item, i) => (
-              <motion.div
-                key={item}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="flex h-full items-center gap-4 rounded-[2rem] bg-white/5 p-6 ring-1 ring-white/10">
-                  <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--finevu-orange)]/15 text-[var(--finevu-orange)]">
-                    <Package className="h-5 w-5" />
-                  </div>
-                  <span className="font-medium text-white">{item}</span>
-                </div>
-              </motion.div>
+          <motion.div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" {...fadeUp}>
+            {opticsCols.map((col) => (
+              <div key={col.label}>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9670f]">{col.label}</p>
+                <h3 className="mt-1 text-2xl font-bold text-[#1a1a1f]">{col.heading}</h3>
+                <hr className="my-4 border-zinc-200" />
+                <ul className="space-y-2 text-sm text-[#5c6478]">
+                  {col.specs.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </div>
+          </motion.div>
 
-          <motion.div {...fadeUp} className="mt-12">
+          <motion.div className="mt-12" {...fadeUp}>
+            <ImgBlock ratio="aspect-[16/9]" label="GX35 lens & sensor detail" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          5. AUTO NIGHT VISION
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-zinc-50 py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div {...fadeUp}>
+              <p className={EYEBROW}>Auto night vision</p>
+              <h2 className={`mt-4 ${HEAD}`}>Clarity the moment the sun goes down.</h2>
+              <p className={`mt-5 ${BODY}`}>
+                A smart AI system reads the light around you and switches exposure automatically, lifting
+                detail out of the dark without blowing out headlights or street lamps.
+              </p>
+            </motion.div>
+            <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
+              <ImgBlock ratio="aspect-[4/3]" label="Night-vision footage still" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          6. DISCREET BY DESIGN
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div className="order-2 lg:order-1" {...fadeUp}>
+              <ImgBlock ratio="aspect-[4/3]" label="Compact — tiny GX35 beside a credit card for scale" />
+            </motion.div>
+            <motion.div className="order-1 lg:order-2" {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
+              <p className={EYEBROW}>Discreet by design</p>
+              <h2 className={`mt-4 ${HEAD}`}>Smaller than a credit card.</h2>
+              <p className={`mt-5 ${BODY}`}>
+                The GX35 tucks neatly behind your mirror and stays out of sight — no bulky housing, no
+                obstruction of your view, just clean, premium protection.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          7. WHILE YOU'RE AWAY — bento
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-zinc-50 py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div {...fadeUp}>
+            <p className={EYEBROW}>While you&apos;re away</p>
+            <h2 className={`mt-4 ${HEAD}`}>It never stops watching.</h2>
+          </motion.div>
+
+          <motion.div className="mt-10 grid lg:grid-cols-2 gap-5" {...fadeUp}>
+            {/* Big card */}
+            <div className={`${bentoCard} flex flex-col justify-center`}>
+              <p className={EYEBROW}>Power saving parking</p>
+              <p className="mt-3 text-4xl md:text-5xl font-extrabold" style={statGradient}>
+                +13,950 hrs
+              </p>
+              <p className="mt-3 text-lg font-semibold text-[#1a1a1f]">
+                98% less power than standard parking mode
+              </p>
+              <p className="mt-2 text-base text-[#5c6478]">
+                Keep watch for weeks without draining the car battery.
+              </p>
+            </div>
+
+            {/* Right column */}
+            <div className="grid gap-5">
+              <div className="grid sm:grid-cols-2 gap-5">
+                <div className={bentoCard}>
+                  <p className={EYEBROW}>AI heat monitoring</p>
+                  <p className="mt-3 text-lg font-semibold text-[#1a1a1f]">Smart thermal control</p>
+                  <p className="mt-2 text-sm text-[#5c6478]">
+                    Auto-switches to power-saving if it overheats, then back when it cools.
+                  </p>
+                </div>
+                <div className={bentoCard}>
+                  <p className={EYEBROW}>Absolute parking</p>
+                  <p className="mt-3 text-4xl font-extrabold" style={statGradient}>
+                    20 sec
+                  </p>
+                  <p className="mt-3 text-lg font-semibold text-[#1a1a1f]">
+                    10s before + 10s after an impact
+                  </p>
+                </div>
+              </div>
+              <div className={bentoCard}>
+                <p className={EYEBROW}>Motion surveillance</p>
+                <p className="mt-3 text-lg font-semibold text-[#1a1a1f]">
+                  A full minute of footage on any motion
+                </p>
+                <p className="mt-2 text-base text-[#5c6478]">
+                  Catch the whole event — not just the instant it began.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          8. ADAS PLUS
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div className="text-center max-w-2xl mx-auto" {...fadeUp}>
+            <p className={EYEBROW}>ADAS Plus</p>
+            <h2 className={`mt-4 ${HEAD}`}>A co-pilot that never blinks.</h2>
+            <p className={`mt-5 ${BODY}`}>
+              Built-in alerts watch the road and warn you out loud — so you stay focused on driving,
+              not on the screen.
+            </p>
+          </motion.div>
+
+          <motion.div className="mt-12" {...fadeUp}>
+            <ImgBlock ratio="aspect-[16/9]" label="ADAS — highway with glowing lane-detection lines" />
+          </motion.div>
+
+          <motion.div className="mt-10 grid sm:grid-cols-2 gap-8 max-w-4xl mx-auto" {...fadeUp}>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.15em] text-[#1a1a1f]">LDWS</p>
+              <p className="mt-2 text-sm text-[#5c6478] leading-relaxed">
+                Lane Departure Warning System — alerts you the moment you drift out of your lane without
+                indicating.
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.15em] text-[#1a1a1f]">FVDA</p>
+              <p className="mt-2 text-sm text-[#5c6478] leading-relaxed">
+                Front Vehicle Departure Alert — tells you when the car ahead has pulled away, so you&apos;re
+                never caught daydreaming in traffic.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          9. SMARTER IN EVERY WAY — bento
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-zinc-50 py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div {...fadeUp}>
+            <p className={EYEBROW}>Smarter in every way</p>
+            <h2 className={`mt-4 ${HEAD}`}>Connected. Effortless.</h2>
+          </motion.div>
+
+          <motion.div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" {...fadeUp}>
+            {smarterCards.map((c) => (
+              <div key={c.eyebrow} className={`${bentoCard} ${c.wide ? "sm:col-span-2" : ""}`}>
+                <p className={EYEBROW}>{c.eyebrow}</p>
+                <p className="mt-3 text-lg font-semibold text-[#1a1a1f]">{c.title}</p>
+                <p className="mt-2 text-sm text-[#5c6478] leading-relaxed">{c.body}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          10. SPECIFICATIONS
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+        <div className="max-w-[1180px] mx-auto px-6">
+          <motion.div {...fadeUp}>
+            <p className={EYEBROW}>The detail</p>
+            <h2 className={`mt-4 ${HEAD}`}>Specifications</h2>
+          </motion.div>
+
+          <motion.dl className="mt-10 border-t border-zinc-200" {...fadeUp}>
+            {specRows.map(([label, value]) => (
+              <div
+                key={label}
+                className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-1 sm:gap-8 border-b border-zinc-200 py-4"
+              >
+                <dt className="text-sm font-semibold text-[#1a1a1f]">{label}</dt>
+                <dd className="text-sm text-[#5c6478]">{value}</dd>
+              </div>
+            ))}
+          </motion.dl>
+          <p className="mt-6 text-xs text-[#9aa0ad]">
+            Specifications compiled from FineVu published material and may change without notice.
+          </p>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          11. CLOSING CTA
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-zinc-50 py-20 md:py-28">
+        <motion.div className="max-w-[900px] mx-auto px-6 text-center" {...fadeUp}>
+          <p className={EYEBROW}>FineVu GX35 Cloud</p>
+          <h2
+            className="mt-4 text-4xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight leading-[1.02]"
+            style={gradientText}
+          >
+            Eyes everywhere.
+          </h2>
+          <p className={`mt-5 mx-auto max-w-lg ${BODY}`}>
+            QHD 2K clarity, cloud-connected — made in Korea and backed by a 3-Year Australian Warranty.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/where-to-buy"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-3.5 font-semibold text-white transition-transform hover:scale-[1.03]"
+            >
+              Where to buy
+              <ArrowRight className="w-5 h-5" />
+            </Link>
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-7 py-3.5 font-bold text-white ring-1 ring-white/20 transition-colors hover:bg-white/20"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-zinc-300 px-8 py-3.5 font-semibold text-zinc-800 transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
             >
-              DIY or professional installation available
-              <ArrowRight className="h-5 w-5" />
+              Book installation
             </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ===================================================================
-          7. CROSS-SELL
-      =================================================================== */}
-      <section data-nav-theme="light" className="bg-zinc-50 py-24 md:py-32">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div {...fadeUp}>
-            <TiltCard className="rounded-[2rem]">
-              <div className="brand-gradient relative overflow-hidden rounded-[2rem] p-10 md:p-16">
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-end overflow-hidden">
-                  <span className="text-[16rem] font-bold text-white opacity-20 leading-none -mr-10 select-none">
-                    4K
-                  </span>
-                </div>
-                <div className="relative max-w-xl">
-                  <p className="font-mono text-xs tracking-wider text-[var(--finevu-orange)] uppercase mb-4">
-                    Step up
-                  </p>
-                  <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
-                    Want ultimate 4K clarity? Meet the GX4K.
-                  </h2>
-                  <p className="mt-4 text-lg text-white/70">
-                    If you want the sharpest footage FineVu makes, the GX4K steps up to
-                    true 4K front recording.
-                  </p>
-                  <Link
-                    href="/gx4k"
-                    className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-4 font-bold text-white transition-transform hover:scale-[1.03]"
-                  >
-                    Explore the GX4K
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </div>
-              </div>
-            </TiltCard>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ===================================================================
-          8. FINAL CTA
-      =================================================================== */}
-      <section
-        data-nav-theme="dark"
-        className="brand-gradient-soft relative overflow-hidden py-24 md:py-32"
-      >
-        <div className="relative max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-white">
-              Record every moment.
-            </h2>
-            <p className="mt-5 text-lg text-white/70">
-              Get the GX35 2K fitted and protect every drive — front and rear.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                href="/where-to-buy"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-4 font-bold text-white transition-transform hover:scale-[1.03]"
-              >
-                Where to Buy
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-              <Link
-                href="/booking"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-8 py-4 font-bold text-white ring-1 ring-white/25 backdrop-blur transition-colors hover:bg-white/20"
-              >
-                Book Installation
-              </Link>
-            </div>
-
-            {/* Footnotes */}
-            <div className="mt-14 space-y-1 text-xs text-white/50">
-              <p>* Recording triggered by motion.</p>
-              <p>^ Nationwide warranty terms, conditions and exclusions apply.</p>
-            </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
 
       <Footer />

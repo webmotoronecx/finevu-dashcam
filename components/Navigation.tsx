@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
@@ -27,29 +27,7 @@ const dropdownProducts = [
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
-  const [isDarkBackground, setIsDarkBackground] = useState(true);
   const pathname = usePathname();
-
-  // Sample the section under the navbar to theme the logo + mobile button.
-  useEffect(() => {
-    const handleScroll = () => {
-      const x = window.innerWidth / 2;
-      const y = 40;
-      const elements = document.elementsFromPoint(x, y);
-      for (const el of elements) {
-        if (el.closest("nav")) continue;
-        const section = el.closest("[data-nav-theme]");
-        if (section) {
-          setIsDarkBackground(section.getAttribute("data-nav-theme") === "dark");
-          return;
-        }
-      }
-      setIsDarkBackground(window.scrollY < 50);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Close menus on route change.
   useEffect(() => {
@@ -57,82 +35,100 @@ export function Navigation() {
     setProductsOpen(false);
   }, [pathname]);
 
-  const { nav } = siteConfig;
+  const { nav, primaryCta } = siteConfig;
   const productsItem = nav.find((n) => n.children);
   const flatLinks = nav.filter((n) => !n.children);
 
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8"
         initial={{ y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="w-full px-6 md:px-8 lg:px-16 py-5 md:py-7">
-          <div className="grid grid-cols-3 items-center">
-            {/* Logo — left */}
-            <Link href="/" aria-label="FineVu home" className="flex items-center justify-self-start">
-              <Logo
-                variant={isDarkBackground ? "white" : "primary"}
-                className="h-9 md:h-11 transition-transform duration-300 hover:scale-105"
-              />
-            </Link>
+        {/* Single floating pill — dark glass, glows purple on hover */}
+        <div
+          className="max-w-[1400px] mx-auto mt-4 md:mt-6 pl-5 md:pl-7 pr-3 md:pr-3 py-2.5 rounded-full btn-glow-purple flex items-center justify-between gap-4"
+          style={{
+            background: "rgba(10, 10, 11, 0.72)",
+            backdropFilter: "blur(40px) saturate(180%)",
+            WebkitBackdropFilter: "blur(40px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+          }}
+        >
+          {/* Logo — left (orange/grey wordmark) */}
+          <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
+            <Logo variant="primary" className="h-7 md:h-8 transition-transform duration-300 hover:scale-105" />
+          </Link>
 
-            {/* Centered floating pill — glows purple on hover */}
-            <div
-              className="hidden md:flex items-center gap-9 px-9 py-3.5 rounded-full backdrop-blur-md justify-self-center btn-glow-purple"
-              style={{ background: "rgba(0,0,0,0.95)" }}
-            >
-              {productsItem && (
-                <button
-                  onClick={() => setProductsOpen((v) => !v)}
-                  className="text-base text-white/90 hover:text-white transition-colors flex items-center gap-1.5 font-medium"
-                  aria-haspopup="true"
-                  aria-expanded={productsOpen}
-                >
-                  {productsItem.label}
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${productsOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-              )}
-
-              {flatLinks.map((link) => {
-                const active = pathname.startsWith(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`text-base font-medium transition-colors ${
-                      active ? "text-white font-semibold" : "text-white/90 hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Right — mobile menu button (keeps the pill centred on desktop) */}
-            <div className="flex md:hidden justify-self-end col-start-3">
+          {/* Center links */}
+          <div className="hidden md:flex items-center gap-8 lg:gap-9">
+            {productsItem && (
               <button
-                onClick={() => setIsMobileMenuOpen((v) => !v)}
-                className={isDarkBackground ? "text-white" : "text-zinc-900"}
-                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-                aria-expanded={isMobileMenuOpen}
+                onClick={() => setProductsOpen((v) => !v)}
+                className="text-[15px] text-white/90 hover:text-white transition-colors flex items-center gap-1.5 font-medium"
+                aria-haspopup="true"
+                aria-expanded={productsOpen}
               >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {productsItem.label}
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${productsOpen ? "rotate-180" : ""}`}
+                />
               </button>
-            </div>
+            )}
+            {flatLinks.map((link) => {
+              const active = pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-[15px] font-medium transition-colors ${
+                    active ? "text-white font-semibold" : "text-white/90 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
+
+          {/* Right — search + Find Retailer */}
+          <div className="hidden md:flex items-center gap-4 shrink-0">
+            <Link
+              href="/support"
+              aria-label="Search"
+              className="text-white/90 hover:text-white transition-colors"
+            >
+              <Search className="w-5 h-5" />
+            </Link>
+            <Link href={primaryCta.href}>
+              <motion.button
+                className="brand-gradient-soft btn-glow-purple text-white font-semibold text-xs uppercase tracking-wider px-6 py-2.5 rounded-full"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {primaryCta.label}
+              </motion.button>
+            </Link>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen((v) => !v)}
+            className="md:hidden text-white shrink-0 pr-1"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
 
         {/* Mobile menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              className="md:hidden mx-6 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden"
+              className="md:hidden max-w-[1400px] mx-auto mt-2 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -149,6 +145,11 @@ export function Navigation() {
                     {link.label}
                   </Link>
                 ))}
+                <Link href={primaryCta.href} className="block pt-2">
+                  <button className="w-full brand-gradient-soft text-white font-semibold text-xs uppercase tracking-wider px-6 py-3 rounded-full">
+                    {primaryCta.label}
+                  </button>
+                </Link>
               </div>
             </motion.div>
           )}

@@ -104,7 +104,7 @@ export const siteConfig: SiteConfig = {
       ],
     },
     { href: "/services", label: "Installation" },
-    { href: "/where-to-buy", label: "Stockists" },
+    { href: "/where-to-buy", label: "Retailers" },
     { href: "/support", label: "Support" },
   ],
 

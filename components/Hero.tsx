@@ -57,8 +57,8 @@ export function Hero() {
   const slide = slides[active];
 
   return (
-    <section className="relative w-full px-4 md:px-6 lg:px-8 pt-3 md:pt-4" data-nav-theme="dark">
-      <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.5rem] min-h-[88vh] flex items-center justify-center">
+    <section className="relative w-full px-4 md:px-8 lg:px-[5.5vw] pt-3 md:pt-4 pb-3 lg:pb-[1vw]" data-nav-theme="dark">
+      <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.5rem] min-h-[80vh] lg:min-h-[max(580px,40vw)] flex items-center justify-center">
         {/* Image placeholder — solid #656565 box per Figma. Client to supply art. */}
         <div className="absolute inset-0 bg-[#656565]" />
 

@@ -99,7 +99,7 @@ export default function Page() {
               <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
                 <Link href="/gx4k" className="block group h-full">
                   <div className="rounded-[2rem] overflow-hidden border border-zinc-200 bg-white hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                    <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
+                    <div className="relative aspect-[16/9] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
                       <ImageWithFallback
                         src="/products/gx4k-studio.jpg"
                         alt="FineVu GX4K 4K front and rear dash cam"
@@ -107,7 +107,7 @@ export default function Page() {
                       />
                       <span className="absolute top-5 left-5 finevu-capsule">4K UHD</span>
                     </div>
-                    <div className="p-8 md:p-10 flex flex-col flex-grow">
+                    <div className="p-6 md:p-8 flex flex-col flex-grow">
                       <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-3">GX4K</h3>
                       <p className="text-zinc-600 leading-relaxed mb-6 flex-grow">
                         Crystal clear 4K recording for every drive. True 4K Ultra HD captures licence plates and street signs with SONY STARVIS clarity.
@@ -125,7 +125,7 @@ export default function Page() {
               <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
                 <Link href="/gx35" className="block group h-full">
                   <div className="rounded-[2rem] overflow-hidden border border-zinc-200 bg-white hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                    <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
+                    <div className="relative aspect-[16/9] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
                       <ImageWithFallback
                         src="/products/gx35-hero.jpg"
                         alt="FineVu GX35 2K front and rear dash cam"
@@ -133,7 +133,7 @@ export default function Page() {
                       />
                       <span className="absolute top-5 left-5 px-4 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider">2K · Best Value</span>
                     </div>
-                    <div className="p-8 md:p-10 flex flex-col flex-grow">
+                    <div className="p-6 md:p-8 flex flex-col flex-grow">
                       <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-3">GX35 2K</h3>
                       <p className="text-zinc-600 leading-relaxed mb-6 flex-grow">
                         Record every moment in 2K. Premium FineVu protection and features at a more accessible price point — the same trusted engineering.

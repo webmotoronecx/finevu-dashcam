@@ -1,348 +1,476 @@
 "use client";
 
-import { Footer } from '@/components/Footer';
-import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
-import { ServiceCard } from '@/components/ServiceCard';
-import { TiltCard } from '@/components/TiltCard';
-import { motion } from 'motion/react';
-import {
-  Wrench,
-  Users,
-  CheckCircle,
-  PlugZap,
-  ShieldCheck,
-  Cable,
-  PlayCircle,
-  MapPin,
-} from 'lucide-react';
+import { Footer } from "@/components/Footer";
+import { motion } from "motion/react";
 import Link from "next/link";
+import { useState } from "react";
+import {
+  CalendarDays,
+  Cable,
+  PlugZap,
+  SlidersHorizontal,
+  Check,
+  CheckCircle2,
+  ArrowRight,
+  ArrowUpRight,
+  MapPin,
+  Info,
+} from "lucide-react";
 
-// NOTE: No real product photography available — road/driving Unsplash shots
-// and brand-gradient panels are used as placeholders throughout.
+const fadeUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.6 },
+};
 
-export default function Page() {
-  // Indicative, illustrative pricing only — confirm at booking.
-  const packages = [
-    {
-      name: "DIY Support",
-      price: "From $0",
-      duration: "Everything in the box",
-      features: [
-        "All cables and mounts included",
-        "Step-by-step support videos",
-        "Plug & play front cable",
-        "Phone and email support",
-        "Hardwire kit guidance",
-      ],
-      recommended: false,
-    },
-    {
-      name: "Professional Install",
-      price: "From $99",
-      duration: "Mobile, at your location",
-      features: [
-        "One of 80+ experienced installers",
-        "Clean, hidden wiring finish",
-        "Front + rear camera fitted",
-        "Hardwiring to unlock all ADAS features",
-        "Comes to your home or office",
-      ],
-      recommended: true,
-    },
-    {
-      name: "Fleet & Multi-vehicle",
-      price: "From $89",
-      duration: "Per vehicle, volume pricing",
-      features: [
-        "Bulk install across your fleet",
-        "Consistent setup on every vehicle",
-        "Flexible on-site scheduling",
-        "Dedicated account contact",
-        "Maximum reliability and uptime",
-      ],
-      recommended: false,
-    },
-  ];
+const whyReasons = [
+  {
+    icon: Cable,
+    title: "Clean, concealed wiring",
+    desc: "Cables routed behind trim panels for a tidy, factory-style finish — no dangling leads across the windscreen.",
+  },
+  {
+    icon: PlugZap,
+    title: "Correct connection",
+    desc: "OBD or hardwire done properly, with parking mode set up the way you want it for round-the-clock protection.",
+  },
+  {
+    icon: SlidersHorizontal,
+    title: "Set up and tested",
+    desc: "Camera angle dialled in, settings configured, and the whole system checked before you drive away.",
+  },
+];
+
+const pricing = [
+  { tier: "Hatchback / Sedan", price: "$200" },
+  { tier: "SUV / Hatchback", price: "$250" },
+  { tier: "Prestige", price: "$300" },
+];
+const priceFeatures = ["Front or front + rear install", "Concealed cable routing", "Full system test & setup"];
+
+const steps = [
+  {
+    n: "01",
+    title: "Request a time",
+    desc: "Fill in the booking form above with your name, contact details, dash cam model, vehicle info and preferred appointment time.",
+  },
+  {
+    n: "02",
+    title: "Send your details",
+    desc: "We'll review your request and follow up by phone or email to confirm availability and answer any questions.",
+  },
+  {
+    n: "03",
+    title: "Get confirmed",
+    desc: "Once confirmed, bring your dash cam, cables and memory card to our Clayton South workshop at your appointment time.",
+  },
+];
+
+const inTheInstall = [
+  "Front or front + rear dash cam installation",
+  "Neat cable routing and a tidy finish",
+  "OBD or hardwire connection (where applicable)",
+  "Camera angle adjustment and basic setup",
+];
+const bringWithYou = [
+  "FineVu dash cam main unit",
+  "Rear camera (if applicable)",
+  "All cables — power, rear camera, OBD / hardware",
+  "Memory card — FineVu or compatible microSD",
+];
+
+const inputClass =
+  "w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-[var(--finevu-orange)] focus:bg-white";
+const labelClass = "block text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5";
+
+function BookingForm() {
+  const [submitted, setSubmitted] = useState(false);
+  const [installType, setInstallType] = useState<"front" | "rear">("front");
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section
-        className="relative pt-32 md:pt-40 pb-24 flex items-center justify-center overflow-hidden brand-gradient"
-        data-nav-theme="dark"
-      >
-        <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
-          <motion.div
-            className="space-y-6 max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+    <div
+      id="book"
+      className="rounded-[1.75rem] border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.25)] scroll-mt-28"
+    >
+      <div className="flex items-center gap-2.5 mb-6">
+        <CalendarDays className="w-5 h-5 text-[var(--finevu-orange)]" />
+        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Request a Booking</h3>
+      </div>
+
+      {submitted ? (
+        <div className="flex flex-col items-center text-center py-10">
+          <CheckCircle2 className="w-12 h-12 text-[var(--finevu-orange)] mb-4" />
+          <h4 className="text-xl font-bold text-zinc-900 mb-2">Booking request sent</h4>
+          <p className="text-sm text-zinc-600 max-w-sm">
+            Thanks — we&apos;ll be in touch by email or phone to confirm your appointment.
+          </p>
+        </div>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSubmitted(true);
+          }}
+          className="space-y-4"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass} htmlFor="firstName">First Name</label>
+              <input id="firstName" name="firstName" className={inputClass} placeholder="Jane" required />
+            </div>
+            <div>
+              <label className={labelClass} htmlFor="lastName">Last Name</label>
+              <input id="lastName" name="lastName" className={inputClass} placeholder="Smith" required />
+            </div>
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="email">Email Address</label>
+            <input id="email" name="email" type="email" className={inputClass} placeholder="jane@example.com" required />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="mobile">Mobile</label>
+            <input id="mobile" name="mobile" type="tel" className={inputClass} placeholder="04xx xxx xxx" />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="model">Dash Cam Model</label>
+            <input id="model" name="model" className={inputClass} placeholder="FineVu GX4K" />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="vehicle">Vehicle Make / Model / Year</label>
+            <input id="vehicle" name="vehicle" className={inputClass} placeholder="e.g. Toyota RAV4 2023" />
+          </div>
+
+          <div>
+            <span className={labelClass}>Install Type</span>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setInstallType("front")}
+                className={`rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+                  installType === "front"
+                    ? "bg-[var(--finevu-orange)] text-white"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                }`}
+              >
+                Front Only
+              </button>
+              <button
+                type="button"
+                onClick={() => setInstallType("rear")}
+                className={`rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+                  installType === "rear"
+                    ? "bg-[var(--finevu-orange)] text-white"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                }`}
+              >
+                Front + Rear
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="datetime">Preferred Date &amp; Time</label>
+            <input id="datetime" name="datetime" type="datetime-local" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="notes">Notes</label>
+            <textarea
+              id="notes"
+              name="notes"
+              rows={3}
+              className={`${inputClass} resize-none`}
+              placeholder="Anything else we should know?"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-transform hover:scale-[1.02] electric-glow"
           >
-            <span className="inline-block font-mono text-xs uppercase tracking-[0.3em] text-[var(--finevu-orange)]">
-              Installation
-            </span>
-            <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.1]">
-              Install it your way
-            </h1>
-            <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Fit it yourself with everything in the box, or have an experienced installer
-              come to you for a clean, hidden finish.
+            Request Booking <ArrowUpRight className="w-4 h-4" />
+          </button>
+          <p className="text-center text-[11px] text-zinc-400 pt-1">
+            By appointment only · Clayton South VIC · We&apos;ll confirm by email or phone
+          </p>
+        </form>
+      )}
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <div className="min-h-screen bg-white overflow-x-hidden">
+      {/* Hero */}
+      <section className="relative w-full px-4 md:px-8 lg:px-[5.5vw] pt-3 md:pt-4 pb-3 lg:pb-[1vw]" data-nav-theme="dark">
+        <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.5rem] min-h-[600px] lg:min-h-[max(560px,38vw)] flex items-center justify-center">
+          {/* Image placeholder — solid #656565 box per Figma. Client to supply art. */}
+          <div className="absolute inset-0 bg-[#656565]" />
+          <motion.div
+            className="relative z-10 max-w-3xl mx-auto px-6 text-center pt-28 md:pt-24 pb-20"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            <p className="text-white/80 font-semibold text-xs md:text-sm tracking-[0.24em] uppercase mb-5">
+              Install Network
             </p>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.02] mb-6">
+              Professional Installation
+            </h1>
+            <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">
+              Buying your FineVu dash cam is the easy part. Having it fitted cleanly and correctly — wiring concealed,
+              parking mode configured, camera dialled in — that&apos;s what a professional install is for. Book yours
+              at our Clayton South workshop.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a href="#book" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
+                  Book Installation
+                </button>
+              </a>
+              <a href="#pricing" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
+                  View Pricing
+                </button>
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Two Paths */}
-      <section className="py-32 bg-white" data-nav-theme="light">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
-              Two ways to fit your FineVu
-            </h2>
-            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-              Both get you protected — choose the path that suits you.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            {/* DIY */}
-            <motion.div
-              className="rounded-[2rem] p-10 lg:p-12 border border-zinc-200 bg-zinc-50 space-y-8"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--finevu-light-grey)]">
-                <Wrench className="w-8 h-8 text-[var(--finevu-orange)]" />
-              </div>
-              <div>
-                <h3 className="text-3xl font-bold mb-3 tracking-tight">Do it yourself</h3>
-                <p className="text-zinc-600 leading-relaxed">
-                  Everything you need is already in the box. With clear guidance and
-                  support videos, most people are up and running in under an hour.
-                </p>
-              </div>
-              <ul className="space-y-4">
-                {[
-                  { icon: CheckCircle, text: "All cables and mounts included" },
-                  { icon: PlayCircle, text: "Clear guidance and support videos" },
-                  { icon: PlugZap, text: "Plug & play front cable" },
-                  { icon: Cable, text: "Hardwire rear cable for full coverage" },
-                ].map((item, i) => {
-                  const Icon = item.icon;
+      {/* Why book a pro install + booking form */}
+      <section className="py-16 md:py-24 bg-white" data-nav-theme="light">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            {/* Left — why */}
+            <motion.div {...fadeUp}>
+              <span className="finevu-capsule mb-5">Why Book Installation</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-8">
+                Why book a pro install?
+              </h2>
+              <div className="space-y-6">
+                {whyReasons.map((r) => {
+                  const Icon = r.icon;
                   return (
-                    <li key={i} className="flex items-start gap-3">
-                      <Icon className="w-5 h-5 text-[var(--finevu-orange)] flex-shrink-0 mt-0.5" />
-                      <span className="text-zinc-700">{item.text}</span>
-                    </li>
+                    <div key={r.title} className="flex gap-4">
+                      <div className="w-10 h-10 shrink-0 rounded-xl bg-[var(--finevu-orange)]/10 flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-[var(--finevu-orange)]" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-zinc-900 mb-1">{r.title}</h3>
+                        <p className="text-sm text-zinc-600 leading-relaxed">{r.desc}</p>
+                      </div>
+                    </div>
                   );
                 })}
-              </ul>
-              <Link href="/support">
-                <motion.button
-                  className="px-6 py-3 rounded-full border border-zinc-300 font-medium hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)] smooth-transition"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+              </div>
+
+              <div className="mt-8 rounded-2xl bg-zinc-50 border border-zinc-100 p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--finevu-orange)] mb-2">
+                  Already have your FineVu?
+                </p>
+                <p className="text-sm text-zinc-600 leading-relaxed mb-3">
+                  Great — just bring the unit, cables and memory card and we&apos;ll handle the rest.
+                </p>
+                <a
+                  href="#included"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-[var(--finevu-orange)]"
                 >
-                  See setup guides
-                </motion.button>
-              </Link>
+                  See what to bring <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
             </motion.div>
 
-            {/* Professional */}
-            <motion.div
-              className="rounded-[2rem] p-10 lg:p-12 border border-[var(--finevu-orange)] bg-white shadow-2xl space-y-8"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--finevu-orange)]">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-3xl font-bold mb-3 tracking-tight">
-                  Professional install
-                </h3>
-                <p className="text-zinc-600 leading-relaxed">
-                  Our network of 80+ experienced installers comes to your home or office.
-                  No messy wiring, maximum reliability — and it unlocks every ADAS feature.
-                </p>
-              </div>
-              <ul className="space-y-4">
-                {[
-                  { icon: MapPin, text: "Comes to your home or office" },
-                  { icon: CheckCircle, text: "Clean, hidden finish — no messy wiring" },
-                  { icon: ShieldCheck, text: "Hardwiring unlocks all ADAS features" },
-                  { icon: Users, text: "80+ experienced installers nationwide" },
-                ].map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <li key={i} className="flex items-start gap-3">
-                      <Icon className="w-5 h-5 text-[var(--finevu-orange)] flex-shrink-0 mt-0.5" />
-                      <span className="text-zinc-700">{item.text}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-              <Link href="/booking">
-                <motion.button
-                  className="px-6 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium electric-glow hover:opacity-90 smooth-transition"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Book Installation
-                </motion.button>
-              </Link>
+            {/* Right — booking form */}
+            <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
+              <BookingForm />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Install Packages */}
-      <section className="py-32 bg-zinc-50" data-nav-theme="light">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
-              Installation packages
+      {/* Pricing */}
+      <section id="pricing" className="py-16 md:py-24 bg-zinc-50 scroll-mt-24" data-nav-theme="light">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
+            <span className="finevu-capsule mb-5">Pricing</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-4">
+              Simple, per-vehicle pricing
             </h2>
-            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-              Pick the level of help you want. Prices below are indicative only — your
-              installer will confirm the exact quote at booking.
-            </p>
+            <p className="text-zinc-600 text-lg">One flat rate, everything included. No hidden charges.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            {packages.map((pkg, index) => (
-              <ServiceCard key={index} {...pkg} delay={index * 0.2} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {pricing.map((p, i) => (
+              <motion.div
+                key={p.tier}
+                className="rounded-[1.75rem] border border-zinc-200 bg-white p-8 text-center"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <h3 className="text-lg font-bold text-zinc-900">{p.tier}</h3>
+                <div className="text-5xl font-bold text-[var(--finevu-orange)] mt-4">{p.price}</div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mt-1">
+                  Per vehicle/inc. setup
+                </p>
+                <hr className="my-6 border-zinc-100" />
+                <ul className="space-y-3 text-left">
+                  {priceFeatures.map((f) => (
+                    <li key={f} className="flex items-center gap-2.5 text-sm text-zinc-600">
+                      <Check className="w-4 h-4 text-[var(--finevu-orange)] shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
             ))}
           </div>
-
-          <p className="text-center text-sm text-zinc-500 mt-12">
-            Indicative pricing only. Final cost depends on vehicle and install type.
+          <p className="text-center text-xs text-zinc-400 mt-8 max-w-3xl mx-auto px-4">
+            Pricing covers the installation service only. Dash cam hardware sold separately. OBD/hardwire components
+            may incur a small additional cost depending on vehicle.
           </p>
         </div>
       </section>
 
-      {/* Why Hardwire callout */}
-      <section className="py-24 brand-gradient text-white overflow-hidden" data-nav-theme="dark">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <span className="inline-block font-mono text-xs uppercase tracking-[0.3em] text-[var(--finevu-orange)] mb-4">
-                Why hardwire?
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight">
-                Hardwiring unlocks the full FineVu
-              </h2>
-              <p className="text-lg text-white/70 mb-8 leading-relaxed">
-                A hardwire install draws power directly from your car, so your FineVu keeps
-                working even when the engine's off. It's what enables ADAS alerts and 24/7
-                parking mode — and it gives you a tidy, hidden finish with no dangling cables.
-              </p>
-              <ul className="space-y-4 mb-10">
-                {[
-                  "Enables ADAS driver-assist alerts",
-                  "Powers 24/7 parking mode",
-                  "Clean, hidden wiring throughout",
-                  "Reliable power without the cigarette socket",
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-white/80">
-                    <ShieldCheck className="w-5 h-5 text-[var(--finevu-orange)] flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/booking">
-                <motion.button
-                  className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium hover:opacity-90 smooth-transition"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Book a hardwire install
-                </motion.button>
-              </Link>
-            </motion.div>
+      {/* Three steps */}
+      <section className="py-16 md:py-24 bg-zinc-950" data-nav-theme="dark">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
+            <span className="finevu-capsule mb-5">How to Book</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
+              Three steps to a booked install
+            </h2>
+            <p className="text-zinc-400 text-lg">Quick and straightforward — from request to confirmed appointment.</p>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 bg-[var(--finevu-orange)]/20 rounded-full blur-[100px] -z-10" />
-              <TiltCard>
-                {/* Placeholder driving image */}
-                <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                  alt="Car on a highway (placeholder)"
-                  className="w-full max-w-md mx-auto rounded-[2rem] shadow-2xl object-cover"
-                />
-              </TiltCard>
-            </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {steps.map((s, i) => (
+              <motion.div
+                key={s.n}
+                className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-8"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <div className="text-5xl font-bold text-white/10 mb-6">{s.n}</div>
+                <h3 className="text-base font-bold uppercase tracking-wider text-white mb-3">{s.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-32 bg-white" data-nav-theme="light">
-        <div className="max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
-          <motion.div
-            className="space-y-8"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Not sure which path is right for you?
+      {/* Everything in the service */}
+      <section id="included" className="py-16 md:py-24 bg-white scroll-mt-24" data-nav-theme="light">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
+            <span className="finevu-capsule mb-5">What&apos;s Included</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-4">
+              Everything in the service
             </h2>
-            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
-              Book an installer to come to you, or talk to our team and we'll point you in
-              the right direction.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <Link href="/booking">
-                <motion.button
-                  className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium electric-glow"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Book Installation
-                </motion.button>
-              </Link>
-              <Link href="/contact">
-                <motion.button
-                  className="px-8 py-3 rounded-full border border-zinc-300 font-medium hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)] smooth-transition"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Talk to us
-                </motion.button>
-              </Link>
-            </div>
+            <p className="text-zinc-600 text-lg">Here&apos;s exactly what we do — and what to bring with you.</p>
           </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 max-w-4xl mx-auto">
+            <motion.div {...fadeUp}>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 mb-5">In the install</h3>
+              <ul className="space-y-4">
+                {inTheInstall.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="w-5 h-5 mt-0.5 shrink-0 rounded-full bg-[var(--finevu-orange)] flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </span>
+                    <span className="text-sm text-zinc-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+            <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 mb-5">Bring with you</h3>
+              <ul className="space-y-4">
+                {bringWithYou.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="w-5 h-5 mt-0.5 shrink-0 rounded-full bg-zinc-200 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-zinc-600" />
+                    </span>
+                    <span className="text-sm text-zinc-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+
+          <div className="mt-10 max-w-4xl mx-auto rounded-r-xl border-l-4 border-[var(--finevu-orange)] bg-zinc-50 p-5">
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              <span className="font-bold text-zinc-900">Note:</span> The installation service covers fitting only —
+              hardware is not supplied as part of this service. Please bring all items listed above to your
+              appointment. If you&apos;re unsure what cables came with your unit, check the FineVu box contents or{" "}
+              <Link href="/contact" className="text-[var(--finevu-orange)] underline">
+                contact us before booking
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Workshop location */}
+      <section className="py-16 md:py-24 bg-zinc-50" data-nav-theme="light">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            <motion.div {...fadeUp}>
+              <span className="finevu-capsule mb-5">Where to Find Us</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-6">
+                Workshop location
+              </h2>
+              <p className="font-bold text-zinc-900">FineVu Dashcam Australia</p>
+              <p className="text-zinc-600">Unit 28 / 266 Osborne Ave</p>
+              <p className="text-zinc-600 mb-6">Clayton South VIC 3169</p>
+              <div className="flex flex-wrap gap-3 mb-8">
+                {["Victoria only", "By appointment", "(03) 9099 0983"].map((b) => (
+                  <span
+                    key={b}
+                    className="rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-zinc-700"
+                  >
+                    {b}
+                  </span>
+                ))}
+              </div>
+              <a href="#book">
+                <button className="px-8 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
+                  Request Booking
+                </button>
+              </a>
+            </motion.div>
+
+            <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
+              {/* Map placeholder — solid #656565 box per Figma. Client to supply map embed. */}
+              <div className="relative aspect-[16/11] rounded-2xl overflow-hidden bg-[#656565] flex items-center justify-center">
+                <MapPin className="w-10 h-10 text-white/80" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+                {[
+                  { t: "Independent installers", d: "Work is carried out by our team at the Clayton South workshop." },
+                  { t: "Direct confirmation", d: "We'll call or email to confirm your appointment time." },
+                  { t: "Outside Victoria?", d: "Currently workshop-only. Contact us to discuss options." },
+                ].map((c) => (
+                  <div key={c.t}>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Info className="w-3.5 h-3.5 text-[var(--finevu-orange)]" />
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{c.t}</p>
+                    </div>
+                    <p className="text-xs text-zinc-600 leading-relaxed">{c.d}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 

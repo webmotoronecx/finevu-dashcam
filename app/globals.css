@@ -108,14 +108,53 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html {
   font-size: var(--font-size);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  /* Cross-browser text rendering + guard against horizontal overflow on mobile */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Media never forces horizontal overflow (Safari/iOS safety) */
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+/* Safari needs the -webkit- prefix to honour custom-styled text inputs.
+   Scoped to text-like fields so shadcn checkbox/radio/select are untouched. */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+input[type="number"],
+input[type="datetime-local"],
+input[type="date"],
+input:not([type]),
+textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 code, kbd, samp, pre {

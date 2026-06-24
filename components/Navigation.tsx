@@ -89,9 +89,9 @@ export function Navigation() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {/* Single floating glass pill — glows purple on hover */}
+        {/* Floating glass pill — compact, content-width, centred. Glows on hover. */}
         <div
-          className="max-w-[1400px] mx-auto mt-4 md:mt-6 pl-5 md:pl-7 pr-3 py-2.5 rounded-full btn-glow-purple flex items-center justify-between gap-4"
+          className="w-full md:w-fit mx-auto mt-4 md:mt-6 pl-5 md:pl-8 pr-3 py-2.5 rounded-full btn-glow-purple flex items-center justify-between md:justify-start gap-5 md:gap-10 lg:gap-12"
           style={pillStyle}
         >
           {/* Logo — left (orange/grey wordmark) */}
@@ -100,7 +100,7 @@ export function Navigation() {
           </Link>
 
           {/* Center links */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-9">
+          <div className="hidden md:flex items-center gap-7 lg:gap-8">
             {productsItem && (
               <button
                 onClick={() => setProductsOpen((v) => !v)}

@@ -1,10 +1,13 @@
 "use client";
 
 import { Footer } from '@/components/Footer';
+import { BrandMarquee } from '@/components/BrandMarquee';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 import {
   ShieldCheck, Users, Award, ChevronRight, ArrowUpRight, ArrowRight,
-  Wifi, MapPin, Moon, Radio, Cpu, Zap, CheckCircle
+  Wifi, MapPin, Moon, Radio, Cpu, CheckCircle, TrendingUp,
+  BadgeCheck, CalendarClock, ScanEye, ParkingSquare, Thermometer,
+  Gauge, Camera, Wrench
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from "next/link";
@@ -16,8 +19,21 @@ import { Hero } from '@/components/Hero';
 import { ReportPreview } from '@/components/ReportPreview';
 import { ReviewCard } from '@/components/ReviewCard';
 
-// NOTE: product/lifestyle imagery uses Unsplash placeholders — swap for official
-// FineVu product photography (brand guidelines pp. 17–18) when available.
+const fadeUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+};
+
+// "The No.1 dash cam brand in Korea." — proven-performance cards.
+const provenStats = [
+  { icon: TrendingUp, title: "No.1 Market Share", desc: "The most-trusted dash cam brand in its home market of Korea." },
+  { icon: BadgeCheck, title: "<0.2% Field Defect Rate", desc: "Built to an exacting standard — reliability the numbers prove." },
+  { icon: ShieldCheck, title: "3 Years Warranty", desc: "Backed locally in Australia, with support you can actually call." },
+  { icon: CalendarClock, title: "15+ Years", desc: "Engineering automotive-IT since 2009 under FINEDIGITAL." },
+];
+
+// "Not just a dash cam. A safety system." — safety cards.
 const safetyFeatures = [
   { icon: Cpu, title: "ADAS Plus", desc: "Lane departure, forward collision, pedestrian and blind-spot warnings — your safety co-pilot on every drive." },
   { icon: Radio, title: "24/7 Parking Mode", desc: "Smart Sense parking surveillance records impacts and motion automatically, even when you're away." },
@@ -25,6 +41,18 @@ const safetyFeatures = [
   { icon: MapPin, title: "Built-in GPS & Wi-Fi", desc: "Tag every clip with location and speed, then view, save and share over Wi-Fi via the FineVu app." },
 ];
 
+// "A co-pilot that never blinks." — intelligence cards.
+const intelligenceCards = [
+  { icon: ScanEye, title: "AI Damage Detection 2.0", desc: "Instantly flags collision events with AI precision." },
+  { icon: ParkingSquare, title: "Power-Saving Parking", desc: "98% less power draw while your car sits idle." },
+  { icon: Thermometer, title: "AI Heat Monitoring", desc: "Protects footage and hardware in extreme temps." },
+  { icon: Gauge, title: "ADAS Plus", desc: "Lane departure, forward collision and distance warnings." },
+  { icon: Camera, title: "Speed Camera Alert", desc: "Real-time alerts with built-in GPS mapping." },
+  { icon: Wifi, title: "Built-in GPS & Wi-Fi", desc: "Connect to the FineVu app for instant clip access." },
+];
+
+// NOTE: lifestyle/guide imagery uses Unsplash placeholders — swap for official
+// FineVu photography when available.
 const educationCards = [
   {
     slug: "4k-vs-2k-dash-cam",
@@ -51,41 +79,27 @@ export default function Page() {
     <div className="min-h-screen bg-white">
       <ScrollProgress />
       <Hero />
+      <BrandMarquee />
 
-      {/* Content wrapper — scrolls over hero */}
+      {/* Content wrapper */}
       <div className="relative z-10 bg-white">
 
-        {/* Choose your FineVu — product range */}
+        {/* Featured products */}
         <section className="py-24 bg-zinc-50" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
-            <motion.div
-              className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <div>
-                <span className="finevu-capsule mb-4">FRONT &amp; REAR · 2CH</span>
-                <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight mb-2">
-                  Choose your FineVu.
-                </h2>
-                <p className="text-zinc-600 text-lg max-w-xl">
-                  A simple, focused range — no fluff, no confusion. Ultimate 4K clarity or dependable 2K value.
-                </p>
-              </div>
+            <motion.div className="text-center mb-14" {...fadeUp}>
+              <span className="finevu-capsule mb-5">FRONT &amp; REAR · 2CH</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight">
+                Featured Products
+              </h2>
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* GX4K */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-              >
+              <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
                 <Link href="/gx4k" className="block group h-full">
                   <div className="rounded-[2rem] overflow-hidden border border-zinc-200 bg-white hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                    <div className="relative aspect-[4/3] bg-zinc-100 overflow-hidden">
+                    <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
                       <ImageWithFallback
                         src="/products/gx4k-studio.jpg"
                         alt="FineVu GX4K 4K front and rear dash cam"
@@ -94,11 +108,11 @@ export default function Page() {
                       <span className="absolute top-5 left-5 finevu-capsule">4K UHD</span>
                     </div>
                     <div className="p-8 md:p-10 flex flex-col flex-grow">
-                      <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-2">GX4K</h3>
+                      <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-3">GX4K</h3>
                       <p className="text-zinc-600 leading-relaxed mb-6 flex-grow">
                         Crystal clear 4K recording for every drive. True 4K Ultra HD captures licence plates and street signs with SONY STARVIS clarity.
                       </p>
-                      <div className="flex items-center gap-3 text-zinc-900 group-hover:text-[var(--finevu-orange)] transition-colors">
+                      <div className="flex items-center gap-2 text-[var(--finevu-orange)] group-hover:gap-3 transition-all">
                         <span className="text-sm font-semibold uppercase tracking-widest">Explore GX4K</span>
                         <ArrowUpRight className="w-4 h-4" />
                       </div>
@@ -108,15 +122,10 @@ export default function Page() {
               </motion.div>
 
               {/* GX35 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-              >
+              <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
                 <Link href="/gx35" className="block group h-full">
                   <div className="rounded-[2rem] overflow-hidden border border-zinc-200 bg-white hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                    <div className="relative aspect-[4/3] bg-zinc-100 overflow-hidden">
+                    <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
                       <ImageWithFallback
                         src="/products/gx35-hero.jpg"
                         alt="FineVu GX35 2K front and rear dash cam"
@@ -125,11 +134,11 @@ export default function Page() {
                       <span className="absolute top-5 left-5 px-4 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider">2K · Best Value</span>
                     </div>
                     <div className="p-8 md:p-10 flex flex-col flex-grow">
-                      <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-2">GX35 2K</h3>
+                      <h3 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-3">GX35 2K</h3>
                       <p className="text-zinc-600 leading-relaxed mb-6 flex-grow">
                         Record every moment in 2K. Premium FineVu protection and features at a more accessible price point — the same trusted engineering.
                       </p>
-                      <div className="flex items-center gap-3 text-zinc-900 group-hover:text-[var(--finevu-orange)] transition-colors">
+                      <div className="flex items-center gap-2 text-[var(--finevu-orange)] group-hover:gap-3 transition-all">
                         <span className="text-sm font-semibold uppercase tracking-widest">Explore GX35</span>
                         <ArrowUpRight className="w-4 h-4" />
                       </div>
@@ -141,46 +150,117 @@ export default function Page() {
           </div>
         </section>
 
+        {/* The No.1 dash cam brand in Korea */}
+        <section className="py-24 bg-zinc-100" data-nav-theme="light">
+          <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+            <motion.div className="text-center max-w-3xl mx-auto mb-14" {...fadeUp}>
+              <span className="finevu-capsule mb-5">Proven Performance</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight mb-5">
+                The No.1 dash cam brand in Korea.
+              </h2>
+              <p className="text-zinc-600 text-lg leading-relaxed">
+                Built by FINEDIGITAL, an automotive-IT specialist since 2009, held to a standard the numbers prove.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {provenStats.map((f, i) => {
+                const Icon = f.icon;
+                return (
+                  <motion.div
+                    key={i}
+                    className="rounded-[1.75rem] bg-white border border-zinc-200 p-8 hover:shadow-xl transition-all duration-500"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                  >
+                    <div className="w-11 h-11 rounded-xl bg-[var(--finevu-orange)]/10 flex items-center justify-center mb-6">
+                      <Icon className="w-5 h-5 text-[var(--finevu-orange)]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-zinc-900 mb-2">{f.title}</h3>
+                    <p className="text-zinc-600 text-sm leading-relaxed">{f.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         {/* Not just a dash cam. A safety system. */}
         <section className="py-24 bg-white" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-            <motion.div
-              className="max-w-3xl mb-16"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
+            <motion.div className="text-center max-w-2xl mx-auto mb-16" {...fadeUp} transition={{ duration: 0.8 }}>
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-6">
-                Not just a dash cam.<br />A safety system.
+                Not just a dash cam. A safety system.
               </h2>
               <p className="text-lg text-zinc-600 leading-relaxed">
                 FineVu turns your dash cam into a smart co-pilot — alerting you to dangers on the road and watching over your vehicle when you&apos;re away.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {safetyFeatures.map((f, i) => {
                 const Icon = f.icon;
                 return (
                   <motion.div
                     key={i}
-                    className="rounded-[2rem] border border-zinc-200 p-8 hover:border-[var(--finevu-orange)]/40 hover:shadow-xl transition-all duration-500 bg-white h-full"
+                    className="rounded-[1.75rem] border border-zinc-200 p-8 hover:border-[var(--finevu-orange)]/40 hover:shadow-xl transition-all duration-500 bg-white h-full"
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[var(--finevu-orange)]/10 flex items-center justify-center mb-6">
-                      <Icon className="w-6 h-6 text-[var(--finevu-orange)]" />
+                    <div className="w-11 h-11 rounded-xl bg-[var(--finevu-orange)]/10 flex items-center justify-center mb-6">
+                      <Icon className="w-5 h-5 text-[var(--finevu-orange)]" />
                     </div>
-                    <h3 className="text-xl font-bold text-zinc-900 mb-3">{f.title}</h3>
+                    <h3 className="text-lg font-bold text-zinc-900 mb-2">{f.title}</h3>
                     <p className="text-zinc-600 text-sm leading-relaxed">{f.desc}</p>
                   </motion.div>
                 );
               })}
             </div>
-            <p className="text-xs text-zinc-400 mt-6">The FineVu camera must be hard-wired to experience all ADAS features.</p>
+            <p className="text-xs text-zinc-400 mt-8 text-center">The FineVu camera must be hard-wired to experience all ADAS features.</p>
+          </div>
+        </section>
+
+        {/* Installation — we'll come to you */}
+        <section className="py-24 bg-black" data-nav-theme="dark">
+          <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+            <motion.div className="text-center max-w-2xl mx-auto mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
+              <span className="finevu-capsule mb-5">Installation</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">
+                We&apos;ll come to you
+              </h2>
+              <p className="text-lg text-white/70 leading-relaxed">
+                Book a FineVu mobile installer to fit your dash cam at home or work — fully hardwired, fully tested, fully covered.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="relative rounded-[2.5rem] overflow-hidden aspect-[16/7] max-w-5xl mx-auto border border-white/10"
+              {...fadeUp}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <ImageWithFallback
+                src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1600"
+                alt="FineVu mobile installer fitting a dash cam"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </motion.div>
+
+            <motion.div className="flex justify-center mt-10" {...fadeUp} transition={{ duration: 0.8, delay: 0.3 }}>
+              <Link href="/booking">
+                <motion.button
+                  className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider smooth-transition hover:shadow-[0_0_30px_var(--electric-glow)]"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Book Installation
+                </motion.button>
+              </Link>
+            </motion.div>
           </div>
         </section>
 
@@ -231,7 +311,7 @@ export default function Page() {
                   })}
                 </div>
                 <Link href="/how-it-works">
-                  <button className="px-8 py-3 rounded-full bg-white text-zinc-900 hover:scale-105 transition-transform font-semibold">
+                  <button className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white hover:scale-105 transition-transform font-semibold text-sm uppercase tracking-wider">
                     See how it works
                   </button>
                 </Link>
@@ -240,44 +320,91 @@ export default function Page() {
           </div>
         </section>
 
-        {/* Reviews + stats */}
-        <section className="relative py-32 bg-black overflow-hidden" data-nav-theme="dark">
+        {/* A co-pilot that never blinks — intelligence */}
+        <section className="py-24 bg-white" data-nav-theme="light">
+          <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+            <motion.div className="text-center max-w-2xl mx-auto mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
+              <span className="finevu-capsule mb-5">Intelligence built in</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight mb-5">
+                A co-pilot that never blinks.
+              </h2>
+              <p className="text-lg text-zinc-600 leading-relaxed">
+                Advanced sensors and smart software work together to protect you on the road and your vehicle while it&apos;s parked.
+              </p>
+            </motion.div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-16">
+              {[
+                { end: 98, suffix: "%", label: "Less power in parking mode", accent: true },
+                { end: 743, suffix: "", label: "Minutes of smart time-lapse" },
+                { end: 20, suffix: " s", label: "Captured around every impact" },
+                { end: 1.9, suffix: " s", decimals: 1, label: "From power-on to recording" },
+              ].map((s, i) => (
+                <div key={i} className="text-center">
+                  <div className={`text-4xl md:text-5xl font-bold mb-2 ${s.accent ? "text-[var(--finevu-orange)]" : "text-zinc-900"}`}>
+                    <AnimatedCounter end={s.end} duration={2} suffix={s.suffix} decimals={s.decimals ?? 0} />
+                  </div>
+                  <p className="text-zinc-500 text-xs md:text-sm leading-snug">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Cards */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {intelligenceCards.map((c, i) => {
+                const Icon = c.icon;
+                return (
+                  <motion.div
+                    key={i}
+                    className="rounded-[1.75rem] border border-zinc-200 p-8 hover:shadow-xl hover:border-[var(--finevu-orange)]/40 transition-all duration-500 bg-white"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
+                  >
+                    <div className="w-11 h-11 rounded-xl bg-[var(--finevu-orange)]/10 flex items-center justify-center mb-6">
+                      <Icon className="w-5 h-5 text-[var(--finevu-orange)]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-zinc-900 mb-2">{c.title}</h3>
+                    <p className="text-zinc-600 text-sm leading-relaxed">{c.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Trusted by drivers worldwide */}
+        <section className="relative py-28 bg-black overflow-hidden" data-nav-theme="dark">
           <ParticleBackground />
           <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16">
-            <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+            <motion.div className="text-center mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
                 Trusted by drivers worldwide
               </h2>
               <p className="text-lg text-zinc-400">Over 4 million dash cams sold globally.</p>
             </motion.div>
 
             <motion.div
-              className="grid grid-cols-3 gap-8 mb-20 max-w-4xl mx-auto"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              className="grid grid-cols-3 gap-8 mb-20 max-w-3xl mx-auto"
+              {...fadeUp}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <div className="text-center">
-                <div className="text-4xl md:text-6xl font-bold text-white mb-2 font-mono">
+                <div className="text-4xl md:text-6xl font-bold text-[var(--finevu-orange)] mb-2">
                   <AnimatedCounter end={4} duration={2} suffix="M+" />
                 </div>
                 <p className="text-zinc-400 font-mono text-xs md:text-sm uppercase tracking-wider">Sold worldwide</p>
               </div>
               <div className="text-center">
-                <div className="text-4xl md:text-6xl font-bold text-white mb-2 font-mono">
+                <div className="text-4xl md:text-6xl font-bold text-[var(--finevu-orange)] mb-2">
                   <AnimatedCounter end={3} duration={2} suffix="yr" />
                 </div>
                 <p className="text-zinc-400 text-xs md:text-sm font-mono uppercase tracking-wider">AU warranty</p>
               </div>
               <div className="text-center">
-                <div className="text-4xl md:text-6xl font-bold text-white mb-2 font-mono">
+                <div className="text-4xl md:text-6xl font-bold text-[var(--finevu-orange)] mb-2">
                   <AnimatedCounter end={4.8} duration={2} decimals={1} />
                 </div>
                 <p className="text-zinc-400 font-mono text-xs md:text-sm uppercase tracking-wider">Avg. rating</p>
@@ -337,27 +464,23 @@ export default function Page() {
           </div>
         </section>
 
-        {/* Why FineVu — bento */}
-        <section className="py-32 bg-zinc-950" data-nav-theme="dark">
+        {/* Built in Korea. Backed in Australia. */}
+        <section className="py-28 bg-zinc-950" data-nav-theme="dark">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-            <motion.div
-              className="text-center mb-16 max-w-3xl mx-auto"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-white">
-                World-leading premium dash cams.
+            <motion.div className="text-center mb-14 max-w-3xl mx-auto" {...fadeUp} transition={{ duration: 0.8 }}>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight">
+                <span className="text-white">Built in Korea.</span><br />
+                <span className="text-[var(--finevu-orange)]">Backed in Australia.</span>
               </h2>
               <p className="text-lg text-zinc-400 leading-relaxed">
                 Engineered in Korea, trusted by drivers worldwide, and backed by local Australian support.
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Big footage card */}
               <motion.div
-                className="md:col-span-2 relative overflow-hidden rounded-[2rem] group min-h-[360px] border border-white/5"
+                className="lg:col-span-2 relative overflow-hidden rounded-[2rem] group min-h-[420px] border border-white/5"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -365,86 +488,97 @@ export default function Page() {
               >
                 <ImageWithFallback
                   src="/products/gx4k-hero.jpg"
-                  alt="FineVu GX4K front and rear cameras"
+                  alt="FineVu low-light footage clarity"
                   className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-10">
-                  <span className="finevu-capsule mb-3">SONY STARVIS</span>
-                  <h3 className="text-3xl font-bold text-white mb-2">Image quality first</h3>
-                  <p className="text-zinc-300 max-w-md">Outstanding clarity in low light, so your footage stays sharp day and night.</p>
+                  <span className="finevu-capsule mb-4">SONY STARVIS</span>
+                  <h3 className="text-3xl font-bold text-white mb-3">Footage that holds up after dark</h3>
+                  <p className="text-zinc-300 max-w-lg mb-6">
+                    The STARVIS sensor pulls detail out of low light, so number plates and signs stay readable at night.
+                  </p>
+                  <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-zinc-400">
+                    <span><span className="text-white">4K</span> front</span>
+                    <span><span className="text-white">Sony STARVIS</span> sensor</span>
+                    <span><span className="text-white">139°</span> field of view</span>
+                    <span><span className="text-white">Front + rear</span> channels</span>
+                  </div>
                 </div>
               </motion.div>
 
-              <motion.div
-                className="rounded-[2rem] p-8 flex flex-col justify-center bg-[var(--finevu-charcoal)] border border-white/5 min-h-[360px]"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
-                <Zap className="w-10 h-10 text-[var(--finevu-orange)] mb-6" />
-                <h3 className="text-2xl font-bold text-white mb-3">DIY or pro install</h3>
-                <p className="text-zinc-400 text-sm leading-relaxed mb-6">Set it up yourself with everything in the box, or have one of 80+ mobile installers come to your home or office.</p>
-                <Link href="/services" className="flex items-center gap-2 text-[var(--finevu-orange)] text-sm font-semibold uppercase tracking-widest">
-                  Installation <ChevronRight className="w-4 h-4" />
-                </Link>
-              </motion.div>
-
-              {[
-                { icon: ShieldCheck, t: "3-Year AU warranty", d: "Local support, long-term confidence." },
-                { icon: MapPin, t: "Built-in GPS & Wi-Fi", d: "Smarter, more useful recordings." },
-                { icon: CheckCircle, t: "Pre-installed SD card", d: "Ready straight out of the box." },
-              ].map((c, i) => {
-                const Icon = c.icon;
-                return (
-                  <motion.div
-                    key={i}
-                    className="rounded-[2rem] p-8 bg-zinc-900/60 border border-white/5 flex flex-col justify-center min-h-[200px]"
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.15 + i * 0.1 }}
-                  >
-                    <Icon className="w-9 h-9 text-white mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-1">{c.t}</h3>
-                    <p className="text-zinc-500 text-sm">{c.d}</p>
-                  </motion.div>
-                );
-              })}
+              {/* Side cards */}
+              <div className="flex flex-col gap-6">
+                {[
+                  { icon: ShieldCheck, t: "3-year AU warranty", d: "Covered locally, with support you can actually call." },
+                  { icon: MapPin, t: "Built-in GPS & Wi-Fi", d: "Tag every trip with speed and location, then review on your phone." },
+                  { icon: CheckCircle, t: "SD card included", d: "Pre-installed and formatted — it records from the first drive." },
+                ].map((c, i) => {
+                  const Icon = c.icon;
+                  return (
+                    <motion.div
+                      key={i}
+                      className="rounded-[2rem] p-7 bg-[var(--finevu-charcoal)] border border-white/5 flex-1 flex flex-col justify-center"
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: 0.15 + i * 0.1 }}
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-[var(--finevu-orange)]/15 flex items-center justify-center mb-4">
+                        <Icon className="w-5 h-5 text-[var(--finevu-orange)]" />
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-1">{c.t}</h3>
+                      <p className="text-zinc-400 text-sm leading-relaxed">{c.d}</p>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </section>
 
-        {/* Learn preview */}
-        <section className="py-32 bg-zinc-50 border-t border-zinc-200" data-nav-theme="light">
-          <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+            {/* DIY or pro install banner */}
             <motion.div
-              className="mb-16 flex justify-between items-end"
+              className="mt-6 rounded-[2rem] bg-[var(--finevu-orange)] p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.6 }}
             >
-              <div>
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-zinc-900">
-                  Dash cam guides
-                </h2>
-                <p className="text-lg text-zinc-600 max-w-2xl">
-                  Everything you need to choose, install and get the most from your FineVu.
-                </p>
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                  <Wrench className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1">DIY or pro install</h3>
+                  <p className="text-white/85 text-sm max-w-xl leading-relaxed">
+                    Everything you need is in the box. Prefer a hand? Book one of 80+ mobile installers to fit it at home or work.
+                  </p>
+                </div>
               </div>
-              <Link href="/learn">
+              <Link href="/services" className="shrink-0">
                 <motion.button
-                  className="hidden md:block px-6 py-3 rounded-full border border-zinc-300 text-zinc-900 hover:bg-black hover:text-white transition-colors font-medium"
+                  className="px-7 py-3 rounded-full bg-zinc-900 text-white font-semibold text-sm flex items-center gap-2 hover:bg-black transition-colors"
                   whileHover={{ scale: 1.05 }}
                 >
-                  View all guides
+                  See installation options <ChevronRight className="w-4 h-4" />
                 </motion.button>
               </Link>
             </motion.div>
+          </div>
+        </section>
 
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+        {/* Dash cam guides */}
+        <section className="py-28 bg-white border-t border-zinc-100" data-nav-theme="light">
+          <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+            <motion.div className="text-center max-w-2xl mx-auto mb-16" {...fadeUp} transition={{ duration: 0.8 }}>
+              <h2 className="text-3xl md:text-5xl font-bold mb-5 tracking-tight text-zinc-900">
+                Dash cam guides
+              </h2>
+              <p className="text-lg text-zinc-600">
+                Everything you need to choose, install and get the most from your FineVu.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
               {educationCards.map((card, i) => (
                 <motion.div
                   key={i}
@@ -461,7 +595,7 @@ export default function Page() {
                           <ImageWithFallback src={card.image} alt={card.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                         </div>
                         <div className="space-y-4 flex flex-col flex-grow">
-                          <h3 className="text-2xl font-bold text-zinc-900 group-hover:text-[var(--finevu-orange)] smooth-transition leading-tight">{card.title}</h3>
+                          <h3 className="text-xl font-bold text-zinc-900 group-hover:text-[var(--finevu-orange)] smooth-transition leading-tight">{card.title}</h3>
                           <p className="text-zinc-600 leading-relaxed text-sm flex-grow">{card.description}</p>
                           <div className="flex items-center gap-2 text-[var(--finevu-orange)] pt-4 border-t border-zinc-100 mt-auto">
                             <span className="text-xs font-mono uppercase tracking-widest">Read guide</span>
@@ -473,6 +607,17 @@ export default function Page() {
                   </Link>
                 </motion.div>
               ))}
+            </div>
+
+            <div className="flex justify-center mt-12">
+              <Link href="/learn">
+                <motion.button
+                  className="px-7 py-3 rounded-full border border-zinc-300 text-zinc-900 hover:bg-black hover:text-white transition-colors font-medium text-sm uppercase tracking-wider"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  View all guides
+                </motion.button>
+              </Link>
             </div>
           </div>
         </section>

@@ -55,7 +55,7 @@ export function Footer() {
             {contact.origin}. Backed by a {contact.warranty.toLowerCase()}.
           </motion.p>
           <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            className="flex justify-center items-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -63,20 +63,11 @@ export function Footer() {
           >
             <Link href="/where-to-buy">
               <motion.button
-                className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow font-semibold"
+                className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow font-semibold text-sm uppercase tracking-wider"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Where to Buy
-              </motion.button>
-            </Link>
-            <Link href="/gx4k">
-              <motion.button
-                className="px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 smooth-transition font-medium hover:bg-white/20"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Explore the Range
+                Find Retailer
               </motion.button>
             </Link>
           </motion.div>

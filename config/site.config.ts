@@ -15,6 +15,8 @@
 export type NavLink = {
   href: string;
   label: string;
+  /** Optional dropdown children (e.g. the Products menu) */
+  children?: NavLink[];
 };
 
 export type BrandLogo = {
@@ -93,13 +95,20 @@ export const siteConfig: SiteConfig = {
   },
 
   nav: [
-    { href: "/gx4k", label: "GX4K" },
-    { href: "/gx35", label: "GX35 2K" },
-    { href: "/about", label: "About" },
-    { href: "/faq", label: "FAQs" },
+    {
+      href: "/gx4k",
+      label: "Products",
+      children: [
+        { href: "/gx4k", label: "GX4K — 4K 2CH" },
+        { href: "/gx35", label: "GX35 — 2K 2CH" },
+      ],
+    },
+    { href: "/services", label: "Installation" },
+    { href: "/where-to-buy", label: "Retailers" },
+    { href: "/support", label: "Support" },
   ],
 
-  primaryCta: { href: "/where-to-buy", label: "Where to Buy" },
+  primaryCta: { href: "/where-to-buy", label: "Find Retailer" },
   secondaryCta: { href: "/gx4k", label: "Explore the Range" },
 
   hero: {

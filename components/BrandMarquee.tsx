@@ -3,64 +3,36 @@
 import { motion } from "motion/react";
 import { siteConfig } from "@/config/site.config";
 
+/**
+ * Orange full-bleed proof-point strip shown directly beneath the hero.
+ * Single line, scrolling, brand-orange background per the FineVu homepage design.
+ */
 export function BrandMarquee() {
-  const { eyebrow, brands } = siteConfig.brandMarquee;
-  // Triple for seamless infinite scroll
-  const duplicatedBrands = [...brands, ...brands, ...brands];
+  const { brands } = siteConfig.brandMarquee;
+  // Triple for a seamless infinite scroll.
+  const items = [...brands, ...brands, ...brands];
 
   return (
-    <div className="relative w-full py-8 md:py-12">
-      <div className="text-center mb-6 md:mb-10 px-8">
-        <p className="text-[9px] md:text-[10px] text-white/25 tracking-[0.25em] uppercase font-mono font-extralight">
-          {eyebrow}
-        </p>
-      </div>
-
-      <div
-        className="relative w-full overflow-hidden"
-        style={{
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent 0%, transparent 10%, black 25%, black 75%, transparent 90%, transparent 100%)",
-          maskImage:
-            "linear-gradient(to right, transparent 0%, transparent 10%, black 25%, black 75%, transparent 90%, transparent 100%)",
+    <div
+      className="relative w-full overflow-hidden bg-[var(--finevu-orange)] py-3.5"
+      data-nav-theme="light"
+    >
+      <motion.div
+        className="flex items-center whitespace-nowrap"
+        animate={{ x: [0, "-33.333%"] }}
+        transition={{
+          x: { repeat: Infinity, repeatType: "loop", duration: 24, ease: "linear" },
         }}
       >
-        <motion.div
-          className="flex gap-6 whitespace-nowrap items-center"
-          animate={{ x: [0, "-33.333%"] }}
-          transition={{
-            x: {
-              repeat: Infinity,
-              repeatType: "loop",
-              duration: 15,
-              ease: "linear",
-            },
-          }}
-        >
-          {duplicatedBrands.map((brand, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 flex items-center justify-center gap-6"
-              style={{ minWidth: "80px" }}
-            >
-              {brand.url ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={brand.url}
-                  alt={brand.name}
-                  className="h-6 md:h-7 w-auto object-contain opacity-40"
-                  style={{ filter: brand.invert ? "brightness(0) invert(1)" : "none" }}
-                />
-              ) : (
-                <span className="text-white/40 tracking-[0.2em] uppercase text-xs md:text-sm font-mono whitespace-nowrap">
-                  {brand.name}
-                </span>
-              )}
-              <span className="text-[var(--finevu-orange)]/40 text-xs">/</span>
-            </div>
-          ))}
-        </motion.div>
-      </div>
+        {items.map((brand, index) => (
+          <div key={index} className="flex items-center flex-shrink-0">
+            <span className="text-white/95 tracking-[0.18em] uppercase text-[11px] md:text-xs font-mono">
+              {brand.name}
+            </span>
+            <span className="mx-6 md:mx-9 text-white/55 text-xs">/</span>
+          </div>
+        ))}
+      </motion.div>
     </div>
   );
 }

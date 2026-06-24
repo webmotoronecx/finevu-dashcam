@@ -27,7 +27,29 @@ const dropdownProducts = [
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
+  const [isDarkBackground, setIsDarkBackground] = useState(true);
   const pathname = usePathname();
+
+  // Sample the section under the navbar to theme the glass + text colours.
+  useEffect(() => {
+    const handleScroll = () => {
+      const x = window.innerWidth / 2;
+      const y = 40;
+      const elements = document.elementsFromPoint(x, y);
+      for (const el of elements) {
+        if (el.closest("nav")) continue;
+        const section = el.closest("[data-nav-theme]");
+        if (section) {
+          setIsDarkBackground(section.getAttribute("data-nav-theme") === "dark");
+          return;
+        }
+      }
+      setIsDarkBackground(window.scrollY < 50);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close menus on route change.
   useEffect(() => {
@@ -39,6 +61,26 @@ export function Navigation() {
   const productsItem = nav.find((n) => n.children);
   const flatLinks = nav.filter((n) => !n.children);
 
+  // Glass pill — translucent light glass per Figma (node 14:1409) over dark
+  // sections; a light-tinted glass keeps it legible over white sections.
+  const pillStyle = isDarkBackground
+    ? {
+        background: "rgba(217, 217, 217, 0.05)",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+      }
+    : {
+        background: "rgba(255, 255, 255, 0.7)",
+        border: "1px solid rgba(0, 0, 0, 0.06)",
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+      };
+
+  const linkBase = isDarkBackground ? "text-white/80 hover:text-white" : "text-zinc-600 hover:text-zinc-950";
+  const linkActive = isDarkBackground ? "text-white" : "text-zinc-950";
+  const iconColor = isDarkBackground ? "text-white/80 hover:text-white" : "text-zinc-600 hover:text-zinc-950";
+
   return (
     <>
       <motion.nav
@@ -47,15 +89,10 @@ export function Navigation() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {/* Single floating pill — dark glass, glows purple on hover */}
+        {/* Single floating glass pill — glows purple on hover */}
         <div
-          className="max-w-[1400px] mx-auto mt-4 md:mt-6 pl-5 md:pl-7 pr-3 md:pr-3 py-2.5 rounded-full btn-glow-purple flex items-center justify-between gap-4"
-          style={{
-            background: "rgba(10, 10, 11, 0.72)",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-          }}
+          className="max-w-[1400px] mx-auto mt-4 md:mt-6 pl-5 md:pl-7 pr-3 py-2.5 rounded-full btn-glow-purple flex items-center justify-between gap-4"
+          style={pillStyle}
         >
           {/* Logo — left (orange/grey wordmark) */}
           <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
@@ -67,7 +104,7 @@ export function Navigation() {
             {productsItem && (
               <button
                 onClick={() => setProductsOpen((v) => !v)}
-                className="text-[15px] text-white/90 hover:text-white transition-colors flex items-center gap-1.5 font-medium"
+                className={`text-[15px] transition-colors flex items-center gap-1.5 font-medium ${linkBase}`}
                 aria-haspopup="true"
                 aria-expanded={productsOpen}
               >
@@ -83,9 +120,7 @@ export function Navigation() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-[15px] font-medium transition-colors ${
-                    active ? "text-white font-semibold" : "text-white/90 hover:text-white"
-                  }`}
+                  className={`text-[15px] font-medium transition-colors ${active ? linkActive + " font-semibold" : linkBase}`}
                 >
                   {link.label}
                 </Link>
@@ -95,11 +130,7 @@ export function Navigation() {
 
           {/* Right — search + Find Retailer */}
           <div className="hidden md:flex items-center gap-4 shrink-0">
-            <Link
-              href="/support"
-              aria-label="Search"
-              className="text-white/90 hover:text-white transition-colors"
-            >
+            <Link href="/support" aria-label="Search" className={`transition-colors ${iconColor}`}>
               <Search className="w-5 h-5" />
             </Link>
             <Link href={primaryCta.href}>
@@ -116,7 +147,7 @@ export function Navigation() {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen((v) => !v)}
-            className="md:hidden text-white shrink-0 pr-1"
+            className={`md:hidden shrink-0 pr-1 ${isDarkBackground ? "text-white" : "text-zinc-900"}`}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
           >

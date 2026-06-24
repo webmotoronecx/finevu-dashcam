@@ -1,39 +1,17 @@
 "use client";
 
-import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { siteConfig } from "@/config/site.config";
 
-const roadImage = "/brand/finevu-hero.jpg";
-
 export function Footer() {
   const { contact } = siteConfig;
 
   return (
-    <div className="relative pb-16 bg-black overflow-hidden" data-nav-theme="dark">
-      {/* Background image for entire section including bottom padding */}
-      <div className="absolute inset-0">
-        <ImageWithFallback
-          src={roadImage}
-          alt="Car on an open road at dusk"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
-      </div>
-
-      {/* CTA Background Section */}
-      <section className="relative py-64 overflow-hidden">
-        <div className="absolute inset-0">
-          <ImageWithFallback
-            src={roadImage}
-            alt="Car on an open road at dusk"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
-        </div>
-
+    <div className="relative bg-white" data-nav-theme="dark">
+      {/* CTA — image placeholder, solid #656565 box per Figma. Client to supply art. */}
+      <section className="relative bg-[#656565] py-24 md:py-28 overflow-hidden">
         {/* CTA Content */}
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
           <motion.h2
@@ -74,9 +52,9 @@ export function Footer() {
         </div>
       </section>
 
-      {/* Rounded footer container — overlays CTA */}
-      <div className="max-w-[1400px] mx-auto px-6 relative z-20 -mt-48">
-        <footer className="bg-black/60 backdrop-blur-xl rounded-[2rem] p-16 lg:p-24 border border-white/10">
+      {/* Rounded dark footer card */}
+      <div className="max-w-[1400px] mx-auto px-6 relative z-20 py-12 md:py-16">
+        <footer className="bg-[#161617] rounded-[2rem] p-16 lg:p-24 border border-white/10">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-16 mb-16">
             {/* Brand */}
             <div className="space-y-6 md:col-span-2">

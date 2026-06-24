@@ -59,24 +59,8 @@ export function Hero() {
   return (
     <section className="relative w-full px-4 md:px-6 lg:px-8 pt-3 md:pt-4" data-nav-theme="dark">
       <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.5rem] min-h-[88vh] flex items-center justify-center">
-        {/* Background image + dark/brand overlays */}
-        <div className="absolute inset-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/finevu-hero.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />
-          <div className="absolute inset-0 opacity-40 mix-blend-soft-light brand-gradient" />
-          <div
-            className="absolute inset-0 opacity-30 mix-blend-screen"
-            style={{
-              background:
-                "radial-gradient(circle at 70% 25%, var(--finevu-blue) 0%, transparent 60%)",
-            }}
-          />
-        </div>
+        {/* Image placeholder — solid #656565 box per Figma. Client to supply art. */}
+        <div className="absolute inset-0 bg-[#656565]" />
 
         {/* Slide content */}
         <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-8 lg:px-16 text-center pt-28 md:pt-24 pb-28">

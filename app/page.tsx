@@ -237,18 +237,12 @@ export default function Page() {
               </p>
             </motion.div>
 
+            {/* Image placeholder — solid #656565 box per Figma. Client to supply art. */}
             <motion.div
-              className="relative rounded-[2.5rem] overflow-hidden aspect-[16/7] max-w-5xl mx-auto border border-white/10"
+              className="rounded-[2.5rem] overflow-hidden aspect-[16/7] max-w-5xl mx-auto bg-[#656565]"
               {...fadeUp}
               transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1600"
-                alt="FineVu mobile installer fitting a dash cam"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            </motion.div>
+            />
 
             <motion.div className="flex justify-center mt-10" {...fadeUp} transition={{ duration: 0.8, delay: 0.3 }}>
               <Link href="/booking">
@@ -480,18 +474,21 @@ export default function Page() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Big footage card */}
               <motion.div
-                className="lg:col-span-2 relative overflow-hidden rounded-[2rem] group min-h-[420px] border border-white/5"
+                className="lg:col-span-2 relative overflow-hidden rounded-[2rem] group min-h-[420px] border border-white/5 bg-[#161618]"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <ImageWithFallback
-                  src="/products/gx4k-hero.jpg"
-                  alt="FineVu low-light footage clarity"
-                  className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+                {/* Dark designed card (per Figma) — subtle warm glow, no photo */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(120% 90% at 70% 55%, rgba(244,121,32,0.16) 0%, transparent 55%)",
+                  }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-10">
                   <span className="finevu-capsule mb-4">SONY STARVIS</span>
                   <h3 className="text-3xl font-bold text-white mb-3">Footage that holds up after dark</h3>
@@ -591,9 +588,8 @@ export default function Page() {
                   <Link href={`/learn/${card.slug}`}>
                     <TiltCard className="group cursor-pointer smooth-transition h-full" tiltStrength={8}>
                       <div className="bg-white border border-zinc-200 rounded-[2rem] overflow-hidden h-full flex flex-col p-6 hover:shadow-xl transition-all duration-500 hover:border-[var(--finevu-orange)]/30">
-                        <div className="relative overflow-hidden rounded-2xl mb-6 h-[220px] w-full">
-                          <ImageWithFallback src={card.image} alt={card.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                        </div>
+                        {/* Image placeholder — solid #656565 box per Figma. Client to supply art. */}
+                        <div className="relative overflow-hidden rounded-2xl mb-6 h-[220px] w-full bg-[#656565]" />
                         <div className="space-y-4 flex flex-col flex-grow">
                           <h3 className="text-xl font-bold text-zinc-900 group-hover:text-[var(--finevu-orange)] smooth-transition leading-tight">{card.title}</h3>
                           <p className="text-zinc-600 leading-relaxed text-sm flex-grow">{card.description}</p>

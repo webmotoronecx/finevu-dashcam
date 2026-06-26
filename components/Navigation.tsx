@@ -128,18 +128,18 @@ export function Navigation() {
       >
         {/* Floating pill — morphs into a white panel when Products is open */}
         <div
-          className={`w-full md:w-fit mx-auto mt-4 md:mt-6 rounded-[2.5rem] flex flex-col ${productsOpen ? "" : "btn-glow-purple"}`}
+          className={`w-full max-w-[1213px] mx-auto mt-4 md:mt-6 rounded-[2.5rem] flex flex-col ${productsOpen ? "" : "btn-glow-purple"}`}
           style={pillStyle}
         >
-          {/* Nav row */}
-          <div className="flex items-center w-full justify-between md:justify-start gap-5 md:gap-10 lg:gap-12 pl-5 md:pl-8 pr-3 py-2.5">
+          {/* Nav row — wide bar: logo pinned left, everything else pinned right (Figma 1213×90) */}
+          <div className="flex items-center w-full justify-between gap-5 px-5 py-2.5 md:px-11 md:py-6">
             {/* Logo — left (orange/grey wordmark) */}
             <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
               <Logo variant="primary" className="h-5 md:h-6 transition-transform duration-300 hover:scale-105" />
             </Link>
 
-            {/* Center links */}
-            <div className="hidden md:flex items-center gap-7 lg:gap-8">
+            {/* Right cluster — links + search + Find Retailer, all pinned right */}
+            <div className="hidden md:flex items-center gap-7 lg:gap-9">
               {productsItem && (
                 <button
                   onClick={() => setProductsOpen((v) => !v)}
@@ -170,16 +170,12 @@ export function Navigation() {
                   </Link>
                 );
               })}
-            </div>
-
-            {/* Right — search + Find Retailer */}
-            <div className="hidden md:flex items-center gap-4 shrink-0">
-              <Link href="/support" aria-label="Search" className={`transition-colors ${iconColor}`}>
+              <Link href="/support" aria-label="Search" className={`transition-colors ml-1 ${iconColor}`}>
                 <Search className="w-5 h-5" />
               </Link>
               <Link href={primaryCta.href}>
                 <motion.button
-                  className="brand-gradient-soft btn-glow-purple text-white font-semibold text-xs uppercase tracking-wider px-6 py-2.5 rounded-full"
+                  className="brand-gradient-soft btn-glow-purple text-white font-semibold text-xs uppercase tracking-wider px-7 py-3 rounded-full"
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
                 >

@@ -216,7 +216,7 @@ export default function Page() {
             <p className="text-white/80 font-semibold text-xs md:text-sm tracking-[0.24em] uppercase mb-5">
               Install Network
             </p>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.02] mb-6">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.02] uppercase mb-6">
               Professional Installation
             </h1>
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">
@@ -246,8 +246,8 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Left — why */}
             <motion.div {...fadeUp}>
-              <span className="finevu-capsule mb-5">Why Book Installation</span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-8">
+              <span className="finevu-capsule uppercase mb-5">Why Book Installation</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-8">
                 Why book a pro install?
               </h2>
               <div className="space-y-6">
@@ -295,8 +295,8 @@ export default function Page() {
       <section id="pricing" className="py-16 md:py-24 bg-zinc-50 scroll-mt-24" data-nav-theme="light">
         <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
           <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
-            <span className="finevu-capsule mb-5">Pricing</span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-4">
+            <span className="finevu-capsule uppercase mb-5">Proven Performance</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-4">
               Simple, per-vehicle pricing
             </h2>
             <p className="text-zinc-600 text-lg">One flat rate, everything included. No hidden charges.</p>
@@ -306,14 +306,14 @@ export default function Page() {
             {pricing.map((p, i) => (
               <motion.div
                 key={p.tier}
-                className="rounded-[1.75rem] border border-zinc-200 bg-white p-8 text-center"
+                className="rounded-[1.75rem] border border-zinc-100 bg-white p-8 text-center shadow-[0_18px_50px_-20px_rgba(0,0,0,0.18)]"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <h3 className="text-lg font-bold text-zinc-900">{p.tier}</h3>
-                <div className="text-5xl font-bold text-[var(--finevu-orange)] mt-4">{p.price}</div>
+                <h3 className="text-xl font-bold text-zinc-900">{p.tier}</h3>
+                <div className="text-5xl md:text-6xl font-bold text-[var(--finevu-orange)] mt-4">{p.price}</div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mt-1">
                   Per vehicle/inc. setup
                 </p>
@@ -329,9 +329,12 @@ export default function Page() {
               </motion.div>
             ))}
           </div>
-          <p className="text-center text-xs text-zinc-400 mt-8 max-w-3xl mx-auto px-4">
-            Pricing covers the installation service only. Dash cam hardware sold separately. OBD/hardwire components
-            may incur a small additional cost depending on vehicle.
+          <p className="flex items-start justify-center gap-2 text-center text-xs text-zinc-400 mt-8 max-w-3xl mx-auto px-4">
+            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <span>
+              Pricing covers the installation service only. Dash cam hardware sold separately. OBD/hardwire components
+              may incur a small additional cost depending on vehicle.
+            </span>
           </p>
         </div>
       </section>
@@ -340,8 +343,8 @@ export default function Page() {
       <section className="py-16 md:py-24 bg-zinc-950" data-nav-theme="dark">
         <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
           <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
-            <span className="finevu-capsule mb-5">How to Book</span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
+            <span className="finevu-capsule uppercase mb-5">How to Book</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight uppercase mb-4">
               Three steps to a booked install
             </h2>
             <p className="text-zinc-400 text-lg">Quick and straightforward — from request to confirmed appointment.</p>
@@ -357,7 +360,7 @@ export default function Page() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <div className="text-5xl font-bold text-white/10 mb-6">{s.n}</div>
+                <div className="text-6xl md:text-7xl font-bold text-white/10 mb-6">{s.n}</div>
                 <h3 className="text-base font-bold uppercase tracking-wider text-white mb-3">{s.title}</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
               </motion.div>
@@ -370,8 +373,8 @@ export default function Page() {
       <section id="included" className="py-16 md:py-24 bg-white scroll-mt-24" data-nav-theme="light">
         <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
           <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
-            <span className="finevu-capsule mb-5">What&apos;s Included</span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-4">
+            <span className="finevu-capsule uppercase mb-5">What&apos;s Included</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-4">
               Everything in the service
             </h2>
             <p className="text-zinc-600 text-lg">Here&apos;s exactly what we do — and what to bring with you.</p>
@@ -396,8 +399,8 @@ export default function Page() {
               <ul className="space-y-4">
                 {bringWithYou.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <span className="w-5 h-5 mt-0.5 shrink-0 rounded-full bg-zinc-200 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-zinc-600" />
+                    <span className="w-5 h-5 mt-0.5 shrink-0 rounded-full border border-[var(--finevu-orange)]/30 bg-[var(--finevu-orange)]/10 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-[var(--finevu-orange)]" />
                     </span>
                     <span className="text-sm text-zinc-700">{item}</span>
                   </li>
@@ -406,7 +409,7 @@ export default function Page() {
             </motion.div>
           </div>
 
-          <div className="mt-10 max-w-4xl mx-auto rounded-r-xl border-l-4 border-[var(--finevu-orange)] bg-zinc-50 p-5">
+          <div className="mt-10 max-w-4xl mx-auto rounded-xl border-l-4 border-[var(--finevu-orange)] bg-zinc-50 p-5">
             <p className="text-sm text-zinc-600 leading-relaxed">
               <span className="font-bold text-zinc-900">Note:</span> The installation service covers fitting only —
               hardware is not supplied as part of this service. Please bring all items listed above to your
@@ -425,8 +428,8 @@ export default function Page() {
         <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             <motion.div {...fadeUp}>
-              <span className="finevu-capsule mb-5">Where to Find Us</span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight mb-6">
+              <span className="finevu-capsule uppercase mb-5">Where to Find Us</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-6">
                 Workshop location
               </h2>
               <p className="font-bold text-zinc-900">FineVu Dashcam Australia</p>
@@ -450,9 +453,20 @@ export default function Page() {
             </motion.div>
 
             <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
-              {/* Map placeholder — solid #656565 box per Figma. Client to supply map embed. */}
-              <div className="relative aspect-[16/11] rounded-2xl overflow-hidden bg-[#656565] flex items-center justify-center">
-                <MapPin className="w-10 h-10 text-white/80" />
+              {/* Map placeholder — styled location mock per Figma. Client to supply embed. */}
+              <div className="relative aspect-[16/11] rounded-2xl overflow-hidden bg-gradient-to-br from-zinc-100 to-zinc-200">
+                {/* faint road lines */}
+                <div className="absolute left-[-10%] right-[-10%] top-[34%] h-px bg-zinc-400/40 -rotate-[7deg]" />
+                <div className="absolute left-[-10%] right-[-10%] top-[64%] h-px bg-zinc-400/40 -rotate-[4deg]" />
+                <div className="absolute top-[-10%] bottom-[-10%] left-[58%] w-px bg-zinc-400/30 rotate-[10deg]" />
+                {/* glow + pin + label */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute h-40 w-40 rounded-full bg-[var(--finevu-orange)]/25 blur-2xl" />
+                  <span className="absolute -rotate-[30deg] translate-y-7 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--finevu-orange)]/70 whitespace-nowrap">
+                    FineVu · Clayton South
+                  </span>
+                  <MapPin className="relative w-10 h-10 -translate-y-2 text-[var(--finevu-orange)]" />
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
                 {[
@@ -461,10 +475,7 @@ export default function Page() {
                   { t: "Outside Victoria?", d: "Currently workshop-only. Contact us to discuss options." },
                 ].map((c) => (
                   <div key={c.t}>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <Info className="w-3.5 h-3.5 text-[var(--finevu-orange)]" />
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{c.t}</p>
-                    </div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--finevu-orange)] mb-2">{c.t}</p>
                     <p className="text-xs text-zinc-600 leading-relaxed">{c.d}</p>
                   </div>
                 ))}

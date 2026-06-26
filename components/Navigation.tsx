@@ -135,7 +135,7 @@ export function Navigation() {
           <div className="flex items-center w-full justify-between md:justify-start gap-5 md:gap-10 lg:gap-12 pl-5 md:pl-8 pr-3 py-2.5">
             {/* Logo — left (orange/grey wordmark) */}
             <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
-              <Logo variant="primary" className="h-7 md:h-8 transition-transform duration-300 hover:scale-105" />
+              <Logo variant="primary" className="h-5 md:h-6 transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Center links */}

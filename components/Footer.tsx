@@ -9,7 +9,7 @@ export function Footer() {
   const { contact } = siteConfig;
 
   return (
-    <div className="relative bg-white" data-nav-theme="dark">
+    <div className="relative bg-[#656565]" data-nav-theme="dark">
       {/* CTA — image placeholder, solid #656565 box per Figma. Client to supply art. */}
       <section className="relative bg-[#656565] py-24 md:py-28 overflow-hidden">
         {/* CTA Content */}

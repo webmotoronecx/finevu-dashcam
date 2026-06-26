@@ -199,7 +199,7 @@ export default function Page() {
               Our Australian team is here to help. Call 1800 818 288 or reach out below.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <Link href="/contact">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow"
                   whileHover={{ scale: 1.05 }}
@@ -208,7 +208,7 @@ export default function Page() {
                   Contact us
                 </motion.button>
               </Link>
-              <Link href="/support">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
                   whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.9)" }}

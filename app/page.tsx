@@ -245,7 +245,7 @@ export default function Page() {
             />
 
             <motion.div className="flex justify-center mt-10" {...fadeUp} transition={{ duration: 0.8, delay: 0.3 }}>
-              <Link href="/booking">
+              <Link href="#">
                 <motion.button
                   className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider smooth-transition hover:shadow-[0_0_30px_var(--electric-glow)]"
                   whileHover={{ scale: 1.05 }}
@@ -304,7 +304,7 @@ export default function Page() {
                     );
                   })}
                 </div>
-                <Link href="/how-it-works">
+                <Link href="#">
                   <button className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white hover:scale-105 transition-transform font-semibold text-sm uppercase tracking-wider">
                     See how it works
                   </button>
@@ -551,7 +551,7 @@ export default function Page() {
                   </p>
                 </div>
               </div>
-              <Link href="/services" className="shrink-0">
+              <Link href="#" className="shrink-0">
                 <motion.button
                   className="px-7 py-3 rounded-full bg-zinc-900 text-white font-semibold text-sm flex items-center gap-2 hover:bg-black transition-colors"
                   whileHover={{ scale: 1.05 }}
@@ -606,7 +606,7 @@ export default function Page() {
             </div>
 
             <div className="flex justify-center mt-12">
-              <Link href="/learn">
+              <Link href="#">
                 <motion.button
                   className="px-7 py-3 rounded-full border border-zinc-300 text-zinc-900 hover:bg-black hover:text-white transition-colors font-medium text-sm uppercase tracking-wider"
                   whileHover={{ scale: 1.05 }}

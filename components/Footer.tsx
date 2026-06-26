@@ -39,7 +39,7 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <Link href="/where-to-buy">
+            <Link href="#">
               <motion.button
                 className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow font-semibold text-sm uppercase tracking-wider"
                 whileHover={{ scale: 1.05 }}

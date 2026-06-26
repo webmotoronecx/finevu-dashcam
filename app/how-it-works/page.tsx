@@ -351,12 +351,12 @@ export default function Page() {
               </ul>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/support">
+                <Link href="#">
                   <button className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium hover:opacity-90 smooth-transition w-full sm:w-auto text-center">
                     App setup & support
                   </button>
                 </Link>
-                <Link href="/learn">
+                <Link href="#">
                   <button className="px-8 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 smooth-transition w-full sm:w-auto text-center font-medium">
                     Learn more
                   </button>
@@ -403,7 +403,7 @@ export default function Page() {
                 Explore the range, then pick up your FineVu from a stockist near you.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-                <Link href="/gx4k">
+                <Link href="#">
                   <motion.button
                     className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium"
                     whileHover={{ scale: 1.05 }}
@@ -412,7 +412,7 @@ export default function Page() {
                     Explore the range
                   </motion.button>
                 </Link>
-                <Link href="/where-to-buy">
+                <Link href="#">
                   <motion.button
                     className="px-8 py-3 rounded-full border border-white/40 text-white font-medium hover:bg-white/10 smooth-transition"
                     whileHover={{ scale: 1.05 }}

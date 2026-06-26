@@ -231,7 +231,7 @@ export default function Page() {
               Genuine stock, full warranty and expert installation.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <a href="#network" className="w-full sm:w-auto">
+              <a href="#" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
                   Browse by State
                 </button>
@@ -386,7 +386,7 @@ export default function Page() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Become a reseller</h3>
               <p className="text-zinc-400 mb-6">Tell us about your business and we&apos;ll be in touch.</p>
-              <Link href="/contact">
+              <Link href="#">
                 <button className="inline-flex items-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-3.5 font-semibold text-white transition-transform hover:scale-[1.03]">
                   Apply now
                   <ArrowRight className="w-5 h-5" />

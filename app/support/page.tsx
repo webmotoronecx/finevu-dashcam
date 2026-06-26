@@ -100,7 +100,7 @@ const channels = [
     line2: "Via our contact form",
     line3: "Response within one business day",
     cta: "Send a message",
-    href: "/contact",
+    href: "#",
     external: false,
   },
   {
@@ -110,7 +110,7 @@ const channels = [
     line2: "Available during support hours",
     line3: "Mon–Fri, 9:00 AM – 5:00 PM AEST",
     cta: "Start a message",
-    href: "/contact",
+    href: "#",
     external: false,
   },
   {
@@ -120,7 +120,7 @@ const channels = [
     line2: "Talk through setup or warranty",
     line3: "Flexible scheduling available",
     cta: "Request a call",
-    href: "/contact",
+    href: "#",
     external: false,
   },
 ];
@@ -268,12 +268,12 @@ export default function Page() {
               backed by Auto Xtreme and a 3-Year Australian Warranty.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href="#topics" className="w-full sm:w-auto">
+              <a href="#" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
                   Browse Help Topics
                 </button>
               </a>
-              <Link href="/where-to-buy" className="w-full sm:w-auto">
+              <Link href="#" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
                   Find Retailer
                 </button>
@@ -425,7 +425,7 @@ export default function Page() {
                   Call 1800 818 288
                 </motion.button>
               </a>
-              <Link href="/contact" className="w-full sm:w-auto">
+              <Link href="#" className="w-full sm:w-auto">
                 <motion.button
                   className="w-full sm:w-auto px-8 py-3.5 rounded-full border-2 border-white/40 text-white font-semibold transition-colors hover:border-white"
                   whileHover={{ scale: 1.04 }}

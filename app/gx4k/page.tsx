@@ -138,14 +138,14 @@ export default function GX4KPage() {
               className="mt-9 flex flex-col sm:flex-row gap-4"
             >
               <Link
-                href="/where-to-buy"
+                href="#"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-4 font-semibold text-white transition-transform hover:scale-[1.03]"
               >
                 Where to Buy
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/booking"
+                href="#"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-8 py-4 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 Book Installation
@@ -486,14 +486,14 @@ export default function GX4KPage() {
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Link
-              href="/where-to-buy"
+              href="#"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-4 font-semibold text-white transition-transform hover:scale-[1.03]"
             >
               Where to Buy
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/booking"
+              href="#"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-8 py-4 font-semibold text-white transition-colors hover:bg-white/10"
             >
               Book Installation

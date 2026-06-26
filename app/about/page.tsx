@@ -82,7 +82,7 @@ export default function Page() {
               in Korea — and supported right here in Australia.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <Link href="/gx4k">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow"
                   whileHover={{ scale: 1.05 }}
@@ -91,7 +91,7 @@ export default function Page() {
                   Explore the range
                 </motion.button>
               </Link>
-              <Link href="/where-to-buy">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
                   whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.9)" }}
@@ -263,7 +263,7 @@ export default function Page() {
               Compare the 4K GX4K and the 2K GX35, or find your nearest stockist.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <Link href="/gx4k">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow inline-flex items-center gap-2"
                   whileHover={{ scale: 1.05 }}
@@ -272,7 +272,7 @@ export default function Page() {
                   Explore GX4K <MoveRight className="w-4 h-4" />
                 </motion.button>
               </Link>
-              <Link href="/gx35">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
                   whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.9)" }}
@@ -281,7 +281,7 @@ export default function Page() {
                   Explore GX35
                 </motion.button>
               </Link>
-              <Link href="/where-to-buy">
+              <Link href="#">
                 <motion.button
                   className="px-6 py-2.5 rounded-full text-white/80 underline underline-offset-4 smooth-transition"
                   whileHover={{ scale: 1.05, color: "#ffffff" }}

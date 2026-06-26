@@ -94,13 +94,13 @@ export default function Page() {
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <a
-                href="#enquire"
+                href="#"
                 className="px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold hover:scale-[1.03] transition-transform"
               >
                 Request an installation
               </a>
               <Link
-                href="/services"
+                href="#"
                 className="px-8 py-4 rounded-full border border-white/30 text-white font-medium hover:bg-white/10 transition-colors"
               >
                 Prefer DIY? See setup help
@@ -219,7 +219,7 @@ export default function Page() {
               </p>
             </div>
             <Link
-              href="/services"
+              href="#"
               className="shrink-0 px-8 py-4 rounded-full bg-white text-[var(--finevu-charcoal)] font-semibold hover:scale-[1.03] transition-transform text-center"
             >
               DIY setup help

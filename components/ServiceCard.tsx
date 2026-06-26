@@ -57,7 +57,7 @@ export function ServiceCard({ name, price, duration, features, recommended, dela
       </div>
 
       <div className="mt-8 pt-6">
-        <Link href="/booking" className="block">
+        <Link href="#" className="block">
           <motion.button
             className={`w-full py-4 rounded-full smooth-transition font-medium tracking-wide ${
               recommended

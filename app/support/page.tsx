@@ -126,109 +126,111 @@ const channels = [
   },
 ];
 
+// FAQ content matches the Figma wireframe (nodes 22:10953 / 22:10990 /
+// 22:11026 / 22:11062 / 22:11098) verbatim, in the order supplied.
 const faqGroups = [
   {
-    heading: "General questions",
+    heading: "General Questions",
     items: [
       {
-        q: "Which FineVu dash cam is right for me?",
-        a: "The GX4K is our flagship, with true 4K front recording for maximum number-plate clarity. The GX35 records sharp 2K up front at a friendlier price. Both are 2-channel (front + rear) and use SONY STARVIS sensors.",
+        q: "What is an EV battery health check?",
+        a: "An EV battery health check is a comprehensive diagnostic assessment that measures your battery's State of Health (SOH), capacity, and overall performance. Our technicians use professional-grade equipment to analyze the battery's current condition and predict future performance.",
       },
       {
-        q: "Where are FineVu dash cams made?",
-        a: "FineVu cameras are designed and manufactured in Korea, with more than 4 million units sold worldwide. In Australia they're distributed and supported by Auto Xtreme.",
+        q: "How long does a battery health check take?",
+        a: "Most battery health checks take around 30 to 60 minutes, depending on your vehicle and battery size. We'll confirm the expected time when you book.",
       },
       {
-        q: "Do FineVu cameras work in Australian conditions?",
-        a: "Yes. Every model is built with heat monitoring and a supercapacitor (not a battery), so it stands up to hot Australian summers and ships ready for local conditions.",
+        q: "Do you offer mobile service?",
+        a: "Yes — our mobile technicians can come to your home or workplace to carry out the battery health check, so you don't have to bring the vehicle to us.",
       },
       {
-        q: "How many channels do FineVu cameras record?",
-        a: "Both the GX4K and GX35 are 2-channel systems — they record the road ahead and behind at the same time with a matched front and rear camera.",
+        q: "What's included in the report?",
+        a: "Your report includes the battery's State of Health (SOH), measured capacity, performance data and clear recommendations, so you know exactly where your battery stands.",
       },
     ],
   },
   {
-    heading: "Installation & setup",
+    heading: "Pre-Purchase Inspections",
     items: [
       {
-        q: "Can I install a FineVu myself?",
-        a: "The front camera is a plug-and-play fit for most cars. For the rear camera, hardwiring and the full ADAS / parking-mode features, we recommend a professional installation so the wiring is concealed and everything is set up correctly.",
+        q: "Should I get a pre-purchase inspection before buying a used EV?",
+        a: "Absolutely. A pre-purchase inspection reveals the true condition of the battery — the most valuable component in an EV — so you know exactly what you're buying before you commit.",
       },
       {
-        q: "Do I need hardwiring for parking mode?",
-        a: "Parking mode and the full ADAS feature set require a constant power connection, which means hardwiring. Our installers can take care of this with a low-voltage cut-off so your car battery is protected.",
+        q: "Can the inspection help me negotiate the price?",
+        a: "Yes. An objective battery health report gives you hard data on the battery's condition, which is powerful leverage when negotiating a fair price.",
       },
       {
-        q: "How do I connect the FineVu app?",
-        a: "Enable Wi-Fi on the camera, then connect your phone to it in the FineVu app. From there you can live-view, download and share clips, and update firmware over the air.",
+        q: "How quickly can I get a pre-purchase inspection?",
+        a: "We aim to accommodate pre-purchase inspections quickly — often within a day or two. Let us know your timeframe and we'll do our best to fit you in.",
       },
       {
-        q: "Where should the camera be mounted?",
-        a: "Mount the front camera behind the rear-view mirror for a clear, unobstructed view, and the rear camera high on the rear windscreen. Our installers position both for the best coverage.",
+        q: "What if the inspection reveals problems?",
+        a: "If the inspection uncovers issues, you'll receive a clear report outlining them and what they mean — giving you the information to walk away, negotiate, or budget for repairs.",
       },
     ],
   },
   {
-    heading: "Features & recording",
+    heading: "Battery Health & Performance",
     items: [
       {
-        q: "What resolution do FineVu cameras record in?",
-        a: "The GX4K records true 4K (3840 × 2160) up front; the GX35 records 2K QHD (2560 × 1440). Both pair a Full HD 1080p rear camera for complete front-and-rear coverage.",
+        q: "What is State of Health (SOH)?",
+        a: "State of Health (SOH) measures your battery's current capacity compared to when it was new, expressed as a percentage. It's the clearest single indicator of how much usable life your battery has left.",
       },
       {
-        q: "How does parking mode work?",
-        a: "While the car is parked the camera keeps watch using motion and impact detection, saving buffered footage of any event — typically several seconds before and after — without draining your battery.",
+        q: "How much battery degradation is normal?",
+        a: "Some degradation is normal over time — most EV batteries lose a few percent of capacity in the first years, then degrade more slowly. A health check shows whether yours is tracking normally.",
       },
       {
-        q: "What size memory card should I use?",
-        a: "Use a high-endurance microSD card. FineVu cameras support cards up to 256 GB, and Format Free 2.0 keeps the card healthy without constant reformatting.",
+        q: "Can battery health be improved?",
+        a: "While natural degradation can't be reversed, good charging habits — avoiding extreme states of charge and excess heat — can slow it. Our report includes tips tailored to your battery.",
       },
       {
-        q: "What is ADAS Plus?",
-        a: "ADAS Plus is FineVu's driver-assistance suite — lane-departure and front-vehicle-departure alerts that warn you out loud. It requires hardwiring to function.",
+        q: "When should I be concerned about my battery?",
+        a: "If you notice a sudden drop in range, faster-than-expected degradation, or warning messages, it's worth getting a health check to diagnose the cause early.",
       },
     ],
   },
   {
-    heading: "Warranty & repairs",
+    heading: "Pricing & Booking",
     items: [
       {
-        q: "What warranty do FineVu cameras come with?",
-        a: "Every FineVu sold by Auto Xtreme is covered by a 3-Year Australian Warranty. Terms, conditions and exclusions apply.",
+        q: "How much does a battery health check cost?",
+        a: "Pricing depends on your vehicle and the type of check required. Get in touch for a quote — we'll give you a clear, upfront price before any work begins.",
       },
       {
-        q: "How do I make a warranty claim?",
-        a: "Call Auto Xtreme on 1800 818 288 or get in touch through our contact form with your purchase details, and we'll guide you through the next steps.",
+        q: "Do you charge extra for mobile service?",
+        a: "A small call-out fee may apply for mobile visits depending on your location. We'll confirm any additional cost when you book.",
       },
       {
-        q: "My camera isn't recording — what should I check first?",
-        a: "Check the memory card is seated and formatted, confirm the camera has power, and make sure firmware is up to date. If it still won't record, reach out and we'll help you troubleshoot.",
+        q: "How do I book an appointment?",
+        a: "Booking is easy — contact us with your vehicle details and preferred time, and we'll confirm your appointment by phone or email.",
       },
       {
-        q: "Where do I get my FineVu repaired?",
-        a: "Repairs are handled through Auto Xtreme, FineVu's Australian distributor. Contact the team and they'll arrange assessment and repair under your warranty where applicable.",
+        q: "What payment methods do you accept?",
+        a: "We accept all major payment methods. Payment details are confirmed at the time of booking.",
       },
     ],
   },
   {
-    heading: "Technical & compatibility",
+    heading: "Technical Details",
     items: [
       {
-        q: "Which vehicles are FineVu cameras compatible with?",
-        a: "FineVu cameras fit virtually any 12V/24V vehicle — cars, SUVs, utes and vans. Professional installation tailors the hardwire connection to your specific vehicle.",
+        q: "Which EV models do you support?",
+        a: "We support a wide range of electric and hybrid vehicles across all major makes. If you're unsure whether your model is covered, just ask.",
       },
       {
-        q: "Do the cameras have built-in GPS and Wi-Fi?",
-        a: "Yes. Built-in Wi-Fi connects to the FineVu app, and GPS tags every clip with speed and location. The GX35 includes an external GPS module plus speed-camera alerts.",
+        q: "What equipment do you use?",
+        a: "Our technicians use professional-grade diagnostic equipment that reads directly from the battery management system, ensuring accurate, reliable results.",
       },
       {
-        q: "How do I update the firmware?",
-        a: "Firmware updates are delivered over Wi-Fi through the FineVu app, or via the memory card. Keeping firmware current ensures the best performance and latest features.",
+        q: "Are your technicians certified?",
+        a: "Yes — our technicians are trained and certified to work safely on high-voltage systems and to interpret battery diagnostic data accurately.",
       },
       {
-        q: "Will parking mode drain my car battery?",
-        a: "No — a low-voltage cut-off powers the camera down before your battery runs low, and Power Saving Parking draws up to 98% less power than standard parking mode.",
+        q: "Is the diagnostic process safe for my vehicle?",
+        a: "Completely. The diagnostic process is non-invasive — it reads data from your vehicle's systems without any risk to the battery or electronics.",
       },
     ],
   },
@@ -241,12 +243,16 @@ function FaqItem({ q, a }: { q: string; a: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+        className="flex w-full items-center justify-between gap-4 px-6 md:px-8 py-6 text-left"
         aria-expanded={open}
       >
-        <span className="font-semibold text-[#18181b]">{q}</span>
-        <span className="shrink-0 text-[var(--finevu-orange)]">
-          {open ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5 text-zinc-400" />}
+        <span className="text-[17px] md:text-[18px] text-[#151515]">{q}</span>
+        <span className="shrink-0">
+          {open ? (
+            <Minus className="w-6 h-6 text-[var(--finevu-orange)]" />
+          ) : (
+            <Plus className="w-6 h-6 text-zinc-400" />
+          )}
         </span>
       </button>
       <div
@@ -255,7 +261,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         }`}
       >
         <div className="overflow-hidden">
-          <p className="px-6 pb-5 text-[15px] text-[#52525c] leading-relaxed">{a}</p>
+          <p className="px-6 md:px-8 pb-6 text-[16px] text-[#52525c] leading-[26px]">{a}</p>
         </div>
       </div>
     </div>
@@ -474,7 +480,9 @@ export default function Page() {
         <div className="max-w-[768px] mx-auto px-6">
           {faqGroups.map((group, gi) => (
             <motion.div key={group.heading} className={gi === 0 ? "" : "mt-16"} {...fadeUp}>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#18181b] mb-6">{group.heading}</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold text-[#18181b] mb-8 md:mb-12">
+                {group.heading}
+              </h2>
               <div className="space-y-4">
                 {group.items.map((item) => (
                   <FaqItem key={item.q} q={item.q} a={item.a} />

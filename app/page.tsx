@@ -89,7 +89,7 @@ export default function Page() {
           <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
             <motion.div className="text-center mb-14" {...fadeUp}>
               <span className="finevu-capsule mb-5">FRONT &amp; REAR · 2CH</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight">
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight uppercase">
                 Featured Products
               </h2>
             </motion.div>
@@ -154,8 +154,8 @@ export default function Page() {
         <section className="py-24 bg-zinc-100" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
             <motion.div className="text-center max-w-3xl mx-auto mb-14" {...fadeUp}>
-              <span className="finevu-capsule mb-5">Proven Performance</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight mb-5">
+              <span className="finevu-capsule mb-5">PROVEN PERFORMANCE</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-5">
                 The No.1 dash cam brand in Korea.
               </h2>
               <p className="text-zinc-600 text-lg leading-relaxed">
@@ -191,7 +191,7 @@ export default function Page() {
         <section className="py-24 bg-white" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center max-w-2xl mx-auto mb-16" {...fadeUp} transition={{ duration: 0.8 }}>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 uppercase mb-6">
                 Not just a dash cam. A safety system.
               </h2>
               <p className="text-lg text-zinc-600 leading-relaxed">
@@ -228,8 +228,8 @@ export default function Page() {
         <section className="py-24 bg-black" data-nav-theme="dark">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center max-w-2xl mx-auto mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
-              <span className="finevu-capsule mb-5">Installation</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">
+              <span className="finevu-capsule mb-5">INSTALLATION</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight uppercase mb-6">
                 We&apos;ll come to you
               </h2>
               <p className="text-lg text-white/70 leading-relaxed">
@@ -259,7 +259,16 @@ export default function Page() {
         </section>
 
         {/* App — your footage, anywhere */}
-        <section className="py-24 brand-gradient overflow-hidden" data-nav-theme="dark">
+        {/* Gradient matched exactly to Figma node 14:4683 — angle (35.92°) and colour stops
+            differ from the global --brand-gradient (65°), so it's applied inline here only. */}
+        <section
+          className="py-24 overflow-hidden"
+          data-nav-theme="dark"
+          style={{
+            backgroundImage:
+              "linear-gradient(35.92deg, #000000 13.47%, #4F2D74 36.72%, #0C4D97 58.3%, #234088 78.23%)",
+          }}
+        >
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div
@@ -280,8 +289,8 @@ export default function Page() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <span className="finevu-capsule mb-6">FineVu App</span>
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">
+                <span className="finevu-capsule mb-6">FINEVU APP</span>
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight uppercase">
                   Your footage, anywhere.
                 </h2>
                 <p className="text-lg text-white/80 mb-8 leading-relaxed">
@@ -318,8 +327,8 @@ export default function Page() {
         <section className="py-24 bg-white" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center max-w-2xl mx-auto mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
-              <span className="finevu-capsule mb-5">Intelligence built in</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight mb-5">
+              <span className="finevu-capsule mb-5">INTELLIGENCE BUILT IN</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-5">
                 A co-pilot that never blinks.
               </h2>
               <p className="text-lg text-zinc-600 leading-relaxed">
@@ -374,7 +383,7 @@ export default function Page() {
           <ParticleBackground />
           <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight uppercase">
                 Trusted by drivers worldwide
               </h2>
               <p className="text-lg text-zinc-400">Over 4 million dash cams sold globally.</p>
@@ -462,7 +471,7 @@ export default function Page() {
         <section className="py-28 bg-zinc-950" data-nav-theme="dark">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center mb-14 max-w-3xl mx-auto" {...fadeUp} transition={{ duration: 0.8 }}>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight uppercase">
                 <span className="text-white">Built in Korea.</span><br />
                 <span className="text-[var(--finevu-orange)]">Backed in Australia.</span>
               </h2>
@@ -567,7 +576,7 @@ export default function Page() {
         <section className="py-28 bg-white border-t border-zinc-100" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center max-w-2xl mx-auto mb-16" {...fadeUp} transition={{ duration: 0.8 }}>
-              <h2 className="text-3xl md:text-5xl font-bold mb-5 tracking-tight text-zinc-900">
+              <h2 className="text-3xl md:text-5xl font-bold mb-5 tracking-tight text-zinc-900 uppercase">
                 Dash cam guides
               </h2>
               <p className="text-lg text-zinc-600">

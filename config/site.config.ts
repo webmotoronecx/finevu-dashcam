@@ -104,11 +104,11 @@ export const siteConfig: SiteConfig = {
       ],
     },
     { href: "/services", label: "Installation" },
-    { href: "/where-to-buy", label: "Retailers" },
+    { href: "#", label: "Retailers" },
     { href: "/support", label: "Support" },
   ],
 
-  primaryCta: { href: "/where-to-buy", label: "Find Retailer" },
+  primaryCta: { href: "#", label: "Find Retailer" },
   secondaryCta: { href: "/gx4k", label: "Explore the Range" },
 
   hero: {

@@ -473,7 +473,7 @@ export default function GX4KPage() {
           <span className="text-[16rem] leading-none font-bold text-white opacity-20">4K</span>
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
-          <motion.h2 {...fadeUp} className="text-4xl md:text-6xl font-bold max-w-3xl mx-auto">
+          <motion.h2 {...fadeUp} className="text-4xl md:text-6xl font-bold max-w-3xl mx-auto uppercase">
             Ask more of your dash cam.
           </motion.h2>
           <motion.p {...fadeUp} transition={{ delay: 0.05 }} className="mt-5 text-lg text-zinc-300 max-w-xl mx-auto">

@@ -15,7 +15,7 @@ export function Footer() {
         {/* CTA Content */}
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 lg:px-16 text-center">
           <motion.h2
-            className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1] mb-6 max-w-4xl mx-auto"
+            className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1] mb-6 max-w-4xl mx-auto uppercase"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

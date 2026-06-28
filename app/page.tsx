@@ -472,7 +472,7 @@ export default function Page() {
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
             <motion.div className="text-center mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight uppercase">
-                <span className="text-white">Built in Korea.</span>{" "}
+                <span className="text-white">Built in Korea.</span><br />
                 <span className="text-[var(--finevu-orange)]">Backed in Australia.</span>
               </h2>
               <p className="text-lg text-zinc-400 leading-relaxed max-w-2xl mx-auto">

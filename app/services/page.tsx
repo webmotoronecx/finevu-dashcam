@@ -225,12 +225,12 @@ export default function Page() {
               at our Clayton South workshop.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href="#" className="w-full sm:w-auto">
+              <a href="#book" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
                   Book Installation
                 </button>
               </a>
-              <a href="#" className="w-full sm:w-auto">
+              <a href="#pricing" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
                   View Pricing
                 </button>
@@ -445,7 +445,7 @@ export default function Page() {
                   </span>
                 ))}
               </div>
-              <a href="#">
+              <a href="#book">
                 <button className="px-8 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
                   Request Booking
                 </button>

@@ -194,7 +194,7 @@ export default function Page() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="#">
+              <Link href="/gx4k">
                 <motion.span
                   className="inline-block px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition whitespace-nowrap font-bold hover:opacity-90"
                   whileHover={{ scale: 1.05 }}
@@ -203,7 +203,7 @@ export default function Page() {
                   Explore the range
                 </motion.span>
               </Link>
-              <Link href="#">
+              <Link href="/where-to-buy">
                 <motion.span
                   className="inline-block px-8 py-4 rounded-full border-2 border-zinc-300 text-zinc-900 smooth-transition whitespace-nowrap font-bold hover:border-[var(--finevu-orange)]"
                   whileHover={{ scale: 1.05 }}

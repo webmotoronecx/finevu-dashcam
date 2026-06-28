@@ -94,13 +94,13 @@ export default function Page() {
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <a
-                href="#"
+                href="#enquire"
                 className="px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold hover:scale-[1.03] transition-transform"
               >
                 Request an installation
               </a>
               <Link
-                href="#"
+                href="/services"
                 className="px-8 py-4 rounded-full border border-white/30 text-white font-medium hover:bg-white/10 transition-colors"
               >
                 Prefer DIY? See setup help
@@ -189,7 +189,7 @@ export default function Page() {
       </section>
 
       {/* Enquiry form */}
-      <section className="py-24 bg-zinc-50" data-nav-theme="light">
+      <section id="enquire" className="py-24 bg-zinc-50" data-nav-theme="light">
         <div className="max-w-[1100px] mx-auto px-8 lg:px-16">
           <BusinessEnquiryForm
             type="Installation"
@@ -219,7 +219,7 @@ export default function Page() {
               </p>
             </div>
             <Link
-              href="#"
+              href="/services"
               className="shrink-0 px-8 py-4 rounded-full bg-white text-[var(--finevu-charcoal)] font-semibold hover:scale-[1.03] transition-transform text-center"
             >
               DIY setup help

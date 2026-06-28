@@ -317,7 +317,7 @@ export default function Page() {
                     Explore the GX4K and GX35. True 4K and 2K, both with SONY STARVIS, front &amp; rear and a 3-Year Australian Warranty.
                   </p>
 
-                  <Link href="#" className="block relative z-10">
+                  <Link href="/gx4k" className="block relative z-10">
                     <button className="w-full py-4 rounded-xl bg-[var(--finevu-orange)] text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center group-hover:scale-[1.02] active:scale-[0.98] duration-200">
                       Explore the range
                       <ChevronRight className="w-4 h-4 ml-1" />

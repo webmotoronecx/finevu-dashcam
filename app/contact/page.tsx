@@ -214,7 +214,7 @@ export default function Page() {
               right fit for your vehicle.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <Link href="#">
+              <Link href="/gx4k">
                 <motion.button
                   className="px-7 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-semibold transition-transform"
                   whileHover={{ scale: 1.04 }}
@@ -223,7 +223,7 @@ export default function Page() {
                   Explore GX4K
                 </motion.button>
               </Link>
-              <Link href="#">
+              <Link href="/gx35">
                 <motion.button
                   className="px-7 py-3 rounded-full border-2 border-zinc-300 font-semibold transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
                   whileHover={{ scale: 1.04 }}

@@ -153,12 +153,12 @@ export default function Page() {
         {/* The No.1 dash cam brand in Korea */}
         <section className="py-24 bg-zinc-100" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
-            <motion.div className="text-center max-w-3xl mx-auto mb-14" {...fadeUp}>
+            <motion.div className="text-center mb-14" {...fadeUp}>
               <span className="finevu-capsule mb-5">PROVEN PERFORMANCE</span>
               <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-5">
                 The No.1 dash cam brand in Korea.
               </h2>
-              <p className="text-zinc-600 text-lg leading-relaxed">
+              <p className="text-zinc-600 text-lg leading-relaxed max-w-2xl mx-auto">
                 Built by FINEDIGITAL, an automotive-IT specialist since 2009, held to a standard the numbers prove.
               </p>
             </motion.div>
@@ -190,11 +190,11 @@ export default function Page() {
         {/* Not just a dash cam. A safety system. */}
         <section className="py-24 bg-white" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-            <motion.div className="text-center max-w-2xl mx-auto mb-16" {...fadeUp} transition={{ duration: 0.8 }}>
+            <motion.div className="text-center mb-16" {...fadeUp} transition={{ duration: 0.8 }}>
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 uppercase mb-6">
                 Not just a dash cam. A safety system.
               </h2>
-              <p className="text-lg text-zinc-600 leading-relaxed">
+              <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
                 FineVu turns your dash cam into a smart co-pilot — alerting you to dangers on the road and watching over your vehicle when you&apos;re away.
               </p>
             </motion.div>
@@ -245,7 +245,7 @@ export default function Page() {
             />
 
             <motion.div className="flex justify-center mt-10" {...fadeUp} transition={{ duration: 0.8, delay: 0.3 }}>
-              <Link href="#">
+              <Link href="/booking">
                 <motion.button
                   className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider smooth-transition hover:shadow-[0_0_30px_var(--electric-glow)]"
                   whileHover={{ scale: 1.05 }}
@@ -290,7 +290,7 @@ export default function Page() {
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
                 <span className="finevu-capsule mb-6">FINEVU APP</span>
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight uppercase">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight uppercase xl:whitespace-nowrap">
                   Your footage, anywhere.
                 </h2>
                 <p className="text-lg text-white/80 mb-8 leading-relaxed">
@@ -313,7 +313,7 @@ export default function Page() {
                     );
                   })}
                 </div>
-                <Link href="#">
+                <Link href="/how-it-works">
                   <button className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white hover:scale-105 transition-transform font-semibold text-sm uppercase tracking-wider">
                     See how it works
                   </button>
@@ -326,12 +326,12 @@ export default function Page() {
         {/* A co-pilot that never blinks — intelligence */}
         <section className="py-24 bg-white" data-nav-theme="light">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-            <motion.div className="text-center max-w-2xl mx-auto mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
+            <motion.div className="text-center mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
               <span className="finevu-capsule mb-5">INTELLIGENCE BUILT IN</span>
               <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-5">
                 A co-pilot that never blinks.
               </h2>
-              <p className="text-lg text-zinc-600 leading-relaxed">
+              <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
                 Advanced sensors and smart software work together to protect you on the road and your vehicle while it&apos;s parked.
               </p>
             </motion.div>
@@ -470,12 +470,12 @@ export default function Page() {
         {/* Built in Korea. Backed in Australia. */}
         <section className="py-28 bg-zinc-950" data-nav-theme="dark">
           <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-            <motion.div className="text-center mb-14 max-w-3xl mx-auto" {...fadeUp} transition={{ duration: 0.8 }}>
+            <motion.div className="text-center mb-14" {...fadeUp} transition={{ duration: 0.8 }}>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight uppercase">
-                <span className="text-white">Built in Korea.</span><br />
+                <span className="text-white">Built in Korea.</span>{" "}
                 <span className="text-[var(--finevu-orange)]">Backed in Australia.</span>
               </h2>
-              <p className="text-lg text-zinc-400 leading-relaxed">
+              <p className="text-lg text-zinc-400 leading-relaxed max-w-2xl mx-auto">
                 Engineered in Korea, trusted by drivers worldwide, and backed by local Australian support.
               </p>
             </motion.div>
@@ -560,7 +560,7 @@ export default function Page() {
                   </p>
                 </div>
               </div>
-              <Link href="#" className="shrink-0">
+              <Link href="/services" className="shrink-0">
                 <motion.button
                   className="px-7 py-3 rounded-full bg-zinc-900 text-white font-semibold text-sm flex items-center gap-2 hover:bg-black transition-colors"
                   whileHover={{ scale: 1.05 }}
@@ -615,7 +615,7 @@ export default function Page() {
             </div>
 
             <div className="flex justify-center mt-12">
-              <Link href="#">
+              <Link href="/learn">
                 <motion.button
                   className="px-7 py-3 rounded-full border border-zinc-300 text-zinc-900 hover:bg-black hover:text-white transition-colors font-medium text-sm uppercase tracking-wider"
                   whileHover={{ scale: 1.05 }}

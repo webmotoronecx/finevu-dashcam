@@ -152,7 +152,7 @@ export default function GX35Page() {
           </p>
           <div className="mt-8 flex justify-center">
             <Link
-              href="#"
+              href="/where-to-buy"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-3.5 text-sm font-semibold uppercase tracking-wider text-white transition-transform hover:scale-[1.03]"
             >
               Find a retailer
@@ -448,14 +448,14 @@ export default function GX35Page() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="#"
+              href="/where-to-buy"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-3.5 font-semibold text-white transition-transform hover:scale-[1.03]"
             >
               Where to buy
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="#"
+              href="/services"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-zinc-300 px-8 py-3.5 font-semibold text-zinc-800 transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
             >
               Book installation

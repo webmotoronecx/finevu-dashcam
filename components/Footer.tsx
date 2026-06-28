@@ -39,7 +39,7 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <Link href="#">
+            <Link href="/where-to-buy">
               <motion.button
                 className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow font-semibold text-sm uppercase tracking-wider"
                 whileHover={{ scale: 1.05 }}
@@ -90,7 +90,7 @@ export function Footer() {
               <ul className="space-y-4">
                 <li><Link href="/gx4k" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX4K — 4K 2CH</Link></li>
                 <li><Link href="/gx35" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX35 — 2K 2CH</Link></li>
-                <li><Link href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Features &amp; App</Link></li>
+                <li><Link href="/how-it-works" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Features &amp; App</Link></li>
                 <li><Link href="/services" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Installation</Link></li>
               </ul>
             </div>
@@ -99,9 +99,9 @@ export function Footer() {
             <div>
               <h4 className="text-white mb-6 font-semibold">Company</h4>
               <ul className="space-y-4">
-                <li><Link href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">About FineVu</Link></li>
-                <li><Link href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Where to Buy</Link></li>
-                <li><Link href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Learn</Link></li>
+                <li><Link href="/about" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">About FineVu</Link></li>
+                <li><Link href="/where-to-buy" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Where to Buy</Link></li>
+                <li><Link href="/learn" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Learn</Link></li>
                 <li><Link href="/contact" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Contact</Link></li>
               </ul>
             </div>
@@ -112,7 +112,7 @@ export function Footer() {
               <ul className="space-y-4">
                 <li><Link href="/support" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Help &amp; Support</Link></li>
                 <li><Link href="/faq" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">FAQs</Link></li>
-                <li><Link href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
+                <li><Link href="/booking" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
                 <li><span className="text-zinc-400 text-sm">{contact.warranty}</span></li>
               </ul>
             </div>

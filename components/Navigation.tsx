@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, X, ChevronDown, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,25 +14,88 @@ const dropdownProducts = [
     href: "/gx4k",
     name: "GX4K",
     subtitle: "True 4K UHD · SONY STARVIS",
-    image: "/products/gx4k-studio.jpg",
+    image: "/products/gx4k-card.jpg",
     badge: "4K UHD",
-    badgeClass: "bg-[var(--finevu-orange)]",
+    badgeClass: "bg-[#f47920]",
   },
   {
     href: "/gx35",
     name: "GX35",
     subtitle: "Premium 2K Camera · Front & Rear",
-    image: "/products/gx35-hero.jpg",
+    image: "/products/gx35-card.jpg",
     badge: "2K · Best Value",
-    badgeClass: "bg-zinc-900",
+    badgeClass: "bg-[#0b0b0c]",
   },
 ];
+
+// Find Retailer pill gradient — exact Figma stops (node 17:7245).
+const CTA_GRADIENT =
+  "linear-gradient(25.69deg, #372649 10.48%, #4f2d74 38.42%, #6284d8 74.91%)";
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [isDarkBackground, setIsDarkBackground] = useState(true);
   const pathname = usePathname();
+  const productsBtnRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const focusFirstOnOpen = useRef(false);
+
+  const focusFirstItem = () => {
+    panelRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+  };
+
+  // Close the Products mega-menu on Escape and restore focus to its trigger.
+  useEffect(() => {
+    if (!productsOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setProductsOpen(false);
+        productsBtnRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [productsOpen]);
+
+  // Move focus into the panel only when it was opened via the keyboard
+  // (ArrowDown/Up on the trigger). Mouse / Enter open keeps focus on the trigger.
+  useEffect(() => {
+    if (productsOpen && focusFirstOnOpen.current) {
+      focusFirstOnOpen.current = false;
+      focusFirstItem();
+    }
+  }, [productsOpen]);
+
+  // Roving focus through the menu items with arrow / Home / End keys.
+  const handlePanelKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const items = Array.from(
+      panelRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []
+    );
+    if (items.length === 0) return;
+    const current = items.indexOf(document.activeElement as HTMLElement);
+    let next = -1;
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        next = current < 0 ? 0 : (current + 1) % items.length;
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        next = current <= 0 ? items.length - 1 : current - 1;
+        break;
+      case "Home":
+        next = 0;
+        break;
+      case "End":
+        next = items.length - 1;
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    items[next]?.focus();
+  };
 
   // Sample the section under the navbar to theme the glass + text colours.
   useEffect(() => {
@@ -94,13 +157,13 @@ export function Navigation() {
       };
 
   const lBase = productsOpen
-    ? "text-zinc-700 hover:text-zinc-950"
+    ? "text-[#0b0b0c] hover:text-black"
     : isDarkBackground
       ? "text-white/80 hover:text-white"
       : "text-zinc-600 hover:text-zinc-950";
   const lActive = productsOpen || !isDarkBackground ? "text-zinc-950" : "text-white";
   const iconColor = productsOpen
-    ? "text-zinc-700 hover:text-zinc-950"
+    ? "text-[#0b0b0c] hover:text-black"
     : isDarkBackground
       ? "text-white/80 hover:text-white"
       : "text-zinc-600 hover:text-zinc-950";
@@ -128,7 +191,7 @@ export function Navigation() {
       >
         {/* Floating pill — morphs into a white panel when Products is open */}
         <div
-          className={`w-full max-w-[1213px] mx-auto mt-4 md:mt-6 rounded-[2.5rem] flex flex-col ${productsOpen ? "" : "btn-glow-purple"}`}
+          className={`w-full max-w-[1213px] mx-auto mt-4 md:mt-6 rounded-[45px] flex flex-col ${productsOpen ? "" : "btn-glow-purple"}`}
           style={pillStyle}
         >
           {/* Nav row — wide bar: logo pinned left, everything else pinned right (Figma 1213×90) */}
@@ -142,19 +205,34 @@ export function Navigation() {
             <div className="hidden md:flex items-center gap-7 lg:gap-9">
               {productsItem && (
                 <button
+                  ref={productsBtnRef}
                   onClick={() => setProductsOpen((v) => !v)}
-                  className={`relative text-[15px] transition-colors flex items-center gap-1.5 font-medium ${
-                    productsOpen ? "text-[var(--finevu-orange)]" : lBase
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      if (productsOpen) {
+                        focusFirstItem();
+                      } else {
+                        focusFirstOnOpen.current = true;
+                        setProductsOpen(true);
+                      }
+                    }
+                  }}
+                  className={`relative text-[16px] tracking-[-0.3px] transition-colors flex items-center gap-1.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${
+                    productsOpen
+                      ? "font-semibold text-[var(--finevu-orange)]"
+                      : `font-medium ${lBase}`
                   }`}
-                  aria-haspopup="true"
+                  aria-haspopup="menu"
                   aria-expanded={productsOpen}
+                  aria-controls="products-menu"
                 >
                   {productsItem.label}
                   <ChevronDown
                     className={`w-4 h-4 transition-transform duration-300 ${productsOpen ? "rotate-180" : ""}`}
                   />
                   {productsOpen && (
-                    <span className="absolute -bottom-2 left-0 h-[2px] w-[72px] bg-[var(--finevu-orange)] rounded-full" />
+                    <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-[var(--finevu-orange)] rounded-full" />
                   )}
                 </button>
               )}
@@ -164,18 +242,23 @@ export function Navigation() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`text-[15px] font-medium transition-colors ${active ? lActive + " font-semibold" : lBase}`}
+                    className={`text-[16px] tracking-[-0.3px] font-medium transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${active ? lActive + " font-semibold" : lBase}`}
                   >
                     {link.label}
                   </Link>
                 );
               })}
-              <Link href="/support" aria-label="Search" className={`transition-colors ml-1 ${iconColor}`}>
-                <Search className="w-5 h-5" />
+              <Link
+                href="/support"
+                aria-label="Search"
+                className={`transition-colors ml-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${iconColor}`}
+              >
+                <Search className="w-[22px] h-[22px]" />
               </Link>
-              <Link href={primaryCta.href}>
+              <Link href={primaryCta.href} className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6284d8] focus-visible:ring-offset-2">
                 <motion.button
-                  className="brand-gradient-soft btn-glow-purple text-white font-semibold text-xs uppercase tracking-wider px-7 py-3 rounded-full"
+                  className="btn-glow-purple text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-7 py-3.5 rounded-full"
+                  style={{ backgroundImage: CTA_GRADIENT }}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -200,43 +283,51 @@ export function Navigation() {
             {productsOpen && (
               <motion.div
                 key="products-panel"
+                id="products-menu"
+                role="menu"
+                aria-label="Dash cameras"
+                ref={panelRef}
+                onKeyDown={handlePanelKeyDown}
                 className="hidden md:block overflow-hidden"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <div className="flex items-start gap-10 lg:gap-14 pl-[20%] pr-10 pt-5 pb-9">
-                  <span className="text-[15px] font-semibold text-zinc-900 whitespace-nowrap pt-2 tracking-wide">
-                    Dash Cameras
-                  </span>
-                  <div className="flex gap-5 lg:gap-6">
-                    {dropdownProducts.map((p) => (
-                      <Link
-                        key={p.href}
-                        href={p.href}
-                        onClick={() => setProductsOpen(false)}
-                        className="group block w-[152px] lg:w-[170px]"
-                      >
-                        <div className="relative aspect-[199/236] rounded-2xl overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-200">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={p.image}
-                            alt={p.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          <span
-                            className={`absolute top-2.5 left-2.5 px-2.5 py-[3px] rounded-full text-[8px] font-semibold uppercase tracking-wider text-white ${p.badgeClass}`}
-                          >
-                            {p.badge}
-                          </span>
-                        </div>
-                        <h4 className="mt-3 text-[16px] lg:text-[17px] font-bold text-zinc-900 group-hover:text-[var(--finevu-orange)] transition-colors">
-                          {p.name}
-                        </h4>
-                        <p className="mt-1 text-[10px] lg:text-[11px] text-zinc-400 whitespace-nowrap">{p.subtitle}</p>
-                      </Link>
-                    ))}
+                <div className="flex justify-center pt-2 pb-12">
+                  <div className="flex items-start gap-[55px]">
+                    <span className="text-[16px] font-semibold text-[#0b0b0c] whitespace-nowrap tracking-[-0.3px] pt-1">
+                      Dash Cameras
+                    </span>
+                    <div className="flex gap-[21px]">
+                      {dropdownProducts.map((p) => (
+                        <Link
+                          key={p.href}
+                          href={p.href}
+                          role="menuitem"
+                          onClick={() => setProductsOpen(false)}
+                          className="group block w-[199px] rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-4"
+                        >
+                          <div className="relative aspect-[199/236] rounded-[20px] overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={p.image}
+                              alt={p.name}
+                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <span
+                              className={`absolute top-[10px] left-[10px] inline-flex items-center h-[15px] px-2.5 rounded-full text-[8px] font-semibold uppercase tracking-[0.24px] leading-none text-white ${p.badgeClass}`}
+                            >
+                              {p.badge}
+                            </span>
+                          </div>
+                          <h4 className="mt-3 text-[17px] font-bold text-[#18181b] group-hover:text-[var(--finevu-orange)] transition-colors">
+                            {p.name}
+                          </h4>
+                          <p className="mt-1 text-[11px] text-[#9f9fa9] whitespace-nowrap">{p.subtitle}</p>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -255,18 +346,26 @@ export function Navigation() {
               transition={{ duration: 0.25 }}
             >
               <div className="px-6 py-6 space-y-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                  Dash Cameras
+                </p>
                 {productsItem?.children?.map((c) => (
-                  <Link key={c.href} href={c.href} className="block text-white/80 hover:text-white transition-colors">
+                  <Link key={c.href} href={c.href} className="block pl-3 text-white/80 hover:text-white transition-colors">
                     {c.label}
                   </Link>
                 ))}
-                {flatLinks.map((link) => (
-                  <Link key={link.href} href={link.href} className="block text-white/80 hover:text-white transition-colors">
-                    {link.label}
-                  </Link>
-                ))}
+                <div className="pt-2 space-y-4">
+                  {flatLinks.map((link) => (
+                    <Link key={link.href} href={link.href} className="block text-white/80 hover:text-white transition-colors">
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
                 <Link href={primaryCta.href} className="block pt-2">
-                  <button className="w-full brand-gradient-soft text-white font-semibold text-xs uppercase tracking-wider px-6 py-3 rounded-full">
+                  <button
+                    className="w-full text-white font-semibold text-[13px] uppercase tracking-wider px-6 py-3.5 rounded-full"
+                    style={{ backgroundImage: CTA_GRADIENT }}
+                  >
                     {primaryCta.label}
                   </button>
                 </Link>

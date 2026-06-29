@@ -3,24 +3,27 @@
 import { Footer } from "@/components/Footer";
 import { motion } from "motion/react";
 import { useState } from "react";
-import {
-  BadgeCheck,
-  ShieldCheck,
-  Wrench,
-  MapPin,
-  Phone,
-  Globe,
-  ArrowRight,
-  Store,
-} from "lucide-react";
+import { Package, ShieldCheck, Wrench, MapPin, Phone, Globe } from "lucide-react";
 import Link from "next/link";
 
+/* ============================================================================
+   WHERE TO BUY — FineVu reseller directory (Figma node 22:13776)
+   Light page: grey hero placeholder, #f4f4f5 "why" band, white directory,
+   dark #161618 trade band. Headings are uppercase per the Figma.
+   ============================================================================ */
+
 const fadeUp = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.6 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
+
+const SHELL = "max-w-[1180px] mx-auto px-6";
+const BADGE =
+  "inline-flex items-center rounded-full bg-[var(--finevu-orange)] px-3 py-[5px] text-[11px] font-bold uppercase tracking-[0.14em] text-white";
+const HEAD =
+  "text-[#1a1a1c] text-3xl sm:text-4xl lg:text-5xl font-bold uppercase leading-[1.04] tracking-tight";
 
 type Reseller = {
   name: string;
@@ -108,24 +111,24 @@ const totalCount = groups.reduce((sum, g) => sum + g.resellers.length, 0);
 
 const whyReasons = [
   {
-    icon: BadgeCheck,
+    icon: Package,
     title: "Genuine stock",
-    desc: "Real FineVu units — current models, sealed and ready to fit. No grey imports or old stock.",
+    desc: "Real FineVu units — current models, sealed and ready to fit. No grey imports, no surprises.",
   },
   {
     icon: ShieldCheck,
     title: "Full AU warranty",
-    desc: "Your purchase is covered by our 3-year Australian warranty and backed by local support.",
+    desc: "Your purchase is covered by our 3-year Australian warranty and local support team.",
   },
   {
     icon: Wrench,
     title: "Expert fitting",
-    desc: "Installers who know the product and fit it cleanly the first time — wiring concealed, tested and ready.",
+    desc: "Installers who know the product and fit it cleanly — wiring hidden, set up the first time.",
   },
 ];
 
 const typeBadge: Record<Reseller["type"], string> = {
-  "In-store": "bg-[var(--finevu-orange)]/10 text-[var(--finevu-orange)]",
+  "In-store": "bg-[#fff1e7] text-[var(--finevu-orange)]",
   Mobile: "bg-blue-50 text-blue-600",
   Online: "bg-emerald-50 text-emerald-600",
 };
@@ -135,30 +138,30 @@ const webHref = (web: string) => `https://${web.replace(/^https?:\/\//, "")}`;
 
 function ResellerCard({ r }: { r: Reseller }) {
   return (
-    <div className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 transition-all hover:border-zinc-300 hover:shadow-md">
-      <div className="flex items-start justify-between gap-3">
-        <h4 className="font-bold text-zinc-900 leading-snug">{r.name}</h4>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${typeBadge[r.type]}`}>
+    <div className="flex flex-col rounded-[10px] border border-[#e6e6e9] bg-white p-5 transition-shadow hover:shadow-md">
+      <div className="flex items-start justify-between gap-3 pb-3">
+        <h4 className="text-[15px] font-bold leading-tight text-[#1a1a1c]">{r.name}</h4>
+        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${typeBadge[r.type]}`}>
           {r.type}
         </span>
       </div>
 
-      <div className="mt-3 space-y-2 text-sm text-zinc-600">
+      <div className="flex flex-1 flex-col gap-1.5 text-[14px] text-[#6b6b72]">
         <p className="flex items-start gap-2">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+          <MapPin className="mt-[3px] h-[13px] w-[13px] shrink-0 text-[var(--finevu-orange)]" />
           <span>{r.location}</span>
         </p>
         {r.phone && (
-          <p className="flex items-center gap-2">
-            <Phone className="h-4 w-4 shrink-0 text-zinc-400" />
+          <p className="flex items-start gap-2">
+            <Phone className="mt-[3px] h-[13px] w-[13px] shrink-0 text-[var(--finevu-orange)]" />
             <a href={telHref(r.phone)} className="hover:text-[var(--finevu-orange)] transition-colors">
               {r.phone}
             </a>
           </p>
         )}
         {r.web && (
-          <p className="flex items-center gap-2">
-            <Globe className="h-4 w-4 shrink-0 text-zinc-400" />
+          <p className="flex items-start gap-2">
+            <Globe className="mt-[3px] h-[13px] w-[13px] shrink-0 text-[var(--finevu-orange)]" />
             <a
               href={webHref(r.web)}
               target="_blank"
@@ -171,11 +174,11 @@ function ResellerCard({ r }: { r: Reseller }) {
         )}
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         {r.phone && (
           <a
             href={telHref(r.phone)}
-            className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+            className="rounded-full bg-[#2d2d30] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-black"
           >
             Call
           </a>
@@ -185,7 +188,7 @@ function ResellerCard({ r }: { r: Reseller }) {
             href={webHref(r.web)}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
+            className="rounded-full border border-[#e6e6e9] px-4 py-2 text-[13px] font-semibold text-[#1a1a1c] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
           >
             Visit site
           </a>
@@ -206,94 +209,85 @@ export default function Page() {
   ];
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
-      {/* Hero — #656565 placeholder per Figma (client to supply art) */}
-      <section
-        className="relative w-full px-4 md:px-8 lg:px-[5.5vw] pt-3 md:pt-4 pb-3 lg:pb-[1vw]"
-        data-nav-theme="dark"
-      >
-        <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.5rem] min-h-[600px] lg:min-h-[max(540px,36vw)] flex items-center justify-center">
-          <div className="absolute inset-0 bg-[#656565]" />
-          <motion.div
-            className="relative z-10 max-w-3xl mx-auto px-6 text-center pt-28 md:pt-24 pb-16"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-          >
-            <p className="text-white/80 font-semibold text-xs md:text-sm tracking-[0.24em] uppercase mb-5">
-              Install Network
-            </p>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white tracking-tight leading-[1.02] mb-6">
-              Find a FineVu near you
-            </h1>
-            <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">
-              Buy, fit and get support from an authorised FineVu reseller — right across Australia.
-              Genuine stock, full warranty and expert installation.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <a href="#network" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
-                  Browse by State
-                </button>
-              </a>
-              <a
-                href="https://autoxtreme.com.au"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto"
-              >
-                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
-                  Shop Online
-                </button>
-              </a>
-            </div>
+    <main className="min-h-screen bg-white overflow-x-hidden">
+      {/* ===================================================================
+          1. HERO — full-bleed grey placeholder (client to supply art)
+      =================================================================== */}
+      <section data-nav-theme="dark" className="relative bg-[#656565] text-white">
+        <motion.div
+          className="relative z-10 mx-auto max-w-[760px] px-6 pt-[210px] pb-[96px] text-center"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/75">
+            Install network
+          </p>
+          <h1 className="mt-6 text-5xl sm:text-6xl lg:text-[80px] font-bold uppercase leading-[1.04] tracking-[-0.01em]">
+            Find a FineVu
+            <br />
+            near you
+          </h1>
+          <p className="mt-7 mx-auto max-w-[560px] text-base leading-relaxed text-white/80">
+            Buy, fit and get support from an authorised FineVu reseller — right across Australia.
+            Genuine stock, full warranty and expert installation.
+          </p>
+          <div className="mt-11 flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <a href="#network" className="w-full sm:w-auto">
+              <button className="w-full sm:w-[214px] h-12 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-[14px] uppercase tracking-[0.04em] transition-transform hover:scale-[1.03]">
+                Browse by state
+              </button>
+            </a>
+            <a href="https://autoxtreme.com.au" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+              <button className="w-full sm:w-[214px] h-12 rounded-full border border-white/40 text-white font-semibold text-[14px] uppercase tracking-[0.04em] hover:bg-white/10 transition-colors">
+                Shop online
+              </button>
+            </a>
+          </div>
 
-            {/* Stats */}
-            <div className="flex justify-center gap-10 sm:gap-16">
-              {stats.map((s) => (
-                <div key={s.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-[var(--finevu-orange)]">{s.value}</div>
-                  <div className="text-[11px] md:text-xs uppercase tracking-wider text-white/70 mt-1">
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+          {/* Stats */}
+          <div className="mt-20 flex justify-center gap-12 sm:gap-16">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-4xl font-bold text-[var(--finevu-orange)]">{s.value}</div>
+                <div className="mt-1 text-[12px] uppercase tracking-[0.08em] text-white/70">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </section>
 
-      {/* Why authorised */}
-      <section className="py-16 md:py-24 bg-zinc-50" data-nav-theme="light">
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
-          <motion.div className="text-center max-w-2xl mx-auto mb-12 md:mb-16" {...fadeUp}>
-            <span className="finevu-capsule mb-5">Why authorised</span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-900 mb-4">
-              Buy it right. Get it fitted right.
-            </h2>
-            <p className="text-lg text-zinc-600">
+      {/* ===================================================================
+          2. WHY AUTHORISED
+      =================================================================== */}
+      <section data-nav-theme="light" className="bg-[#f4f4f5] py-20">
+        <div className={SHELL}>
+          <motion.div className="text-center" {...fadeUp}>
+            <span className={BADGE}>Why authorised</span>
+            <h2 className={`mt-5 ${HEAD}`}>Buy it right. Get it fitted right.</h2>
+            <p className="mt-3 mx-auto max-w-[540px] text-base leading-relaxed text-[#6b6b72]">
               Choose an authorised reseller for genuine stock, full warranty and installers who actually
               know the product.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5">
             {whyReasons.map((r, i) => {
               const Icon = r.icon;
               return (
                 <motion.div
                   key={r.title}
-                  className="rounded-[1.75rem] border border-zinc-200 bg-white p-8"
-                  initial={{ opacity: 0, y: 30 }}
+                  className="rounded-[10px] border border-[#e6e6e9] bg-white p-7"
+                  initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-[var(--finevu-orange)]/10 flex items-center justify-center mb-5">
-                    <Icon className="w-6 h-6 text-[var(--finevu-orange)]" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#fff1e7]">
+                    <Icon className="h-5 w-5 text-[var(--finevu-orange)]" />
                   </div>
-                  <h3 className="text-lg font-bold text-zinc-900 mb-2">{r.title}</h3>
-                  <p className="text-sm text-zinc-600 leading-relaxed">{r.desc}</p>
+                  <h3 className="mt-3 text-[16px] font-semibold text-[#1a1a1c]">{r.title}</h3>
+                  <p className="mt-1.5 text-[15px] leading-relaxed text-[#6b6b72]">{r.desc}</p>
                 </motion.div>
               );
             })}
@@ -301,54 +295,62 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Find a reseller */}
-      <section id="network" className="py-16 md:py-24 bg-white scroll-mt-24" data-nav-theme="light">
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
-          <motion.div className="mb-8" {...fadeUp}>
-            <span className="finevu-capsule mb-5">The network</span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-900 mb-4">
-              Find a reseller
-            </h2>
-            <p className="text-lg text-zinc-600">
+      {/* ===================================================================
+          3. FIND A RESELLER
+      =================================================================== */}
+      <section id="network" className="bg-white py-20 scroll-mt-24" data-nav-theme="light">
+        <div className={SHELL}>
+          <motion.div {...fadeUp}>
+            <span className={BADGE}>The network</span>
+            <h2 className={`mt-5 ${HEAD}`}>Find a reseller</h2>
+            <p className="mt-3 max-w-[540px] text-base leading-relaxed text-[#6b6b72]">
               Filter by state, or scroll the full list. Tap to call or visit a site.
             </p>
           </motion.div>
 
           {/* Filter chips */}
-          <div className="flex flex-wrap gap-2.5 mb-10">
+          <div className="mt-8 flex flex-wrap gap-2.5">
             <button
               onClick={() => setActive("all")}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              className={`rounded-full px-[17px] py-2 text-[13px] font-semibold transition-colors ${
                 active === "all"
-                  ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                  ? "bg-[#2d2d30] text-white"
+                  : "border border-[#e6e6e9] bg-white text-[#1a1a1c] hover:border-zinc-300"
               }`}
             >
-              All <span className="opacity-60">{totalCount}</span>
+              All{" "}
+              <span className={`text-[11px] font-bold ${active === "all" ? "text-white/70" : "text-[var(--finevu-orange)]"}`}>
+                {totalCount}
+              </span>
             </button>
             {groups.map((g) => (
               <button
                 key={g.key}
                 onClick={() => setActive(g.key)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                className={`rounded-full px-[17px] py-2 text-[13px] font-semibold transition-colors ${
                   active === g.key
-                    ? "bg-zinc-900 text-white"
-                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                    ? "bg-[#2d2d30] text-white"
+                    : "border border-[#e6e6e9] bg-white text-[#1a1a1c] hover:border-zinc-300"
                 }`}
               >
-                {g.label} <span className="opacity-60">{g.resellers.length}</span>
+                {g.label}{" "}
+                <span className={`text-[11px] font-bold ${active === g.key ? "text-white/70" : "text-[var(--finevu-orange)]"}`}>
+                  {g.resellers.length}
+                </span>
               </button>
             ))}
           </div>
 
           {/* Groups */}
-          <div className="space-y-12">
+          <div className="mt-10 space-y-10">
             {shownGroups.map((g) => (
               <div key={g.key}>
-                <div className="flex items-center gap-4 mb-6">
-                  <h3 className="text-xl font-bold text-zinc-900 whitespace-nowrap">{g.label}</h3>
-                  <span className="h-px flex-1 bg-zinc-200" />
-                  <span className="text-sm font-semibold text-zinc-400">{g.resellers.length}</span>
+                <div className="mb-5 flex items-center gap-4">
+                  <h3 className="whitespace-nowrap text-[13px] font-bold uppercase tracking-[0.1em] text-[#1a1a1c]">
+                    {g.label}
+                  </h3>
+                  <span className="h-px flex-1 bg-gradient-to-r from-[var(--finevu-orange)] to-transparent" />
+                  <span className="text-[13px] font-semibold text-zinc-400">{g.resellers.length}</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {g.resellers.map((r) => (
@@ -361,35 +363,45 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Trade enquiries */}
-      <section className="py-16 md:py-24 bg-zinc-950" data-nav-theme="dark">
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      {/* ===================================================================
+          4. TRADE ENQUIRIES
+      =================================================================== */}
+      <section data-nav-theme="dark" className="relative overflow-hidden bg-[#161618] py-20">
+        {/* radial orange glow, bottom-left */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(420px 220px at 14% 90%, rgba(244,121,32,0.18), rgba(122,61,16,0.09) 32%, rgba(0,0,0,0) 65%)",
+          }}
+        />
+        <div className={`relative ${SHELL}`}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             <motion.div {...fadeUp}>
-              <span className="finevu-capsule mb-5">Trade enquiries</span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-5">
+              <span className="inline-flex items-center rounded-full bg-[rgba(244,121,32,0.15)] px-3 py-[5px] text-[12px] font-medium uppercase tracking-[0.16em] text-[var(--finevu-orange)]">
+                Trade enquiries
+              </span>
+              <h2 className="mt-5 text-[22px] font-bold uppercase leading-[1.2] tracking-tight text-white">
                 Stock the No.1 dash cam brand in Korea.
               </h2>
-              <p className="text-lg text-zinc-400 leading-relaxed">
+              <p className="mt-4 max-w-[542px] text-base leading-relaxed text-[#bdbdc4]">
                 Join the FineVu reseller network and put a proven, premium product on your shelf — with
                 full distributor support, training and marketing behind you.
               </p>
             </motion.div>
 
             <motion.div
-              className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-8 md:p-10"
+              className="rounded-[14px] border border-white/10 bg-white/[0.05] p-8"
               {...fadeUp}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <div className="w-12 h-12 rounded-2xl bg-[var(--finevu-orange)]/15 flex items-center justify-center mb-5">
-                <Store className="w-6 h-6 text-[var(--finevu-orange)]" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Become a reseller</h3>
-              <p className="text-zinc-400 mb-6">Tell us about your business and we&apos;ll be in touch.</p>
-              <Link href="/contact">
-                <button className="inline-flex items-center gap-2 rounded-full bg-[var(--finevu-orange)] px-8 py-3.5 font-semibold text-white transition-transform hover:scale-[1.03]">
+              <h3 className="text-[18px] font-bold text-white">Become a reseller</h3>
+              <p className="mt-2 text-[14px] text-[#bdbdc4]">
+                Tell us about your business and we&apos;ll be in touch.
+              </p>
+              <Link href="/contact" className="mt-6 block">
+                <button className="w-full rounded-full bg-[var(--finevu-orange)] px-6 py-3 text-[14px] font-semibold uppercase tracking-[0.04em] text-white transition-transform hover:scale-[1.02]">
                   Apply now
-                  <ArrowRight className="w-5 h-5" />
                 </button>
               </Link>
             </motion.div>
@@ -398,6 +410,6 @@ export default function Page() {
       </section>
 
       <Footer />
-    </div>
+    </main>
   );
 }

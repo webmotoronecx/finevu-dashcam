@@ -249,7 +249,8 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Explore FineVu — horizontal carousel */}
+      {/* Explore FineVu — horizontal carousel (hidden for now; flip `false` to re-enable) */}
+      {false && (
       <section className="bg-[#f7f7f7] py-20 overflow-hidden" data-nav-theme="light">
         <div className="max-w-[1480px] mx-auto px-6">
           <div className="relative flex items-center justify-center mb-10">
@@ -291,6 +292,7 @@ export default function Page() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Where to buy / Install / Support */}
       <section className="bg-[#f7f7f7] pt-6 pb-24" data-nav-theme="light">

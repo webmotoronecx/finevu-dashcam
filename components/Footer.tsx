@@ -18,8 +18,8 @@ export function Footer() {
           alt="The FineVu dash cam range"
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-black/70" />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/45" />
       </div>
 
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
@@ -64,7 +64,7 @@ export function Footer() {
 
         {/* Footer panel, set over the product image */}
         <div className="pb-28">
-          <footer className="rounded-[2rem] border border-white/10 bg-[#1c1f26]/80 backdrop-blur-md px-8 md:px-12 lg:px-16 py-14 lg:py-16">
+          <footer className="rounded-[2rem] border border-white/10 bg-[#0c0e12]/45 backdrop-blur-[2px] px-8 md:px-12 lg:px-16 py-14 lg:py-16">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-10 lg:gap-14 mb-10">
               {/* Brand */}
               <div className="space-y-5 md:col-span-2">

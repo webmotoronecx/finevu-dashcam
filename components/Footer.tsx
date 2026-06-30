@@ -3,30 +3,18 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { siteConfig } from "@/config/site.config";
 
 export function Footer() {
   const { contact } = siteConfig;
 
   return (
-    <div className="relative overflow-hidden bg-[#0b0b0c]" data-nav-theme="dark">
-      {/* Product-lineup background (per Figma 22:11135) */}
-      <div className="absolute inset-0">
-        <ImageWithFallback
-          src="/products/footer-lineup.jpg"
-          alt="The FineVu dash cam range"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/45" />
-      </div>
-
+    <div className="relative overflow-hidden bg-black" data-nav-theme="dark">
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
         {/* CTA */}
-        <div className="text-center pt-28 md:pt-40 pb-12">
+        <div className="text-center pt-24 md:pt-32 pb-12">
           <motion.h2
-            className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1] mb-5 max-w-3xl mx-auto uppercase"
+            className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1] mb-5 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -64,7 +52,7 @@ export function Footer() {
 
         {/* Footer panel, set over the product image */}
         <div className="pb-28">
-          <footer className="rounded-[2rem] border border-white/10 bg-[#0c0e12]/45 backdrop-blur-[2px] px-8 md:px-12 lg:px-16 py-14 lg:py-16">
+          <footer className="rounded-[2rem] border border-white/10 px-8 md:px-12 lg:px-16 py-14 lg:py-16">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-10 lg:gap-14 mb-10">
               {/* Brand */}
               <div className="space-y-5 md:col-span-2">
@@ -98,8 +86,8 @@ export function Footer() {
               <div>
                 <h4 className="text-white mb-5 font-semibold text-sm">Dash Cams</h4>
                 <ul className="space-y-3">
-                  <li><Link href="/gx4k" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX4K — 4K 2CH</Link></li>
-                  <li><Link href="/gx35" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX35 — 2K 2CH</Link></li>
+                  <li><Link href="/gx4k" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX4K - 4K 2CH</Link></li>
+                  <li><Link href="/gx35" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX35 - 2K 2CH</Link></li>
                   <li><Link href="/how-it-works" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Features &amp; App</Link></li>
                   <li><Link href="/services" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Installation</Link></li>
                 </ul>

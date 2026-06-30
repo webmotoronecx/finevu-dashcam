@@ -129,7 +129,7 @@ export const articles: Article[] = [
 
       <div class="bg-zinc-50 p-6 rounded-xl border-l-4 border-[var(--finevu-orange)] my-8">
         <h4 class="font-bold text-zinc-900 mb-2">Get it installed properly</h4>
-        <p class="text-sm text-zinc-600">A clean hardwire install protects your warranty, keeps wiring out of sight, and makes sure ADAS and parking mode work as intended. Auto Xtreme can point you to a fitter, call 1800 818 288.</p>
+        <p class="text-sm text-zinc-600">A clean hardwire install protects your warranty, keeps wiring out of sight, and makes sure ADAS and parking mode work as intended. AutoXtreme can point you to a fitter, call 1800 818 288.</p>
       </div>
 
       <h3>ADAS plus a recording you can trust</h3>
@@ -256,7 +256,7 @@ export const articles: Article[] = [
 
       <div class="bg-zinc-50 p-6 rounded-xl border-l-4 border-[var(--finevu-orange)] my-8">
         <h4 class="font-bold text-zinc-900 mb-2">Peace of mind, backed locally</h4>
-        <p class="text-sm text-zinc-600">FineVu is Made in Korea, carries a 3-Year Australian Warranty and is distributed here by Auto Xtreme. Questions on fitting or footage? Call 1800 818 288.</p>
+        <p class="text-sm text-zinc-600">FineVu is Made in Korea, carries a 3-Year Australian Warranty and is distributed here by AutoXtreme. Questions on fitting or footage? Call 1800 818 288.</p>
       </div>
 
       <h3>The bottom line</h3>

@@ -29,7 +29,7 @@ export default function Page() {
     {
       icon: MapPin,
       title: "Local Australian support",
-      description: "Distributed in Australia by Auto Xtreme and backed by a 3-Year Australian Warranty, with a national network of mobile installers behind you."
+      description: "Distributed in Australia by AutoXtreme and backed by a 3-Year Australian Warranty, with a national network of mobile installers behind you."
     }
   ];
 
@@ -135,7 +135,7 @@ export default function Page() {
                 clear faces, clear evidence.
               </p>
               <p>
-                In Australia, FineVu is distributed by Auto Xtreme. That means global technology
+                In Australia, FineVu is distributed by AutoXtreme. That means global technology
                 leadership paired with local support, local stock and a 3-Year Australian Warranty.
                 It's a premium product, backed the way a premium product should be.
               </p>

@@ -13,7 +13,7 @@ export default function Page() {
       icon: Phone,
       title: "Call support",
       content: "1800 818 288",
-      subtext: "Auto Xtreme — Australian distributor for FineVu",
+      subtext: "AutoXtreme — Australian distributor for FineVu",
       link: "tel:1800818288",
       external: false,
     },
@@ -67,7 +67,7 @@ export default function Page() {
             </h1>
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Questions about a FineVu dash cam, installation or your warranty? FineVu is
-              distributed in Australia by Auto Xtreme — reach the team below.
+              distributed in Australia by AutoXtreme — reach the team below.
             </p>
             <div className="flex flex-wrap justify-center gap-3 pt-4">
               <span className="finevu-capsule">Made in Korea</span>
@@ -95,7 +95,7 @@ export default function Page() {
                   Talk to the team
                 </h2>
                 <p className="text-lg text-zinc-600 leading-relaxed">
-                  Auto Xtreme handles FineVu sales, support and warranty in Australia. Call,
+                  AutoXtreme handles FineVu sales, support and warranty in Australia. Call,
                   visit us online, or send a message and we'll get back to you.
                 </p>
               </div>
@@ -154,7 +154,7 @@ export default function Page() {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="w-6 h-6 text-[var(--finevu-orange)] flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-zinc-600 leading-relaxed">
-                    Every FineVu camera sold by Auto Xtreme is covered by a{" "}
+                    Every FineVu camera sold by AutoXtreme is covered by a{" "}
                     <span className="font-semibold text-zinc-900">3-Year Australian Warranty</span>{" "}
                     and built with SONY STARVIS sensors.
                   </p>

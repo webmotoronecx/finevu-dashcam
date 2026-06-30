@@ -82,7 +82,7 @@ export const siteConfig: SiteConfig = {
 
   contact: {
     phone: "1800 818 288",
-    distributor: "Auto Xtreme",
+    distributor: "AutoXtreme",
     distributorUrl: "https://autoxtreme.com.au",
     warranty: "3-Year Australian Warranty",
     origin: "Made in Korea",

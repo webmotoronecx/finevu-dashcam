@@ -68,7 +68,7 @@ const topics = [
     icon: ShieldCheck,
     title: "Warranty & repairs",
     description:
-      "Every FineVu comes with a 3-Year Australian Warranty. Lodge a claim or arrange a repair through Auto Xtreme on 1800 818 288.",
+      "Every FineVu comes with a 3-Year Australian Warranty. Lodge a claim or arrange a repair through AutoXtreme on 1800 818 288.",
     links: [
       { label: "Call 1800 818 288", href: "tel:1800818288" },
       { label: "Contact us", href: "/contact" },
@@ -294,7 +294,7 @@ export default function Page() {
             </h1>
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">
               Everything you need to install, set up and get the most from your FineVu dash cam —
-              backed by Auto Xtreme and a 3-Year Australian Warranty.
+              backed by AutoXtreme and a 3-Year Australian Warranty.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a href="#topics" className="w-full sm:w-auto">
@@ -439,7 +439,7 @@ export default function Page() {
               Talk to support
             </h2>
             <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">
-              Still stuck? Auto Xtreme, FineVu&apos;s Australian distributor, can help with setup,
+              Still stuck? AutoXtreme, FineVu&apos;s Australian distributor, can help with setup,
               warranty and repairs. Call us during support hours, Mon–Fri 9:00 AM – 5:00 PM AEST.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

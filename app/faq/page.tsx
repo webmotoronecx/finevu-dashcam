@@ -25,7 +25,7 @@ export default function Page() {
         },
         {
           q: "Where can I buy FineVu?",
-          a: "FineVu is distributed in Australia by Auto Xtreme and available through a national network of stockists and mobile installers. Use the Where to Buy page to find your nearest option, or call 1800 818 288."
+          a: "FineVu is distributed in Australia by AutoXtreme and available through a national network of stockists and mobile installers. Use the Where to Buy page to find your nearest option, or call 1800 818 288."
         }
       ]
     },
@@ -63,7 +63,7 @@ export default function Page() {
         },
         {
           q: "What warranty do I get?",
-          a: "Every FineVu sold in Australia comes with a 3-Year Australian Warranty, supported locally by Auto Xtreme — not a grey-import warranty from overseas."
+          a: "Every FineVu sold in Australia comes with a 3-Year Australian Warranty, supported locally by AutoXtreme — not a grey-import warranty from overseas."
         }
       ]
     }

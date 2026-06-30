@@ -109,6 +109,10 @@ const groups: Group[] = [
 
 const totalCount = groups.reduce((sum, g) => sum + g.resellers.length, 0);
 
+// Reseller directory + "Browse by state" CTA are hidden for now per client
+// request. Flip to true to restore the full list (data above is preserved).
+const SHOW_RESELLERS = false;
+
 const whyReasons = [
   {
     icon: Package,
@@ -233,11 +237,13 @@ export default function Page() {
             Genuine stock, full warranty and expert installation.
           </p>
           <div className="mt-11 flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <a href="#network" className="w-full sm:w-auto">
-              <button className="w-full sm:w-[214px] h-12 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-[14px] uppercase tracking-[0.04em] transition-transform hover:scale-[1.03]">
-                Browse by state
-              </button>
-            </a>
+            {SHOW_RESELLERS && (
+              <a href="#network" className="w-full sm:w-auto">
+                <button className="w-full sm:w-[214px] h-12 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-[14px] uppercase tracking-[0.04em] transition-transform hover:scale-[1.03]">
+                  Browse by state
+                </button>
+              </a>
+            )}
             <a href="https://autoxtreme.com.au" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
               <button className="w-full sm:w-[214px] h-12 rounded-full border border-white/40 text-white font-semibold text-[14px] uppercase tracking-[0.04em] hover:bg-white/10 transition-colors">
                 Shop online
@@ -296,8 +302,9 @@ export default function Page() {
       </section>
 
       {/* ===================================================================
-          3. FIND A RESELLER
+          3. FIND A RESELLER — hidden for now (toggle SHOW_RESELLERS)
       =================================================================== */}
+      {SHOW_RESELLERS && (
       <section id="network" className="bg-white py-20 scroll-mt-24" data-nav-theme="light">
         <div className={SHELL}>
           <motion.div {...fadeUp}>
@@ -362,6 +369,7 @@ export default function Page() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ===================================================================
           4. TRADE ENQUIRIES

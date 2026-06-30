@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, ChevronDown, Search } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
@@ -28,9 +28,8 @@ const dropdownProducts = [
   },
 ];
 
-// Find Retailer pill gradient — exact Figma stops (node 17:7245).
-const CTA_GRADIENT =
-  "linear-gradient(25.69deg, #372649 10.48%, #4f2d74 38.42%, #6284d8 74.91%)";
+// Find Retailer pill — solid brand orange per Figma v4 (node 113:3356).
+const CTA_ORANGE = "#F68428";
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -128,45 +127,27 @@ export function Navigation() {
   const productsItem = nav.find((n) => n.children);
   const flatLinks = nav.filter((n) => !n.children);
 
-  // When the Products panel is open the pill becomes a solid white panel with
-  // dark text; otherwise it is the translucent glass pill (themed per section).
+  // Translucent glass pill, themed to the section under the navbar.
   const glassStyle = isDarkBackground
     ? {
-        background: "rgba(217, 217, 217, 0.05)",
-        border: "1px solid rgba(255, 255, 255, 0.15)",
+        background: "rgba(255, 255, 255, 0.05)",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
       }
     : {
-        background: "rgba(255, 255, 255, 0.7)",
+        background: "rgba(255, 255, 255, 0.72)",
         border: "1px solid rgba(0, 0, 0, 0.06)",
       };
+  const pillStyle = {
+    ...glassStyle,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
+    transition: "background 250ms ease, border-color 250ms ease",
+  };
 
-  const pillStyle = productsOpen
-    ? {
-        background: "#ffffff",
-        border: "1px solid rgba(0, 0, 0, 0.06)",
-        boxShadow: "0 28px 60px -24px rgba(0,0,0,0.35)",
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
-        transition: "background 250ms ease, box-shadow 250ms ease, border-color 250ms ease",
-      }
-    : {
-        ...glassStyle,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
-        transition: "background 250ms ease, box-shadow 250ms ease, border-color 250ms ease",
-      };
-
-  const lBase = productsOpen
-    ? "text-[#0b0b0c] hover:text-black"
-    : isDarkBackground
-      ? "text-white/80 hover:text-white"
-      : "text-zinc-600 hover:text-zinc-950";
-  const lActive = productsOpen || !isDarkBackground ? "text-zinc-950" : "text-white";
-  const iconColor = productsOpen
-    ? "text-[#0b0b0c] hover:text-black"
-    : isDarkBackground
-      ? "text-white/80 hover:text-white"
-      : "text-zinc-600 hover:text-zinc-950";
+  const lBase = isDarkBackground
+    ? "text-white/85 hover:text-white"
+    : "text-zinc-600 hover:text-zinc-950";
+  const lActive = isDarkBackground ? "text-white" : "text-zinc-950";
 
   return (
     <>
@@ -189,20 +170,21 @@ export function Navigation() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {/* Floating pill — morphs into a white panel when Products is open */}
-        <div
-          className={`w-full max-w-[1213px] mx-auto mt-4 md:mt-6 rounded-[45px] flex flex-col ${productsOpen ? "" : "btn-glow-purple"}`}
-          style={pillStyle}
-        >
-          {/* Nav row — wide bar: logo pinned left, everything else pinned right (Figma 1213×90) */}
-          <div className="flex items-center w-full justify-between gap-5 px-5 py-2.5 md:px-11 md:py-6">
-            {/* Logo — left (orange/grey wordmark) */}
+        {/* Row: centered glass pill (logo + links) with the Find Retailer button
+            floating to the right — per Figma v4 (pill 113:3561, button 113:3356). */}
+        <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center">
+          {/* Centered pill */}
+          <div
+            className="relative z-10 flex w-full md:w-auto items-center justify-between md:justify-center gap-4 md:gap-12 rounded-full px-5 py-2.5 md:px-9 md:py-3"
+            style={pillStyle}
+          >
+            {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
               <Logo variant="primary" className="h-5 md:h-6 transition-transform duration-300 hover:scale-105" />
             </Link>
 
-            {/* Right cluster — links + search + Find Retailer, all pinned right */}
-            <div className="hidden md:flex items-center gap-7 lg:gap-9">
+            {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}
+            <div className="hidden md:flex items-center gap-7 lg:gap-8">
               {productsItem && (
                 <button
                   ref={productsBtnRef}
@@ -232,7 +214,7 @@ export function Navigation() {
                     className={`w-4 h-4 transition-transform duration-300 ${productsOpen ? "rotate-180" : ""}`}
                   />
                   {productsOpen && (
-                    <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-[var(--finevu-orange)] rounded-full" />
+                    <span className="absolute -bottom-2 left-0 right-0 h-[2px] bg-[var(--finevu-orange)] rounded-full" />
                   )}
                 </button>
               )}
@@ -248,23 +230,6 @@ export function Navigation() {
                   </Link>
                 );
               })}
-              <Link
-                href="/support"
-                aria-label="Search"
-                className={`transition-colors ml-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${iconColor}`}
-              >
-                <Search className="w-[22px] h-[22px]" />
-              </Link>
-              <Link href={primaryCta.href} className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6284d8] focus-visible:ring-offset-2">
-                <motion.button
-                  className="btn-glow-purple text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-7 py-3.5 rounded-full"
-                  style={{ backgroundImage: CTA_GRADIENT }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  {primaryCta.label}
-                </motion.button>
-              </Link>
             </div>
 
             {/* Mobile menu button */}
@@ -278,62 +243,75 @@ export function Navigation() {
             </button>
           </div>
 
-          {/* Products mega-menu panel — expands inside the pill */}
-          <AnimatePresence initial={false}>
-            {productsOpen && (
-              <motion.div
-                key="products-panel"
-                id="products-menu"
-                role="menu"
-                aria-label="Dash cameras"
-                ref={panelRef}
-                onKeyDown={handlePanelKeyDown}
-                className="hidden md:block overflow-hidden"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                <div className="flex justify-center pt-2 pb-12">
-                  <div className="flex items-start gap-[55px]">
-                    <span className="text-[16px] font-semibold text-[#0b0b0c] whitespace-nowrap tracking-[-0.3px] pt-1">
-                      Dash Cameras
-                    </span>
-                    <div className="flex gap-[21px]">
-                      {dropdownProducts.map((p) => (
-                        <Link
-                          key={p.href}
-                          href={p.href}
-                          role="menuitem"
-                          onClick={() => setProductsOpen(false)}
-                          className="group block w-[199px] rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-4"
-                        >
-                          <div className="relative aspect-[199/236] rounded-[20px] overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-200">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={p.image}
-                              alt={p.name}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                            <span
-                              className={`absolute top-[10px] left-[10px] inline-flex items-center h-[15px] px-2.5 rounded-full text-[8px] font-semibold uppercase tracking-[0.24px] leading-none text-white ${p.badgeClass}`}
-                            >
-                              {p.badge}
-                            </span>
-                          </div>
-                          <h4 className="mt-3 text-[17px] font-bold text-[#18181b] group-hover:text-[var(--finevu-orange)] transition-colors">
-                            {p.name}
-                          </h4>
-                          <p className="mt-1 text-[11px] text-[#9f9fa9] whitespace-nowrap">{p.subtitle}</p>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Find Retailer — solid orange, floating to the right of the pill */}
+          <Link
+            href={primaryCta.href}
+            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2"
+          >
+            <motion.button
+              className="text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-8 py-3.5 rounded-full shadow-[0_10px_28px_-12px_rgba(246,132,40,0.55)]"
+              style={{ backgroundColor: CTA_ORANGE }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              {primaryCta.label}
+            </motion.button>
+          </Link>
         </div>
+
+        {/* Products mega-menu — floating white panel centered below the pill */}
+        <AnimatePresence>
+          {productsOpen && (
+            <motion.div
+              key="products-panel"
+              id="products-menu"
+              role="menu"
+              aria-label="Dash cameras"
+              ref={panelRef}
+              onKeyDown={handlePanelKeyDown}
+              className="hidden md:block absolute left-1/2 -translate-x-1/2 top-full mt-3 z-50 rounded-[28px] bg-white border border-black/[0.06] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.35)]"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <div className="flex items-start gap-[55px] px-12 py-10">
+                <span className="text-[16px] font-semibold text-[#0b0b0c] whitespace-nowrap tracking-[-0.3px] pt-1">
+                  Dash Cameras
+                </span>
+                <div className="flex gap-[21px]">
+                  {dropdownProducts.map((p) => (
+                    <Link
+                      key={p.href}
+                      href={p.href}
+                      role="menuitem"
+                      onClick={() => setProductsOpen(false)}
+                      className="group block w-[199px] rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-4"
+                    >
+                      <div className="relative aspect-[199/236] rounded-[20px] overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.image}
+                          alt={p.name}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <span
+                          className={`absolute top-[10px] left-[10px] inline-flex items-center h-[15px] px-2.5 rounded-full text-[8px] font-semibold uppercase tracking-[0.24px] leading-none text-white ${p.badgeClass}`}
+                        >
+                          {p.badge}
+                        </span>
+                      </div>
+                      <h4 className="mt-3 text-[17px] font-bold text-[#18181b] group-hover:text-[var(--finevu-orange)] transition-colors">
+                        {p.name}
+                      </h4>
+                      <p className="mt-1 text-[11px] text-[#9f9fa9] whitespace-nowrap">{p.subtitle}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Mobile menu */}
         <AnimatePresence>
@@ -364,7 +342,7 @@ export function Navigation() {
                 <Link href={primaryCta.href} className="block pt-2">
                   <button
                     className="w-full text-white font-semibold text-[13px] uppercase tracking-wider px-6 py-3.5 rounded-full"
-                    style={{ backgroundImage: CTA_GRADIENT }}
+                    style={{ backgroundColor: CTA_ORANGE }}
                   >
                     {primaryCta.label}
                   </button>

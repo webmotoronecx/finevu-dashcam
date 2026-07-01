@@ -135,8 +135,13 @@ function Carousel({
   note?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const by = (d: number) =>
-    ref.current?.scrollBy({ left: d * 620, behavior: "smooth" });
+  const by = (d: number) => {
+    const track = ref.current;
+    if (!track) return;
+    const card = track.querySelector<HTMLElement>("[data-card]");
+    const step = card ? card.offsetWidth + 24 : 640; // card width + gap-6
+    track.scrollBy({ left: d * step, behavior: "smooth" });
+  };
   return (
     <section data-nav-theme="dark" className="py-16 md:py-24">
       <div className={`${SHELL} mb-8 md:mb-12 text-center`}>
@@ -149,8 +154,9 @@ function Carousel({
         {cards.map((c) => (
           <motion.article
             key={c.title}
+            data-card
             {...fadeUp}
-            className="w-[86vw] max-w-[600px] shrink-0 snap-start"
+            className="w-[var(--card-w)] shrink-0 snap-center"
           >
             {c.img ? (
               <div className="tile-hover relative aspect-[73/50] overflow-hidden rounded-[22px] border border-white/[0.06]">

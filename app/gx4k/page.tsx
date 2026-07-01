@@ -203,10 +203,11 @@ function BentoTile({
   className?: string;
 }) {
   return (
-    <div className={`tile-hover relative overflow-hidden rounded-[20px] ${className}`}>
+    <div className={`tile-hover relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-[#0b0b0b] ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={img} alt={label} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+      {/* object-contain so the full product is always visible (no cropping);
+          extra bottom padding reserves clean space for the label */}
+      <img src={img} alt={label} className="absolute inset-0 h-full w-full object-contain p-6 pb-16 md:p-8 md:pb-20" />
       <p className="absolute inset-x-0 bottom-5 px-4 text-center text-[15px] md:text-[17px] font-semibold text-white">
         {label}
         {sup && <sup className="ml-0.5 text-[10px] font-medium">[{sup}]</sup>}
@@ -592,17 +593,12 @@ export default function GX4KPage() {
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
-        <div className={SHELL}>
-          {/* Row 1 — taller tiles, No.1 wider than warranty (Figma 133:58) */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1.32fr_1fr]">
-            <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="h-[260px] sm:h-[380px] md:h-[440px]" />
-            <BentoTile img="/gx4k/warranty3.webp" label="3 Year Warranty" sup="1" className="h-[260px] sm:h-[380px] md:h-[440px]" />
-          </div>
-          {/* Row 2 — shorter, equal tiles */}
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="h-[220px] sm:h-[300px] md:h-[340px]" />
-            <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="h-[220px] sm:h-[300px] md:h-[340px]" />
-          </div>
+        {/* Uniform 2×2 grid — equal tiles, images fully contained (no cuts) */}
+        <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2`}>
+          <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[4/3]" />
+          <BentoTile img="/gx4k/warranty3.webp" label="3 Year Warranty" sup="1" className="aspect-[4/3]" />
+          <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="aspect-[4/3]" />
+          <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[4/3]" />
         </div>
       </section>
 
@@ -614,7 +610,7 @@ export default function GX4KPage() {
           </motion.div>
           <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[28px] border border-white/[0.06]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/gx4k/install.webp" alt="FineVu certified installer" className="h-[280px] w-full object-cover md:h-[520px]" />
+            <img src="/gx4k/wiring-experts.webp" alt="FineVu certified installer arriving on-site" className="h-[280px] w-full object-cover md:h-[520px]" />
           </motion.div>
           <p className={`mx-auto mt-8 max-w-[620px] ${BODY} text-center`}>
             The GX4K records straight out of the box, but full-time parking protection means

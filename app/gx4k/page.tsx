@@ -584,16 +584,25 @@ export default function GX4KPage() {
       </section>
       </div>
 
+      {/* 14–19 · #0B0B0B band — from "More reasons" through the Firmware /
+          "Do not power off…" section, per client spec ---------------------- */}
+      <div data-nav-theme="dark" style={{ background: "#0B0B0B" }}>
       {/* 14 · REASONS / INCLUDES bento ------------------------------------ */}
-      <section data-nav-theme="dark" className="py-16 md:py-24">
+      <section className="py-16 md:py-24">
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
-        <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2`}>
-          <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[16/10]" />
-          <BentoTile img="/gx4k/warranty3.webp" label="3 Year Warranty" sup="1" className="aspect-[16/10]" />
-          <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="aspect-[16/10]" />
-          <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[16/10]" />
+        <div className={SHELL}>
+          {/* Row 1 — taller tiles, No.1 wider than warranty (Figma 133:58) */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1.32fr_1fr]">
+            <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="h-[260px] sm:h-[380px] md:h-[440px]" />
+            <BentoTile img="/gx4k/warranty3.webp" label="3 Year Warranty" sup="1" className="h-[260px] sm:h-[380px] md:h-[440px]" />
+          </div>
+          {/* Row 2 — shorter, equal tiles */}
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="h-[220px] sm:h-[300px] md:h-[340px]" />
+            <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="h-[220px] sm:h-[300px] md:h-[340px]" />
+          </div>
         </div>
       </section>
 
@@ -764,6 +773,7 @@ export default function GX4KPage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* 20 · WARRANTY DISCLAIMER ----------------------------------------- */}
       <section data-nav-theme="dark" className="pb-24 pt-4">

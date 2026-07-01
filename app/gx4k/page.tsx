@@ -498,8 +498,14 @@ export default function GX4KPage() {
       {/* 12 · DISCREET BY DESIGN. showcase -------------------------------- */}
       <Showcase img="/gx4k/discreet.webp" title="Discreet by Design." subtitle="A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind." />
 
+      {/* 13 + 13b · DESIGNED TO DISAPPEAR band — one full-bleed gradient
+          container behind both sections (Figma "Rectangle 35" / 141:114) ---- */}
+      <div
+        data-nav-theme="dark"
+        style={{ background: "linear-gradient(180deg, #241C38 0%, #130F1E 7.2%, #08080C 59.6%)" }}
+      >
       {/* 13 · DESIGNED TO DISAPPEAR (banner + interactive tabs) ------------ */}
-      <section data-nav-theme="dark" className="py-20 md:py-28">
+      <section className="py-20 md:py-28">
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="Designed to Disappear" className="!text-[28px] md:!text-[42px]" />
         </motion.div>
@@ -548,7 +554,7 @@ export default function GX4KPage() {
       </section>
 
       {/* 13b · SMALL IN SIZE. RICH IN DETAIL. gallery --------------------- */}
-      <section data-nav-theme="dark" className="py-16 md:py-24">
+      <section className="py-16 md:py-24">
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="Small in Size. " grad="Rich in Detail." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
@@ -576,6 +582,7 @@ export default function GX4KPage() {
           </motion.div>
         </div>
       </section>
+      </div>
 
       {/* 14 · REASONS / INCLUDES bento ------------------------------------ */}
       <section data-nav-theme="dark" className="py-16 md:py-24">

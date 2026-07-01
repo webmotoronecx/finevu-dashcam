@@ -84,7 +84,7 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <Link href="/gx4k">
                 <motion.button
-                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow"
+                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition"
                 >
                   Explore the range
                 </motion.button>
@@ -261,7 +261,7 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
               <Link href="/gx4k">
                 <motion.button
-                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow inline-flex items-center gap-2"
+                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition inline-flex items-center gap-2"
                 >
                   Explore GX4K <MoveRight className="w-4 h-4" />
                 </motion.button>

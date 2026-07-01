@@ -60,7 +60,7 @@ export function ServiceCard({ name, price, duration, features, recommended, dela
           <motion.button
             className={`cta-hover w-full py-4 rounded-full font-medium tracking-wide ${
               recommended
-                ? 'bg-[var(--brand-primary)] text-white electric-glow hover:opacity-90'
+                ? 'bg-[var(--brand-primary)] text-white hover:opacity-90'
                 : 'border border-zinc-200 text-zinc-900 hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'
             }`}
           >

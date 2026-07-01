@@ -186,7 +186,7 @@ function BookingForm() {
 
           <button
             type="submit"
-            className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white electric-glow"
+            className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white"
           >
             Request Booking <ArrowUpRight className="w-4 h-4" />
           </button>

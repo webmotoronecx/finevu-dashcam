@@ -515,21 +515,23 @@ export default function GX4KPage() {
             />
           </motion.div>
 
-          {/* Tab selector */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-            {disappearTabs.map((t, i) => (
-              <button
-                key={t.title}
-                onClick={() => setDtd(i)}
-                aria-pressed={dtd === i}
-                className={`cta-hover rounded-full px-5 py-2.5 text-[13px] font-semibold ${
-                  dtd === i ? "text-white" : "text-zinc-500 hover:text-zinc-300"
-                }`}
-                style={dtd === i ? { backgroundImage: "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)" } : undefined}
-              >
-                {t.title}
-              </button>
-            ))}
+          {/* Tab selector — single inline row; drag/scroll horizontally on mobile */}
+          <div className="mt-8">
+            <div className="mx-auto flex w-max max-w-full gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {disappearTabs.map((t, i) => (
+                <button
+                  key={t.title}
+                  onClick={() => setDtd(i)}
+                  aria-pressed={dtd === i}
+                  className={`cta-hover shrink-0 whitespace-nowrap rounded-full px-5 py-2.5 text-[13px] font-semibold ${
+                    dtd === i ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                  style={dtd === i ? { backgroundImage: "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)" } : undefined}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Active tab copy */}

@@ -524,15 +524,8 @@ export default function GX4KPage() {
         </motion.div>
 
         <div className={SHELL}>
-          {/* Banner */}
-          <motion.div {...fadeUp} className="overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d14]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/gx4k/optics.webp"
-              alt="FineVu GX4K, screen-free wedge design"
-              className="h-[240px] w-full object-cover md:h-[520px]"
-            />
-          </motion.div>
+          {/* Banner — Figma 110:2716 (blank placeholder: #656565, rounded-[32px]) */}
+          <motion.div {...fadeUp} className="aspect-[1297/562] w-full rounded-[32px] bg-[#656565]" />
 
           {/* Tab selector — single inline row; drag/scroll horizontally on mobile */}
           <div className="mt-8">

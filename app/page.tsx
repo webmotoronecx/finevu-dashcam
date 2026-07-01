@@ -38,6 +38,8 @@ function Hero({
 }) {
   const dark = theme === 'dark';
   const text = dark ? 'text-white' : 'text-[#0b0b0c]';
+  // Video frames vary frame-to-frame, so guarantee legibility with a text shadow.
+  const shadow = video ? ' [text-shadow:0_2px_18px_rgba(0,0,0,0.7)]' : '';
   return (
     <section
       className="relative w-full overflow-hidden aspect-[2160/1245] min-h-[560px]"
@@ -64,21 +66,25 @@ function Hero({
           style={{ backgroundImage: `url(${image})` }}
         />
       )}
+      {video && (
+        // Readability scrim so overlaid copy stays legible over the video.
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/20" />
+      )}
       <div className="absolute inset-x-0 top-[15.1%] flex flex-col items-center text-center px-6">
         <motion.p
-          className={`${text} font-bold text-[11.5px] leading-[17px] tracking-[0.28em] uppercase`}
+          className={`${text}${shadow} font-bold text-[11.5px] leading-[17px] tracking-[0.28em] uppercase`}
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
         >
           {eyebrow}
         </motion.p>
         <motion.h1
-          className={`${text} font-bold uppercase text-5xl sm:text-6xl lg:text-[80px] leading-[1.04] lg:leading-[83px] tracking-[-0.01em] mt-[14px]`}
+          className={`${text}${shadow} font-bold uppercase text-5xl sm:text-6xl lg:text-[80px] leading-[1.04] lg:leading-[83px] tracking-[-0.01em] mt-[14px]`}
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}
         >
           {title}
         </motion.h1>
         <motion.p
-          className={`${dark ? 'text-white' : 'text-[#0b0b0c]'} text-base lg:text-[18px] leading-[30px] max-w-[470px] mt-6`}
+          className={`${dark ? 'text-white' : 'text-[#0b0b0c]'}${shadow} text-base lg:text-[18px] leading-[30px] max-w-[470px] mt-6`}
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
         >
           {sub}
@@ -175,9 +181,9 @@ export default function Page() {
         href="/gx4k"
       />
 
-      {/* Hero — GX35 (light studio) */}
+      {/* Hero — GX35 (video; white text over a readability scrim) */}
       <Hero
-        theme="light"
+        theme="dark"
         image="/home/hero-gx35.jpg"
         video="/home/GX35_Hero_Video_v2.mp4"
         eyebrow="FineVu GX35 2k · 2-Channel 2k QHD"

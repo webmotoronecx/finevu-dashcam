@@ -768,7 +768,7 @@ export default function GX4KPage() {
             {/* Divider + spec table */}
             <div className="mt-10 border-t border-white/10 md:mt-12">
               {compareRows.map(([label, a, b]) => (
-                <div key={label} className="grid grid-cols-2 gap-4 border-b border-white/[0.07] py-4 text-center sm:gap-8">
+                <div key={label} className="grid grid-cols-2 gap-4 py-4 text-center sm:gap-8">
                   <div>
                     <p className="text-[11px] text-zinc-500 sm:text-[12px]">{label}</p>
                     <p className="mt-1 text-[14px] font-semibold text-white sm:text-[16px]">{a}</p>

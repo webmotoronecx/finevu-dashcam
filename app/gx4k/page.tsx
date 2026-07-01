@@ -279,11 +279,28 @@ const cConnected: Card[] = [
   { title: "Built-in GPS", body: "Records speed, location and route with no external GPS to buy or wire in. Every clip stamped with exactly where and how fast you were going." },
 ];
 
-const disappear = [
-  "Screen-Free by Design",
-  "Disappears Behind the Mirror",
-  "One Cable, Clean Install",
-  "Details That Think Ahead",
+const disappearTabs = [
+  {
+    title: "Screen-Free by Design",
+    body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it's recording, keeping your attention where it belongs, on the road.",
+  },
+  {
+    title: "Disappears Behind the Mirror",
+    body: "At 96.5mm wide and just 114g, the wedge-shaped front unit tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g. Always present, never in sight.",
+  },
+  {
+    title: "One Cable, Clean Install",
+    body: "A single 6-metre cable links the rear camera and powers it at the same time, so there's no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
+  },
+  {
+    title: "Details That Think Ahead",
+    body: "Thoughtful touches throughout. A microSD slot with an on/off switch lets you pause recording without unplugging, QR-code pairing gets you set up in seconds, and simple physical buttons handle mic, emergency and Wi-Fi.",
+  },
+];
+
+const detailGallery = [
+  { src: "/gx4k/detail-lens.webp", alt: "GX4K lens macro", ratio: "746/562" },
+  { src: "/gx4k/detail-body.webp", alt: "FineVu machined body", ratio: "527/562" },
 ];
 
 const specRows: [string, string][] = [
@@ -341,6 +358,7 @@ const warranty = [
 
 export default function GX4KPage() {
   const [fwTab, setFwTab] = useState<"Firmware" | "User Manual" | "Speed Cam Data">("Firmware");
+  const [dtd, setDtd] = useState(0);
 
   return (
     <main className="overflow-hidden bg-[#08080c]">
@@ -480,31 +498,88 @@ export default function GX4KPage() {
       {/* 12 · DISCREET BY DESIGN. showcase -------------------------------- */}
       <Showcase img="/gx4k/discreet.webp" title="Discreet by Design." subtitle="A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind." />
 
-      {/* 13 · DESIGNED TO DISAPPEAR --------------------------------------- */}
+      {/* 13 · DESIGNED TO DISAPPEAR (banner + interactive tabs) ------------ */}
       <section data-nav-theme="dark" className="py-20 md:py-28">
-        <motion.div {...fadeUp} className={`${SHELL} text-center`}>
+        <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="Designed to Disappear" className="!text-[28px] md:!text-[42px]" />
-          <p className={`mx-auto mt-5 max-w-[600px] ${BODY} text-center`}>
-            No LCD, no glare, no distraction. Just subtle status lights that let you know it&apos;s
-            recording, keeping your attention where it belongs, on the road.
-          </p>
         </motion.div>
-        <div className={`${SHELL} mt-10 grid grid-cols-2 gap-4 md:grid-cols-4`}>
-          {disappear.map((d, i) => (
-            <motion.div
-              key={d}
-              {...fadeUp}
-              transition={{ duration: 0.5, delay: i * 0.06 }}
-              className="tile-hover rounded-[20px] border border-white/[0.06] bg-white/[0.02] p-6 text-center"
-            >
-              <p className="text-[15px] font-semibold text-white">{d}</p>
-            </motion.div>
-          ))}
+
+        <div className={SHELL}>
+          {/* Banner */}
+          <motion.div {...fadeUp} className="overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d14]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/gx4k/optics.webp"
+              alt="FineVu GX4K, screen-free wedge design"
+              className="h-[240px] w-full object-cover md:h-[520px]"
+            />
+          </motion.div>
+
+          {/* Tab selector */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+            {disappearTabs.map((t, i) => (
+              <button
+                key={t.title}
+                onClick={() => setDtd(i)}
+                aria-pressed={dtd === i}
+                className={`cta-hover rounded-full px-5 py-2.5 text-[13px] font-semibold ${
+                  dtd === i ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+                style={dtd === i ? { backgroundImage: "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)" } : undefined}
+              >
+                {t.title}
+              </button>
+            ))}
+          </div>
+
+          {/* Active tab copy */}
+          <motion.p
+            key={dtd}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className={`mx-auto mt-7 max-w-[660px] text-center ${BODY}`}
+          >
+            {disappearTabs[dtd].body}
+          </motion.p>
+        </div>
+      </section>
+
+      {/* 13b · SMALL IN SIZE. RICH IN DETAIL. gallery --------------------- */}
+      <section data-nav-theme="dark" className="py-16 md:py-24">
+        <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
+          <Head pre="Small in Size. " grad="Rich in Detail." className="!text-[26px] md:!text-[40px]" />
+        </motion.div>
+        <div className={`${SHELL} space-y-4`}>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1.42fr_1fr]">
+            {detailGallery.map((g) => (
+              <motion.div
+                key={g.src}
+                {...fadeUp}
+                className="tile-hover overflow-hidden rounded-[22px] border border-white/[0.06]"
+                style={{ aspectRatio: g.ratio.replace("/", " / ") }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={g.src} alt={g.alt} className="h-full w-full object-cover" />
+              </motion.div>
+            ))}
+          </div>
+          <motion.div
+            {...fadeUp}
+            className="tile-hover overflow-hidden rounded-[22px] border border-white/[0.06]"
+            style={{ aspectRatio: "1297 / 427" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/gx4k/detail-angle.webp" alt="GX4K angled macro" className="h-full w-full object-cover" />
+          </motion.div>
         </div>
       </section>
 
       {/* 14 · REASONS / INCLUDES bento ------------------------------------ */}
       <section data-nav-theme="dark" className="py-16 md:py-24">
+        <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
+          <Head pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
+        </motion.div>
         <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2`}>
           <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[16/10]" />
           <BentoTile img="/gx4k/warranty3.webp" label="3 Year Warranty" sup="1" className="aspect-[16/10]" />

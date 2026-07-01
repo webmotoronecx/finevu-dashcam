@@ -26,10 +26,11 @@ const SUB = 'text-[#5c6478] text-base lg:text-[18px] leading-[27px]';
 
 /* ─────────────────────────  HERO  ───────────────────────── */
 function Hero({
-  theme, image, eyebrow, title, sub, href,
+  theme, image, video, eyebrow, title, sub, href,
 }: {
   theme: 'dark' | 'light';
   image: string;
+  video?: string;
   eyebrow: string;
   title: string;
   sub: string;
@@ -42,10 +43,27 @@ function Hero({
       className="relative w-full overflow-hidden aspect-[2160/1245] min-h-[560px]"
       data-nav-theme={theme}
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${image})` }}
-      />
+      {video ? (
+        // Background video — autoplay/muted/loop for iOS; poster shows the
+        // still frame instantly and acts as a fallback if the video can't play.
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster={image}
+          aria-hidden="true"
+        >
+          <source src={video} type="video/mp4" />
+        </video>
+      ) : (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${image})` }}
+        />
+      )}
       <div className="absolute inset-x-0 top-[15.1%] flex flex-col items-center text-center px-6">
         <motion.p
           className={`${text} font-bold text-[11.5px] leading-[17px] tracking-[0.28em] uppercase`}
@@ -150,6 +168,7 @@ export default function Page() {
       <Hero
         theme="dark"
         image="/home/hero-gx4k.jpg"
+        video="/home/GX4K_Hero_Video_V2.mp4"
         eyebrow="FineVu GX4K · 2-Channel UHD"
         title="GX4K"
         sub="The clearest view of the road you've ever recorded - front and rear."
@@ -160,6 +179,7 @@ export default function Page() {
       <Hero
         theme="light"
         image="/home/hero-gx35.jpg"
+        video="/home/GX35_Hero_Video_v2.mp4"
         eyebrow="FineVu GX35 2k · 2-Channel 2k QHD"
         title="GX35"
         sub="QHD 2K clarity in a camera smaller than a credit card - now with a live view of your car from anywhere in the world."

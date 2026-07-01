@@ -21,7 +21,7 @@ export function Logo({ className = "h-7", variant = "primary" }: LogoProps) {
     <img
       src={src}
       alt="FineVu"
-      className={`${className} w-auto select-none`}
+      className={`${className} select-none`}
       draggable={false}
     />
   );

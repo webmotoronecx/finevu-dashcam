@@ -180,7 +180,7 @@ export function Navigation() {
           >
             {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
-              <Logo variant="primary" className="h-7 xl:h-9 transition-transform duration-300 hover:scale-105" />
+              <Logo variant="primary" className="w-[170px] h-[41px] object-contain transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}

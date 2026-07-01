@@ -252,7 +252,7 @@ export default function Page() {
           </div>
 
           {/* Stats */}
-          <div className="mt-20 flex justify-center gap-12 sm:gap-16">
+          <div className="mt-20 flex flex-wrap justify-center gap-x-8 gap-y-6 sm:gap-16">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-4xl font-bold text-[var(--finevu-orange)]">{s.value}</div>

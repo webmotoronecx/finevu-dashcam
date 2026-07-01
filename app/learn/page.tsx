@@ -123,13 +123,13 @@ export default function Page() {
       <section className="py-32 bg-white" data-nav-theme="light">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
           <motion.div
-            className="mb-20 flex justify-between items-end"
+            className="mb-20 flex flex-col gap-6 sm:flex-row sm:justify-between sm:items-end"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div>
+            <div className="min-w-0">
               <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
                 {selectedCategory === "All" ? "Latest guides" : `${selectedCategory} guides`}
               </h2>

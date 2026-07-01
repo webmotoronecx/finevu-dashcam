@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ==========================================================================
    THEME TOKENS — FineVu brand (single source of truth)
@@ -181,6 +182,13 @@ code, kbd, samp, pre {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Safari/WebKit still needs the prefixed form for clip-to-text; Tailwind's
+   `bg-clip-text` utility only emits the unprefixed property. Add the prefix
+   so gradient headings (e.g. the GX4K hero) aren't invisible on older iOS. */
+.bg-clip-text {
+  -webkit-background-clip: text;
 }
 
 /* Highlight capsule — orange pill used alongside headlines / as buttons */

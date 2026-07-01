@@ -216,7 +216,7 @@ export default function Page() {
             <p className="text-white/80 font-semibold text-xs md:text-sm tracking-[0.24em] uppercase mb-5">
               Install Network
             </p>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.02] uppercase mb-6">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.02] uppercase mb-6 break-words">
               Professional Installation
             </h1>
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">

@@ -202,7 +202,7 @@ export default function Page() {
       </div>
 
       <div className="max-w-[1440px] mx-auto px-8 lg:px-16 py-16 lg:py-24">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-24">
           
           {/* Sidebar (Left) - Share & TOC */}
           <div className="hidden lg:block lg:col-span-3">

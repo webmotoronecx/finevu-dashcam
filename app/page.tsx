@@ -172,11 +172,11 @@ export default function Page() {
           <motion.h2 className={`${HEAD} text-center mb-12`} {...fadeUp}>
             More reasons to choose FineVu.
           </motion.h2>
-          <motion.div className="grid grid-cols-[730fr_550fr] gap-5 mb-5" {...fadeUp}>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-[730fr_550fr] gap-5 mb-5" {...fadeUp}>
             <ReasonCard {...reasons[0]} aspect="aspect-[730/600]" />
             <ReasonCard {...reasons[1]} aspect="aspect-[550/600]" />
           </motion.div>
-          <motion.div className="grid grid-cols-2 gap-5" {...fadeUp}>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-5" {...fadeUp}>
             <ReasonCard {...reasons[2]} aspect="aspect-[640/400]" />
             <ReasonCard {...reasons[3]} aspect="aspect-[640/400]" />
           </motion.div>
@@ -296,7 +296,7 @@ export default function Page() {
 
       {/* Where to buy / Install / Support */}
       <section className="bg-[#f7f7f7] pt-6 pb-24" data-nav-theme="light">
-        <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-3 gap-8">
+        <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-3 gap-8">
           {quickLinks.map((q) => {
             const Icon = q.icon;
             return (

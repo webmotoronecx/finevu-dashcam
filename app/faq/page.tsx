@@ -146,7 +146,7 @@ export default function Page() {
                       >
                         <button
                           onClick={() => setOpenIndex(isOpen ? null : currentIndex)}
-                          className="w-full px-8 py-6 flex items-center justify-between text-left smooth-transition hover:bg-zinc-50"
+                          className="w-full px-5 sm:px-8 py-6 flex items-center justify-between text-left smooth-transition hover:bg-zinc-50"
                           aria-expanded={isOpen}
                         >
                           <span className="text-lg font-bold pr-8">{faq.q}</span>
@@ -168,7 +168,7 @@ export default function Page() {
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
-                          <div className="px-8 pb-6 text-zinc-600 leading-relaxed">
+                          <div className="px-5 sm:px-8 pb-6 text-zinc-600 leading-relaxed">
                             {faq.a}
                           </div>
                         </motion.div>

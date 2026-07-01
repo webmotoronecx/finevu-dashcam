@@ -308,7 +308,7 @@ export default function GX35Page() {
             </motion.div>
             <motion.div className="order-1 lg:order-2" {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
               <p className={EYEBROW}>Discreet by design</p>
-              <h2 className={`mt-4 ${HEAD} lg:whitespace-nowrap`}>Smaller than a credit card.</h2>
+              <h2 className={`mt-4 ${HEAD}`}>Smaller than a credit card.</h2>
               <p className={`mt-5 max-w-[465px] ${BODY}`}>
                 The GX35 tucks neatly behind your mirror and stays out of your eyeline. A swivel mount
                 lets you turn it toward a side window whenever you need a different angle.
@@ -442,7 +442,7 @@ export default function GX35Page() {
             {specRows.map(([label, value]) => (
               <div
                 key={label}
-                className="grid grid-cols-1 sm:grid-cols-[360px_1fr] gap-1 sm:gap-6 border-b border-[#e3e3e6] py-4"
+                className="grid grid-cols-1 sm:grid-cols-[minmax(160px,220px)_1fr] lg:grid-cols-[360px_1fr] gap-1 sm:gap-6 border-b border-[#e3e3e6] py-4"
               >
                 <dt className="text-[#d9670f] text-[11.5px] font-semibold uppercase tracking-[0.18em] pt-0.5">
                   {label}

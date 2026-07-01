@@ -14,6 +14,8 @@ import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 
 const SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
 const HEAD_GRAD = "linear-gradient(90deg, #8ea6f0 0%, #b79ce2 100%)";
+// FineVu Gradient v2 — used for the "What's in The Box?" item labels (Figma 110:2810)
+const BOX_GRAD = "linear-gradient(166deg, #603DB0 0%, #4F47FF 44%, #6284D8 100%)";
 const BODY = "text-[15px] md:text-[18px] leading-[1.6] text-[#a6a6a6]";
 
 const fadeUp = {
@@ -672,14 +674,26 @@ export default function GX4KPage() {
           <motion.div {...fadeUp}>
             <Head pre="What’s in The Box?" className="!text-[28px] md:!text-[40px]" />
           </motion.div>
-          <div className="mx-auto mt-8 grid max-w-[720px] grid-cols-2 gap-x-10 gap-y-4 sm:grid-cols-3">
+          {/* Box contents — 3-col × 2-row grid, each label gradient-filled (Figma 110:2810) */}
+          <div className="mx-auto mt-10 grid max-w-[760px] grid-cols-2 gap-x-10 gap-y-5 sm:grid-cols-3 md:mt-12">
             {boxItems.map((it) => (
-              <TwoTone key={it} text={it} className="text-[15px] md:text-[17px] font-semibold" />
+              <p
+                key={it}
+                className="text-[16px] font-medium md:text-[20px]"
+                style={{
+                  backgroundImage: BOX_GRAD,
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                {it}
+              </p>
             ))}
           </div>
-          <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d14]">
+          <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[32px] md:mt-12">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/gx4k/box.webp" alt="FineVu GX4K box contents" className="mx-auto max-h-[520px] w-auto object-contain" />
+            <img src="/gx4k/box.webp" alt="FineVu GX4K box contents" className="aspect-[1300/519] w-full object-cover" />
           </motion.div>
         </div>
       </section>

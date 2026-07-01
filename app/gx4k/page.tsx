@@ -196,21 +196,24 @@ function BentoTile({
   label,
   sup,
   className = "",
+  imgClass = "",
 }: {
   img: string;
   label: string;
   sup?: string;
   className?: string;
+  imgClass?: string;
 }) {
   return (
-    <div className={`tile-hover relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-[#0b0b0b] ${className}`}>
+    // Figma 133:58 tile — rounded-[32px], image cover-fills to the edges,
+    // white label overlaid at the bottom (subtle gradient for legibility).
+    <div className={`tile-hover relative overflow-hidden rounded-[32px] ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {/* object-contain so the full product is always visible (no cropping);
-          extra bottom padding reserves clean space for the label */}
-      <img src={img} alt={label} className="absolute inset-0 h-full w-full object-contain p-6 pb-16 md:p-8 md:pb-20" />
-      <p className="absolute inset-x-0 bottom-5 px-4 text-center text-[15px] md:text-[17px] font-semibold text-white">
+      <img src={img} alt={label} className={`absolute inset-0 h-full w-full object-cover ${imgClass}`} />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <p className="absolute inset-x-0 bottom-6 px-4 text-center text-[16px] font-semibold text-white md:text-[22px]">
         {label}
-        {sup && <sup className="ml-0.5 text-[10px] font-medium">[{sup}]</sup>}
+        {sup && <sup className="ml-0.5 align-super text-[11px] font-medium md:text-[13px]">[{sup}]</sup>}
       </p>
     </div>
   );
@@ -593,12 +596,23 @@ export default function GX4KPage() {
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
-        {/* Uniform 2×2 grid — equal tiles, images fully contained (no cuts) */}
-        <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2`}>
-          <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[4/3]" />
-          <BentoTile img="/gx4k/warranty3.webp" label="3 Year Warranty" sup="1" className="aspect-[4/3]" />
-          <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="aspect-[4/3]" />
-          <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[4/3]" />
+        {/* Figma 133:58 bento — top row taller (No.1 730 : warranty 550, both
+            600 tall), bottom row two equal tiles (640×400); 20px gaps */}
+        <div className={`${SHELL} space-y-4 sm:space-y-5`}>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
+            <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
+            <BentoTile
+              img="/gx4k/warranty3.webp"
+              label="3 Year Warranty"
+              sup="1"
+              imgClass="object-[50%_42%]"
+              className="aspect-[550/600] sm:aspect-auto sm:h-full"
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+            <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+            <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
+          </div>
         </div>
       </section>
 

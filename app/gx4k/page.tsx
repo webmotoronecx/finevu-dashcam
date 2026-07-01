@@ -360,6 +360,13 @@ const warranty = [
   ["Hardwire Kit & Power Cable", "GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6 month warranty."],
 ];
 
+// Help / quick-links row (Figma 180:225)
+const helpLinks: { icon: string; label: string; href: string; flip?: boolean }[] = [
+  { icon: "/gx4k/help-where.svg", label: "Where to buy", href: "/where-to-buy" },
+  { icon: "/gx4k/help-install.svg", label: "Install", href: "/booking", flip: true },
+  { icon: "/gx4k/help-support.svg", label: "Support", href: "/support" },
+];
+
 /* ------------------------------------------------------------- component -- */
 
 export default function GX4KPage() {
@@ -819,15 +826,45 @@ export default function GX4KPage() {
       </section>
       </div>
 
-      {/* 20 · WARRANTY DISCLAIMER ----------------------------------------- */}
-      <section data-nav-theme="dark" className="pb-24 pt-4">
-        <div className={`${SHELL} max-w-[900px] space-y-5`}>
-          {warranty.map(([h, body]) => (
-            <div key={h}>
-              <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-[#6e8fe6]">{h}</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-zinc-600">{body}</p>
-            </div>
-          ))}
+      {/* 20a · HELP / QUICK LINKS — Figma 180:225 (#121214 band) --------- */}
+      <section data-nav-theme="dark" className="bg-[#121214] py-14 md:py-20">
+        <div className={SHELL}>
+          <div className="mx-auto flex max-w-[900px] flex-col items-center justify-center gap-12 sm:flex-row sm:items-start sm:gap-16 md:gap-28">
+            {helpLinks.map((it) => (
+              <Link
+                key={it.label}
+                href={it.href}
+                className="group flex w-full flex-col items-center text-center sm:w-[200px]"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={it.icon}
+                  alt=""
+                  aria-hidden
+                  className={`h-[68px] w-[68px] md:h-[76px] md:w-[76px] ${it.flip ? "-scale-y-100" : ""}`}
+                />
+                <h3 className="mt-4 text-[20px] font-semibold text-white md:text-[22px]">{it.label}</h3>
+                <span className="mt-3.5 text-[15px] font-medium text-[#a6a6a6] transition-colors group-hover:text-white">
+                  Learn More &gt;
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 20b · WARRANTY DISCLAIMER — Figma 180:226 (#0f0f0f, decimal list) */}
+      <section data-nav-theme="dark" className="bg-[#0f0f0f] py-12 md:py-14">
+        <div className={SHELL}>
+          <ol className="mx-auto max-w-[1220px] list-decimal space-y-4 ps-5 text-[12px] font-medium leading-[18px] text-[#838383]">
+            {warranty.map(([h, body]) => (
+              <li key={h}>
+                {h}
+                <br />
+                {body}
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 

@@ -275,6 +275,22 @@ code, kbd, samp, pre {
   box-shadow: 0 24px 50px -18px rgba(246, 132, 40, 0.5);
 }
 
+/* Carousel track: left padding matches the centered content (SHELL max-w 1280),
+   so the first card lines up with the heading; the track still bleeds off the
+   right edge for scrolling. */
+.carousel-inset {
+  padding-left: max(1.5rem, calc((100% - 1280px) / 2 + 1.5rem));
+  scroll-padding-left: max(1.5rem, calc((100% - 1280px) / 2 + 1.5rem));
+  padding-right: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .carousel-inset {
+    padding-left: max(2.5rem, calc((100% - 1280px) / 2 + 2.5rem));
+    scroll-padding-left: max(2.5rem, calc((100% - 1280px) / 2 + 2.5rem));
+    padding-right: 2.5rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cta-hover:hover,
   .tile-hover:hover {

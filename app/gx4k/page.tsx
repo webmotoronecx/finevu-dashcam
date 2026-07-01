@@ -144,7 +144,7 @@ function Carousel({
       </div>
       <div
         ref={ref}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-pl-6 px-6 pb-4 lg:scroll-pl-10 lg:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="carousel-inset flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {cards.map((c) => (
           <motion.article

@@ -200,9 +200,9 @@ export default function Page() {
           </motion.div>
           <motion.div className="mt-10 overflow-hidden rounded-[24px]" {...fadeUp}>
             <ImageWithFallback
-              src="/home/FineVu_InstallBanner_v1.webp"
+              src="/home/FineVu_Homepage_Install_Banner.webp"
               alt="A FineVu mobile installer at a customer's home"
-              className="w-full h-auto object-cover aspect-[2161/993]"
+              className="w-full h-auto object-cover aspect-[2688/1520]"
             />
           </motion.div>
         </div>

@@ -87,8 +87,8 @@ function Hero({
 
 /* ─────────────────────  "MORE REASONS" BENTO  ───────────────────── */
 const reasons = [
-  { img: '/home/reason-no1.jpg', label: 'No.1 Dash Cam in Korea' },
-  { img: '/home/reason-3yr.jpg', label: '3 Year Warranty', sup: '1' },
+  { img: '/home/No.1_Banner.webp', label: 'No.1 Dash Cam in Korea' },
+  { img: '/home/3YearWarranty_Tile.webp', label: '3 Year Warranty', sup: '1' },
   { img: '/home/reason-microsd.jpg', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
   { img: '/home/reason-hardwire.jpg', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
 ];
@@ -200,9 +200,9 @@ export default function Page() {
           </motion.div>
           <motion.div className="mt-10 overflow-hidden rounded-[24px]" {...fadeUp}>
             <ImageWithFallback
-              src="/home/install-van.jpg"
+              src="/home/FineVu_InstallBanner_v1.webp"
               alt="A FineVu mobile installer at a customer's home"
-              className="w-full h-auto object-cover aspect-[1705/620]"
+              className="w-full h-auto object-cover aspect-[2161/993]"
             />
           </motion.div>
         </div>

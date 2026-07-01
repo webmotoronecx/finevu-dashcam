@@ -497,8 +497,8 @@ export default function GX4KPage() {
       {/* 4 · SEE EVERY DETAIL carousel — hidden per request --------------- */}
       {false && <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} />}
 
-      {/* 5 · PROTECTED WHILE PARKED carousel ------------------------------ */}
-      <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />
+      {/* 5 · PROTECTED WHILE PARKED carousel — hidden per request --------- */}
+      {false && <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />}
 
       {/* ─── sections below hidden per request (flip false → true to show) ─── */}
       {false && (
@@ -610,8 +610,8 @@ export default function GX4KPage() {
       </>
       )}
 
-      {/* 14–19 · #0B0B0B band — from "More reasons" through the Firmware /
-          "Do not power off…" section, per client spec ---------------------- */}
+      {/* 14–19 · #0B0B0B band (More reasons → Firmware) — hidden per request */}
+      {false && (
       <div data-nav-theme="dark" style={{ background: "#0B0B0B" }}>
       {/* 14–18 hidden per request (flip false → true to show) */}
       {false && (
@@ -843,6 +843,7 @@ export default function GX4KPage() {
         </div>
       </section>
       </div>
+      )}
 
       {/* 20a–20b hidden per request (flip false → true to show) */}
       {false && (

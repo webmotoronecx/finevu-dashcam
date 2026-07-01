@@ -175,16 +175,16 @@ export function Navigation() {
         <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center">
           {/* Centered pill */}
           <div
-            className="relative z-10 flex w-full md:w-auto items-center justify-between md:justify-center gap-4 md:gap-12 rounded-full px-5 py-2.5 md:px-9 md:py-3"
+            className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2.5 xl:px-10 xl:py-3"
             style={pillStyle}
           >
             {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex items-center shrink-0">
-              <Logo variant="primary" className="h-5 md:h-6 transition-transform duration-300 hover:scale-105" />
+              <Logo variant="primary" className="h-7 xl:h-9 transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}
-            <div className="hidden md:flex items-center gap-7 lg:gap-8">
+            <div className="hidden xl:flex items-center gap-7">
               {productsItem && (
                 <button
                   ref={productsBtnRef}
@@ -235,7 +235,7 @@ export function Navigation() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen((v) => !v)}
-              className={`md:hidden shrink-0 pr-1 ${isDarkBackground ? "text-white" : "text-zinc-900"}`}
+              className={`xl:hidden shrink-0 pr-1 ${isDarkBackground ? "text-white" : "text-zinc-900"}`}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
             >
@@ -246,10 +246,10 @@ export function Navigation() {
           {/* Find Retailer — solid orange, floating to the right of the pill */}
           <Link
             href={primaryCta.href}
-            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2"
+            className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2"
           >
             <motion.button
-              className="text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-8 py-3.5 rounded-full shadow-[0_10px_28px_-12px_rgba(246,132,40,0.55)]"
+              className="text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-9 py-4 rounded-full shadow-[0_10px_28px_-12px_rgba(246,132,40,0.55)]"
               style={{ backgroundColor: CTA_ORANGE }}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
@@ -269,7 +269,7 @@ export function Navigation() {
               aria-label="Dash cameras"
               ref={panelRef}
               onKeyDown={handlePanelKeyDown}
-              className="hidden md:block absolute left-1/2 -translate-x-1/2 top-full mt-3 z-50 rounded-[28px] bg-white border border-black/[0.06] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.35)]"
+              className="hidden xl:block absolute left-1/2 -translate-x-1/2 top-full mt-3 z-50 rounded-[28px] bg-white border border-black/[0.06] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.35)]"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -317,7 +317,7 @@ export function Navigation() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              className="md:hidden max-w-[1400px] mx-auto mt-2 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden"
+              className="xl:hidden max-w-[1400px] mx-auto mt-2 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

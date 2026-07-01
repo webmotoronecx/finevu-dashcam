@@ -249,10 +249,8 @@ export function Navigation() {
             className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2"
           >
             <motion.button
-              className="text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-9 py-4 rounded-full shadow-[0_10px_28px_-12px_rgba(246,132,40,0.55)]"
+              className="cta-hover text-white font-semibold text-[14px] uppercase tracking-[0.06em] px-9 py-4 rounded-full"
               style={{ backgroundColor: CTA_ORANGE }}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
             >
               {primaryCta.label}
             </motion.button>
@@ -341,7 +339,7 @@ export function Navigation() {
                 </div>
                 <Link href={primaryCta.href} className="block pt-2">
                   <button
-                    className="w-full text-white font-semibold text-[13px] uppercase tracking-wider px-6 py-3.5 rounded-full"
+                    className="cta-hover w-full text-white font-semibold text-[13px] uppercase tracking-wider px-6 py-3.5 rounded-full"
                     style={{ backgroundColor: CTA_ORANGE }}
                   >
                     {primaryCta.label}

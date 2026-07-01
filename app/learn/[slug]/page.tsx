@@ -81,7 +81,7 @@ export default function Page() {
         <h1 className="text-4xl font-light mb-4">Article Not Found</h1>
         <p className="text-zinc-600 mb-8">The article you are looking for does not exist.</p>
         <Link href="/learn">
-          <button className="px-8 py-4 rounded-full bg-zinc-900 text-white hover:scale-105 transition-transform">
+          <button className="cta-hover px-8 py-4 rounded-full bg-zinc-900 text-white">
             Back to Learn
           </button>
         </Link>
@@ -294,11 +294,11 @@ export default function Page() {
             <div className="lg:hidden mt-12 pt-8 border-t border-zinc-200">
               <h4 className="font-medium mb-4">Share this article</h4>
               <div className="flex gap-4">
-                <button className="flex-1 py-3 rounded-lg border border-zinc-200 flex items-center justify-center gap-2 font-medium hover:bg-zinc-50">
+                <button className="cta-hover flex-1 py-3 rounded-lg border border-zinc-200 flex items-center justify-center gap-2 font-medium hover:bg-zinc-50">
                   <Twitter className="w-4 h-4" />
                   Tweet
                 </button>
-                <button className="flex-1 py-3 rounded-lg border border-zinc-200 flex items-center justify-center gap-2 font-medium hover:bg-zinc-50">
+                <button className="cta-hover flex-1 py-3 rounded-lg border border-zinc-200 flex items-center justify-center gap-2 font-medium hover:bg-zinc-50">
                   <Linkedin className="w-4 h-4" />
                   Share
                 </button>
@@ -318,7 +318,7 @@ export default function Page() {
                   </p>
 
                   <Link href="/gx4k" className="block relative z-10">
-                    <button className="w-full py-4 rounded-xl bg-[var(--finevu-orange)] text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center group-hover:scale-[1.02] active:scale-[0.98] duration-200">
+                    <button className="cta-hover w-full py-4 rounded-xl bg-[var(--finevu-orange)] text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center">
                       Explore the range
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </button>
@@ -341,7 +341,7 @@ export default function Page() {
             
             <div className="grid md:grid-cols-2 gap-8">
               {relatedArticles.map((related) => (
-                <Link href={`/learn/${related.slug}`} key={related.slug} className="group block bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-zinc-100">
+                <Link href={`/learn/${related.slug}`} key={related.slug} className="tile-hover group block bg-white rounded-2xl overflow-hidden border border-zinc-100">
                   <div className="grid md:grid-cols-2 h-full">
                     <div className="h-64 md:h-auto overflow-hidden relative">
                       <ImageWithFallback 

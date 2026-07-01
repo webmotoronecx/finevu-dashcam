@@ -84,18 +84,14 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <Link href="/gx4k">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow"
                 >
                   Explore the range
                 </motion.button>
               </Link>
               <Link href="/where-to-buy">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
-                  whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.9)" }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
                 >
                   Where to buy
                 </motion.button>
@@ -203,7 +199,7 @@ export default function Page() {
               return (
                 <motion.div
                   key={index}
-                  className="flex gap-6 bg-white rounded-[2rem] p-8 border border-zinc-200"
+                  className="tile-hover flex gap-6 bg-white rounded-[2rem] p-8 border border-zinc-200"
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -265,27 +261,21 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
               <Link href="/gx4k">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow inline-flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow inline-flex items-center gap-2"
                 >
                   Explore GX4K <MoveRight className="w-4 h-4" />
                 </motion.button>
               </Link>
               <Link href="/gx35">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
-                  whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.9)" }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
                 >
                   Explore GX35
                 </motion.button>
               </Link>
               <Link href="/where-to-buy">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full text-white/80 underline underline-offset-4 smooth-transition"
-                  whileHover={{ scale: 1.05, color: "#ffffff" }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full text-white/80 underline underline-offset-4 smooth-transition"
                 >
                   Where to buy
                 </motion.button>

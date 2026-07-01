@@ -71,7 +71,7 @@ function Hero({
         >
           <Link
             href={href}
-            className={`inline-flex items-center justify-center w-[214px] h-12 rounded-full text-[14px] font-semibold uppercase tracking-wider transition-colors ${
+            className={`cta-hover inline-flex items-center justify-center w-[214px] h-12 rounded-full text-[14px] font-semibold uppercase tracking-wider ${
               dark
                 ? 'border border-white/70 text-white bg-white/5 hover:bg-white/10'
                 : 'border border-[#0b0b0c]/55 text-[#0b0b0c] hover:bg-[#0b0b0c]/5'
@@ -95,7 +95,7 @@ const reasons = [
 
 function ReasonCard({ img, label, sup, aspect }: { img: string; label: string; sup?: string; aspect: string }) {
   return (
-    <div className={`relative overflow-hidden rounded-[20px] ${aspect}`}>
+    <div className={`tile-hover relative overflow-hidden rounded-[20px] ${aspect}`}>
       <ImageWithFallback src={img} alt={label} className="absolute inset-0 w-full h-full object-cover" />
       <p className="absolute inset-x-0 bottom-6 text-center text-white font-bold text-[17px] px-4">
         {label}
@@ -193,7 +193,7 @@ export default function Page() {
           <motion.div className="mt-8" {...fadeUp}>
             <Link
               href="/booking"
-              className="inline-flex items-center justify-center h-12 px-9 rounded-full bg-[var(--finevu-orange)] text-white text-[14px] font-semibold uppercase tracking-wider hover:shadow-[0_0_30px_var(--electric-glow)] transition-shadow"
+              className="cta-hover inline-flex items-center justify-center h-12 px-9 rounded-full bg-[var(--finevu-orange)] text-white text-[14px] font-semibold uppercase tracking-wider"
             >
               Book Installation
             </Link>
@@ -221,7 +221,7 @@ export default function Page() {
             {reviews.map((r, i) => (
               <motion.div
                 key={i}
-                className="bg-white rounded-[18px] border border-[#ececef] p-7 flex flex-col"
+                className="tile-hover bg-white rounded-[18px] border border-[#ececef] p-7 flex flex-col"
                 initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.5, delay: i * 0.1 }}
               >

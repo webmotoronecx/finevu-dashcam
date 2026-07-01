@@ -142,7 +142,7 @@ const webHref = (web: string) => `https://${web.replace(/^https?:\/\//, "")}`;
 
 function ResellerCard({ r }: { r: Reseller }) {
   return (
-    <div className="flex flex-col rounded-[10px] border border-[#e6e6e9] bg-white p-5 transition-shadow hover:shadow-md">
+    <div className="tile-hover flex flex-col rounded-[10px] border border-[#e6e6e9] bg-white p-5">
       <div className="flex items-start justify-between gap-3 pb-3">
         <h4 className="text-[15px] font-bold leading-tight text-[#1a1a1c]">{r.name}</h4>
         <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${typeBadge[r.type]}`}>
@@ -182,7 +182,7 @@ function ResellerCard({ r }: { r: Reseller }) {
         {r.phone && (
           <a
             href={telHref(r.phone)}
-            className="rounded-full bg-[#2d2d30] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-black"
+            className="cta-hover rounded-full bg-[#2d2d30] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-black"
           >
             Call
           </a>
@@ -192,7 +192,7 @@ function ResellerCard({ r }: { r: Reseller }) {
             href={webHref(r.web)}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full border border-[#e6e6e9] px-4 py-2 text-[13px] font-semibold text-[#1a1a1c] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
+            className="cta-hover rounded-full border border-[#e6e6e9] px-4 py-2 text-[13px] font-semibold text-[#1a1a1c] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
           >
             Visit site
           </a>
@@ -239,13 +239,13 @@ export default function Page() {
           <div className="mt-11 flex flex-col sm:flex-row gap-3 justify-center items-center">
             {SHOW_RESELLERS && (
               <a href="#network" className="w-full sm:w-auto">
-                <button className="w-full sm:w-[214px] h-12 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-[14px] uppercase tracking-[0.04em] transition-transform hover:scale-[1.03]">
+                <button className="cta-hover w-full sm:w-[214px] h-12 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-[14px] uppercase tracking-[0.04em]">
                   Browse by state
                 </button>
               </a>
             )}
             <a href="https://autoxtreme.com.au" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-              <button className="w-full sm:w-[214px] h-12 rounded-full border border-white/40 text-white font-semibold text-[14px] uppercase tracking-[0.04em] hover:bg-white/10 transition-colors">
+              <button className="cta-hover w-full sm:w-[214px] h-12 rounded-full border border-white/40 text-white font-semibold text-[14px] uppercase tracking-[0.04em] hover:bg-white/10 transition-colors">
                 Shop online
               </button>
             </a>
@@ -283,7 +283,7 @@ export default function Page() {
               return (
                 <motion.div
                   key={r.title}
-                  className="rounded-[10px] border border-[#e6e6e9] bg-white p-7"
+                  className="tile-hover rounded-[10px] border border-[#e6e6e9] bg-white p-7"
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -408,7 +408,7 @@ export default function Page() {
                 Tell us about your business and we&apos;ll be in touch.
               </p>
               <Link href="/contact" className="mt-6 block">
-                <button className="w-full rounded-full bg-[var(--finevu-orange)] px-6 py-3 text-[14px] font-semibold uppercase tracking-[0.04em] text-white transition-transform hover:scale-[1.02]">
+                <button className="cta-hover w-full rounded-full bg-[var(--finevu-orange)] px-6 py-3 text-[14px] font-semibold uppercase tracking-[0.04em] text-white">
                   Apply now
                 </button>
               </Link>

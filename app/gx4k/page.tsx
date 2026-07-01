@@ -77,7 +77,7 @@ function FeatureCard({
 }) {
   return (
     <div
-      className={`rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-7 ${className}`}
+      className={`tile-hover rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-7 ${className}`}
     >
       <span className={`block ${CARD_LABEL}`}>{label}</span>
       {titleBig && (
@@ -189,7 +189,7 @@ export default function GX4KPage() {
           <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.15 }}>
             <Link
               href="/where-to-buy"
-              className="mt-9 inline-flex items-center justify-center rounded-full px-12 py-3.5 text-sm font-semibold uppercase tracking-wide text-white transition-transform hover:scale-[1.03]"
+              className="cta-hover mt-9 inline-flex items-center justify-center rounded-full px-12 py-3.5 text-sm font-semibold uppercase tracking-wide text-white"
               style={{
                 backgroundImage:
                   "linear-gradient(24deg, #372649 10%, #4f2d74 38%, #6284d8 75%)",
@@ -330,7 +330,7 @@ export default function GX4KPage() {
             {/* Left tall card */}
             <motion.div
               {...fadeUp}
-              className="relative overflow-hidden rounded-[24px] border border-white/[0.06] p-7"
+              className="tile-hover relative overflow-hidden rounded-[24px] border border-white/[0.06] p-7"
               style={{
                 background:
                   "linear-gradient(155deg, rgba(79,45,116,0.22) 0%, rgba(13,13,22,0.55) 55%)",
@@ -435,7 +435,7 @@ export default function GX4KPage() {
             {/* Row 1 — wide Wi-Fi card */}
             <motion.div
               {...fadeUp}
-              className="relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-7 lg:col-span-2"
+              className="tile-hover relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-7 lg:col-span-2"
             >
               <div
                 className="pointer-events-none absolute inset-0"

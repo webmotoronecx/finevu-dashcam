@@ -40,9 +40,7 @@ export function Footer() {
           >
             <Link href="/where-to-buy">
               <motion.button
-                className="px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow font-semibold text-sm uppercase tracking-wider"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="cta-hover px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider"
               >
                 Find Retailer
               </motion.button>

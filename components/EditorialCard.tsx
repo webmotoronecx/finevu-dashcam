@@ -14,7 +14,7 @@ interface EditorialCardProps {
 export function EditorialCard({ image, title, description }: EditorialCardProps) {
   return (
     <TiltCard className="group cursor-pointer smooth-transition h-full" tiltStrength={8}>
-      <div className="bg-zinc-900 border border-white/5 rounded-[2rem] overflow-hidden h-full flex flex-col p-6 hover:border-[var(--brand-primary)]/30 transition-colors">
+      <div className="tile-hover bg-zinc-900 border border-white/5 rounded-[2rem] overflow-hidden h-full flex flex-col p-6 hover:border-[var(--brand-primary)]/30 transition-colors">
         {/* Image Container */}
         <motion.div 
           className="relative overflow-hidden rounded-2xl mb-6 h-[220px] w-full"

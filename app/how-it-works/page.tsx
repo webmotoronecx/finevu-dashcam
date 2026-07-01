@@ -226,7 +226,7 @@ export default function Page() {
                         <Link
                           key={idx}
                           href={link.href}
-                          className="px-5 py-2.5 rounded-full border border-zinc-200 text-sm font-medium text-zinc-900 hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)] smooth-transition"
+                          className="cta-hover px-5 py-2.5 rounded-full border border-zinc-200 text-sm font-medium text-zinc-900 hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)] smooth-transition"
                         >
                           {link.label}
                         </Link>
@@ -236,9 +236,7 @@ export default function Page() {
 
                   {/* Visual */}
                   <motion.div
-                    className={`relative h-[500px] rounded-[2rem] overflow-hidden shadow-2xl ${isEven ? 'md:order-2' : 'md:order-1'}`}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.3 }}
+                    className={`tile-hover relative h-[500px] rounded-[2rem] overflow-hidden shadow-2xl ${isEven ? 'md:order-2' : 'md:order-1'}`}
                   >
                     <div className="absolute inset-0 brand-gradient" />
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -278,12 +276,11 @@ export default function Page() {
               return (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-[2rem] p-10 space-y-6 border border-zinc-100"
+                  className="tile-hover bg-white rounded-[2rem] p-10 space-y-6 border border-zinc-100"
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.08)" }}
                 >
                   <motion.div
                     className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--finevu-light-grey)]"
@@ -352,12 +349,12 @@ export default function Page() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/support">
-                  <button className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium hover:opacity-90 smooth-transition w-full sm:w-auto text-center">
+                  <button className="cta-hover px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium hover:opacity-90 smooth-transition w-full sm:w-auto text-center">
                     App setup & support
                   </button>
                 </Link>
                 <Link href="/learn">
-                  <button className="px-8 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 smooth-transition w-full sm:w-auto text-center font-medium">
+                  <button className="cta-hover px-8 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 smooth-transition w-full sm:w-auto text-center font-medium">
                     Learn more
                   </button>
                 </Link>
@@ -405,18 +402,14 @@ export default function Page() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
                 <Link href="/gx4k">
                   <motion.button
-                    className="px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="cta-hover px-8 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-medium"
                   >
                     Explore the range
                   </motion.button>
                 </Link>
                 <Link href="/where-to-buy">
                   <motion.button
-                    className="px-8 py-3 rounded-full border border-white/40 text-white font-medium hover:bg-white/10 smooth-transition"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="cta-hover px-8 py-3 rounded-full border border-white/40 text-white font-medium hover:bg-white/10 smooth-transition"
                   >
                     Where to buy
                   </motion.button>

@@ -85,17 +85,14 @@ export function Hero() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link href={slide.primary.href} className="w-full sm:w-auto">
                   <motion.button
-                    className="w-full sm:w-auto px-10 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider smooth-transition hover:shadow-[0_0_30px_var(--electric-glow)]"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="cta-hover w-full sm:w-auto px-10 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider smooth-transition"
                   >
                     {slide.primary.label}
                   </motion.button>
                 </Link>
                 <Link href="/where-to-buy" className="w-full sm:w-auto">
                   <motion.button
-                    className="w-full sm:w-auto px-10 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm"
-                    whileHover={{ scale: 1.05 }}
+                    className="cta-hover w-full sm:w-auto px-10 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm"
                   >
                     Find Retailer
                   </motion.button>

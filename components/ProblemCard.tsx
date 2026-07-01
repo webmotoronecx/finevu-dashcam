@@ -52,7 +52,7 @@ export function ProblemCard({ image, title, description, link }: ProblemCardProp
   if (link) {
     return (
       <Link href={link}>
-        <TiltCard className="group relative overflow-hidden rounded-3xl smooth-transition cursor-pointer" tiltStrength={10}>
+        <TiltCard className="tile-hover group relative overflow-hidden rounded-3xl smooth-transition cursor-pointer" tiltStrength={10}>
           <CardContent />
         </TiltCard>
       </Link>
@@ -60,7 +60,7 @@ export function ProblemCard({ image, title, description, link }: ProblemCardProp
   }
 
   return (
-    <TiltCard className="group relative overflow-hidden rounded-3xl smooth-transition cursor-pointer" tiltStrength={10}>
+    <TiltCard className="tile-hover group relative overflow-hidden rounded-3xl smooth-transition cursor-pointer" tiltStrength={10}>
       <CardContent />
     </TiltCard>
   );

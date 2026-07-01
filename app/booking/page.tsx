@@ -95,13 +95,13 @@ export default function Page() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <a
                 href="#enquire"
-                className="px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold hover:scale-[1.03] transition-transform"
+                className="cta-hover px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold"
               >
                 Request an installation
               </a>
               <Link
                 href="/services"
-                className="px-8 py-4 rounded-full border border-white/30 text-white font-medium hover:bg-white/10 transition-colors"
+                className="cta-hover px-8 py-4 rounded-full border border-white/30 text-white font-medium hover:bg-white/10 transition-colors"
               >
                 Prefer DIY? See setup help
               </Link>
@@ -135,7 +135,7 @@ export default function Page() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="bg-zinc-50 rounded-[2rem] p-8 border border-zinc-100"
+                className="tile-hover bg-zinc-50 rounded-[2rem] p-8 border border-zinc-100"
               >
                 <div className="w-12 h-12 rounded-full bg-[var(--finevu-orange)]/10 flex items-center justify-center mb-6">
                   <benefit.icon className="w-6 h-6 text-[var(--finevu-orange)]" />
@@ -170,7 +170,7 @@ export default function Page() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white/5 rounded-[2rem] p-8 border border-white/10"
+                className="tile-hover bg-white/5 rounded-[2rem] p-8 border border-white/10"
               >
                 <div className="flex items-center justify-between mb-6">
                   <span className="font-mono text-3xl font-bold text-[var(--finevu-orange)]">
@@ -220,7 +220,7 @@ export default function Page() {
             </div>
             <Link
               href="/services"
-              className="shrink-0 px-8 py-4 rounded-full bg-white text-[var(--finevu-charcoal)] font-semibold hover:scale-[1.03] transition-transform text-center"
+              className="cta-hover shrink-0 px-8 py-4 rounded-full bg-white text-[var(--finevu-charcoal)] font-semibold text-center"
             >
               DIY setup help
             </Link>

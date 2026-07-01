@@ -298,12 +298,12 @@ export default function Page() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a href="#topics" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
+                <button className="cta-hover w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider">
                   Browse Help Topics
                 </button>
               </a>
               <a href="/where-to-buy" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
+                <button className="cta-hover w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
                   Find Retailer
                 </button>
               </a>
@@ -330,12 +330,11 @@ export default function Page() {
               return (
                 <motion.div
                   key={topic.title}
-                  className="flex flex-col rounded-[2rem] border border-[#e4e4e7] bg-white p-8 transition-all hover:border-[var(--finevu-orange)]/50 hover:shadow-lg"
+                  className="tile-hover flex flex-col rounded-[2rem] border border-[#e4e4e7] bg-white p-8 transition-all hover:border-[var(--finevu-orange)]/50"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (index % 3) * 0.08 }}
-                  whileHover={{ y: -6 }}
                 >
                   <Icon className="w-7 h-7 text-[var(--finevu-orange)] mb-5" />
                   <div className="flex-grow">
@@ -390,7 +389,7 @@ export default function Page() {
               return (
                 <motion.div
                   key={c.title}
-                  className="flex flex-col gap-6 rounded-2xl border border-[#e4e4e7] bg-white p-8"
+                  className="tile-hover flex flex-col gap-6 rounded-2xl border border-[#e4e4e7] bg-white p-8"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -407,13 +406,13 @@ export default function Page() {
                   </div>
                   {c.external ? (
                     <a href={c.href} className="block">
-                      <button className="w-full rounded-full bg-[var(--finevu-orange)] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-transform hover:scale-[1.02]">
+                      <button className="cta-hover w-full rounded-full bg-[var(--finevu-orange)] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white">
                         {c.cta}
                       </button>
                     </a>
                   ) : (
                     <a href={c.href} className="block">
-                      <button className="w-full rounded-full bg-[var(--finevu-orange)] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-transform hover:scale-[1.02]">
+                      <button className="cta-hover w-full rounded-full bg-[var(--finevu-orange)] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white">
                         {c.cta}
                       </button>
                     </a>
@@ -445,18 +444,14 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a href="tel:1800818288" className="w-full sm:w-auto">
                 <motion.button
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
+                  className="cta-hover w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider"
                 >
                   Call 1800 818 288
                 </motion.button>
               </a>
               <a href="/contact" className="w-full sm:w-auto">
                 <motion.button
-                  className="w-full sm:w-auto px-8 py-4 rounded-full border-2 border-white/40 text-white font-semibold text-sm uppercase tracking-wider transition-colors hover:border-white"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
+                  className="cta-hover w-full sm:w-auto px-8 py-4 rounded-full border-2 border-white/40 text-white font-semibold text-sm uppercase tracking-wider transition-colors hover:border-white"
                 >
                   Send a message
                 </motion.button>

@@ -201,18 +201,14 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
               <Link href="/contact">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition electric-glow"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition"
                 >
                   Contact us
                 </motion.button>
               </Link>
               <Link href="/support">
                 <motion.button
-                  className="px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
-                  whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.9)" }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover px-6 py-2.5 rounded-full border-2 border-white/40 text-white smooth-transition"
                 >
                   Visit support
                 </motion.button>

@@ -16,16 +16,15 @@ interface ServiceCardProps {
 export function ServiceCard({ name, price, duration, features, recommended, delay = 0 }: ServiceCardProps) {
   return (
     <motion.div
-      className={`relative rounded-[2rem] p-8 lg:p-10 border flex flex-col h-full bg-white ${
-        recommended 
-          ? 'border-[var(--brand-primary)] shadow-2xl' 
+      className={`tile-hover relative rounded-[2rem] p-8 lg:p-10 border flex flex-col h-full bg-white ${
+        recommended
+          ? 'border-[var(--brand-primary)] shadow-2xl'
           : 'border-zinc-200'
       }`}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay }}
-      whileHover={{ y: -8, transition: { duration: 0.3 } }}
     >
       {recommended && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full bg-[var(--brand-primary)] text-white text-xs font-mono uppercase tracking-widest border border-white/20">
@@ -59,13 +58,11 @@ export function ServiceCard({ name, price, duration, features, recommended, dela
       <div className="mt-8 pt-6">
         <Link href="/booking" className="block">
           <motion.button
-            className={`w-full py-4 rounded-full smooth-transition font-medium tracking-wide ${
+            className={`cta-hover w-full py-4 rounded-full font-medium tracking-wide ${
               recommended
                 ? 'bg-[var(--brand-primary)] text-white electric-glow hover:opacity-90'
                 : 'border border-zinc-200 text-zinc-900 hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'
             }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             Book Now
           </motion.button>

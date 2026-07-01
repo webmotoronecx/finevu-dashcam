@@ -105,12 +105,11 @@ export default function Page() {
                   const Icon = item.icon;
                   const CardInner = (
                     <motion.div
-                      className="p-7 rounded-[2rem] border border-zinc-200 transition-all hover:border-[var(--finevu-orange)] hover:shadow-lg space-y-4 h-full"
+                      className="tile-hover p-7 rounded-[2rem] border border-zinc-200 transition-all hover:border-[var(--finevu-orange)] space-y-4 h-full"
                       initial={{ opacity: 0, y: 40 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
-                      whileHover={{ y: -6 }}
                     >
                       <div className="w-12 h-12 rounded-full bg-[var(--finevu-orange)]/10 flex items-center justify-center">
                         <Icon className="w-6 h-6 text-[var(--finevu-orange)]" />
@@ -216,18 +215,14 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
               <Link href="/gx4k">
                 <motion.button
-                  className="px-7 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-semibold transition-transform"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
+                  className="cta-hover px-7 py-3 rounded-full bg-[var(--finevu-orange)] text-white font-semibold"
                 >
                   Explore GX4K
                 </motion.button>
               </Link>
               <Link href="/gx35">
                 <motion.button
-                  className="px-7 py-3 rounded-full border-2 border-zinc-300 font-semibold transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
+                  className="cta-hover px-7 py-3 rounded-full border-2 border-zinc-300 font-semibold transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"
                 >
                   Explore GX35
                 </motion.button>

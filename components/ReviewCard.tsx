@@ -17,7 +17,7 @@ interface ReviewCardProps {
 export function ReviewCard({ name, location, vehicle, review, image, delay = 0 }: ReviewCardProps) {
   return (
     <motion.div
-      className="relative p-8 rounded-[2rem] bg-zinc-900/50 backdrop-blur-sm border border-white/5 h-full flex flex-col hover:border-[var(--brand-primary)]/30 transition-colors"
+      className="tile-hover relative p-8 rounded-[2rem] bg-zinc-900/50 backdrop-blur-sm border border-white/5 h-full flex flex-col hover:border-[var(--brand-primary)]/30 transition-colors"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}

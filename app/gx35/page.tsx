@@ -139,7 +139,7 @@ const specRows: [string, string][] = [
 ];
 
 const card =
-  "rounded-[20px] border border-[#ececf0] bg-white p-6 shadow-[0_8px_30px_rgba(20,22,40,0.05)]";
+  "tile-hover rounded-[20px] border border-[#ececf0] bg-white p-6 shadow-[0_8px_30px_rgba(20,22,40,0.05)]";
 const cardEyebrow = "text-[#d9670f] text-[11.5px] font-semibold uppercase tracking-[0.2em]";
 const cardTitle = "text-[#1a1a1f] text-lg font-semibold leading-snug";
 const cardBody = "text-[#5c6478] text-sm leading-[1.5]";
@@ -181,7 +181,7 @@ export default function GX35Page() {
           <div className="mt-7 flex justify-center">
             <Link
               href="/where-to-buy"
-              className="inline-flex h-11 w-[214px] items-center justify-center rounded-full bg-[#f68428] text-sm font-semibold uppercase tracking-[0.06em] text-white transition-transform hover:scale-[1.03]"
+              className="cta-hover inline-flex h-11 w-[214px] items-center justify-center rounded-full bg-[#f68428] text-sm font-semibold uppercase tracking-[0.06em] text-white"
             >
               Find a retailer
             </Link>

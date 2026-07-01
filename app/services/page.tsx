@@ -186,7 +186,7 @@ function BookingForm() {
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-transform hover:scale-[1.02] electric-glow"
+            className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white electric-glow"
           >
             Request Booking <ArrowUpRight className="w-4 h-4" />
           </button>
@@ -226,12 +226,12 @@ export default function Page() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a href="#book" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
+                <button className="cta-hover w-full sm:w-auto px-9 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider">
                   Book Installation
                 </button>
               </a>
               <a href="#pricing" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
+                <button className="cta-hover w-full sm:w-auto px-9 py-3.5 rounded-full border border-white/40 text-white font-semibold text-sm uppercase tracking-wider hover:bg-white/10 transition-colors backdrop-blur-sm">
                   View Pricing
                 </button>
               </a>
@@ -306,7 +306,7 @@ export default function Page() {
             {pricing.map((p, i) => (
               <motion.div
                 key={p.tier}
-                className="rounded-[1.75rem] border border-zinc-100 bg-white p-8 text-center shadow-[0_18px_50px_-20px_rgba(0,0,0,0.18)]"
+                className="tile-hover rounded-[1.75rem] border border-zinc-100 bg-white p-8 text-center shadow-[0_18px_50px_-20px_rgba(0,0,0,0.18)]"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -354,7 +354,7 @@ export default function Page() {
             {steps.map((s, i) => (
               <motion.div
                 key={s.n}
-                className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-8"
+                className="tile-hover rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-8"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -446,7 +446,7 @@ export default function Page() {
                 ))}
               </div>
               <a href="#book">
-                <button className="px-8 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider transition-transform hover:scale-105">
+                <button className="cta-hover px-8 py-3.5 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-sm uppercase tracking-wider">
                   Request Booking
                 </button>
               </a>

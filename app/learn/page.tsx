@@ -95,7 +95,7 @@ export default function Page() {
               return (
                 <motion.div
                   key={index}
-                  className={`bg-white rounded-[2rem] p-8 text-center space-y-4 cursor-pointer border transition-all ${
+                  className={`tile-hover bg-white rounded-[2rem] p-8 text-center space-y-4 cursor-pointer border transition-all ${
                     isSelected ? 'border-[var(--finevu-orange)] ring-2 ring-[var(--finevu-orange)]/20' : 'border-transparent hover:border-zinc-200'
                   }`}
                   onClick={() => setSelectedCategory(isSelected ? "All" : category.title)}
@@ -103,7 +103,6 @@ export default function Page() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
                 >
                   <motion.div
                     className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--finevu-orange)]/10"
@@ -143,7 +142,7 @@ export default function Page() {
             {selectedCategory !== "All" && (
               <button
                 onClick={() => setSelectedCategory("All")}
-                className="text-zinc-500 hover:text-[var(--finevu-orange)] transition-colors underline underline-offset-4"
+                className="cta-hover text-zinc-500 hover:text-[var(--finevu-orange)] transition-colors underline underline-offset-4"
               >
                 View all guides
               </button>
@@ -196,18 +195,14 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/gx4k">
                 <motion.span
-                  className="inline-block px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition whitespace-nowrap font-bold hover:opacity-90"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover inline-block px-8 py-4 rounded-full bg-[var(--finevu-orange)] text-white smooth-transition whitespace-nowrap font-bold hover:opacity-90"
                 >
                   Explore the range
                 </motion.span>
               </Link>
               <Link href="/where-to-buy">
                 <motion.span
-                  className="inline-block px-8 py-4 rounded-full border-2 border-zinc-300 text-zinc-900 smooth-transition whitespace-nowrap font-bold hover:border-[var(--finevu-orange)]"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="cta-hover inline-block px-8 py-4 rounded-full border-2 border-zinc-300 text-zinc-900 smooth-transition whitespace-nowrap font-bold hover:border-[var(--finevu-orange)]"
                 >
                   Where to buy
                 </motion.span>

@@ -168,9 +168,7 @@ export function BusinessEnquiryForm({
         <motion.button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          className="cta-hover w-full py-4 rounded-full bg-[var(--finevu-orange)] text-white font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>

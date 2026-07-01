@@ -698,62 +698,82 @@ export default function GX4KPage() {
         </div>
       </section>
 
-      {/* 18 · FINEVU SERIES COMPARISON ------------------------------------ */}
+      {/* 18 · FINEVU SERIES COMPARISON — Figma 109:2614 (container 109:2615) */}
       <section data-nav-theme="dark" className="py-16 md:py-24">
         <div className={SHELL}>
-          <motion.div {...fadeUp} className="mb-10 text-center">
-            <Head pre="FineVu Series Comparison" className="!text-[28px] md:!text-[40px]" />
-          </motion.div>
+          <motion.div
+            {...fadeUp}
+            className="mx-auto max-w-[992px] rounded-[32px] bg-[#141414] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16"
+          >
+            {/* Title (inside the container) */}
+            <div className="text-center">
+              <Head pre="FineVu Series Comparison" className="!text-[26px] md:!text-[40px]" />
+            </div>
 
-          <div className="mx-auto max-w-[900px] rounded-[28px] border border-white/[0.06] bg-white/[0.02] p-6 md:p-10">
-            <div className="grid grid-cols-2 gap-6">
+            {/* Two product columns */}
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-8 md:mt-12">
               {/* GX4K */}
-              <div className="text-center">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f68428]/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#f68428]">
-                  <Eye className="h-3.5 w-3.5" /> Currently Viewing
-                </span>
-                <h3 className="mt-4 text-2xl font-bold text-white md:text-3xl">GX4K</h3>
-                <p className="mx-auto mt-3 max-w-[280px] text-[13px] leading-relaxed text-zinc-400">
+              <div className="flex h-full flex-col items-center text-center">
+                <div className="flex h-[34px] items-center">
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#f68428]/60 px-3 py-1.5 text-[11px] font-medium tracking-wide text-[#f68428] sm:px-3.5 sm:text-[12px]">
+                    <Eye className="h-3.5 w-3.5" /> Currently Viewing
+                  </span>
+                </div>
+                <h3 className="mt-4 text-[24px] font-bold text-white sm:text-[28px] md:text-[32px]">GX4K</h3>
+                <p className="mx-auto mt-3 max-w-[320px] text-[13px] leading-[1.6] text-[#a6a6a6] sm:text-[15px]">
                   Crystal clear 4K recording for every drive. True 4K Ultra HD captures licence
                   plates and street signs with SONY STARVIS clarity.
                 </p>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/gx4k/compare-gx4k.webp" alt="GX4K" className="mx-auto my-6 h-[150px] w-auto object-contain md:h-[200px]" />
-                <Link href="/gx4k" className="cta-hover inline-flex rounded-full bg-[#f68428] px-8 py-3 text-[13px] font-semibold uppercase tracking-wide text-white">
+                <div className="flex flex-1 items-center justify-center py-6 md:py-8">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/gx4k/compare-gx4k.webp"
+                    alt="FineVu GX4K front and rear cameras"
+                    className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[180px]"
+                  />
+                </div>
+                <Link href="/gx4k" className="cta-hover inline-flex whitespace-nowrap rounded-full bg-[#f68428] px-6 py-3 text-[13px] font-semibold uppercase tracking-wide text-white sm:px-9 md:px-11 md:py-3.5">
                   Learn More
                 </Link>
               </div>
               {/* GX35 */}
-              <div className="text-center">
-                <span className="inline-block h-[26px]" />
-                <h3 className="mt-4 text-2xl font-bold text-white md:text-3xl">GX35</h3>
-                <p className="mx-auto mt-3 max-w-[280px] text-[13px] leading-relaxed text-zinc-400">
+              <div className="flex h-full flex-col items-center text-center">
+                <div className="h-[34px]" />
+                <h3 className="mt-4 text-[24px] font-bold text-white sm:text-[28px] md:text-[32px]">GX35</h3>
+                <p className="mx-auto mt-3 max-w-[320px] text-[13px] leading-[1.6] text-[#a6a6a6] sm:text-[15px]">
                   Record every moment in 2K. Premium FineVu protection and features at a more
                   accessible price point — the same trusted engineering.
                 </p>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/products/gx35-studio.jpg" alt="GX35" className="mx-auto my-6 h-[150px] w-auto object-contain md:h-[200px]" />
-                <Link href="/gx35" className="cta-hover inline-flex rounded-full bg-[#f68428] px-8 py-3 text-[13px] font-semibold uppercase tracking-wide text-white">
+                <div className="flex flex-1 items-center justify-center py-6 md:py-8">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/gx4k/compare-gx35.webp"
+                    alt="FineVu GX35"
+                    className="h-auto max-h-[115px] w-auto max-w-full object-contain md:max-h-[155px]"
+                  />
+                </div>
+                <Link href="/gx35" className="cta-hover inline-flex whitespace-nowrap rounded-full bg-[#f68428] px-6 py-3 text-[13px] font-semibold uppercase tracking-wide text-white sm:px-9 md:px-11 md:py-3.5">
                   Learn More
                 </Link>
               </div>
             </div>
 
-            <div className="mt-8 border-t border-white/10">
+            {/* Divider + spec table */}
+            <div className="mt-10 border-t border-white/10 md:mt-12">
               {compareRows.map(([label, a, b]) => (
-                <div key={label} className="grid grid-cols-2 gap-6 border-b border-white/10 py-4 text-center">
+                <div key={label} className="grid grid-cols-2 gap-4 border-b border-white/[0.07] py-4 text-center sm:gap-8">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
-                    <p className="mt-1 text-[15px] font-semibold text-white">{a}</p>
+                    <p className="text-[11px] text-zinc-500 sm:text-[12px]">{label}</p>
+                    <p className="mt-1 text-[14px] font-semibold text-white sm:text-[16px]">{a}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
-                    <p className="mt-1 text-[15px] font-semibold text-white">{b}</p>
+                    <p className="text-[11px] text-zinc-500 sm:text-[12px]">{label}</p>
+                    <p className="mt-1 text-[14px] font-semibold text-white sm:text-[16px]">{b}</p>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 

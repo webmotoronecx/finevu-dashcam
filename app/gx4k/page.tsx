@@ -494,12 +494,15 @@ export default function GX4KPage() {
         </div>
       </section>
 
-      {/* 4 · SEE EVERY DETAIL carousel ------------------------------------ */}
-      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} />
+      {/* 4 · SEE EVERY DETAIL carousel — hidden per request --------------- */}
+      {false && <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} />}
 
       {/* 5 · PROTECTED WHILE PARKED carousel ------------------------------ */}
       <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />
 
+      {/* ─── sections below hidden per request (flip false → true to show) ─── */}
+      {false && (
+      <>
       {/* 6 · A SECOND SET OF EYES. showcase ------------------------------- */}
       <Showcase title="A Second Set of Eyes." subtitle="ADAS Plus watches the road with you, and speaks up before you need to." />
 
@@ -604,10 +607,15 @@ export default function GX4KPage() {
         </div>
       </section>
       </div>
+      </>
+      )}
 
       {/* 14–19 · #0B0B0B band — from "More reasons" through the Firmware /
           "Do not power off…" section, per client spec ---------------------- */}
       <div data-nav-theme="dark" style={{ background: "#0B0B0B" }}>
+      {/* 14–18 hidden per request (flip false → true to show) */}
+      {false && (
+      <>
       {/* 14 · REASONS / INCLUDES bento ------------------------------------ */}
       <section className="py-16 md:py-24">
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
@@ -791,6 +799,8 @@ export default function GX4KPage() {
           </motion.div>
         </div>
       </section>
+      </>
+      )}
 
       {/* 19 · FIRMWARE / DOWNLOADS ---------------------------------------- */}
       <section data-nav-theme="dark" className="py-16 md:py-24">
@@ -834,6 +844,9 @@ export default function GX4KPage() {
       </section>
       </div>
 
+      {/* 20a–20b hidden per request (flip false → true to show) */}
+      {false && (
+      <>
       {/* 20a · HELP / QUICK LINKS — Figma 180:225 (#121214 band) --------- */}
       <section data-nav-theme="dark" className="bg-[#121214] py-14 md:py-20">
         <div className={SHELL}>
@@ -875,6 +888,8 @@ export default function GX4KPage() {
           </ol>
         </div>
       </section>
+      </>
+      )}
 
       <Footer />
     </main>

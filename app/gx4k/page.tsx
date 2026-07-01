@@ -3,7 +3,7 @@
 import { Footer } from "@/components/Footer";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 
 /* ============================================================================
@@ -127,14 +127,22 @@ function Carousel({
   post,
   cards,
   note,
+  alignEnd,
 }: {
   pre?: string;
   grad?: string;
   post?: string;
   cards: Card[];
   note?: string;
+  alignEnd?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  // alignEnd: start the track at its end, so the *last* card sits centred with
+  // the big empty margin on the right and earlier cards bleeding off the left
+  // (mirror of the default left-margin layout).
+  useEffect(() => {
+    if (alignEnd && ref.current) ref.current.scrollLeft = ref.current.scrollWidth;
+  }, [alignEnd, cards.length]);
   const by = (d: number) => {
     const track = ref.current;
     if (!track) return;
@@ -490,7 +498,7 @@ export default function GX4KPage() {
       <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} />
 
       {/* 5 · PROTECTED WHILE PARKED carousel ------------------------------ */}
-      <Carousel grad="Protected" post=" While Parked" cards={cParked} />
+      <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />
 
       {/* 6 · A SECOND SET OF EYES. showcase ------------------------------- */}
       <Showcase title="A Second Set of Eyes." subtitle="ADAS Plus watches the road with you, and speaks up before you need to." />
@@ -503,6 +511,7 @@ export default function GX4KPage() {
         pre="Built to Last"
         cards={cBuilt}
         note="* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system."
+        alignEnd
       />
 
       {/* 9 · STORAGE THAT MANAGES ITSELF carousel ------------------------- */}

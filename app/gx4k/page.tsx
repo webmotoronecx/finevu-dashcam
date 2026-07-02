@@ -491,7 +491,7 @@ export default function GX4KPage() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/gx4k/hero-bg.png"
+          src="/gx4k/hero-bg.webp"
           alt="FineVu GX4K front and rear dash cam in a cosmic nebula"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />

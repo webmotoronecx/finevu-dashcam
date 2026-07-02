@@ -112,7 +112,6 @@ function StageMedia() {
       src="/gx4k/optics.webp"
       alt="FineVu GX4K front and rear cameras against a cosmic nebula"
       fill
-      priority
       sizes="100vw"
       className="object-cover"
     />

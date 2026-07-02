@@ -7,11 +7,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 
-/* ============================================================================
-   FineVu GX4K — premium product page
-   Full rebuild of Figma frame 102:2004 (FineVu Website Wireframe).
-   Dark cinematic layout, real frame imagery in public/gx4k/*.
-   ========================================================================== */
+/* FineVu GX4K product page — Figma frame 102:2004 (dark cinematic layout). */
 
 const SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
 const HEAD_GRAD = "linear-gradient(90deg, #8ea6f0 0%, #b79ce2 100%)";
@@ -98,10 +94,7 @@ function Showcase({
   );
 }
 
-/* Horizontal feature carousel — centred-peek cards, click/drag + prev/next.
-   A transform track (not native scroll) so the ends clamp cleanly: the active
-   card is centred, but the first/last clamp to a side margin instead of over-
-   scrolling into empty space. Draggable by pointer; snaps to the nearest card. */
+/* Horizontal feature carousel — peek cards on a transform track, click/drag + prev/next, clamped ends. */
 type Card = { title: string; body: string; img?: string; note?: string };
 function Carousel({
   pre,
@@ -140,14 +133,8 @@ function Carousel({
     const gap = 24;
     const step = cardW + gap;
     if (pinGutter) {
-      // Fixed "gutter": the active card always lands at the same spot with a
-      // constant empty space beside it, and the outgoing card slides BEHIND that
-      // space (the viewport is inset by `gutter`, so it clips there) rather than
-      // through it. The gutter equals the centred-first-card margin, so the
-      // resting look is unchanged — only navigation stops eating the space.
-      //   • default   → space on the LEFT, cards bleed right  (See Every Detail)
-      //   • gutterRight→ mirror: space on the RIGHT, cards bleed left, first card
-      //     right-anchored (cards are rendered reversed, see displayCards below).
+      // Fixed gutter: active card lands at a set spot with constant empty space
+      // beside it; gutterRight mirrors to the right (cards rendered reversed).
       const fullVw = document.documentElement.clientWidth;
       const g = Math.max(0, (fullVw - cardW) / 2);
       const span = (cards.length - 1) * step;
@@ -173,8 +160,7 @@ function Carousel({
     setTx(Math.max(r.min, Math.min(r.max, r.max - clamped * r.step)));
   }, [cards.length]);
 
-  // Position on mount (retry via rAF until the cards have laid out) and re-clamp
-  // on resize. All setState runs inside async callbacks, never the effect body.
+  // Position on mount (rAF retry until laid out) and re-clamp on resize.
   const positioned = useRef(false);
   useEffect(() => {
     const vp = vpRef.current;
@@ -305,9 +291,7 @@ function Carousel({
           ))}
         </div>
       </div>
-      {/* Nav row. For pinGutter carousels the arrows align to the featured
-          card's right edge (= viewport width − gutter, the same column for
-          both left- and right-gutter layouts) instead of the page edge. */}
+      {/* Nav row — pinGutter aligns the arrows to the featured card's right edge. */}
       <div
         className={`mt-2 flex items-center justify-end gap-3 ${pinGutter ? "" : SHELL}`}
         style={pinGutter ? { marginRight: gutter } : undefined}
@@ -590,8 +574,7 @@ export default function GX4KPage() {
       {/* 4 · SEE EVERY DETAIL carousel ----------------------------------- */}
       <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
 
-      {/* 5 · PROTECTED WHILE PARKED carousel — mirror of See Every Detail:
-             fixed big space on the RIGHT, maintained while sliding. --------- */}
+      {/* 5 · PROTECTED WHILE PARKED carousel — mirror, space on the right ---- */}
       <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1047 / 562" pinGutter gutterRight />
 
       {/* 6 · SMARTER, SAFER DRIVING carousel — left gutter ---------------- */}
@@ -624,8 +607,7 @@ export default function GX4KPage() {
       {/* ─── sections below hidden per request (flip false → true to show) ─── */}
       {false && (
       <>
-      {/* 13 + 13b · DESIGNED TO DISAPPEAR band — one full-bleed gradient
-          container behind both sections (Figma "Rectangle 35" / 141:114) ---- */}
+      {/* 13 + 13b · DESIGNED TO DISAPPEAR band — full-bleed gradient (Figma 141:114) */}
       <div
         data-nav-theme="dark"
         style={{ background: "linear-gradient(180deg, #241C38 0%, #130F1E 7.2%, #08080C 59.6%)" }}
@@ -716,8 +698,7 @@ export default function GX4KPage() {
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
           <Head pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
-        {/* Figma 133:58 bento — top row taller (No.1 730 : warranty 550, both
-            600 tall), bottom row two equal tiles (640×400); 20px gaps */}
+        {/* Figma 133:58 bento — taller top row, two equal tiles below. */}
         <div className={`${SHELL} space-y-4 sm:space-y-5`}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
             <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[730/600]" />

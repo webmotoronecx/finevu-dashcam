@@ -4,21 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { motion, useScroll, useMotionValueEvent, useReducedMotion } from "motion/react";
 
-/* ============================================================================
-   The Optics Behind the Image — cinematic pinned reveal (Figma 141:176 / 141:180
-   / 141:177). On desktop the full-bleed composite is pinned with NATIVE
-   position:sticky (smooth, no jitter) while the Front → Core → Rear callouts
-   reveal one at a time as you scroll. Mobile & reduced-motion stack the callouts
-   below the image, fully visible.
-
-   Requires the page's <main> to use overflow-x-clip (not overflow-hidden) — the
-   `hidden` value turns an ancestor into a scroll container and breaks sticky;
-   `clip` keeps the same horizontal clipping without breaking it.
-
-   Media is a full-bleed 16:9 stage so the same layout drops in a <video> later:
-   swap <StageMedia> for a <video className="h-full w-full object-cover"> and the
-   overlays/connector lines keep aligning (they live in the stage's 1920×1080 space).
-   ========================================================================== */
+/* "The Optics Behind the Image" pinned reveal (Figma 141:176) — needs <main> overflow-x-clip for the sticky pin; swap <StageMedia> for a <video> to reuse. */
 
 const SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
 
@@ -48,8 +34,7 @@ const CALLOUTS: Callout[] = [
   },
 ];
 
-/* Reveal windows over scrollYProgress — disjoint, so only one appears at a time.
-   `a..b` fades/raises the block; `la..lb` draws its connector line. */
+/* Disjoint reveal windows over scrollYProgress — a..b fades the block, la..lb draws its line. */
 const REVEAL = [
   { a: 0.1, b: 0.24, la: 0.12, lb: 0.28 },
   { a: 0.33, b: 0.47, la: 0.35, lb: 0.51 },

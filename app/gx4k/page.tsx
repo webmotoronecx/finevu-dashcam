@@ -132,6 +132,7 @@ function Carousel({
   cards,
   note,
   alignEnd,
+  leftAlign,
   imgAspect = "73 / 50",
 }: {
   pre?: string;
@@ -140,6 +141,7 @@ function Carousel({
   cards: Card[];
   note?: string;
   alignEnd?: boolean;
+  leftAlign?: boolean;
   imgAspect?: string;
 }) {
   const vpRef = useRef<HTMLDivElement>(null);
@@ -159,12 +161,25 @@ function Carousel({
     const gap = 24;
     const trackW = cards.length * cardW + (cards.length - 1) * gap;
     const vw = vp.clientWidth;
-    const max = (vw - cardW) / 2; // first card centred → margin on the left
-    const min = Math.min(max, (vw + cardW) / 2 - trackW); // last card → margin on the right
+    let max: number;
+    let min: number;
+    if (leftAlign) {
+      // First card flush to the content-left margin (matches the page SHELL:
+      // max-w-[1280px] + px-6 / lg:px-10) so there's no leading empty space —
+      // cards bleed off the right, last card clamps to the content-right margin.
+      // Per Figma 140:225 (carousel is left-aligned, not centred).
+      const pad = vw >= 1024 ? 40 : 24;
+      const inset = Math.max(0, (vw - 1280) / 2) + pad;
+      max = inset; // first card pinned at the content-left edge
+      min = Math.min(max, vw - inset - trackW); // last card right edge → content-right
+    } else {
+      max = (vw - cardW) / 2; // first card centred → margin on the left
+      min = Math.min(max, (vw + cardW) / 2 - trackW); // last card → margin on the right
+    }
     const r = { min, max, step: cardW + gap };
     setRange(r);
     return r;
-  }, [cards.length]);
+  }, [cards.length, leftAlign]);
 
   const snap = useCallback((rawTx: number, r: { min: number; max: number; step: number }) => {
     const i = Math.round((r.max - rawTx) / r.step);
@@ -562,7 +577,7 @@ export default function GX4KPage() {
       <OpticsSection />
 
       {/* 4 · SEE EVERY DETAIL carousel ----------------------------------- */}
-      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" />
+      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" leftAlign />
 
       {/* 5 · PROTECTED WHILE PARKED carousel — hidden per request --------- */}
       {false && <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />}

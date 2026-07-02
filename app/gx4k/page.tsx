@@ -620,33 +620,35 @@ export default function GX4KPage() {
              fixed big space on the RIGHT, maintained while sliding. --------- */}
       <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1047 / 562" pinGutter gutterRight />
 
-      {/* ─── sections below hidden per request (flip false → true to show) ─── */}
-      {false && (
-      <>
-      {/* 6 · A SECOND SET OF EYES. showcase ------------------------------- */}
-      <Showcase title="A Second Set of Eyes." subtitle="ADAS Plus watches the road with you, and speaks up before you need to." />
+      {/* 6 · SMARTER, SAFER DRIVING carousel — left gutter ---------------- */}
+      <Carousel pre="Smarter, " grad="Safer Driving" cards={cSafer} imgAspect="1047 / 562" pinGutter />
 
-      {/* 7 · SMARTER, SAFER DRIVING carousel ------------------------------ */}
-      <Carousel pre="Smarter, " grad="Safer Driving" cards={cSafer} />
-
-      {/* 8 · BUILT TO LAST carousel --------------------------------------- */}
+      {/* 7 · BUILT TO LAST carousel — right gutter (mirror) --------------- */}
       <Carousel
         pre="Built to Last"
         cards={cBuilt}
         note="* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system."
-        alignEnd
+        imgAspect="1047 / 562"
+        pinGutter
+        gutterRight
       />
 
-      {/* 9 · STORAGE THAT MANAGES ITSELF carousel ------------------------- */}
-      <Carousel pre="Storage That Manages Itself" cards={cStorage} />
+      {/* 8 · STORAGE THAT MANAGES ITSELF carousel — left gutter ----------- */}
+      <Carousel pre="Storage That Manages Itself" cards={cStorage} imgAspect="1047 / 562" pinGutter />
 
-      {/* 10 · YOUR DASHCAM. IN YOUR HAND. showcase ------------------------ */}
+      {/* 9 · CONNECTED IN YOUR POCKET carousel — right gutter (mirror) ---- */}
+      <Carousel grad="Connected" post=" in Your Pocket" cards={cConnected} imgAspect="1047 / 562" pinGutter gutterRight />
+
+      {/* ─── sections below hidden per request (flip false → true to show) ─── */}
+      {false && (
+      <>
+      {/* A SECOND SET OF EYES. showcase ----------------------------------- */}
+      <Showcase title="A Second Set of Eyes." subtitle="ADAS Plus watches the road with you, and speaks up before you need to." />
+
+      {/* YOUR DASHCAM. IN YOUR HAND. showcase ----------------------------- */}
       <Showcase title="Your Dashcam. In Your Hand." subtitle="Live view, instant downloads and settings, all from your phone. No cables, no card removal." />
 
-      {/* 11 · CONNECTED IN YOUR POCKET carousel --------------------------- */}
-      <Carousel grad="Connected" post=" in Your Pocket" cards={cConnected} />
-
-      {/* 12 · DISCREET BY DESIGN. showcase -------------------------------- */}
+      {/* DISCREET BY DESIGN. showcase ------------------------------------- */}
       <Showcase img="/gx4k/discreet.webp" title="Discreet by Design." subtitle="A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind." />
 
       {/* 13 + 13b · DESIGNED TO DISAPPEAR band — one full-bleed gradient

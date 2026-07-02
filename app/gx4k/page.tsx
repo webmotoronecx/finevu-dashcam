@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { OpticsSection } from "@/components/sections/OpticsSection";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 
 /* ============================================================================
@@ -120,7 +120,10 @@ function Showcase({
   );
 }
 
-/* Horizontal feature carousel with prev/next controls. */
+/* Horizontal feature carousel — centred-peek cards, click/drag + prev/next.
+   A transform track (not native scroll) so the ends clamp cleanly: the active
+   card is centred, but the first/last clamp to a side margin instead of over-
+   scrolling into empty space. Draggable by pointer; snaps to the nearest card. */
 type Card = { title: string; body: string; img?: string; blank?: boolean };
 function Carousel({
   pre,
@@ -139,74 +142,163 @@ function Carousel({
   alignEnd?: boolean;
   imgAspect?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  // alignEnd: start the track at its end, so the *last* card sits centred with
-  // the big empty margin on the right and earlier cards bleeding off the left
-  // (mirror of the default left-margin layout).
+  const vpRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [tx, setTx] = useState(0);
+  const [range, setRange] = useState({ min: 0, max: 0, step: 1 });
+  const [dragging, setDragging] = useState(false);
+  // live gesture state (avoids stale-closure reads inside pointer handlers)
+  const drag = useRef({ x: 0, tx: 0, active: false, min: 0, max: 0, step: 1 });
+
+  // measure viewport/card and the clamped translate range for the current size
+  const measure = useCallback(() => {
+    const vp = vpRef.current;
+    const card = trackRef.current?.querySelector<HTMLElement>("[data-card]");
+    if (!vp || !card) return null;
+    const cardW = card.offsetWidth;
+    const gap = 24;
+    const trackW = cards.length * cardW + (cards.length - 1) * gap;
+    const vw = vp.clientWidth;
+    const max = (vw - cardW) / 2; // first card centred → margin on the left
+    const min = Math.min(max, (vw + cardW) / 2 - trackW); // last card → margin on the right
+    const r = { min, max, step: cardW + gap };
+    setRange(r);
+    return r;
+  }, [cards.length]);
+
+  const snap = useCallback((rawTx: number, r: { min: number; max: number; step: number }) => {
+    const i = Math.round((r.max - rawTx) / r.step);
+    const clamped = Math.max(0, Math.min(cards.length - 1, i));
+    setTx(Math.max(r.min, Math.min(r.max, r.max - clamped * r.step)));
+  }, [cards.length]);
+
+  // Position on mount (retry via rAF until the cards have laid out) and re-clamp
+  // on resize. All setState runs inside async callbacks, never the effect body.
+  const positioned = useRef(false);
   useEffect(() => {
-    if (alignEnd && ref.current) ref.current.scrollLeft = ref.current.scrollWidth;
-  }, [alignEnd, cards.length]);
-  const by = (d: number) => {
-    const track = ref.current;
-    if (!track) return;
-    const card = track.querySelector<HTMLElement>("[data-card]");
-    const step = card ? card.offsetWidth + 24 : 640; // card width + gap-6
-    track.scrollBy({ left: d * step, behavior: "smooth" });
+    const vp = vpRef.current;
+    if (!vp) return;
+    let raf = 0;
+    const init = () => {
+      const r = measure();
+      if (!r) {
+        raf = requestAnimationFrame(init);
+        return;
+      }
+      positioned.current = true;
+      setTx(alignEnd ? r.min : r.max);
+    };
+    raf = requestAnimationFrame(init);
+    const ro = new ResizeObserver(() => {
+      const r = measure();
+      if (r && positioned.current) setTx((p) => Math.max(r.min, Math.min(r.max, p)));
+    });
+    ro.observe(vp);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [measure, alignEnd]);
+
+  const stepBy = (d: number) => {
+    const cur = Math.round((range.max - tx) / range.step);
+    snap(range.max - (cur + d) * range.step, range);
   };
+
+  const onDown = (e: React.PointerEvent) => {
+    const r = measure() ?? range;
+    drag.current = { x: e.clientX, tx, active: true, ...r };
+    setDragging(true);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore — synthetic events / unsupported pointers */
+    }
+  };
+  const onMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d.active) return;
+    const raw = d.tx + (e.clientX - d.x);
+    // rubber-band resistance past the clamped bounds
+    const v = raw > d.max ? d.max + (raw - d.max) * 0.3 : raw < d.min ? d.min + (raw - d.min) * 0.3 : raw;
+    setTx(v);
+  };
+  const onUp = () => {
+    if (!drag.current.active) return;
+    drag.current.active = false;
+    setDragging(false);
+    snap(tx, { min: drag.current.min, max: drag.current.max, step: drag.current.step });
+  };
+
+  const atStart = tx >= range.max - 1;
+  const atEnd = tx <= range.min + 1;
+
   return (
     <section data-nav-theme="dark" className="py-16 md:py-24">
       <div className={`${SHELL} mb-8 md:mb-12 text-center`}>
         <Head pre={pre} grad={grad} post={post} className="!text-[26px] md:!text-[38px]" />
       </div>
-      <div
-        ref={ref}
-        className="carousel-inset flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {cards.map((c) => (
-          <motion.article
-            key={c.title}
-            data-card
-            {...fadeUp}
-            className="w-[var(--card-w)] shrink-0 snap-center"
-          >
-            {c.img ? (
-              <div
-                className="tile-hover relative overflow-hidden rounded-[22px] border border-white/[0.06]"
-                style={{ aspectRatio: imgAspect }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.img} alt={c.title} className="h-full w-full object-cover" />
-              </div>
-            ) : c.blank ? (
-              // image not yet supplied — Figma "blank" placeholder (#656565)
-              <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
-            ) : (
-              <Panel className="aspect-[73/50]" />
-            )}
-            <h3 className="mt-6 text-[22px] md:text-2xl font-semibold text-white">
-              {c.title}
-            </h3>
-            <p className={`mt-3 max-w-[540px] ${BODY} !text-[14px] md:!text-[16px]`}>
-              {c.body}
-            </p>
-          </motion.article>
-        ))}
+      <div ref={vpRef} className="overflow-hidden" style={{ touchAction: "pan-y" }}>
+        <div
+          ref={trackRef}
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+          className={`flex select-none gap-6 pb-4 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+          style={{
+            transform: `translate3d(${tx}px,0,0)`,
+            transition: dragging ? "none" : "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+          }}
+        >
+          {cards.map((c) => (
+            <motion.article
+              key={c.title}
+              data-card
+              {...fadeUp}
+              className="w-[80vw] shrink-0 md:w-[62vw] lg:w-[min(48vw,1040px)]"
+            >
+              {c.img ? (
+                <div
+                  className="tile-hover relative overflow-hidden rounded-[22px] border border-white/[0.06]"
+                  style={{ aspectRatio: imgAspect }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={c.img} alt={c.title} draggable={false} className="h-full w-full object-cover" />
+                </div>
+              ) : c.blank ? (
+                // image not yet supplied — Figma "blank" placeholder (#656565)
+                <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
+              ) : (
+                <Panel className="aspect-[73/50]" />
+              )}
+              <h3 className="mt-6 text-[22px] md:text-2xl font-semibold text-white">
+                {c.title}
+              </h3>
+              <p className={`mt-3 max-w-[540px] ${BODY} !text-[14px] md:!text-[16px]`}>
+                {c.body}
+              </p>
+            </motion.article>
+          ))}
+        </div>
       </div>
       <div className={`${SHELL} mt-2 flex items-center justify-end gap-3`}>
         {note && (
           <p className="mr-auto max-w-[560px] text-left text-[12px] text-zinc-600">{note}</p>
         )}
         <button
-          onClick={() => by(-1)}
+          onClick={() => stepBy(-1)}
+          disabled={atStart}
           aria-label="Previous"
-          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white"
+          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white disabled:cursor-default disabled:opacity-30"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
-          onClick={() => by(1)}
+          onClick={() => stepBy(1)}
+          disabled={atEnd}
           aria-label="Next"
-          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white"
+          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white disabled:cursor-default disabled:opacity-30"
         >
           <ChevronRight className="h-5 w-5" />
         </button>

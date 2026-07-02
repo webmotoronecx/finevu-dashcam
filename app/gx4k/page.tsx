@@ -102,13 +102,12 @@ function Showcase({
    A transform track (not native scroll) so the ends clamp cleanly: the active
    card is centred, but the first/last clamp to a side margin instead of over-
    scrolling into empty space. Draggable by pointer; snaps to the nearest card. */
-type Card = { title: string; body: string; img?: string };
+type Card = { title: string; body: string; img?: string; note?: string };
 function Carousel({
   pre,
   grad,
   post,
   cards,
-  note,
   alignEnd,
   pinGutter,
   gutterRight,
@@ -118,7 +117,6 @@ function Carousel({
   grad?: string;
   post?: string;
   cards: Card[];
-  note?: string;
   alignEnd?: boolean;
   pinGutter?: boolean;
   gutterRight?: boolean;
@@ -297,6 +295,12 @@ function Carousel({
               <p className={`mt-3 max-w-[540px] ${BODY} !text-[14px] md:!text-[16px]`}>
                 {c.body}
               </p>
+              {c.note && (
+                // per-card footnote — Figma 113:3785 (#8f8f8f, 12px medium)
+                <p className="mt-3 max-w-[540px] text-[12px] font-medium leading-[1.6] text-[#8f8f8f]">
+                  {c.note}
+                </p>
+              )}
             </motion.article>
           ))}
         </div>
@@ -308,9 +312,6 @@ function Carousel({
         className={`mt-2 flex items-center justify-end gap-3 ${pinGutter ? "" : SHELL}`}
         style={pinGutter ? { marginRight: gutter } : undefined}
       >
-        {note && (
-          <p className="mr-auto max-w-[560px] text-left text-[12px] text-zinc-600">{note}</p>
-        )}
         <button
           onClick={goPrev}
           disabled={prevOff}
@@ -405,7 +406,7 @@ const cSafer: Card[] = [
 const cBuilt: Card[] = [
   { title: "Supercapacitor, Not Battery", body: "A supercapacitor replaces the traditional battery for better heat tolerance and a longer service life. Engineered for reliability, not shortcuts." },
   { title: "Built In-House", body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That's reliability you can count on." },
-  { title: "Battery Protection Integrated", body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap." },
+  { title: "Battery Protection Integrated", body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.", note: "* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system." },
 ];
 
 const cStorage: Card[] = [
@@ -611,18 +612,18 @@ export default function GX4KPage() {
       {/* 9 · CONNECTED IN YOUR POCKET carousel — right gutter (mirror) ---- */}
       <Carousel grad="Connected" post=" in Your Pocket" cards={cConnected} imgAspect="1047 / 562" pinGutter gutterRight />
 
+      {/* 10 · A SECOND SET OF EYES. showcase ------------------------------ */}
+      <Showcase title="A Second Set of Eyes." subtitle="ADAS Plus watches the road with you, and speaks up before you need to." />
+
+      {/* 11 · YOUR DASHCAM. IN YOUR HAND. showcase ------------------------ */}
+      <Showcase title="Your Dashcam. In Your Hand." subtitle="Live view, instant downloads and settings, all from your phone. No cables, no card removal." />
+
+      {/* 12 · DISCREET BY DESIGN. showcase -------------------------------- */}
+      <Showcase img="/gx4k/discreet.webp" title="Discreet by Design." subtitle="A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind." />
+
       {/* ─── sections below hidden per request (flip false → true to show) ─── */}
       {false && (
       <>
-      {/* A SECOND SET OF EYES. showcase ----------------------------------- */}
-      <Showcase title="A Second Set of Eyes." subtitle="ADAS Plus watches the road with you, and speaks up before you need to." />
-
-      {/* YOUR DASHCAM. IN YOUR HAND. showcase ----------------------------- */}
-      <Showcase title="Your Dashcam. In Your Hand." subtitle="Live view, instant downloads and settings, all from your phone. No cables, no card removal." />
-
-      {/* DISCREET BY DESIGN. showcase ------------------------------------- */}
-      <Showcase img="/gx4k/discreet.webp" title="Discreet by Design." subtitle="A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind." />
-
       {/* 13 + 13b · DESIGNED TO DISAPPEAR band — one full-bleed gradient
           container behind both sections (Figma "Rectangle 35" / 141:114) ---- */}
       <div

@@ -59,10 +59,19 @@ function Head({
 }
 
 /* Dark media panel — used where the frame leaves an image slot empty. */
-function Panel({ className = "", label }: { className?: string; label?: string }) {
+function Panel({
+  className = "",
+  label,
+  style,
+}: {
+  className?: string;
+  label?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
       className={`relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-[#0d0d14] ${className}`}
+      style={style}
     >
       <div
         className="absolute inset-0"
@@ -133,6 +142,7 @@ function Carousel({
   note,
   alignEnd,
   pinGutter,
+  gutterRight,
   imgAspect = "73 / 50",
 }: {
   pre?: string;
@@ -142,6 +152,7 @@ function Carousel({
   note?: string;
   alignEnd?: boolean;
   pinGutter?: boolean;
+  gutterRight?: boolean;
   imgAspect?: string;
 }) {
   const vpRef = useRef<HTMLDivElement>(null);
@@ -162,15 +173,21 @@ function Carousel({
     const gap = 24;
     const step = cardW + gap;
     if (pinGutter) {
-      // Fixed left "gutter": the active card always sits at the same spot with a
-      // constant empty space on its left, and the outgoing card slides BEHIND
-      // that space (the viewport is inset by `gutter`, so it clips there) rather
-      // than through it. The gutter equals the centred-first-card margin, so the
+      // Fixed "gutter": the active card always lands at the same spot with a
+      // constant empty space beside it, and the outgoing card slides BEHIND that
+      // space (the viewport is inset by `gutter`, so it clips there) rather than
+      // through it. The gutter equals the centred-first-card margin, so the
       // resting look is unchanged — only navigation stops eating the space.
+      //   • default   → space on the LEFT, cards bleed right  (See Every Detail)
+      //   • gutterRight→ mirror: space on the RIGHT, cards bleed left, first card
+      //     right-anchored (cards are rendered reversed, see displayCards below).
       const fullVw = document.documentElement.clientWidth;
       const g = Math.max(0, (fullVw - cardW) / 2);
-      const r = { min: -(cards.length - 1) * step, max: 0, step };
+      const span = (cards.length - 1) * step;
       setGutter(g);
+      const r = gutterRight
+        ? { min: fullVw - g - cardW - span, max: fullVw - g - cardW, step }
+        : { min: -span, max: 0, step };
       setRange(r);
       return r;
     }
@@ -181,7 +198,7 @@ function Carousel({
     const r = { min, max, step };
     setRange(r);
     return r;
-  }, [cards.length, pinGutter]);
+  }, [cards.length, pinGutter, gutterRight]);
 
   const snap = useCallback((rawTx: number, r: { min: number; max: number; step: number }) => {
     const i = Math.round((r.max - rawTx) / r.step);
@@ -203,7 +220,8 @@ function Carousel({
         return;
       }
       positioned.current = true;
-      setTx(alignEnd ? r.min : r.max);
+      // right-gutter pins the FIRST card to the right edge, which is r.min
+      setTx(alignEnd || (pinGutter && gutterRight) ? r.min : r.max);
     };
     raf = requestAnimationFrame(init);
     const ro = new ResizeObserver(() => {
@@ -215,7 +233,7 @@ function Carousel({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [measure, alignEnd]);
+  }, [measure, alignEnd, pinGutter, gutterRight]);
 
   const stepBy = (d: number) => {
     const cur = Math.round((range.max - tx) / range.step);
@@ -250,6 +268,15 @@ function Carousel({
   const atStart = tx >= range.max - 1;
   const atEnd = tx <= range.min + 1;
 
+  // Right-gutter renders cards reversed (first card right-anchored), so the
+  // prev/next direction and disabled-ends are mirrored versus the default.
+  const flip = !!(pinGutter && gutterRight);
+  const displayCards = flip ? [...cards].reverse() : cards;
+  const goPrev = () => stepBy(flip ? 1 : -1);
+  const goNext = () => stepBy(flip ? -1 : 1);
+  const prevOff = flip ? atEnd : atStart;
+  const nextOff = flip ? atStart : atEnd;
+
   return (
     <section data-nav-theme="dark" className="py-16 md:py-24">
       <div className={`${SHELL} mb-8 md:mb-12 text-center`}>
@@ -258,7 +285,11 @@ function Carousel({
       <div
         ref={vpRef}
         className="overflow-hidden"
-        style={{ touchAction: "pan-y", marginLeft: pinGutter ? gutter : undefined }}
+        style={{
+          touchAction: "pan-y",
+          marginLeft: pinGutter && !gutterRight ? gutter : undefined,
+          marginRight: pinGutter && gutterRight ? gutter : undefined,
+        }}
       >
         <div
           ref={trackRef}
@@ -272,7 +303,7 @@ function Carousel({
             transition: dragging ? "none" : "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
           }}
         >
-          {cards.map((c) => (
+          {displayCards.map((c) => (
             <motion.article
               key={c.title}
               data-card
@@ -291,7 +322,7 @@ function Carousel({
                 // image not yet supplied — Figma "blank" placeholder (#656565)
                 <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
               ) : (
-                <Panel className="aspect-[73/50]" />
+                <Panel style={{ aspectRatio: imgAspect }} />
               )}
               <h3 className="mt-6 text-[22px] md:text-2xl font-semibold text-white">
                 {c.title}
@@ -308,16 +339,16 @@ function Carousel({
           <p className="mr-auto max-w-[560px] text-left text-[12px] text-zinc-600">{note}</p>
         )}
         <button
-          onClick={() => stepBy(-1)}
-          disabled={atStart}
+          onClick={goPrev}
+          disabled={prevOff}
           aria-label="Previous"
           className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white disabled:cursor-default disabled:opacity-30"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
-          onClick={() => stepBy(1)}
-          disabled={atEnd}
+          onClick={goNext}
+          disabled={nextOff}
           aria-label="Next"
           className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white disabled:cursor-default disabled:opacity-30"
         >
@@ -585,8 +616,9 @@ export default function GX4KPage() {
       {/* 4 · SEE EVERY DETAIL carousel ----------------------------------- */}
       <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
 
-      {/* 5 · PROTECTED WHILE PARKED carousel — hidden per request --------- */}
-      {false && <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />}
+      {/* 5 · PROTECTED WHILE PARKED carousel — mirror of See Every Detail:
+             fixed big space on the RIGHT, maintained while sliding. --------- */}
+      <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1047 / 562" pinGutter gutterRight />
 
       {/* ─── sections below hidden per request (flip false → true to show) ─── */}
       {false && (

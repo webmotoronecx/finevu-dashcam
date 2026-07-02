@@ -627,7 +627,6 @@ export default function GX4KPage() {
       <Carousel
         pre="Built to Last"
         cards={cBuilt}
-        note="* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system."
         imgAspect="1047 / 562"
         pinGutter
         gutterRight

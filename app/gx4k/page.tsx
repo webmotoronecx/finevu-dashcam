@@ -121,7 +121,7 @@ function Showcase({
 }
 
 /* Horizontal feature carousel with prev/next controls. */
-type Card = { title: string; body: string; img?: string };
+type Card = { title: string; body: string; img?: string; blank?: boolean };
 function Carousel({
   pre,
   grad,
@@ -129,6 +129,7 @@ function Carousel({
   cards,
   note,
   alignEnd,
+  imgAspect = "73 / 50",
 }: {
   pre?: string;
   grad?: string;
@@ -136,6 +137,7 @@ function Carousel({
   cards: Card[];
   note?: string;
   alignEnd?: boolean;
+  imgAspect?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   // alignEnd: start the track at its end, so the *last* card sits centred with
@@ -168,10 +170,16 @@ function Carousel({
             className="w-[var(--card-w)] shrink-0 snap-center"
           >
             {c.img ? (
-              <div className="tile-hover relative aspect-[73/50] overflow-hidden rounded-[22px] border border-white/[0.06]">
+              <div
+                className="tile-hover relative overflow-hidden rounded-[22px] border border-white/[0.06]"
+                style={{ aspectRatio: imgAspect }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={c.img} alt={c.title} className="h-full w-full object-cover" />
               </div>
+            ) : c.blank ? (
+              // image not yet supplied — Figma "blank" placeholder (#656565)
+              <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
             ) : (
               <Panel className="aspect-[73/50]" />
             )}
@@ -260,9 +268,9 @@ const detailCards = [
 ];
 
 const cSeeDetail: Card[] = [
-  { title: "True 4K Ultra HD", body: "Front records in 3840×2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.", img: "/gx4k/card-uhd.webp" },
-  { title: "AI Auto Night Vision", body: "Smart AI reads the light around you and adjusts brightness and contrast on its own — clear night footage with nothing to switch on.", img: "/gx4k/card-night.webp" },
-  { title: "Sony STARVIS Sensor", body: "The 8.5MP Sony STARVIS IMX515 delivers vivid, low-noise footage with the dynamic range to handle harsh glare and deep shadow alike.", img: "/gx4k/card-sensor.webp" },
+  { title: "True 4K Ultra HD", body: "Front records in 3840×2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.", img: "/gx4k/see-uhd.webp" },
+  { title: "Sony STARVIS Sensor", body: "The 8.5MP Sony STARVIS IMX515 delivers vivid, low-noise footage with the dynamic range to handle harsh glare and deep shadow alike.", img: "/gx4k/see-sensor.webp" },
+  { title: "AI Auto Night Vision", body: "Smart AI reads the light around you and adjusts brightness and contrast on its own, for clear night footage with nothing to switch on.", blank: true },
 ];
 
 const cParked: Card[] = [
@@ -461,8 +469,8 @@ export default function GX4KPage() {
       {/* 3 · THE OPTICS BEHIND THE IMAGE. — scroll-revealed callouts ------- */}
       <OpticsSection />
 
-      {/* 4 · SEE EVERY DETAIL carousel — hidden per request --------------- */}
-      {false && <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} />}
+      {/* 4 · SEE EVERY DETAIL carousel ----------------------------------- */}
+      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" />
 
       {/* 5 · PROTECTED WHILE PARKED carousel — hidden per request --------- */}
       {false && <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />}

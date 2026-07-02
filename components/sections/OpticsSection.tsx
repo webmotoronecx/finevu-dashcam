@@ -4,26 +4,26 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { motion, useScroll, useMotionValueEvent, useReducedMotion } from "motion/react";
 
-// Hydration-safe "is this the client?" — false on the server + first client render,
-// true thereafter. No effect/setState, so it doesn't trip react-hooks rules.
-const emptySubscribe = () => () => {};
-
 /* ============================================================================
-   The Optics Behind the Image — scroll-revealed callout section (Figma 141:176 /
-   141:180 / 141:177). On desktop the nebula composite is pinned and the Front →
-   Core → Rear callouts reveal one at a time as you scroll; mobile & reduced-motion
-   stack the callouts below the image, fully visible.
+   The Optics Behind the Image — cinematic pinned reveal (Figma 141:176 / 141:180
+   / 141:177). On desktop the full-bleed composite is pinned with NATIVE
+   position:sticky (smooth, no jitter) while the Front → Core → Rear callouts
+   reveal one at a time as you scroll. Mobile & reduced-motion stack the callouts
+   below the image, fully visible.
 
-   The pin + reveals are driven imperatively from `scrollYProgress` (write straight
-   to refs). We deliberately avoid binding MotionValues through `style` here: the
-   page's <main> uses overflow-hidden (which breaks position:sticky) and framer's
-   style-bound values were being wrapped in tweens that lag the scroll. Writing the
-   transforms ourselves keeps the reveal locked to the scrollbar, frame for frame.
+   Requires the page's <main> to use overflow-x-clip (not overflow-hidden) — the
+   `hidden` value turns an ancestor into a scroll container and breaks sticky;
+   `clip` keeps the same horizontal clipping without breaking it.
+
+   Media is a full-bleed 16:9 stage so the same layout drops in a <video> later:
+   swap <StageMedia> for a <video className="h-full w-full object-cover"> and the
+   overlays/connector lines keep aligning (they live in the stage's 1920×1080 space).
    ========================================================================== */
 
 const SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const emptySubscribe = () => () => {};
 
 type Callout = { key: string; title: string; sub: string; items: string[] };
 
@@ -51,23 +51,23 @@ const CALLOUTS: Callout[] = [
 /* Reveal windows over scrollYProgress — disjoint, so only one appears at a time.
    `a..b` fades/raises the block; `la..lb` draws its connector line. */
 const REVEAL = [
-  { a: 0.1, b: 0.26, la: 0.12, lb: 0.3 },
-  { a: 0.38, b: 0.54, la: 0.4, lb: 0.58 },
-  { a: 0.62, b: 0.78, la: 0.64, lb: 0.82 },
+  { a: 0.1, b: 0.24, la: 0.12, lb: 0.28 },
+  { a: 0.33, b: 0.47, la: 0.35, lb: 0.51 },
+  { a: 0.56, b: 0.7, la: 0.58, lb: 0.74 },
 ];
 
-/* Position of each callout over the 16:9 composite (desktop overlay). */
+/* Position of each callout over the full-bleed 16:9 stage. */
 const OVERLAY_POS: Record<string, string> = {
-  front: "left-[1%] top-[11%]",
-  core: "left-[17%] bottom-[7%]",
-  rear: "right-[1%] bottom-[4%]",
+  front: "left-[2%] top-[19%]",
+  core: "left-[16%] bottom-[11%]",
+  rear: "right-[2%] bottom-[8%]",
 };
 
-/* Connector-line endpoints in the image's own 1920×1080 space (block → camera). */
+/* Connector-line endpoints in the stage's own 1920×1080 space (block → camera). */
 const LINES: Record<string, { x1: number; y1: number; x2: number; y2: number }> = {
-  front: { x1: 500, y1: 360, x2: 778, y2: 560 },
-  core: { x1: 770, y1: 770, x2: 880, y2: 612 },
-  rear: { x1: 1410, y1: 815, x2: 1298, y2: 748 },
+  front: { x1: 500, y1: 400, x2: 778, y2: 560 },
+  core: { x1: 770, y1: 730, x2: 880, y2: 612 },
+  rear: { x1: 1410, y1: 760, x2: 1298, y2: 748 },
 };
 
 /* One callout block — shared by the desktop overlay and the mobile stack. */
@@ -91,13 +91,13 @@ function CalloutCard({ data }: { data: Callout }) {
   );
 }
 
-function OpticsHead() {
+function OpticsHead({ className = "" }: { className?: string }) {
   return (
-    <div className="text-center">
+    <div className={`text-center ${className}`}>
       <h2 className="text-[28px] font-semibold leading-[1.12] tracking-[-0.01em] text-white md:text-[42px]">
         The Optics Behind the Image.
       </h2>
-      <p className="mx-auto mt-5 max-w-[560px] text-[15px] leading-[1.6] text-[#a6a6a6] md:text-[18px]">
+      <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.6] text-[#c8ccd8] md:text-[18px]">
         Sony STARVIS IMX515. A precision-engineered 8.5-megapixel sensor paired with F/1.8
         wide-aperture glass, made to perform when it matters most.
       </p>
@@ -105,38 +105,27 @@ function OpticsHead() {
   );
 }
 
-/* Nebula composite + subtle legibility vignette. */
-function OpticsImage() {
+/* The full-bleed media. Swap this for a <video …/> to reuse the whole section. */
+function StageMedia() {
   return (
-    <>
-      <Image
-        src="/gx4k/optics.webp"
-        alt="FineVu GX4K front and rear cameras against a cosmic nebula"
-        fill
-        sizes="(min-width: 1024px) 1040px, 100vw"
-        className="rounded-[24px] object-cover"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 rounded-[24px]"
-        style={{
-          background:
-            "linear-gradient(115deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.12) 34%, rgba(0,0,0,0) 55%), linear-gradient(300deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 32%, rgba(0,0,0,0) 52%)",
-        }}
-      />
-    </>
+    <Image
+      src="/gx4k/optics.webp"
+      alt="FineVu GX4K front and rear cameras against a cosmic nebula"
+      fill
+      priority
+      sizes="100vw"
+      className="object-cover"
+    />
   );
 }
 
 export function OpticsSection() {
-  // Gate reduced-motion behind mount: useReducedMotion() is false on the server
-  // but can be true on the client's first render, which would desync hydration.
-  // Deferring until mounted keeps SSR and first client render identical.
+  // Gate reduced-motion behind mount so SSR and first client render match.
   const prefersReduced = useReducedMotion();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const reduce = mounted && prefersReduced;
 
   const trackRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
   const lineLen = useRef<number[]>([]);
@@ -146,13 +135,8 @@ export function OpticsSection() {
     offset: ["start start", "end end"],
   });
 
-  // Write the pin + reveal states straight to the DOM for the given progress.
+  // Write the reveal state straight to the DOM — instant, locked to the scrollbar.
   const paint = useCallback((p: number) => {
-    // Pin: the track is 320vh and the panel 100vh, so the panel travels 220vh
-    // to stay fixed in the viewport across the scroll.
-    if (panelRef.current) {
-      panelRef.current.style.transform = `translate3d(0, ${p * window.innerHeight * 2.2}px, 0)`;
-    }
     REVEAL.forEach((r, i) => {
       const t = clamp((p - r.a) / (r.b - r.a), 0, 1);
       const card = cardRefs.current[i];
@@ -173,7 +157,6 @@ export function OpticsSection() {
 
   useEffect(() => {
     if (reduce) return;
-    // Cache each connector's length and prime its dash so it starts undrawn.
     lineRefs.current.forEach((line, i) => {
       if (!line) return;
       const len = line.getTotalLength();
@@ -182,9 +165,6 @@ export function OpticsSection() {
       line.style.strokeDashoffset = String(len);
     });
     paint(scrollYProgress.get());
-    const onResize = () => paint(scrollYProgress.get());
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
   }, [reduce, paint, scrollYProgress]);
 
   /* -------- reduced motion: static, fully visible, no pin -------------- */
@@ -194,7 +174,7 @@ export function OpticsSection() {
         <div className={SHELL}>
           <OpticsHead />
           <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-[24px]">
-            <OpticsImage />
+            <StageMedia />
           </div>
           <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-3">
             {CALLOUTS.map((c) => (
@@ -213,7 +193,7 @@ export function OpticsSection() {
         <div className={SHELL}>
           <OpticsHead />
           <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-[24px]">
-            <OpticsImage />
+            <StageMedia />
           </div>
           <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-3">
             {CALLOUTS.map((c, i) => (
@@ -231,26 +211,26 @@ export function OpticsSection() {
         </div>
       </div>
 
-      {/* ---------- DESKTOP (>= lg): pinned composite, one-at-a-time reveal - */}
-      <div ref={trackRef} className="relative hidden h-[320vh] lg:block">
-        <div
-          ref={panelRef}
-          className="absolute inset-x-0 top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-10 pt-[100px] will-change-transform"
-        >
-          <OpticsHead />
+      {/* ---------- DESKTOP (>= lg): full-bleed composite pinned (native sticky) */}
+      <div ref={trackRef} className="relative hidden h-[360vh] lg:block">
+        <div className="sticky top-0 h-screen w-full overflow-hidden">
+          {/* full-width 16:9 stage, vertically centred (clipped top/bottom if taller) */}
+          <div className="absolute inset-x-0 top-1/2 aspect-[16/9] w-full -translate-y-1/2">
+            <StageMedia />
 
-          {/* Width is capped by viewport height so the pinned panel always fits
-              below the nav without cropping the 16:9 composite. */}
-          <div
-            className="relative mt-8 aspect-[16/9] max-w-full"
-            style={{ width: "min(1040px, calc((100vh - 312px) * 16 / 9))" }}
-          >
-            <OpticsImage />
+            {/* legibility scrims: darker at the top (title) and the callout corners */}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(8,8,12,0.72) 0%, rgba(8,8,12,0.12) 22%, rgba(8,8,12,0) 40%), linear-gradient(115deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.08) 32%, rgba(0,0,0,0) 52%), linear-gradient(300deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0) 50%)",
+              }}
+            />
 
-            {/* connector lines, drawn in the image's own coordinate space */}
+            {/* connector lines in the stage's own coordinate space */}
             <svg
               viewBox="0 0 1920 1080"
-              preserveAspectRatio="xMidYMid meet"
+              preserveAspectRatio="none"
               className="pointer-events-none absolute inset-0 h-full w-full"
               aria-hidden="true"
             >
@@ -283,7 +263,7 @@ export function OpticsSection() {
               })}
             </svg>
 
-            {/* callout blocks overlaid on the composite (revealed imperatively) */}
+            {/* callout blocks, revealed imperatively */}
             {CALLOUTS.map((c, i) => (
               <div
                 key={c.key}
@@ -297,6 +277,9 @@ export function OpticsSection() {
               </div>
             ))}
           </div>
+
+          {/* title overlaid near the top, always readable over the top scrim */}
+          <OpticsHead className="absolute inset-x-0 top-[13%] px-6" />
         </div>
       </div>
     </section>

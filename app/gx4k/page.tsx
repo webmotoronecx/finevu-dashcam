@@ -383,7 +383,7 @@ export default function GX4KPage() {
   const [dtd, setDtd] = useState(0);
 
   return (
-    <main className="overflow-hidden bg-[#08080c]">
+    <main className="overflow-x-clip bg-[#08080c]">
       {/* 1 · HERO ---------------------------------------------------------- */}
       <section
         data-nav-theme="dark"

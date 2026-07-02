@@ -58,37 +58,6 @@ function Head({
   );
 }
 
-/* Dark media panel — used where the frame leaves an image slot empty. */
-function Panel({
-  className = "",
-  label,
-  style,
-}: {
-  className?: string;
-  label?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-[#0d0d14] ${className}`}
-      style={style}
-    >
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 90% at 50% 40%, rgba(110,143,230,0.10), transparent 62%)",
-        }}
-      />
-      {label && (
-        <span className="absolute inset-0 flex items-center justify-center px-6 text-center text-[13px] text-zinc-600">
-          {label}
-        </span>
-      )}
-    </div>
-  );
-}
-
 /* Full-bleed showcase divider: big image with centered heading + subtitle. */
 function Showcase({
   img,
@@ -133,7 +102,7 @@ function Showcase({
    A transform track (not native scroll) so the ends clamp cleanly: the active
    card is centred, but the first/last clamp to a side margin instead of over-
    scrolling into empty space. Draggable by pointer; snaps to the nearest card. */
-type Card = { title: string; body: string; img?: string; blank?: boolean };
+type Card = { title: string; body: string; img?: string };
 function Carousel({
   pre,
   grad,
@@ -318,11 +287,9 @@ function Carousel({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={c.img} alt={c.title} draggable={false} className="h-full w-full object-cover" />
                 </div>
-              ) : c.blank ? (
-                // image not yet supplied — Figma "blank" placeholder (#656565)
-                <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
               ) : (
-                <Panel style={{ aspectRatio: imgAspect }} />
+                // placeholder until real imagery is supplied — Figma 113:3760 (#656565)
+                <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
               )}
               <h3 className="mt-6 text-[22px] md:text-2xl font-semibold text-white">
                 {c.title}
@@ -420,14 +387,14 @@ const detailCards = [
 const cSeeDetail: Card[] = [
   { title: "True 4K Ultra HD", body: "Front records in 3840×2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.", img: "/gx4k/see-uhd.webp" },
   { title: "Sony STARVIS Sensor", body: "The 8.5MP Sony STARVIS IMX515 delivers vivid, low-noise footage with the dynamic range to handle harsh glare and deep shadow alike.", img: "/gx4k/see-sensor.webp" },
-  { title: "AI Auto Night Vision", body: "Smart AI reads the light around you and adjusts brightness and contrast on its own, for clear night footage with nothing to switch on.", blank: true },
+  { title: "AI Auto Night Vision", body: "Smart AI reads the light around you and adjusts brightness and contrast on its own, for clear night footage with nothing to switch on." },
 ];
 
 const cParked: Card[] = [
   { title: "Power Saving Parking Mode", body: "Prolonged recording time. Consuming 98% less power, GX4K records 2,325 more hours than standard parking mode.", img: "/gx4k/parking.webp" },
   { title: "Smart Time-Lapse", body: "Records at 10fps while parked, then jumps to 30fps the instant something happens — up to 743 minutes of coverage without filling the card." },
-  { title: "AI Heat Monitoring", body: "Built-in temperature sensing powers the camera down before heat becomes a risk — protection made for hot climates and long summer parks.", img: "/gx4k/card-heat.webp" },
-  { title: "20-Second Impact Capture", body: "Every impact saves the 10 seconds before and 10 seconds after — front and rear — so the full scene is locked in, not just the moment of contact.", img: "/gx4k/impact.webp" },
+  { title: "AI Heat Monitoring", body: "Built-in temperature sensing powers the camera down before heat becomes a risk — protection made for hot climates and long summer parks." },
+  { title: "20-Second Impact Capture", body: "Every impact saves the 10 seconds before and 10 seconds after — front and rear — so the full scene is locked in, not just the moment of contact." },
 ];
 
 const cSafer: Card[] = [

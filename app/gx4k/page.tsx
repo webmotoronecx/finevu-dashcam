@@ -132,7 +132,7 @@ function Carousel({
   cards,
   note,
   alignEnd,
-  leftAlign,
+  pinGutter,
   imgAspect = "73 / 50",
 }: {
   pre?: string;
@@ -141,13 +141,14 @@ function Carousel({
   cards: Card[];
   note?: string;
   alignEnd?: boolean;
-  leftAlign?: boolean;
+  pinGutter?: boolean;
   imgAspect?: string;
 }) {
   const vpRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [tx, setTx] = useState(0);
   const [range, setRange] = useState({ min: 0, max: 0, step: 1 });
+  const [gutter, setGutter] = useState(0);
   const [dragging, setDragging] = useState(false);
   // live gesture state (avoids stale-closure reads inside pointer handlers)
   const drag = useRef({ x: 0, tx: 0, active: false, min: 0, max: 0, step: 1 });
@@ -159,27 +160,28 @@ function Carousel({
     if (!vp || !card) return null;
     const cardW = card.offsetWidth;
     const gap = 24;
+    const step = cardW + gap;
+    if (pinGutter) {
+      // Fixed left "gutter": the active card always sits at the same spot with a
+      // constant empty space on its left, and the outgoing card slides BEHIND
+      // that space (the viewport is inset by `gutter`, so it clips there) rather
+      // than through it. The gutter equals the centred-first-card margin, so the
+      // resting look is unchanged — only navigation stops eating the space.
+      const fullVw = document.documentElement.clientWidth;
+      const g = Math.max(0, (fullVw - cardW) / 2);
+      const r = { min: -(cards.length - 1) * step, max: 0, step };
+      setGutter(g);
+      setRange(r);
+      return r;
+    }
     const trackW = cards.length * cardW + (cards.length - 1) * gap;
     const vw = vp.clientWidth;
-    let max: number;
-    let min: number;
-    if (leftAlign) {
-      // First card flush to the content-left margin (matches the page SHELL:
-      // max-w-[1280px] + px-6 / lg:px-10) so there's no leading empty space —
-      // cards bleed off the right, last card clamps to the content-right margin.
-      // Per Figma 140:225 (carousel is left-aligned, not centred).
-      const pad = vw >= 1024 ? 40 : 24;
-      const inset = Math.max(0, (vw - 1280) / 2) + pad;
-      max = inset; // first card pinned at the content-left edge
-      min = Math.min(max, vw - inset - trackW); // last card right edge → content-right
-    } else {
-      max = (vw - cardW) / 2; // first card centred → margin on the left
-      min = Math.min(max, (vw + cardW) / 2 - trackW); // last card → margin on the right
-    }
-    const r = { min, max, step: cardW + gap };
+    const max = (vw - cardW) / 2; // first card centred → margin on the left
+    const min = Math.min(max, (vw + cardW) / 2 - trackW); // last card → margin on the right
+    const r = { min, max, step };
     setRange(r);
     return r;
-  }, [cards.length, leftAlign]);
+  }, [cards.length, pinGutter]);
 
   const snap = useCallback((rawTx: number, r: { min: number; max: number; step: number }) => {
     const i = Math.round((r.max - rawTx) / r.step);
@@ -253,7 +255,11 @@ function Carousel({
       <div className={`${SHELL} mb-8 md:mb-12 text-center`}>
         <Head pre={pre} grad={grad} post={post} className="!text-[26px] md:!text-[38px]" />
       </div>
-      <div ref={vpRef} className="overflow-hidden" style={{ touchAction: "pan-y" }}>
+      <div
+        ref={vpRef}
+        className="overflow-hidden"
+        style={{ touchAction: "pan-y", marginLeft: pinGutter ? gutter : undefined }}
+      >
         <div
           ref={trackRef}
           onPointerDown={onDown}
@@ -577,7 +583,7 @@ export default function GX4KPage() {
       <OpticsSection />
 
       {/* 4 · SEE EVERY DETAIL carousel ----------------------------------- */}
-      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" leftAlign />
+      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
 
       {/* 5 · PROTECTED WHILE PARKED carousel — hidden per request --------- */}
       {false && <Carousel grad="Protected" post=" While Parked" cards={cParked} alignEnd />}

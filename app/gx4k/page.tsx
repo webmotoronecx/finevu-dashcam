@@ -334,7 +334,13 @@ function Carousel({
           ))}
         </div>
       </div>
-      <div className={`${SHELL} mt-2 flex items-center justify-end gap-3`}>
+      {/* Nav row. For pinGutter carousels the arrows align to the featured
+          card's right edge (= viewport width − gutter, the same column for
+          both left- and right-gutter layouts) instead of the page edge. */}
+      <div
+        className={`mt-2 flex items-center justify-end gap-3 ${pinGutter ? "" : SHELL}`}
+        style={pinGutter ? { marginRight: gutter } : undefined}
+      >
         {note && (
           <p className="mr-auto max-w-[560px] text-left text-[12px] text-zinc-600">{note}</p>
         )}

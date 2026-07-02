@@ -1,6 +1,7 @@
 "use client";
 
 import { Footer } from "@/components/Footer";
+import { OpticsSection } from "@/components/sections/OpticsSection";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -258,12 +259,6 @@ const detailCards = [
   { title: "136°/143° Field of View", caption: "Front & Rear", img: "" },
 ];
 
-const opticsCols = [
-  { title: "Front", sub: "UHD wide", items: ["SONY STARVIS IMX515", "8.5 MP sensor", "3840 × 2160 (4K UHD)", "136° field of view"] },
-  { title: "Core", sub: "Dual-core engine", items: ["Dual-core processor", "HDR auto night vision", "microSD up to 256 GB", "Format Free 2.0"] },
-  { title: "Rear", sub: "Full-HD wide", items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "23 g compact module"] },
-];
-
 const cSeeDetail: Card[] = [
   { title: "True 4K Ultra HD", body: "Front records in 3840×2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.", img: "/gx4k/card-uhd.webp" },
   { title: "AI Auto Night Vision", body: "Smart AI reads the light around you and adjusts brightness and contrast on its own — clear night footage with nothing to switch on.", img: "/gx4k/card-night.webp" },
@@ -463,36 +458,8 @@ export default function GX4KPage() {
         </div>
       </section>
 
-      {/* 3 · THE OPTICS BEHIND THE IMAGE. --------------------------------- */}
-      <section data-nav-theme="dark" className="py-16 md:py-24">
-        <motion.div {...fadeUp} className={`${SHELL} text-center`}>
-          <Head pre="The Optics Behind the Image." className="!text-[28px] md:!text-[42px]" />
-          <p className={`mx-auto mt-5 max-w-[560px] ${BODY} text-center`}>
-            Sony STARVIS IMX515. A precision-engineered 8.5-megapixel sensor paired with F/1.8
-            wide-aperture glass, made to perform when it matters most.
-          </p>
-        </motion.div>
-
-        <div className={`${SHELL} relative mt-10 md:mt-16`}>
-          <motion.div {...fadeUp} className="relative overflow-hidden rounded-[28px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/gx4k/optics.webp" alt="GX4K front and rear cameras" className="w-full object-cover" />
-          </motion.div>
-          <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-3">
-            {opticsCols.map((col, i) => (
-              <motion.div key={col.title} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }}>
-                <h3 className="text-2xl font-bold text-white">{col.title}</h3>
-                <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#6e8fe6]">{col.sub}</p>
-                <ul className="mt-4 space-y-2 border-t border-white/10 pt-4">
-                  {col.items.map((it) => (
-                    <li key={it} className="text-sm text-zinc-400">{it}</li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 3 · THE OPTICS BEHIND THE IMAGE. — scroll-revealed callouts ------- */}
+      <OpticsSection />
 
       {/* 4 · SEE EVERY DETAIL carousel — hidden per request --------------- */}
       {false && <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} />}

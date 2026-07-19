@@ -1,0 +1,303 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Theme tokens — FineVu brand (black + gradient primary, orange highlight only, grey secondary) */
+
+:root {
+  --font-size: 16px;
+
+  /* FineVu core palette */
+  --finevu-orange: #F47920;        /* Highlight colour ONLY (PANTONE 165C) */
+  --finevu-grey: #A1A1A4;          /* Secondary (PANTONE Cool Gray 18C) */
+  --finevu-charcoal: #222223;      /* Secondary (PANTONE 419C) */
+  --finevu-light-grey: #F1F2F2;    /* Secondary */
+  --finevu-black: #000000;         /* Primary */
+
+  /* 4K gradient stops (65° angle) */
+  --finevu-dark-blue: #234088;     /* location 80% */
+  --finevu-blue: #0C4D97;          /* location 62% */
+  --finevu-purple: #4F2D74;        /* location 36% */
+
+  /* Brand gradient — used as the hero design layer across the site */
+  --brand-gradient: linear-gradient(65deg, #000000 6%, #4F2D74 34%, #0C4D97 60%, #234088 84%);
+  --brand-gradient-soft: linear-gradient(65deg, #4F2D74 0%, #0C4D97 52%, #234088 100%);
+
+  /* Back-compat aliases consumed by existing components */
+  --brand-primary: var(--finevu-orange);   /* the accent/highlight everywhere */
+  --brand-dark: #0A0A0B;
+  --brand-white: #FFFFFF;
+  --brand-light-gray: var(--finevu-light-grey);
+  --electric-blue: #2F6FD0;                 /* vivid blue for on-dark accents */
+  --electric-green: var(--finevu-orange);   /* remap legacy "green" refs to brand orange */
+
+  /* Semantic tokens (derived from brand) */
+  --background: #ffffff;
+  --foreground: #0A0A0B;
+  --card: #ffffff;
+  --card-foreground: #0A0A0B;
+  --primary: var(--finevu-orange);
+  --primary-foreground: #ffffff;
+  --secondary: var(--finevu-light-grey);
+  --secondary-foreground: #0A0A0B;
+  --muted: var(--finevu-light-grey);
+  --muted-foreground: #6B6B6E;
+  --accent: var(--finevu-light-grey);
+  --accent-foreground: #0A0A0B;
+  --destructive: #E5484D;
+  --destructive-foreground: #ffffff;
+  --border: #E3E3E5;
+  --input: var(--finevu-light-grey);
+  --ring: var(--finevu-orange);
+  --radius: 0.625rem;
+
+  /* Effects */
+  --electric-glow: rgba(244, 121, 32, 0.45);
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.5);
+}
+
+.dark {
+  --background: #0A0A0B;
+  --foreground: #ffffff;
+  --card: #222223;
+  --card-foreground: #ffffff;
+  --primary: var(--finevu-orange);
+  --primary-foreground: #ffffff;
+  --secondary: #222223;
+  --secondary-foreground: #ffffff;
+  --muted: #222223;
+  --muted-foreground: #A1A1A4;
+  --accent: #222223;
+  --accent-foreground: #ffffff;
+  --destructive: #E5484D;
+  --destructive-foreground: #ffffff;
+  --border: #222223;
+  --input: #222223;
+  --ring: var(--finevu-orange);
+  --glass-bg: rgba(0, 0, 0, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* TEMP: map mono → Inter sitewide; Geist Mono stays loaded and can be reassigned later */
+  --font-mono: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: var(--font-size);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  /* Cross-browser text rendering + guard against horizontal overflow on mobile */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Media never forces horizontal overflow (Safari/iOS safety) */
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+/* Safari needs the -webkit- prefix for custom-styled text inputs; scoped so shadcn checkbox/radio/select are untouched */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+input[type="number"],
+input[type="datetime-local"],
+input[type="date"],
+input:not([type]),
+textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+}
+
+/* FineVu brand utilities */
+
+/* Hero design layer — the FineVu 4K gradient */
+.brand-gradient {
+  background: var(--brand-gradient);
+}
+.brand-gradient-soft {
+  background-image: var(--brand-gradient-soft);
+}
+
+/* Text set in the FineVu gradient (gradient minus black, per guidelines) */
+.text-brand-gradient {
+  background-image: linear-gradient(65deg, #4F2D74, #0C4D97, #234088);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Add the -webkit- prefix for clip-to-text so gradient headings aren't invisible on older iOS */
+.bg-clip-text {
+  -webkit-background-clip: text;
+}
+
+/* Highlight capsule — orange pill used alongside headlines / as buttons */
+.finevu-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--finevu-orange);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* Glass morphism utility (used by Navigation) */
+.glass-blur {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.1) inset,
+    0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* Electric glow effect (orange) */
+.electric-glow {
+  box-shadow: 0 0 20px var(--electric-glow);
+}
+
+/* Smooth transition utility */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Navigation glow — pulsing glow on the floating nav pill / CTAs (hover) */
+@keyframes glow-orange-pulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 0 16px 2px rgba(246,132,40,0.45); }
+  50%      { box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 0 34px 8px rgba(246,132,40,0.85); }
+}
+
+@keyframes glow-purple-pulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 0 16px 2px rgba(123,79,176,0.45); }
+  50%      { box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 0 34px 8px rgba(123,79,176,0.85); }
+}
+
+.btn-glow-orange,
+.btn-glow-purple {
+  transition: box-shadow 0.4s ease, transform 0.2s ease, background 0.2s ease;
+}
+.btn-glow-orange:hover { animation: glow-orange-pulse 1.6s ease-in-out infinite; }
+.btn-glow-purple:hover { animation: glow-purple-pulse 1.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-glow-orange:hover { animation: none; box-shadow: 0 0 20px 4px rgba(246,132,40,0.55); }
+  .btn-glow-purple:hover { animation: none; box-shadow: 0 0 20px 4px rgba(123,79,176,0.55); }
+}
+
+/* Unified hover: .cta-hover scales up only, .tile-hover scales up plus a soft orange glow (pure CSS) */
+.cta-hover {
+  transition: transform 0.25s ease,
+    background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+.cta-hover:hover {
+  transform: scale(1.04);
+}
+.cta-hover:active {
+  transform: scale(0.98);
+}
+
+.tile-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.tile-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 24px 50px -18px rgba(246, 132, 40, 0.5);
+}
+
+/* GX4K bento tiles: same scale-up, but a purple glow (#9083C2) instead of orange. */
+.tile-hover-purple {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.tile-hover-purple:hover {
+  transform: scale(1.02);
+  box-shadow: 0 24px 50px -18px rgba(144, 131, 194, 0.55);
+}
+
+/* GX4K carousel cards: scale-up on hover, no glow. */
+.tile-scale {
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.tile-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Carousel track centre-mode: the active card (--card-w) is centred with neighbours peeking off both edges */
+.carousel-inset {
+  --card-w: 80vw;
+  padding-inline: max(1.5rem, calc((100% - var(--card-w)) / 2));
+  scroll-padding-inline: max(1.5rem, calc((100% - var(--card-w)) / 2));
+}
+@media (min-width: 768px) {
+  .carousel-inset {
+    --card-w: 62vw;
+  }
+}
+@media (min-width: 1024px) {
+  .carousel-inset {
+    --card-w: min(48vw, 1040px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-hover:hover,
+  .tile-hover:hover,
+  .tile-hover-purple:hover,
+  .tile-scale:hover {
+    transform: none;
+  }
+}

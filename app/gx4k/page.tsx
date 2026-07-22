@@ -511,12 +511,12 @@ export default function GX4KPage() {
         </motion.div>
 
         <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-          <BentoCardGridItem card={{title:""}} className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+          <BentoCardGridItem card={{title:""}} className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
           <BentoCardGridItem card={{ 
             type:"displayText", 
             title: "Format Free 2.0", 
-            caption:"Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive." }} className="lg:col-span-5  lg:row-span-2  aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
-          <BentoCardGridItem card={{img:'/gx4k/bento-storage-dash.png'}} className="lg:col-span-12 aspect-[16/9] lg:min-h-[520px]" />
+            caption:"Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive." }} className="lg:col-span-6  lg:row-span-2  aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+          <BentoCardGridItem card={{img:'/gx4k/bento-storage-dash.png'}} className="lg:col-span-12 aspect-[16/7]" />
         </div>
       </section>
   

@@ -60,6 +60,9 @@ export type SiteConfig = {
     eyebrow: string;
     brands: BrandLogo[];
   };
+
+  /** Routes that render the Coming Soon placeholder instead of their content */
+  comingSoon: string[];
 };
 
 export const siteConfig: SiteConfig = {
@@ -119,4 +122,18 @@ export const siteConfig: SiteConfig = {
       { name: "4 MILLION+ SOLD", url: "" },
     ],
   },
+
+  // Routes here render the Coming Soon placeholder instead of their page content.
+  // e.g. ["/services", "/about"]
+  comingSoon: [
+    "/about", 
+    "/become-a-retailer", 
+    "/contact", 
+    "/faq",
+    "/how-it-works",
+    "/learn",
+    "/retailers",
+    "/services",
+    "/support"
+  ],
 };

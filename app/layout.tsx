@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import { ComingSoonGate } from "@/components/ComingSoonGate";
 import { siteConfig } from "@/config/site.config";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -32,7 +33,7 @@ export default function RootLayout({
         className={`${inter.variable} ${geistMono.variable} antialiased`}
       >
         <Navigation />
-        {children}
+        <ComingSoonGate>{children}</ComingSoonGate>
         <Analytics />
       </body>
     </html>

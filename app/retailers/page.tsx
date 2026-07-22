@@ -354,8 +354,8 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative flex aspect-[2160/1040] max-h-[880px] min-h-[600px] items-center justify-center text-center text-white" data-nav-theme="dark">
-        <Image src="/retailers/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
+      <section id="top" className="relative flex w-full aspect-[2160/960]  items-center justify-center text-center text-white" data-nav-theme="dark">
+        <Image src="/retailers/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" objectPosition="top" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(rgba(12,12,14,.35),rgba(12,12,14,.5))" }} />
         <div className="relative z-10 mx-auto max-w-[660px] px-6 pt-36 pb-24">
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.015em] md:text-[64px] md:leading-[76px]">

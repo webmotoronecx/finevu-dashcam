@@ -1,0 +1,39 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+FineVu is a marketing/brochure site for a premium dash-cam brand (Australian distributor: AutoXtreme). It is a Next.js 16 App Router app (React 19, Tailwind CSS v4, `motion`/Framer Motion, shadcn-style Radix UI). No backend, database, or auth — every page is static content plus client-side animation. Forms (e.g. `BusinessEnquiryForm`) are presentation-only.
+
+## Commands
+
+```bash
+npm run dev      # dev server at http://localhost:3000
+npm run build    # production build (use this to catch type/lint errors — there is no test suite)
+npm start        # serve the production build
+npm run lint     # eslint (flat config, eslint-config-next)
+```
+
+There are **no tests**. Verification = `npm run build` + driving the page in the browser. The `docs/responsiveness-audit-*.md` files are manual QA reports, not automated checks.
+
+## Architecture
+
+- **`config/site.config.ts`** — single source of truth for nav links, CTAs, hero copy, contact/distributor details, and the trust marquee. `SiteConfig` is a typed schema; edit content here rather than hardcoding in components. `layout.tsx` metadata and `Navigation` both read from it.
+- **`app/`** — App Router pages. Product pages (`gx4k`, `gx35`), audience/landing pages (`services`, `retailers`, `support`, `about`, etc.), and blog at `learn/` + dynamic `learn/[slug]`.
+- **`lib/data/articles.ts`** — the entire "Learn" blog content lives here as an array of `Article` objects with **HTML strings** in `content`. `learn/[slug]/page.tsx` finds the article by slug, injects `id`s into `<h3>` tags to build a table of contents, and renders via `dangerouslySetInnerHTML` styled by `@tailwindcss/typography`.
+- **`components/`** — top-level components are bespoke site sections/animations (Hero, Navigation, Footer, TiltCard, MagneticButton, ParallaxImage, AnimatedCounter, etc.). `components/ui/` is the generated shadcn/Radix primitive set — treat as vendored; prefer composing over editing.
+- **`components/LandingPageLayout.tsx`** — reusable template driving most audience landing pages via props (title, benefits grid, optional `form`, optional `content`, FAQ).
+
+### Two conventions that are easy to miss
+
+1. **`data-nav-theme` drives the navbar color.** `Navigation` uses an IntersectionObserver to read the `data-nav-theme="dark" | "light"` attribute of whatever section is under the header, then swaps to white or dark text/glass. **Every full-width `<section>` must set `data-nav-theme`** or the navbar will render with the wrong contrast when scrolled over it.
+
+2. **Use `ImageWithFallback` (`components/figma/ImageWithFallback.tsx`), not `next/image`.** This is a plain `<img>` with an SVG error placeholder. Many images are remote Unsplash URLs; `next.config.ts` does not configure `images.remotePatterns`, so `next/image` would reject them.
+
+### Styling
+
+- Tailwind v4 (CSS-first, `@import "tailwindcss"` in `app/globals.css` — no `tailwind.config.js`).
+- Brand tokens are CSS variables in `globals.css`. Use `var(--brand-primary)` (FineVu orange, the only accent), `var(--brand-gradient)` (the 65° purple→blue hero gradient), and the semantic `--background`/`--foreground`/`--border` set. **Legacy aliases exist and are intentional**: `--electric-green` is remapped to brand orange, so older `text-[var(--electric-green)]` refs still render on-brand — don't "fix" them to a real green.
+- `"use client"` is required on any component using `motion`, hooks, or `useParams`/`usePathname` (most components here).
+- Path alias: `@/*` → repo root.

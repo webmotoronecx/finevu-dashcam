@@ -394,7 +394,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative flex aspect-[2160/1040] max-h-[880px] min-h-[600px] items-center justify-center overflow-hidden text-center text-white" data-nav-theme="dark">
+      <section id="top" className="relative flex w-full aspect-[2160/960] items-center justify-center overflow-hidden text-center text-white" data-nav-theme="dark">
         <Image src="/booking/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 mx-auto max-w-[820px] px-6">

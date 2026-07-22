@@ -12,6 +12,7 @@ import { Head } from "@/components/sections/Head";
 import { Carousel, type Card } from "@/components/sections/Carousel";
 import { FeatureTabs } from "@/components/sections/FeatureTabs";
 import { BarGraph } from "@/components/sections/BarGraph";
+import { ScrollScrubVideo } from "@/components/sections/ScrollScrubVideo";
 
 /* FineVu GX4K product page — Figma frame 102:2004 (dark cinematic layout). */
 
@@ -385,7 +386,7 @@ const memoryAllocationTabs = [
   {
     title: "Driving Priority",
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-14">
+      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
       <BarGraph
         data={[
           { label: "Driving", value: 70 },
@@ -400,7 +401,7 @@ const memoryAllocationTabs = [
   {
     title: "Event Priority",
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-14">
+      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
       <BarGraph
         data={[
           { label: "Driving", value: 45 },
@@ -415,7 +416,7 @@ const memoryAllocationTabs = [
   {
     title: "Parking Priority",
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-14">
+      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
       <BarGraph
         data={[
           { label: "Driving", value: 40 },
@@ -430,7 +431,7 @@ const memoryAllocationTabs = [
   {
     title: "Driving Only",
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-14">
+      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
       <BarGraph
         data={[
           { label: "Driving", value: 85 },
@@ -454,6 +455,11 @@ export default function GX4KPage() {
       {/* Hero: scroll-pinned video */}
       <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" />
 
+      {/* Scroll-scrubbed render: playback + annotation callouts driven by scroll position.
+          NOTE: callout `pos`/`line` coords are a starting point (borrowed from OpticsSection);
+          tune them against the actual video framing. */}
+     
+
       {/* Every detail card grid */}
       <section data-nav-theme="dark" className="py-20 md:py-28">
         <motion.div {...fadeUp} className={`${SHELL} mb-12 text-center md:mb-16`}>
@@ -474,12 +480,65 @@ export default function GX4KPage() {
       </section>
 
       {/* Optics behind the image */}
-      <OpticsSection />
+      {/* <OpticsSection /> */}
+
 
       <MediaSection data={mDualVision} />
 
       {/* See every detail carousel */}
       <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
+
+      <ScrollScrubVideo
+        video="/gx4k/hero_render_scrub.mp4"
+        poster="/gx4k/hero-bg.webp"
+        head={{
+          title: "The Optics Behind the Image.",
+          subtitle:
+            "Sony STARVIS IMX515. A precision-engineered 8.5-megapixel sensor paired with F/1.8 wide-aperture glass, made to perform when it matters most.",
+        }}
+        // beats={[
+        //   {
+        //     start: 0.04,
+        //     end: 0.18,
+        //     kicker: "FineVu GX4K · Engineered",
+        //     headline: "Precision, in Every Frame.",
+        //     sub: "Scroll to explore the GX4K from every angle.",
+        //   },
+        // ]}
+        callouts={[
+          {
+            key: "front",
+            title: "Front",
+            sub: "UHD wide",
+            items: ["SONY STARVIS IMX515", "8.5 MP sensor", "3840 × 2160 (4K UHD)", "136° field of view"],
+            start: 0.28,
+            end: 0.95,
+            pos: "left-[0px] top-[100px]",
+            // horizontal lead-in off the divider, then a bend down to the front lens
+            line: { points: [[0, 300], [500, 300], [700, 560]] },
+          },
+          {
+            key: "core",
+            title: "Core",
+            sub: "Dual-core engine",
+            items: ["Dual-core processor", "HDR auto night vision", "microSD up to 256 GB", "Format Free 2.0"],
+            start: 0.36,
+            end: 0.95,
+            pos: "left-[190px] bottom-[-90px]",
+            line: { points: [[300, 1040], [760, 1040], [980, 612]] },
+          },
+          {
+            key: "rear",
+            title: "Rear",
+            sub: "Full-HD wide",
+            items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "23 g compact module"],
+            start: 0.44,
+            end: 0.95,
+            pos: "right-[-50px] bottom-[-95px]",
+            line: { points: [[1300, 690], [1400, 1040], [1760, 1040]] },
+          },
+        ]}
+      />
 
       {/* Protected while parked carousel */}
       <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1047 / 562" pinGutter gutterRight />
@@ -535,7 +594,7 @@ export default function GX4KPage() {
         </motion.div>
 
          <div className="flex items-center justify-center">
-            <FeatureTabs sectionClass={`py-10 min-w-[970px]`} title="" tabs={memoryAllocationTabs} tabsPosition="top" /> 
+            <FeatureTabs sectionClass={`py-10 min-w-0 md:min-w-[970px]`} title="" tabs={memoryAllocationTabs} tabsPosition="top" />
          </div> 
            
      

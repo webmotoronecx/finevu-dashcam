@@ -3,7 +3,7 @@
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Head } from "@/components/sections/Head";
 import { motion } from "motion/react";
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 // Default page shell width (GX4K). Override per-page via the `shellClass` prop.
 const DEFAULT_SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
@@ -47,6 +47,7 @@ export function FeatureTabs({
   video,
   poster,
   bannerAspect = "1297/562",
+  mobileBannerAspect = "4/3",
   tabsPosition = "bottom",
   shellClass = DEFAULT_SHELL,
   contentClass = "",
@@ -66,6 +67,8 @@ export function FeatureTabs({
   poster?: string;
   /** CSS aspect-ratio for the banner (default matches the Figma frame) */
   bannerAspect?: string;
+  /** Taller aspect-ratio used below `md` so the banner isn't a thin strip on phones. */
+  mobileBannerAspect?: string;
   /** Tab row placement. "top" puts the tabs above the media (copy stays below it). */
   tabsPosition?: "top" | "bottom";
   shellClass?: string;
@@ -87,6 +90,13 @@ export function FeatureTabs({
 
   const tabsTop = tabsPosition === "top";
 
+  // Banner ratio: taller below `md`, wide at `md+`. Fed as CSS vars so the
+  // `md:` breakpoint switches aspect-ratio without any JS.
+  const bannerRatioVars = {
+    "--ba-m": mobileBannerAspect,
+    "--ba-d": bannerAspect,
+  } as CSSProperties;
+
   // Banner — active tab's custom component > video > image > blank placeholder (Figma 110:2716).
   // A custom component renders bare (it controls its own sizing), keyed to re-run entrance
   // animations on tab change.
@@ -97,8 +107,8 @@ export function FeatureTabs({
   ) : bVideo || bImage ? (
       <motion.div
         {...fadeUp}
-        className="w-full overflow-hidden rounded-[32px]"
-        style={{ aspectRatio: bannerAspect }}
+        className="w-full overflow-hidden rounded-[32px] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
+        style={bannerRatioVars}
       >
         {bVideo ? (
           <video
@@ -127,16 +137,16 @@ export function FeatureTabs({
     ) : (
       <motion.div
         {...fadeUp}
-        className="w-full rounded-[32px] bg-[#656565]"
-        style={{ aspectRatio: bannerAspect }}
+        className="w-full rounded-[32px] bg-[#656565] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
+        style={bannerRatioVars}
       />
     );
 
-  // Tab selector — single inline row; drag/scroll horizontally on mobile.
-  // Top layout hugs the title (mb) instead of sitting below the banner (mt).
+  // Tab selector — pills wrap onto centered rows below `md`, collapse to a single
+  // pill at `md+`. Top layout hugs the title (mb) instead of sitting below the banner (mt).
   const tabRow = (
     <div className={` ` + (tabsTop ? "mb-8" : "mt-8") }>
-      <div className="bg-[#202020] rounded-full mx-auto flex w-max max-w-full gap-2  [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="bg-[#202020] rounded-[26px] md:rounded-full mx-auto flex flex-wrap md:flex-nowrap justify-center w-max max-w-full gap-2 p-1.5 md:p-0">
         {tabs.map((t, i) => (
           <button
             key={t.title}

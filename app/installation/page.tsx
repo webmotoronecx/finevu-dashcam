@@ -20,6 +20,7 @@ import {
   ChevronDown,
   Home,
   Briefcase,
+  Lock,
 } from "lucide-react";
 
 // Booking / installation page — hero, booking wizard, how-it-works, what's-included, service-area checker, why-experts, FAQs, fine print.
@@ -35,8 +36,8 @@ const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT", "NT"];
 const SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DOWS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const TOTAL = 4;
-const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details"];
+const TOTAL = 5;
+const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details", "Checkout"];
 
 const THREE = [
   { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
@@ -96,8 +97,9 @@ const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#
 type Form = {
   model: string | null; place: string | null; street: string; suburb: string; stateAu: string; postcode: string; slot: string | null;
   name: string; phone: string; email: string; retailer: string; make: string; vmodel: string; year: string; notes: string;
+  ccName: string; ccNum: string; ccExp: string; ccCvc: string;
 };
-const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "" };
+const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "", ccName: "", ccNum: "", ccExp: "", ccCvc: "" };
 
 function useCalendar() {
   return useMemo(() => {
@@ -147,6 +149,16 @@ function BookingWizard() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return fail("Please enter a valid email address.");
       if (!form.make || !form.vmodel) return fail("Please enter your vehicle make and model.");
     }
+    if (s === 5) {
+      const num = form.ccNum.replace(/\s+/g, "");
+      if (!form.ccName) return fail("Please enter the name on your card.");
+      if (!/^\d{15,16}$/.test(num)) return fail("Please enter a valid card number.");
+      const em = form.ccExp.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+      if (!em) return fail("Please enter your card expiry as MM/YY.");
+      const now = new Date(); const yy = 2000 + parseInt(em[2], 10); const mm = parseInt(em[1], 10);
+      if (yy < now.getFullYear() || (yy === now.getFullYear() && mm < now.getMonth() + 1)) return fail("Your card expiry date has passed.");
+      if (!/^\d{3,4}$/.test(form.ccCvc)) return fail("Please enter your card’s 3–4 digit CVC.");
+    }
     setHint({ msg: "", cls: "" }); return true;
   }
   function next() {
@@ -154,7 +166,7 @@ function BookingWizard() {
     if (step < TOTAL) { setHint({ msg: "", cls: "" }); setStep(step + 1); scrollTop(); }
     else {
       setProcessing(true);
-      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); setProcessing(false); setStep(5); scrollTop(); }, 900);
+      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); setProcessing(false); setStep(6); scrollTop(); }, 900);
     }
   }
   function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setStep(step - 1); scrollTop(); } }
@@ -165,11 +177,11 @@ function BookingWizard() {
     ["Location", (form.place ? form.place + " — " : "") + [form.street, form.suburb, form.stateAu, form.postcode].filter(Boolean).join(", ")],
     ["Date", dateLabel || "—"],
     ["Time", form.slot || "—"],
-    ["Total", "$250.00 AUD — pay on the day"],
+    ["Total", "$250.00 AUD — paid today"],
   ];
   const confirmRows = (): [string, string][] => {
     const rows = summaryRows();
-    rows.push(["Name", form.name], ["Contact", `${form.phone} · ${form.email}`]);
+    rows.push(["Payment", `Card ending ${form.ccNum.replace(/\s+/g, "").slice(-4)} · Paid`], ["Name", form.name], ["Contact", `${form.phone} · ${form.email}`]);
     if (form.make) rows.push(["Vehicle", [form.make, form.vmodel, form.year].filter(Boolean).join(" ")]);
     return rows;
   };
@@ -300,11 +312,30 @@ function BookingWizard() {
           )}
 
           {step === 5 && (
+            <div>
+              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Checkout</h3>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Pay the $250 flat rate now to lock in your appointment. Your card is charged today and your booking is confirmed instantly.</p>
+              <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-6 py-[22px]">
+                <span className="mb-3 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Order summary</span>
+                <dl className="space-y-2 text-[.88rem]">{summaryRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
+              </div>
+              <span className={FLABEL}>Payment details</span>
+              <input className={INPUT} placeholder="Name on card" autoComplete="cc-name" value={form.ccName} onChange={(e) => set("ccName", e.target.value)} />
+              <input className={`${INPUT} mt-4`} placeholder="Card number" inputMode="numeric" autoComplete="cc-number" maxLength={19} value={form.ccNum} onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 16); set("ccNum", d.replace(/(\d{4})(?=\d)/g, "$1 ")); }} />
+              <div className="mt-4 grid max-w-[420px] gap-4 sm:grid-cols-2">
+                <input className={INPUT} placeholder="Expiry (MM/YY)" inputMode="numeric" autoComplete="cc-exp" maxLength={5} value={form.ccExp} onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 4); set("ccExp", d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d); }} />
+                <input className={INPUT} placeholder="CVC" inputMode="numeric" autoComplete="cc-csc" maxLength={4} value={form.ccCvc} onChange={(e) => set("ccCvc", e.target.value.replace(/\D/g, "").slice(0, 4))} />
+              </div>
+              <p className="mt-[22px] flex items-start gap-2 text-[.78rem] text-[#9c9ca3]"><Lock className="mt-[3px] h-[13px] w-[13px] shrink-0 text-[var(--finevu-orange)]" /> Payments are encrypted and processed securely. A tax receipt is emailed to you as soon as payment clears.</p>
+            </div>
+          )}
+
+          {step === 6 && (
             <div className="py-[22px] text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white"><Check className="h-7 w-7" strokeWidth={2.4} /></div>
-              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Booking request received</h3>
-              <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref}</div>
-              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your installation request is in. We&apos;ll confirm your appointment by email within one business day, and your installer will call ahead on the day. The $250 flat rate is paid on the day, once your install is complete. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
+              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Booking confirmed — payment received</h3>
+              <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref} · Paid</div>
+              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $250.00 AUD has been received and your installation is locked in. Your confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
               <div className="mx-auto mt-8 max-w-[580px] rounded-[12px] bg-[#f7f7f7] px-6 py-[22px] text-left">
                 <dl className="space-y-2 text-[.88rem]">{confirmRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>
@@ -319,12 +350,12 @@ function BookingWizard() {
           <div className="flex items-center justify-between gap-4 border-t border-[#e8e7e2] px-6 py-5 md:px-9">
             <button type="button" onClick={back} disabled={step === 1} className="rounded-full border border-[#1d1d1f] px-[19px] py-[9px] text-[12px] font-semibold uppercase leading-[18px] tracking-[0.96px] text-[#1d1d1f] transition-colors disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
             <span className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">Step {step} of {TOTAL}</span>
-            <button type="button" onClick={next} disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Submitting…" : step === TOTAL ? "Confirm booking →" : "Continue →"}</button>
+            <button type="button" onClick={next} disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $250 AUD" : "Continue →"}</button>
           </div>
         )}
       </div>
 
-      {/* We Accept — payment logos (paid on the day) */}
+      {/* We Accept — payment logos */}
       <div className="mt-14 flex justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/installation/we-accept.svg" alt="We accept AMEX, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
@@ -412,7 +443,7 @@ export default function Page() {
         <div className="mx-auto max-w-[1160px] px-6">
           <div className="mx-auto mb-11 max-w-[720px] text-center">
             <h2 className="text-[32px] font-semibold leading-[40px] tracking-[-0.5px] text-[#1d1d1f] md:text-[48px] md:leading-[60px]">Book your installation</h2>
-            <p className="mt-4 text-[18px] leading-[27px] text-[#5b5e66]">Professional hardwire installation at your home or workplace. $250 flat rate — no payment required to book, pay on the day.</p>
+            <p className="mt-4 text-[18px] leading-[27px] text-[#5b5e66]">Professional hardwire installation at your home or workplace. $250 flat rate — paid securely online when you book.</p>
           </div>
           <BookingWizard />
         </div>

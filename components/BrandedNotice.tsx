@@ -16,6 +16,7 @@ type BrandedNoticeProps = {
   title: string;
   sub: string;
   cta: { label: string; href: string };
+  logo?: boolean;
 };
 
 /**

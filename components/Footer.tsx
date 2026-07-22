@@ -13,7 +13,7 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
         {/* CTA */}
         {cta && (
-        <div className="text-center pt-24 md:pt-32 pb-12">
+        <div className="text-center pt-12 md:pt-32 pb-12">
           <motion.h2
             className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1] mb-5 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
@@ -111,8 +111,8 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
                 <ul className="space-y-3">
                   <li><Link href="/support" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Help &amp; Support</Link></li>
                   <li><Link href="/faq" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">FAQs</Link></li>
-                  <li><Link href="/booking" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
-                  <li><span className="text-zinc-400 text-sm">{contact.warranty}</span></li>
+                  <li><Link href="/installation" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
+                  <li><Link href="/warranty" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">{contact.warranty}</Link></li>
                 </ul>
               </div>
             </div>

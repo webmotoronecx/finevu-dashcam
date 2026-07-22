@@ -43,7 +43,7 @@ function Hero({
   const shadow = video ? ' [text-shadow:0_2px_18px_rgba(0,0,0,0.7)]' : '';
   return (
     <section
-      className="relative w-full overflow-hidden aspect-[2160/1245] min-h-[560px]"
+      className="relative w-full overflow-hidden m:aspect-[2160/1245] min-h-screen"
       data-nav-theme={theme}
     >
       {video ? (
@@ -186,7 +186,7 @@ export default function Page() {
       />
 
       {/* More reasons to choose FineVu — bento */}
-      <section className="bg-[#f7f7f7] py-24" data-nav-theme="light">
+      <section className="bg-[#f7f7f7] py-16 md:py-24" data-nav-theme="light">
         <div className="max-w-[1340px] mx-auto px-6">
           <motion.h2 className={`${HEAD} text-center mb-12`} {...fadeUp}>
             More reasons to choose FineVu.
@@ -203,7 +203,7 @@ export default function Page() {
       </section>
 
       {/* We'll come to you */}
-      <section className="bg-[#f7f7f7] pb-24" data-nav-theme="light">
+      <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1705px] mx-auto px-6 text-center">
           <motion.h2 className={HEAD} {...fadeUp}>We&apos;ll come to you</motion.h2>
           <motion.p className={`${SUB} max-w-[660px] mx-auto mt-4`} {...fadeUp}>
@@ -211,7 +211,7 @@ export default function Page() {
           </motion.p>
           <motion.div className="mt-8" {...fadeUp}>
             <Link
-              href="/booking"
+              href="/installation"
               className="cta-hover inline-flex items-center justify-center h-12 px-9 rounded-full bg-[var(--finevu-orange)] text-white text-[14px] font-semibold uppercase leading-[20px]"
             >
               Book Installation
@@ -219,16 +219,17 @@ export default function Page() {
           </motion.div>
           <motion.div className="mt-10 overflow-hidden rounded-[24px]" {...fadeUp}>
             <ImageWithFallback
-              src="/home/FineVu_Homepage_Install_Banner.webp"
+              src="/home/hero-book.webp"
               alt="A FineVu mobile installer at a customer's home"
-              className="w-full h-auto object-cover aspect-[2688/1520]"
+              className="w-full h-auto object-cover aspect-[2688/1000] object-middle"
+           
             />
           </motion.div>
         </div>
       </section>
 
       {/* Reviews */}
-      <section className="bg-[#f7f7f7] pb-24" data-nav-theme="light">
+      <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1340px] mx-auto px-6">
           <motion.div className="text-center max-w-[760px] mx-auto mb-14" {...fadeUp}>
             <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dashcams.</h2>
@@ -314,7 +315,7 @@ export default function Page() {
       )}
 
       {/* Where to buy / Install / Support */}
-      <LearnMoreLinks />
+      <LearnMoreLinks className='!pt-0' />
 
       {/* Disclaimers */}
       <section className="bg-[#ededf0] py-10" data-nav-theme="light">

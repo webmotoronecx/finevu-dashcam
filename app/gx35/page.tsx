@@ -885,7 +885,7 @@ export default function GX35Page() {
             every cable and set it up right the first time.
           </p>
           <Link
-            href="/booking"
+            href="/installation"
             className="cta-hover mt-8 inline-flex items-center justify-center rounded-full bg-[#f68428] px-10 py-3.5 text-sm font-semibold uppercase leading-[20px] text-white"
           >
             Book Installation

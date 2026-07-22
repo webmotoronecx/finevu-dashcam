@@ -174,7 +174,8 @@ export function Navigation() {
             floating to the right — per Figma v4 (pill 113:3561, button 113:3356). */}
         {/* xl:pr reserves a gutter on the right so the centered pill can never
             slide under the absolutely-positioned Find Retailer button. */}
-        <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center xl:pr-[210px]">
+         {/* ZEUS remove the padding right coz we already have a mobile view for navigation    */}
+        <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center">
           {/* Centered pill */}
           <div
             className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2.5 xl:px-10 xl:py-3"

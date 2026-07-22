@@ -39,9 +39,9 @@ const TOTAL = 4;
 const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details"];
 
 const THREE = [
-  { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/booking/step-purchase.webp" },
-  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat — no payment required to reserve.", img: "/booking/step-book.webp" },
-  { n: "", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/booking/step-install.webp" },
+  { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
+  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat — no payment required to reserve.", img: "/installation/step-book.webp" },
+  { n: "", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/installation/step-install.webp" },
 ];
 
 const INCLUDED = [
@@ -327,7 +327,7 @@ function BookingWizard() {
       {/* We Accept — payment logos (paid on the day) */}
       <div className="mt-14 flex justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/booking/we-accept.svg" alt="We accept AMEX, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
+        <img src="/installation/we-accept.svg" alt="We accept AMEX, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
       </div>
     </div>
   );
@@ -345,7 +345,7 @@ function PostcodeCheck() {
   async function loadRows(): Promise<PostcodeRow[] | null> {
     if (postcodeCache) return postcodeCache;
     try {
-      const res = await fetch("/booking/au-postcodes.json");
+      const res = await fetch("/installation/au-postcodes.json");
       if (!res.ok) return null;
       const data = (await res.json()) as { rows: PostcodeRow[] };
       postcodeCache = data.rows;
@@ -394,8 +394,8 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative flex w-full aspect-[2160/960] items-center justify-center overflow-hidden text-center text-white" data-nav-theme="dark">
-        <Image src="/booking/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
+      <section id="top" className="relative flex w-full aspect-[2160/960] min-h-screen items-center justify-center overflow-hidden text-center text-white" data-nav-theme="dark">
+        <Image src="/installation/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 mx-auto max-w-[820px] px-6">
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.8px] md:text-[64px] md:leading-[76px]">Leave the wiring to<br />the experts</motion.h1>
@@ -475,7 +475,7 @@ export default function Page() {
           <div className="grid items-center gap-11 md:grid-cols-2 md:gap-16">
             <div className="flex justify-center">
               <div className="relative aspect-[1102/1036] w-full max-w-[400px]">
-                <Image src="/booking/aus-map.webp" alt="Map of Australia showing FineVu installation coverage" fill sizes="(max-width:768px) 80vw, 400px" className="object-contain" />
+                <Image src="/installation/aus-map.webp" alt="Map of Australia showing FineVu installation coverage" fill sizes="(max-width:768px) 80vw, 400px" className="object-contain" />
               </div>
             </div>
             <div>

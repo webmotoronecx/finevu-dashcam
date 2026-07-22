@@ -54,7 +54,7 @@ export default function Page() {
       ],
       links: [
         { label: "Installation options", href: "/services" },
-        { label: "Book an installer", href: "/booking" },
+        { label: "Book an installer", href: "/installation" },
       ],
     },
     {

@@ -11,14 +11,14 @@ type Item = {
 
 const ITEMS: Item[] = [
   { icon: CircleCheckBig, label: "Where to buy", href: "/retailers" },
-  { icon: Settings, label: "Install", href: "/booking" },
+  { icon: Settings, label: "Install", href: "/installation" },
   { icon: Headphones, label: "Support", href: "/support" },
 ];
 
 export function LearnMoreLinks({ exclude, className = "" }: { exclude?: string; className?: string }) {
   const items = exclude ? ITEMS.filter((i) => i.href !== exclude) : ITEMS;
   return (
-    <section className={`bg-[#f7f7f7] py-[70px] ${className}`} data-nav-theme="light">
+    <section className={`bg-[#f7f7f7] py-16 md:py-[70px] ${className}`} data-nav-theme="light">
       <div className="mx-auto flex max-w-[1000px] flex-wrap items-start justify-center gap-x-[clamp(48px,9vw,113px)] gap-y-12 px-6 text-center">
         {items.map((it) => {
           const Icon = it.icon;

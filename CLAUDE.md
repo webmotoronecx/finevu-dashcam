@@ -6,6 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FineVu is a marketing/brochure site for a premium dash-cam brand (Australian distributor: AutoXtreme). It is a Next.js 16 App Router app (React 19, Tailwind CSS v4, `motion`/Framer Motion, shadcn-style Radix UI). No backend, database, or auth — every page is static content plus client-side animation. Forms (e.g. `BusinessEnquiryForm`) are presentation-only.
 
+## MVP scope
+
+The launch MVP is **four pages**. These are the only routes that should ship complete, polished content:
+
+- **Homepage** — `app/page.tsx` (`/`)
+- **GX4K** — `app/gx4k/page.tsx` (`/gx4k`)
+- **GX35** — `app/gx35/page.tsx` (`/gx35`)
+- **Installation** — `app/installation/page.tsx` (`/installation`)
+
+Every other route exists but is not part of the MVP. Non-MVP pages can be hidden behind the **Coming Soon gate**: add their path to `comingSoon: string[]` in `config/site.config.ts` and `ComingSoonGate` (wired in `app/layout.tsx`) renders the branded `ComingSoon` placeholder instead of the page. Preview a gated page's real content with `?showpage=true`. Prioritise the four MVP pages; treat the rest as secondary until they're promoted out of the coming-soon list.
+
 ## Commands
 
 ```bash

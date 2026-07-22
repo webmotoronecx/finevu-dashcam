@@ -91,7 +91,7 @@ export const siteConfig: SiteConfig = {
         { href: "/gx35", label: "GX35 — 2K 2CH" },
       ],
     },
-    { href: "/services", label: "Installation" },
+    { href: "/installation", label: "Installation" },
     { href: "/retailers", label: "Retailers" },
     { href: "/support", label: "Support" },
   ],

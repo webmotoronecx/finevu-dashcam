@@ -44,6 +44,8 @@ export type ScrubCallout = {
   end: number;
   /** Anchor on the lg+ stage as Tailwind position classes, e.g. "left-[2%] top-[19%]". */
   pos: string;
+  /** Entrance slide direction as the block fades in (default "bottom" → slides up). */
+  from?: "bottom" | "left" | "right";
   /** Optional segmented connector, in `stageViewBox` coordinate space. `points` are the
    *  polyline vertices [x,y] (e.g. a horizontal lead-in then a bend toward the product).
    *  `start`/`end` default to the block's window; the connector draws itself over that range. */
@@ -68,6 +70,16 @@ const CO_LINE_STOPS = [
 
 const emptySubscribe = () => () => {};
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+// Scroll → video time. Default is linear (0→duration). With `reverseAt` set, it's a
+// triangle: play forward reaching the last frame exactly at p=reverseAt, then reverse
+// back to frame 0 by p=1 — the clip winds forward then rewinds to its initial state.
+function scrubTime(p: number, duration: number, reverseAt?: number) {
+  if (!reverseAt || reverseAt <= 0 || reverseAt >= 1) return p * duration;
+  return p <= reverseAt
+    ? (p / reverseAt) * duration
+    : (1 - (p - reverseAt) / (1 - reverseAt)) * duration;
+}
 
 /** Section title + description — mirrors OpticsSection's OpticsHead, legible over video. */
 function ScrubHead({ head, className = "" }: { head: SectionHead; className?: string }) {
@@ -103,7 +115,7 @@ function CalloutBlock({ data }: { data: ScrubCallout }) {
           {data.sub}
         </p>
       )}
-      {/* <div className="mt-3 h-px w-full" style={{ backgroundImage: CO_DIVIDER }} /> */}
+      <div className="mt-3 h-px w-full md:hidden" style={{ backgroundImage: CO_DIVIDER }} />
       <ul className="mt-3.5 space-y-1.5">
         {data.items.map((it) => (
           <li key={it} className="text-[13px] font-medium text-white xl:text-[14.4px]" style={{ textShadow: TEXT_SHADOW }}>
@@ -122,6 +134,8 @@ export function ScrollScrubVideo({
   beats = [],
   callouts = [],
   scrubLength = "300vh",
+  reverseAt,
+  reverseOnExit = false,
   stageViewBox = "0 0 1920 1080",
   stageMaxWidth = "1440px",
   sectionClass = "",
@@ -139,6 +153,16 @@ export function ScrollScrubVideo({
   callouts?: ScrubCallout[];
   /** Height of the scroll track that drives the scrub (default "300vh"). */
   scrubLength?: string;
+  /** Optional "transition end": scroll progress (0..1) at which the video finishes
+   *  playing forward and starts reversing back to frame 0. Omit for the default
+   *  forward-only linear scrub. Typical value 0.6–0.75. Composes with `reverseOnExit`
+   *  — there it overrides the geometry-derived split so you can tune where the flip lands. */
+  reverseAt?: number;
+  /** Reverse *as the section releases*, not while pinned: the video plays forward over
+   *  the whole pinned range, then rewinds to frame 0 during the exit — while the next
+   *  section scrolls into view. On its own the split is derived from `scrubLength` (the
+   *  pin lasts `(scrubLength − 100vh)` of the track); pass `reverseAt` too to override it. */
+  reverseOnExit?: boolean;
   /** Coordinate space for `callout.line` endpoints (default the video's 1920×1080). */
   stageViewBox?: string;
   /** Max width of the centered stage the callouts anchor to, so they stay put (don't drift
@@ -168,15 +192,32 @@ export function ScrollScrubVideo({
   const [, , vbW, vbH] = stageViewBox.split(/\s+/).map(Number);
   const stageAspect = vbW && vbH ? `${vbW} / ${vbH}` : "16 / 9";
 
+  // Reverse-on-exit: the sticky stage is 100dvh, so the pin lasts `(trackVh − 100)` of
+  // the track. Tracking the whole track (offset end→start) makes progress span the pin
+  // *and* the exit; the pin fraction becomes the reverse split, so the video winds back
+  // as the section slides away. Falls back to the manual `reverseAt` otherwise.
+  const trackVh = parseFloat(scrubLength);
+  const exitReverseAt =
+    reverseOnExit && Number.isFinite(trackVh) && trackVh > 100 ? (trackVh - 100) / trackVh : undefined;
+  // The split point: an explicit `reverseAt` always wins (so you can tune where the flip
+  // happens); otherwise reverse-on-exit uses the geometry-derived release fraction.
+  const effReverseAt = reverseAt ?? exitReverseAt;
+
   const { scrollYProgress } = useScroll({
     // Reduced motion is static, so it has no scroll target (see OpticsSection).
     target: reduce ? undefined : trackRef,
-    offset: ["start start", "end end"],
+    // Reverse-on-exit needs progress to continue through the un-pin/exit, so track the
+    // track's full travel (end at viewport start) rather than stopping at release.
+    offset: reverseOnExit ? ["start start", "end start"] : ["start start", "end end"],
   });
 
   // Overlay reveals — written straight to the DOM, instant and locked to the scrollbar.
   const paint = useCallback(
-    (p: number) => {
+    (rawP: number) => {
+      // With `reverseAt`, drive overlays off the same triangle as the video (0→1→0) so
+      // they fade in on the way forward and back out on the rewind. Without it, this is
+      // the identity (scrubTime(p,1) === p) and overlays behave one-way as before.
+      const p = scrubTime(rawP, 1, effReverseAt);
       const fade = 0.06;
       beats.forEach((beat, i) => {
         const el = beatRefs.current[i];
@@ -196,8 +237,12 @@ export function ScrollScrubVideo({
         const t = clamp((p - c.start) / (c.end - c.start), 0, 1);
         const card = cardRefs.current[i];
         if (card) {
+          // Slide in from the chosen edge (24px), easing to rest as it fades in.
+          const off = (1 - t) * 24;
+          const tx = c.from === "left" ? -off : c.from === "right" ? off : 0;
+          const ty = c.from === "left" || c.from === "right" ? 0 : off;
           card.style.opacity = String(t);
-          card.style.transform = `translate3d(0, ${(1 - t) * 24}px, 0)`;
+          card.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
         }
         const line = lineRefs.current[i];
         if (line && c.line) {
@@ -209,14 +254,14 @@ export function ScrollScrubVideo({
         }
       });
     },
-    [beats, callouts],
+    [beats, callouts, effReverseAt],
   );
 
   // Scroll → target video time + overlay repaint (does not touch currentTime directly;
   // the rAF loop below lerps toward the target so seeks stay smooth).
   useMotionValueEvent(scrollYProgress, "change", (p) => {
-    targetTimeRef.current = p * (durationRef.current || 0);
-    paint(p);
+    targetTimeRef.current = scrubTime(p, durationRef.current || 0, effReverseAt);
+    paint(p); // paint uses raw p — beats/callouts fire on scroll position, not video time
   });
 
   // Prime connector-line dash geometry so it can "draw" on scroll (OpticsSection pattern).
@@ -242,7 +287,7 @@ export function ScrollScrubVideo({
     v.pause(); // we own currentTime; never let it autoplay
     const onMeta = () => {
       durationRef.current = v.duration || 0;
-      targetTimeRef.current = scrollYProgress.get() * durationRef.current;
+      targetTimeRef.current = scrubTime(scrollYProgress.get(), durationRef.current, effReverseAt);
     };
     v.addEventListener("loadedmetadata", onMeta);
     if (v.readyState >= 1) onMeta();
@@ -270,7 +315,7 @@ export function ScrollScrubVideo({
       cancelAnimationFrame(raf);
       v.removeEventListener("loadedmetadata", onMeta);
     };
-  }, [reduce, scrollYProgress]);
+  }, [reduce, scrollYProgress, effReverseAt]);
 
   const beatText = (beat: ScrubBeat, centered = false) => (
     <>
@@ -445,8 +490,8 @@ export function ScrollScrubVideo({
             {callouts.map((c, i) => (
               <motion.div
                 key={c.key}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: c.from === "left" ? -24 : c.from === "right" ? 24 : 0, y: c.from === "left" || c.from === "right" ? 0 : 24 }}
+                whileInView={{ opacity: 1, x: 0, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
               >

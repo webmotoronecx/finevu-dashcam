@@ -69,6 +69,31 @@ ffmpeg -i input.mp4 -an \
 - Keep the un-scrubbed original around for any normal autoplay use; suffix the
   scrub build `_scrub.mp4` so it's obvious which is which.
 
+## TODO / deferred work
+
+### Responsive images (`srcset`) — not yet built
+
+The site ships full-size originals to every device. `public/` is **~201 MB / 98
+raster files**, including unoptimized PNGs like `public/gx4k/detail-starvis.png`
+(**16 MB**) and several 5–6 MB graphics. There are ~41 image sites across ~13 files
+(95 local `/public` refs + 13 remote Unsplash URLs). This payload — not the markup —
+is the real problem; `srcset` only helps once smaller variants actually exist.
+
+Groundwork already in place: **`ImageWithFallback` is a plain `<img>` that spreads
+`...rest`**, so `srcSet`/`sizes` already pass straight through (see
+`FeatureTabs`'s `imageSrcSet`/`imageSizes` props). We deliberately avoid `next/image`
+(remote Unsplash + no `images.remotePatterns` + static prerender).
+
+Recommended approach when picked up:
+1. Add `sharp` and a **prebuild script** that generates width variants
+   (e.g. 480/960/1440/1920) in **webp + avif** for `/public` rasters, plus a manifest
+   mapping source path → variants. Fold in compression of the giant PNGs (the biggest
+   single win).
+2. A `ResponsiveImage` wrapper (or an extended `ImageWithFallback`) that reads the
+   manifest and emits `<picture>` with `srcSet`/`sizes`. For the 13 **Unsplash** URLs,
+   build the `srcSet` from `&w=`/`&q=`/`&fm=` params instead of generating files.
+3. Roll out MVP-4 pages first (Homepage, GX4K, GX35, Installation), then the rest.
+
 ### Styling
 
 - Tailwind v4 (CSS-first, `@import "tailwindcss"` in `app/globals.css` — no `tailwind.config.js`).

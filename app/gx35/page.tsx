@@ -3,6 +3,7 @@
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { OpticsSection } from "@/components/sections/OpticsSection";
+import { BentoCard } from "@/components/sections/BentoCard";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -108,43 +109,6 @@ function Showcase({
         </motion.div>
       </div>
     </section>
-  );
-}
-
-// Feature tile — image with title-top and caption-bottom overlays
-function FeatureTile({
-  img,
-  title,
-  caption,
-  className = "",
-}: {
-  img?: string;
-  title: string;
-  caption: string;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      {...fadeUp}
-      className={`tile-hover relative overflow-hidden rounded-[24px] border border-[#ececf0] ${className}`}
-    >
-      {img ? (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={img} alt={title} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/55" />
-        </>
-      ) : (
-        // solid #656565 — matches the Figma placeholder tile
-        <div className="absolute inset-0 bg-[#656565]" />
-      )}
-      <p className="absolute inset-x-0 top-5 px-4 text-center text-[16px] md:text-[20px] font-semibold text-white">
-        {title}
-      </p>
-      <p className="absolute inset-x-0 bottom-5 px-4 text-center text-[13px] md:text-[15px] text-white/75">
-        {caption}
-      </p>
-    </motion.div>
   );
 }
 
@@ -671,17 +635,20 @@ export default function GX35Page() {
         </motion.div>
 
         <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-          <FeatureTile
+          <BentoCard
+            theme="light"
             {...featureTiles[0]}
             className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
           />
-          <FeatureTile {...featureTiles[1]} className="lg:col-span-5 aspect-[16/9]" />
-          <FeatureTile {...featureTiles[2]} className="lg:col-span-5 aspect-[16/9]" />
-          <FeatureTile
+          <BentoCard theme="light" {...featureTiles[1]} className="lg:col-span-5 aspect-[16/9]" />
+          <BentoCard theme="light" {...featureTiles[2]} className="lg:col-span-5 aspect-[16/9]" />
+          <BentoCard
+            theme="light"
             {...featureTiles[3]}
             className="lg:col-span-5 aspect-[16/9] lg:aspect-auto lg:min-h-[300px]"
           />
-          <FeatureTile
+          <BentoCard
+            theme="light"
             {...featureTiles[4]}
             className="lg:col-span-7 aspect-[16/9] lg:aspect-auto lg:min-h-[300px]"
           />

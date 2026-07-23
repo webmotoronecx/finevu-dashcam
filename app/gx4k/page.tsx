@@ -13,6 +13,7 @@ import { Carousel, type Card } from "@/components/sections/Carousel";
 import { FeatureTabs } from "@/components/sections/FeatureTabs";
 import { BarGraph } from "@/components/sections/BarGraph";
 import { ScrollScrubVideo } from "@/components/sections/ScrollScrubVideo";
+import { BentoCard } from "@/components/sections/BentoCard";
 
 /* FineVu GX4K product page — Figma frame 102:2004 (dark cinematic layout). */
 
@@ -226,11 +227,11 @@ function TwoTone({ text, className = "" }: { text: string; className?: string })
 /* Data */
 
 const detailCards = [
-  { title: "3840 × 2160 UHD Front Camera", caption: "Every pixel captured", img: "/gx4k/card-uhd.webp" },
-  { title: "Sony STARVIS IMX515", caption: "8.5MP · F/1.8 · crystal-clear detail", img: "/gx4k/card-sensor.webp" },
-  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", img: "/gx4k/card-night.webp" },
-  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/card-heat.webp" },
-  { title: "136°/143° Field of View", caption: "Front & Rear", img: "/gx4k/card-field-view.png" },
+  { title: "3840 × 2160 UHD Front Camera", caption: "Every pixel captured", video: "/gx4k/captured-front-cam.mp4" },
+  { title: "Sony STARVIS IMX515", caption: "8.5MP · F/1.8 · crystal-clear detail", img: "/gx4k/captured-starvis.png" },
+  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx4k/captured-night.mp4" },
+  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/captured-ai-heat.png" },
+  { title: "136°/143° Field of View", caption: "Front & Rear", img: "/gx4k/captured-front-rear.png" },
 ];
 
 const cSeeDetail: Card[] = [
@@ -471,11 +472,11 @@ export default function GX4KPage() {
         </motion.div>
 
         <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-          <BentoCardGridItem card={detailCards[0]} className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
-          <BentoCardGridItem card={detailCards[1]} className="lg:col-span-5 aspect-[16/9]" />
-          <BentoCardGridItem card={detailCards[2]} className="lg:col-span-5 aspect-[16/9]" />
-          <BentoCardGridItem card={detailCards[3]} className="lg:col-span-6 aspect-[16/9]" />
-          <BentoCardGridItem card={detailCards[4]} className="lg:col-span-6 aspect-[16/9]" />
+          <BentoCard theme="dark" {...detailCards[0]} className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+          <BentoCard theme="dark" {...detailCards[1]} className="lg:col-span-5 aspect-[16/9]" />
+          <BentoCard theme="dark" {...detailCards[2]} className="lg:col-span-5 aspect-[16/9]" />
+          <BentoCard theme="dark" {...detailCards[3]} className="lg:col-span-6 aspect-[16/9]" />
+          <BentoCard theme="dark" {...detailCards[4]} className="lg:col-span-6 aspect-[16/9]" />
         </div>
       </section>
 
@@ -484,6 +485,8 @@ export default function GX4KPage() {
       <ScrollScrubVideo
         video="/gx4k/gx4k_secondary_banner_scrub.mp4"
         poster="/gx4k/hero-bg.webp"
+        reverseAt={0.65}
+        reverseOnExit
         head={{
           title: "The Optics Behind the Image.",
           subtitle:
@@ -495,11 +498,12 @@ export default function GX4KPage() {
             title: "Front",
             sub: "UHD wide",
             items: ["SONY STARVIS IMX515", "8.5 MP sensor", "3840 × 2160 (4K UHD)", "136° field of view"],
-            start: 0.28,
+            start: 0.2,
             end: 0.95,
             pos: "left-[0px] top-[100px]",
             // horizontal lead-in off the divider, then a bend down to the front lens
             line: { points: [[0, 300], [500, 300], [700, 560]] },
+            from:"right"
           },
           {
             key: "core",
@@ -510,16 +514,18 @@ export default function GX4KPage() {
             end: 0.95,
             pos: "left-[190px] bottom-[-90px]",
             line: { points: [[300, 1040], [760, 1040], [980, 612]] },
+            from:"right"
           },
           {
             key: "rear",
             title: "Rear",
             sub: "Full-HD wide",
             items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "23 g compact module"],
-            start: 0.44,
+            start: 0.64,
             end: 0.95,
             pos: "right-[-50px] bottom-[-95px]",
             line: { points: [[1300, 690], [1400, 1040], [1760, 1040]] },
+            from:"left"
           },
         ]}
       />
@@ -564,12 +570,15 @@ export default function GX4KPage() {
         </motion.div>
 
         <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-          <BentoCardGridItem card={{title:""}} className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
-          <BentoCardGridItem card={{ 
-            type:"displayText", 
-            title: "Format Free 2.0", 
-            caption:"Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive." }} className="lg:col-span-6  lg:row-span-2  aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
-          <BentoCardGridItem card={{img:'/gx4k/bento-storage-dash.png'}} className="lg:col-span-12 aspect-[16/7]" />
+          <BentoCard theme="dark" title="" className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+          <BentoCard
+            theme="dark"
+            variant="displayText"
+            title="Format Free 2.0"
+            caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive."
+            className="lg:col-span-6  lg:row-span-2  aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
+          />
+          <BentoCard theme="dark" img="/gx4k/bento-storage-dash.png" className="lg:col-span-12 aspect-[16/7]" />
         </div>
       </section>
   
@@ -889,57 +898,5 @@ export default function GX4KPage() {
 
       <Footer />
     </main>
-  );
-}
-
-/* Card for the "Every Detail" bento grid (title top, caption bottom). */
-function BentoCardGridItem({
-  card,
-  className = "",
-}: {
-  card: { title?: string; caption?: string; img?: string, type?: string };
-  className?: string;
-}) {
-  // "displayText" variant — no image; a large left-aligned title with a body
-  // paragraph beneath, vertically centred on a plain dark panel (Figma Storage tile).
-  if (card.type === "displayText") {
-    return (
-      <motion.div
-        {...fadeUp}
-        className={`tile-hover-purple relative flex flex-col justify-center overflow-hidden rounded-[22px] border border-white/[0.06] bg-[#0d0d0d] px-8 py-10 md:px-12 ${className}`}
-      >
-        <h3 className="text-[26px] md:text-[38px] font-semibold leading-[1.08] text-white">
-          {card.title}
-        </h3>
-        {card.caption && (
-          <p className="mt-5 max-w-[420px] text-[15px] md:text-[18px] leading-[1.55] text-white/55">
-            {card.caption}
-          </p>
-        )}
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div
-      {...fadeUp}
-      className={`tile-hover-purple relative overflow-hidden rounded-[22px] border border-white/[0.06] ${className}`}
-    >
-      {card.img ? (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={card.img} alt={card.title} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/70" />
-        </>
-      ) : (
-        <div className="absolute inset-0 bg-[#26262b]" />
-      )}
-      <p className="absolute inset-x-0 top-5 px-4 text-center text-[15px] md:text-[17px] font-semibold text-white">
-        {card.title}
-      </p>
-      <p className="absolute inset-x-0 bottom-5 px-4 text-center text-[13px] text-white/70">
-        {card.caption}
-      </p>
-    </motion.div>
   );
 }

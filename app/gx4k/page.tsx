@@ -484,8 +484,7 @@ export default function GX4KPage() {
       {/* <OpticsSection /> */}
       <ScrollScrubVideo
         video="/gx4k/gx4k_secondary_banner_scrub.mp4"
-        poster="/gx4k/hero-bg.webp"
-        reverseAt={0.65}
+        poster="/gx4k/hero-render.png"      
         reverseOnExit
         head={{
           title: "The Optics Behind the Image.",

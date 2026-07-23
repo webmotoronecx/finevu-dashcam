@@ -136,6 +136,8 @@ export function ScrollScrubVideo({
   scrubLength = "300vh",
   reverseAt,
   reverseOnExit = false,
+  mobileObjectPosition = "center",
+  mobileScale = 1,
   stageViewBox = "0 0 1920 1080",
   stageMaxWidth = "1440px",
   sectionClass = "",
@@ -163,6 +165,13 @@ export function ScrollScrubVideo({
    *  section scrolls into view. On its own the split is derived from `scrubLength` (the
    *  pin lasts `(scrubLength − 100vh)` of the track); pass `reverseAt` too to override it. */
   reverseOnExit?: boolean;
+  /** Mobile-only (< md) framing of the object-cover video. `mobileObjectPosition` is a
+   *  CSS object-position (e.g. "center", "50% 40%") choosing which slice of the cropped
+   *  frame shows; `mobileScale` zooms it (>1 tighter/more crop, <1 pulls back but reveals
+   *  the section background around the video). Both reset to normal at md+. Note: cover
+   *  can't un-crop the sides — for a full uncropped mobile frame, supply a portrait clip. */
+  mobileObjectPosition?: string;
+  mobileScale?: number;
   /** Coordinate space for `callout.line` endpoints (default the video's 1920×1080). */
   stageViewBox?: string;
   /** Max width of the centered stage the callouts anchor to, so they stay put (don't drift
@@ -375,7 +384,7 @@ export function ScrollScrubVideo({
   return (
     <>
       <section ref={trackRef} data-nav-theme="dark" className={`relative w-full ${sectionClass}`} style={{ height: scrubLength }}>
-        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+        <div className="bg-black sticky top-0  h-[80dvh] md:h-[100dvh] w-full overflow-hidden flex  items-center ">
           <video
             ref={videoRef}
             src={video}
@@ -383,7 +392,10 @@ export function ScrollScrubVideo({
             muted
             playsInline
             preload="auto"
-            className="absolute inset-0 h-full w-full object-cover"
+            // Stays object-cover; below md, `mobileObjectPosition` picks which slice of
+            // the (cropped) frame shows and `mobileScale` zooms it. md+ resets to normal.
+            className="absolute top-50 md:top-0 inset-0 w-full object-cover [object-position:var(--ssv-pos)] [transform:scale(var(--ssv-scale))] md:[object-position:center] md:[transform:none] h-[60dvh] md:h-full"
+            style={{ ["--ssv-pos" as string]: mobileObjectPosition, ["--ssv-scale" as string]: mobileScale }}
           />
 
           {overlayScrim && (
@@ -481,11 +493,8 @@ export function ScrollScrubVideo({
       {/* Mobile / tablet (< lg): callouts stacked in normal flow instead of positioned. */}
       {callouts.length > 0 && (
         <section data-nav-theme="dark" className="bg-[#08080c] py-16 lg:hidden">
-          {head && (
-            <motion.div {...{ initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "-60px" }, transition: { duration: 0.5 } }} className="mb-12 px-6">
-              <ScrubHead head={head} />
-            </motion.div>
-          )}
+          {/* Head is already shown pinned over the video at every breakpoint, so it's
+              intentionally omitted here to avoid a duplicate heading on mobile. */}
           <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-6 sm:grid-cols-3">
             {callouts.map((c, i) => (
               <motion.div

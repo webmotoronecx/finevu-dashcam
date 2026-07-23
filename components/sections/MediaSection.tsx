@@ -31,6 +31,15 @@ export type MediaSectionData = {
   heightClass?: string;
   /** CSS aspect-ratio for aspect mode, e.g. "825/451" (default matches the mock) */
   aspectRatio?: string;
+  /**
+   * Extra breathing room above the media, as Tailwind padding classes
+   * (e.g. "pt-16 md:pt-0"). Unlike normal padding, this *grows* the section
+   * height in aspect mode so a long title on mobile no longer overlaps the
+   * image. The media still fills the padded area.
+   */
+  padTop?: string;
+  /** Extra breathing room below the media — see `padTop`. */
+  padBottom?: string;
   /** Dark top-to-bottom legibility gradient over the media */
   scrim?: boolean;
   /** Drives text colour and the navbar contrast signal */
@@ -59,10 +68,17 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     poster,
     heightClass,
     aspectRatio = "825/451",
+    padTop = "",
+    padBottom = "",
     scrim = false,
     theme = "dark",
     className = "",
   } = data;
+  // When padding is present in aspect mode we switch to `box-content` so the
+  // padding adds to the section's height instead of eating into the locked
+  // aspect-ratio box (which is what makes the extra space actually appear).
+  const pad = `${padTop} ${padBottom}`.trim();
+  const boxClass = pad && !heightClass ? "box-content" : "";
   const dark = theme === "dark";
   const banner = Boolean(heightClass);
   const titleColor = dark ? "text-white" : "text-[#0b0b0c]";
@@ -72,7 +88,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
 
   return (
     <section
-      className={`relative w-full overflow-hidden ${banner ? heightClass : "min-h-[420px]"} ${className}`}
+      className={`relative w-full overflow-hidden ${banner ? heightClass : "min-h-[420px]"} ${boxClass} ${pad} ${className}`}
       style={banner ? undefined : { aspectRatio }}
       data-nav-theme={theme}
     >

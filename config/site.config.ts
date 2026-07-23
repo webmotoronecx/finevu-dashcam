@@ -126,7 +126,7 @@ export const siteConfig: SiteConfig = {
   // Routes here render the Coming Soon placeholder instead of their page content.
   // e.g. ["/services", "/about"]
   comingSoon: [
-    "/about", 
+   
     "/become-a-retailer", 
     "/contact", 
     "/faq",
@@ -134,6 +134,6 @@ export const siteConfig: SiteConfig = {
     "/learn",
     "/retailers",
     "/services",
-    "/support"
+    
   ],
 };

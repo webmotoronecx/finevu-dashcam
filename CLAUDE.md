@@ -42,6 +42,33 @@ There are **no tests**. Verification = `npm run build` + driving the page in the
 
 2. **Use `ImageWithFallback` (`components/figma/ImageWithFallback.tsx`), not `next/image`.** This is a plain `<img>` with an SVG error placeholder. Many images are remote Unsplash URLs; `next.config.ts` does not configure `images.remotePatterns`, so `next/image` would reject them.
 
+### `ScrollScrubVideo` — video encoding
+
+`components/sections/ScrollScrubVideo.tsx` scrubs a background video by writing
+`video.currentTime` from scroll progress. Smooth scrubbing depends entirely on
+**keyframe density** — the seek cost is decoding, not the animation library (no
+GSAP; we use `motion`'s `useScroll` + a rAF lerp). A normal web MP4 has ~1
+keyframe per few seconds, so seeking lands on the nearest keyframe and stutters.
+
+Re-encode any clip fed to `ScrollScrubVideo` so **every frame is a keyframe**:
+
+```bash
+ffmpeg -i input.mp4 -an \
+  -c:v libx264 -g 1 -keyint_min 1 -sc_threshold 0 \
+  -pix_fmt yuv420p -movflags +faststart \
+  public/<page>/<name>_scrub.mp4
+```
+
+- `-g 1 -keyint_min 1 -sc_threshold 0` → keyframe on every frame (exact seeks).
+  This inflates file size (e.g. `hero_render.mp4` → `hero_render_scrub.mp4`,
+  ~6.7MB); keep the clip short and drop `fps`/`scale` if it gets large.
+- `-an` strips audio (video is `muted`), `+faststart` moves the moov atom up for
+  progressive load, `-pix_fmt yuv420p` keeps it broadly decodable.
+- Verify with `ffprobe -select_streams v -show_frames -show_entries frame=pict_type input.mp4 | grep -c 'pict_type=I'`
+  — the I-frame count should equal the total frame count.
+- Keep the un-scrubbed original around for any normal autoplay use; suffix the
+  scrub build `_scrub.mp4` so it's obvious which is which.
+
 ### Styling
 
 - Tailwind v4 (CSS-first, `@import "tailwindcss"` in `app/globals.css` — no `tailwind.config.js`).

@@ -481,30 +481,14 @@ export default function GX4KPage() {
 
       {/* Optics behind the image */}
       {/* <OpticsSection /> */}
-
-
-      <MediaSection data={mDualVision} />
-
-      {/* See every detail carousel */}
-      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
-
       <ScrollScrubVideo
-        video="/gx4k/hero_render_scrub.mp4"
+        video="/gx4k/gx4k_secondary_banner_scrub.mp4"
         poster="/gx4k/hero-bg.webp"
         head={{
           title: "The Optics Behind the Image.",
           subtitle:
             "Sony STARVIS IMX515. A precision-engineered 8.5-megapixel sensor paired with F/1.8 wide-aperture glass, made to perform when it matters most.",
         }}
-        // beats={[
-        //   {
-        //     start: 0.04,
-        //     end: 0.18,
-        //     kicker: "FineVu GX4K · Engineered",
-        //     headline: "Precision, in Every Frame.",
-        //     sub: "Scroll to explore the GX4K from every angle.",
-        //   },
-        // ]}
         callouts={[
           {
             key: "front",
@@ -539,6 +523,16 @@ export default function GX4KPage() {
           },
         ]}
       />
+
+
+      <MediaSection data={mDualVision} />
+
+      {/* See every detail carousel */}
+      <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
+
+    
+
+ 
 
       {/* Protected while parked carousel */}
       <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1047 / 562" pinGutter gutterRight />

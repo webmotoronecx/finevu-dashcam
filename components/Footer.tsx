@@ -125,7 +125,7 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Facebook</a>
                 <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">YouTube</a>
                 <span className="text-zinc-700 hidden md:inline">|</span>
-                <a href="/privacy-policy" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Privacy Policy</a>
+                <a href="https://motoronegroup.com/privacy-policy/" target="_blank" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Privacy Policy</a>
                 <a href="/terms-of-service" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Terms of Service</a>
               </div>
             </div>

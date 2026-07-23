@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useCallback, useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
 
 /**
  * Scroll-scrubbed video background section.
@@ -42,14 +42,25 @@ export type ScrubCallout = {
   /** Scroll-progress window (0..1) over which the block fades in. */
   start: number;
   end: number;
-  /** Anchor on the lg+ stage as Tailwind position classes, e.g. "left-[2%] top-[19%]". */
-  pos: string;
+  /** Where the block sits on the video frame, in `stageViewBox` units. Because the lg+ stage is
+   *  sized to the video's object-cover rect, this point tracks the same spot on the footage at
+   *  every viewport size. The block's own text stays at fixed px sizes. */
+  at: [number, number];
+  /** Which corner of the block lands on `at` (default "top-left"). */
+  align?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
   /** Entrance slide direction as the block fades in (default "bottom" → slides up). */
   from?: "bottom" | "left" | "right";
-  /** Optional segmented connector, in `stageViewBox` coordinate space. `points` are the
-   *  polyline vertices [x,y] (e.g. a horizontal lead-in then a bend toward the product).
+  /** Optional segmented connector, drawn block → product in `stageViewBox` coordinates.
+   *
+   *  The path always *starts* at the block: that first vertex is measured off the block's divider
+   *  each layout (see `syncLines`) rather than authored, because the text is fixed-px while the
+   *  frame scales — the two only stay flush if measured. `lead` is the x the horizontal underline
+   *  runs out to (it inherits the measured y, so it is exactly horizontal); `points` are the
+   *  remaining vertices, ending on the feature being annotated. `attachDx` nudges only that
+   *  measured start along x (viewBox units, + right / − left) to trim or extend the underline
+   *  without moving the block.
    *  `start`/`end` default to the block's window; the connector draws itself over that range. */
-  line?: { points: [number, number][]; start?: number; end?: number };
+  line?: { lead?: number; attachDx?: number; points: [number, number][]; start?: number; end?: number };
 };
 
 // Beat text tokens (kept light so it reads over video) — matches ScrollHero.
@@ -70,6 +81,37 @@ const CO_LINE_STOPS = [
 
 const emptySubscribe = () => () => {};
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+/** Offset of `el` inside `ancestor`, walking the offsetParent chain. Deliberately not
+ *  getBoundingClientRect: `paint` puts an entrance transform on the card mid-reveal, and
+ *  offsetLeft/offsetTop ignore transforms — so this reads the block's resting position whenever
+ *  it's measured. Returns null if the chain doesn't reach `ancestor` (e.g. display:none below lg). */
+function offsetWithin(el: HTMLElement, ancestor: HTMLElement) {
+  let left = 0;
+  let top = 0;
+  let node: HTMLElement | null = el;
+  while (node && node !== ancestor) {
+    left += node.offsetLeft;
+    top += node.offsetTop;
+    node = node.offsetParent as HTMLElement | null;
+  }
+  return node === ancestor ? { left, top } : null;
+}
+
+/** Pin a callout's `align` corner to its `at` point on the frame. Deliberately uses the inset
+ *  properties rather than a translate, so the element stays transform-free and `syncLines` can
+ *  measure it with offsetLeft/offsetTop. */
+function anchorStyle(c: ScrubCallout, vbW: number, vbH: number): CSSProperties {
+  const [x, y] = c.at;
+  const px = `${(x / vbW) * 100}%`;
+  const py = `${(y / vbH) * 100}%`;
+  const inv = (v: number) => `${100 - v}%`;
+  const align = c.align ?? "top-left";
+  return {
+    ...(align.endsWith("right") ? { right: inv((x / vbW) * 100) } : { left: px }),
+    ...(align.startsWith("bottom") ? { bottom: inv((y / vbH) * 100) } : { top: py }),
+  };
+}
 
 // Scroll → video time. Default is linear (0→duration). With `reverseAt` set, it's a
 // triangle: play forward reaching the last frame exactly at p=reverseAt, then reverse
@@ -103,8 +145,17 @@ export type SectionHead = { title: string; subtitle?: string };
 // but laggier; this makes even cheap encodes look fluid and avoids seek-spam jank.
 const LERP = 0.15;
 
-/** One annotation block — shared by the pinned overlay and the mobile stack. */
-function CalloutBlock({ data }: { data: ScrubCallout }) {
+// Height of the sticky stage at md+ — also the `H` in the object-cover width formula below, so the
+// callout layer resolves to the video's exact rendered box. Keep the two in lockstep.
+const STAGE_H = "100dvh";
+
+/** One annotation block — shared by the pinned overlay and the mobile stack.
+ *
+ * `measureDivider` is only passed by the pinned overlay: there the connector's lead-in segment *is*
+ * the divider, so the element is rendered as an invisible 1px spacer purely to be measured. In
+ * normal flow (mobile stack / reduced motion) it keeps its painted gradient as before. */
+function CalloutBlock({ data, measureDivider }: { data: ScrubCallout; measureDivider?: (el: HTMLDivElement | null) => void }) {
+  const anchored = measureDivider !== undefined;
   return (
     <div className="w-full md:w-[248px] xl:w-[300px]">
       <p className={`text-[28px] font-semibold leading-none xl:text-[34px] ${CO_TITLE}`} style={{ filter: HEAD_SHADOW }}>
@@ -115,7 +166,11 @@ function CalloutBlock({ data }: { data: ScrubCallout }) {
           {data.sub}
         </p>
       )}
-      <div className="mt-3 h-px w-full md:hidden" style={{ backgroundImage: CO_DIVIDER }} />
+      <div
+        ref={measureDivider}
+        className={`mt-3 h-px w-full ${anchored ? "" : ""}`}
+        style={anchored ? undefined : { backgroundImage: CO_DIVIDER }}
+      />
       <ul className="mt-3.5 space-y-1.5">
         {data.items.map((it) => (
           <li key={it} className="text-[13px] font-medium text-white xl:text-[14.4px]" style={{ textShadow: TEXT_SHADOW }}>
@@ -134,12 +189,13 @@ export function ScrollScrubVideo({
   beats = [],
   callouts = [],
   scrubLength = "300vh",
+  startVisible = 1,
+  holdLength = "0vh",
   reverseAt,
   reverseOnExit = false,
   mobileObjectPosition = "center",
   mobileScale = 1,
   stageViewBox = "0 0 1920 1080",
-  stageMaxWidth = "1440px",
   sectionClass = "",
   overlayScrim = true,
 }: {
@@ -155,6 +211,19 @@ export function ScrollScrubVideo({
   callouts?: ScrubCallout[];
   /** Height of the scroll track that drives the scrub (default "300vh"). */
   scrubLength?: string;
+  /** How much of the viewport the section must fill before the scrub starts, 0..1.
+   *  `1` (default) = the old behaviour: progress 0 the moment the section is pinned
+   *  (its top at the top of the viewport). `0.5` starts scrubbing while the section is
+   *  only half on screen, so the video is already moving as it slides up into the pin.
+   *  Lowering it lengthens the total scroll travel by `(1 − startVisible) × 100vh`
+   *  without changing `scrubLength`, so beats/callout windows keep their relative shape. */
+  startVisible?: number;
+  /** Extra scroll (e.g. "80vh") the section stays pinned *after* the scrub finishes, before it
+   *  unsticks. Added on top of `scrubLength`; the scrub still completes over `scrubLength`, then
+   *  everything holds on the last frame — video, beats and connectors all freeze — for this much
+   *  scroll. With `reverseOnExit` the hold sits between the forward scrub and the rewind, so the
+   *  final frame lands before the section starts sliding away. Default "0vh" (no hold). */
+  holdLength?: string;
   /** Optional "transition end": scroll progress (0..1) at which the video finishes
    *  playing forward and starts reversing back to frame 0. Omit for the default
    *  forward-only linear scrub. Typical value 0.6–0.75. Composes with `reverseOnExit`
@@ -172,11 +241,11 @@ export function ScrollScrubVideo({
    *  can't un-crop the sides — for a full uncropped mobile frame, supply a portrait clip. */
   mobileObjectPosition?: string;
   mobileScale?: number;
-  /** Coordinate space for `callout.line` endpoints (default the video's 1920×1080). */
+  /** Coordinate space for `callout.at` anchors and `callout.line` points. This **must** match the
+   *  video's intrinsic pixel size — the callout layer is sized to the video's object-cover rect, so
+   *  a mismatched aspect ratio skews every anchor and connector. Check with
+   *  `ffprobe -show_entries stream=width,height <file>`; a mismatch warns in dev. */
   stageViewBox?: string;
-  /** Max width of the centered stage the callouts anchor to, so they stay put (don't drift
-   *  to the edges) on large/ultrawide screens. Its aspect ratio is derived from `stageViewBox`. */
-  stageMaxWidth?: string;
   /** Extra classes on the outer <section>. */
   sectionClass?: string;
   /** Show the legibility scrim + bottom fade over the video (default true). */
@@ -192,6 +261,8 @@ export function ScrollScrubVideo({
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(SVGPolylineElement | null)[]>([]);
+  const dividerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const stageRef = useRef<HTMLDivElement>(null);
   const lineLen = useRef<number[]>([]);
   const targetTimeRef = useRef(0);
   const durationRef = useRef(0);
@@ -200,14 +271,62 @@ export function ScrollScrubVideo({
   // line coordinate space, so blocks and connectors stay aligned at any width.
   const [, , vbW, vbH] = stageViewBox.split(/\s+/).map(Number);
   const stageAspect = vbW && vbH ? `${vbW} / ${vbH}` : "16 / 9";
+  // The callout layer is the video's object-cover content box: for a container W×H and intrinsic
+  // aspect A, cover renders it max(W, H·A) wide, centered. Expressed in CSS so it needs no JS and
+  // can't fall out of sync with the video — see the stage div below.
+  const stageWidth = vbW && vbH ? `max(100%, calc(${STAGE_H} * ${vbW} / ${vbH}))` : "100%";
+
+  // How much viewport height is scrolled *before* the section pins, in vh. `startVisible: 1`
+  // gives 0 (progress starts at the pin, as before); 0.5 gives 50 — half a viewport of
+  // lead-in during which the section is sliding up and the video is already scrubbing.
+  const leadVh = (1 - clamp(startVisible, 0, 1)) * 100;
+  // Framer offset: "start <x>%" fires progress 0 when the section's top reaches x% down the
+  // viewport. 100% ("end") = section just peeking in; 0% ("start") = fully pinned.
+  const startOffset: `start ${number}%` = `start ${100 - leadVh}%`;
 
   // Reverse-on-exit: the sticky stage is 100dvh, so the pin lasts `(trackVh − 100)` of
-  // the track. Tracking the whole track (offset end→start) makes progress span the pin
-  // *and* the exit; the pin fraction becomes the reverse split, so the video winds back
-  // as the section slides away. Falls back to the manual `reverseAt` otherwise.
+  // the track. Tracking the whole track (offset end→start) makes progress span the lead-in,
+  // the pin *and* the exit; the fraction up to release becomes the reverse split, so the
+  // video winds back as the section slides away. Falls back to the manual `reverseAt` otherwise.
   const trackVh = parseFloat(scrubLength);
   const exitReverseAt =
-    reverseOnExit && Number.isFinite(trackVh) && trackVh > 100 ? (trackVh - 100) / trackVh : undefined;
+    reverseOnExit && Number.isFinite(trackVh) && trackVh > 100
+      ? (leadVh + trackVh - 100) / (leadVh + trackVh)
+      : undefined;
+
+  // End hold: extra track height that keeps the section pinned after the scrub is done.
+  //
+  // Rather than thread a second timeline through the scrub/beat/connector maths, we grow the
+  // track and *remap* raw scroll progress back onto the no-hold timeline — so `effReverseAt`
+  // above and every authored beat/callout window keep meaning exactly what they meant before.
+  //
+  // In vh along the track: `fwdVh` is the travel over which the video scrubs forward (lead-in +
+  // pin), then `holdVh` of plateau, then whatever remains (the 100vh exit, only tracked when
+  // `reverseOnExit`). `V` is the total travel the raw progress spans; `V − holdVh` is the
+  // no-hold travel the remap targets.
+  const holdVh = Math.max(0, parseFloat(holdLength) || 0);
+  const fwdVh = leadVh + trackVh - 100;
+  const totalVh = leadVh + trackVh + holdVh - (reverseOnExit ? 0 : 100);
+  const hold =
+    holdVh > 0 && Number.isFinite(fwdVh) && fwdVh > 0 && totalVh > holdVh
+      ? {
+          start: fwdVh / totalVh, // raw progress where the scrub is finished
+          end: (fwdVh + holdVh) / totalVh, // raw progress where it resumes / releases
+          at: fwdVh / (totalVh - holdVh), // the no-hold progress being held
+        }
+      : null;
+
+  // Raw scroll progress → no-hold-timeline progress: rate up to the plateau, freeze across it,
+  // rate again after. Identity when there's no hold.
+  const unhold = useCallback(
+    (p: number) => {
+      if (!hold) return p;
+      if (p <= hold.start) return hold.start > 0 ? (p / hold.start) * hold.at : hold.at;
+      if (p <= hold.end) return hold.at;
+      return hold.at + ((p - hold.end) / (1 - hold.end)) * (1 - hold.at);
+    },
+    [hold?.start, hold?.end, hold?.at], // eslint-disable-line react-hooks/exhaustive-deps
+  );
   // The split point: an explicit `reverseAt` always wins (so you can tune where the flip
   // happens); otherwise reverse-on-exit uses the geometry-derived release fraction.
   const effReverseAt = reverseAt ?? exitReverseAt;
@@ -217,8 +336,19 @@ export function ScrollScrubVideo({
     target: reduce ? undefined : trackRef,
     // Reverse-on-exit needs progress to continue through the un-pin/exit, so track the
     // track's full travel (end at viewport start) rather than stopping at release.
-    offset: reverseOnExit ? ["start start", "end start"] : ["start start", "end end"],
+    offset: reverseOnExit ? [startOffset, "end start"] : [startOffset, "end end"],
   });
+
+  // Fade to black as the section releases. Its own timeline: 0 the moment the stage
+  // unpins (section bottom at the viewport bottom), 1 when the section has fully left —
+  // so the exit is always the last 100vh of travel regardless of `scrubLength`/`hold`.
+  const { scrollYProgress: exitProgress } = useScroll({
+    target: reduce ? undefined : trackRef,
+    offset: ["end end", "end start"],
+  });
+  // Sit clear for the first slice of the release, then ramp to solid before the section
+  // is gone, so the next section scrolls in from black rather than from a half-lit frame.
+  const exitFade = useTransform(exitProgress, [0.1, 0.75], [0, 1]);
 
   // Overlay reveals — written straight to the DOM, instant and locked to the scrollbar.
   const paint = useCallback(
@@ -268,24 +398,71 @@ export function ScrollScrubVideo({
 
   // Scroll → target video time + overlay repaint (does not touch currentTime directly;
   // the rAF loop below lerps toward the target so seeks stay smooth).
-  useMotionValueEvent(scrollYProgress, "change", (p) => {
+  useMotionValueEvent(scrollYProgress, "change", (raw) => {
+    // Everything downstream runs on the no-hold timeline; the plateau is folded in here once.
+    const p = unhold(raw);
     targetTimeRef.current = scrubTime(p, durationRef.current || 0, effReverseAt);
-    paint(p); // paint uses raw p — beats/callouts fire on scroll position, not video time
+    paint(p); // paint uses scroll progress — beats/callouts fire on scroll position, not video time
   });
 
-  // Prime connector-line dash geometry so it can "draw" on scroll (OpticsSection pattern).
-  useEffect(() => {
-    if (reduce) return;
-    lineRefs.current.forEach((line, i) => {
-      if (!line) return;
-      const len = line.getTotalLength();
+  // Attach each connector to its block, then prime the dash geometry so it can "draw" on scroll.
+  //
+  // The lead-in segment doubles as the block's underline, but the block's text is fixed-px while
+  // the stage scales with the video — so the junction is only exact if measured. We read the
+  // divider's box-offsets (not getBoundingClientRect: `paint` puts an entrance transform on the
+  // card, and offsetLeft/Top ignore transforms), convert to viewBox units and prepend that as the
+  // polyline's first vertex. Authors supply only the bend and the tip on the product.
+  const syncLines = useCallback(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const sw = stage.clientWidth;
+    const sh = stage.clientHeight;
+    if (!sw || !sh) return;
+
+    callouts.forEach((c, i) => {
+      const line = lineRefs.current[i];
+      if (!line || !c.line) return;
+
+      const divider = dividerRefs.current[i];
+      const offset = divider && offsetWithin(divider, stage);
+      const pts = [...c.line.points];
+      if (offset) {
+        const width = divider.offsetWidth;
+        // Attach on the edge *away* from the target, so the segment underlines the block before
+        // running out to the product.
+        const centre = ((offset.left + width / 2) / sw) * vbW;
+        const toward = c.line.lead ?? c.line.points[0]?.[0] ?? centre;
+        const ax = ((toward > centre ? offset.left : offset.left + width) / sw) * vbW + (c.line.attachDx ?? 0);
+        const ay = (offset.top / sh) * vbH;
+        if (c.line.lead !== undefined) pts.unshift([c.line.lead, ay]); // horizontal by construction
+        pts.unshift([ax, ay]);
+      }
+      line.setAttribute("points", pts.map(([x, y]) => `${x},${y}`).join(" "));
+
+      // `vector-effect: non-scaling-stroke` makes the browser resolve the *whole* stroke — dash
+      // pattern included — in screen space, but getTotalLength() reports viewBox user units. Scale
+      // the dash to px or the pattern no longer covers the path: under-long once the stage scales
+      // past 1:1 (big screens), which renders the connector as a floating fragment.
+      const len = line.getTotalLength() * (sw / vbW);
       lineLen.current[i] = len;
       line.style.strokeDasharray = String(len);
       line.style.strokeDashoffset = String(len);
       line.style.opacity = "0";
     });
-    paint(scrollYProgress.get());
-  }, [reduce, callouts, paint, scrollYProgress]);
+    paint(unhold(scrollYProgress.get()));
+  }, [callouts, paint, scrollYProgress, unhold, vbW, vbH]);
+
+  useEffect(() => {
+    if (reduce) return;
+    syncLines();
+    // Webfonts change the block's height, which moves the divider — re-measure once they land.
+    document.fonts?.ready.then(syncLines).catch(() => {});
+    const stage = stageRef.current;
+    if (!stage) return;
+    const ro = new ResizeObserver(syncLines);
+    ro.observe(stage);
+    return () => ro.disconnect();
+  }, [reduce, syncLines]);
 
   // Scrub loop: lerp video.currentTime toward the scroll target.
   useEffect(() => {
@@ -296,7 +473,15 @@ export function ScrollScrubVideo({
     v.pause(); // we own currentTime; never let it autoplay
     const onMeta = () => {
       durationRef.current = v.duration || 0;
-      targetTimeRef.current = scrubTime(scrollYProgress.get(), durationRef.current, effReverseAt);
+      targetTimeRef.current = scrubTime(unhold(scrollYProgress.get()), durationRef.current, effReverseAt);
+      // The callout stage is the video's cover box, so a viewBox that doesn't match the real frame
+      // silently skews every anchor and connector. Cheap guard — this exact mismatch shipped once.
+      if (process.env.NODE_ENV !== "production" && v.videoWidth && (v.videoWidth !== vbW || v.videoHeight !== vbH)) {
+        console.warn(
+          `[ScrollScrubVideo] stageViewBox is ${vbW}×${vbH} but ${video} is ${v.videoWidth}×${v.videoHeight}. ` +
+            `Callout anchors and connector lines will be skewed — pass stageViewBox="0 0 ${v.videoWidth} ${v.videoHeight}".`,
+        );
+      }
     };
     v.addEventListener("loadedmetadata", onMeta);
     if (v.readyState >= 1) onMeta();
@@ -324,7 +509,7 @@ export function ScrollScrubVideo({
       cancelAnimationFrame(raf);
       v.removeEventListener("loadedmetadata", onMeta);
     };
-  }, [reduce, scrollYProgress, effReverseAt]);
+  }, [reduce, scrollYProgress, unhold, effReverseAt, video, vbW, vbH]);
 
   const beatText = (beat: ScrubBeat, centered = false) => (
     <>
@@ -383,7 +568,14 @@ export function ScrollScrubVideo({
 
   return (
     <>
-      <section ref={trackRef} data-nav-theme="dark" className={`relative w-full ${sectionClass}`} style={{ height: scrubLength }}>
+      <section
+        ref={trackRef}
+        data-nav-theme="dark"
+        className={`relative w-full ${sectionClass}`}
+        // The hold is just extra track: the pin lasts as long as the section is taller than the
+        // sticky stage, and `unhold` above keeps the scrub itself confined to `scrubLength`.
+        style={{ height: hold ? `calc(${scrubLength} + ${holdLength})` : scrubLength }}
+      >
         <div className="bg-black sticky top-0  h-[80dvh] md:h-[100dvh] w-full overflow-hidden flex  items-center ">
           <video
             ref={videoRef}
@@ -399,15 +591,20 @@ export function ScrollScrubVideo({
           />
 
           {overlayScrim && (
-            <>
-              {/* Legibility scrim plus a bottom fade into the next section (matches ScrollHero). */}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{ background: "radial-gradient(ellipse 78% 58% at 50% 50%, rgba(6,7,11,0.62) 0%, rgba(6,7,11,0.34) 46%, rgba(6,7,11,0.06) 74%, transparent 100%)" }}
-              />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32" style={{ background: "linear-gradient(to bottom, transparent, #08080c)" }} />
-            </>
+            /* Legibility scrim (matches ScrollHero). */
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ background: "radial-gradient(ellipse 78% 58% at 50% 50%, rgba(6,7,11,0.62) 0%, rgba(6,7,11,0.34) 46%, rgba(6,7,11,0.06) 74%, transparent 100%)" }}
+            />
           )}
+
+          {/* Bottom fade into the page background — always on, so the pinned stage never
+              cuts off with a hard edge against the next section. */}
+          {/* Mobile gets the softer multi-stop ramp in the page colour; md+ swaps to a
+              straight fade to pure black. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-40 md:h-56 [background-image:linear-gradient(to_bottom,rgba(8,8,12,0)_0%,rgba(8,8,12,0.55)_45%,rgba(8,8,12,0.88)_75%,#08080c_100%)] md:[background-image:linear-gradient(to_bottom,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]"
+          />
 
           {/* Section title + description — pinned near the top, always visible (OpticsSection style). */}
           {head && (
@@ -416,12 +613,15 @@ export function ScrollScrubVideo({
             </div>
           )}
 
-          {/* Positioned callouts + connector lines — anchored to a centered, max-width stage so
-              they stay put (don't drift to the edges) on large screens. lg+ only; mobile stacks below. */}
+          {/* Positioned callouts + connector lines. The stage is sized to the video's *object-cover
+              content box* — same centre, same aspect, same scale — so viewBox coordinates map 1:1
+              onto the footage and every anchor tracks the product at any viewport size. lg+ only;
+              mobile stacks below. */}
           {callouts.length > 0 && (
             <div
-              className="pointer-events-none absolute left-1/2 top-1/2 hidden w-[full] h-[600px] -translate-x-1/2 -translate-y-1/2 lg:block"
-              style={{ maxWidth: stageMaxWidth, aspectRatio: stageAspect }}
+              ref={stageRef}
+              className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
+              style={{ width: stageWidth, aspectRatio: stageAspect }}
             >
               <svg viewBox={stageViewBox} preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">
                 <defs>
@@ -452,15 +652,24 @@ export function ScrollScrubVideo({
               </svg>
 
               {callouts.map((c, i) => (
-                <div
-                  key={c.key}
-                  ref={(el) => {
-                    cardRefs.current[i] = el;
-                  }}
-                  className={`pointer-events-auto absolute ${c.pos} will-change-transform`}
-                  style={{ opacity: 0 }}
-                >
-                  <CalloutBlock data={c} />
+                // Two elements on purpose: the wrapper carries the frame anchor and stays
+                // transform-free so `syncLines` can read exact box-offsets, while the inner card
+                // takes the entrance opacity/translate written by `paint`.
+                <div key={c.key} className="absolute" style={anchorStyle(c, vbW, vbH)}>
+                  <div
+                    ref={(el) => {
+                      cardRefs.current[i] = el;
+                    }}
+                    className="pointer-events-auto will-change-transform"
+                    style={{ opacity: 0 }}
+                  >
+                    <CalloutBlock
+                      data={c}
+                      measureDivider={(el) => {
+                        dividerRefs.current[i] = el;
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -486,6 +695,14 @@ export function ScrollScrubVideo({
             style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }}
             animate={{ scaleY: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
             transition={{ duration: 1.6, ease: "easeInOut", repeat: Infinity }}
+          />
+
+          {/* Fade to black on exit — last layer, so it takes the video, callouts and
+              beats down together as the section releases. */}
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-20 bg-black"
+            style={{ opacity: exitFade }}
           />
         </div>
       </section>

@@ -111,66 +111,76 @@ export function FeatureTabs({
   // `componentStatic` (keeps the tab-change remount but drops the fade/slide-up).
   const componentAnim = t.componentStatic ? {} : fadeUp;
 
-  // Floating overlay element — bottom-center, inside the banner frame. Keyed to `active`
-  // so it re-runs its entrance animation on tab change (mirrors the bare-component swap).
+  // Overlay element. Below `md` it sits in normal flow *beneath* the banner (the graph
+  // would otherwise swallow the media on a phone); at `md+` it floats bottom-center over
+  // the frame. Keyed to `active` so it re-runs its entrance animation on tab change
+  // (mirrors the bare-component swap).
   const overlayEl = overlayMode ? (
     <motion.div
       {...componentAnim}
       key={active}
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-4"
+      className="relative z-10 mt-4 flex justify-center md:pointer-events-none md:absolute md:inset-x-0 md:bottom-0 md:mt-0 md:p-4"
     >
       <div className="pointer-events-auto w-full max-w-full">{t.component}</div>
     </motion.div>
   ) : null;
 
-  // Banner — active tab's custom component (bare) > video > image > blank placeholder
-  // (Figma 110:2716). In overlay mode the media renders normally and `overlayEl` floats
-  // over it. A bare custom component controls its own sizing, keyed to re-run entrance
-  // animations on tab change.
+  // Banner media — video > image > blank placeholder (Figma 110:2716).
+  const media = bVideo || bImage ? (
+    <motion.div
+      {...fadeUp}
+      className="relative w-full overflow-hidden rounded-[32px] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
+      style={bannerRatioVars}
+    >
+      {bVideo ? (
+        <video
+          // Remount on tab change so the new source loads and autoplays.
+          key={bVideo}
+          src={bVideo}
+          poster={bPoster || bImage}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          aria-label={t.title}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <ImageWithFallback
+          src={bImage}
+          srcSet={bSrcSet}
+          sizes={bSizes}
+          alt={t.title}
+          className="h-full w-full object-cover"
+        />
+      )}
+    </motion.div>
+  ) : (
+    <motion.div
+      {...fadeUp}
+      className="relative w-full rounded-[32px] bg-[#656565] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
+      style={bannerRatioVars}
+    />
+  );
+
+  // Banner — a bare custom component replaces the media entirely (controls its own
+  // sizing, keyed to re-run entrance animations on tab change). In overlay mode the
+  // media renders normally and `overlayEl` stacks under it / floats over it per
+  // breakpoint — the wrapper is the positioning context so the overlay can escape the
+  // media box's `overflow-hidden` when it's in flow.
   const banner = t.component && !overlayMode ? (
     <motion.div {...componentAnim} key={active} className="w-full">
       {t.component}
     </motion.div>
-  ) : bVideo || bImage ? (
-      <motion.div
-        {...fadeUp}
-        className="relative w-full overflow-hidden rounded-[32px] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
-        style={bannerRatioVars}
-      >
-        {bVideo ? (
-          <video
-            // Remount on tab change so the new source loads and autoplays.
-            key={bVideo}
-            src={bVideo}
-            poster={bPoster || bImage}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            aria-label={t.title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <ImageWithFallback
-            src={bImage}
-            srcSet={bSrcSet}
-            sizes={bSizes}
-            alt={t.title}
-            className="h-full w-full object-cover"
-          />
-        )}
-        {overlayEl}
-      </motion.div>
-    ) : (
-      <motion.div
-        {...fadeUp}
-        className="relative w-full rounded-[32px] bg-[#656565] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
-        style={bannerRatioVars}
-      >
-        {overlayEl}
-      </motion.div>
-    );
+  ) : overlayMode ? (
+    <div className="relative w-full">
+      {media}
+      {overlayEl}
+    </div>
+  ) : (
+    media
+  );
 
   // Tab selector — pills wrap onto centered rows below `md`, collapse to a single
   // pill at `md+`. Top layout hugs the title (mb) instead of sitting below the banner (mt).
@@ -194,17 +204,27 @@ export function FeatureTabs({
     </div>
   );
 
-  // Active tab copy — omitted when the tab has no body (e.g. component-only tabs)
-  const copy = tabs[active].body ? (
-    <motion.p
-      key={active}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className={`mx-auto mt-7 max-w-[660px] text-center ${BODY}`}
-    >
-      {tabs[active].body}
-    </motion.p>
+  // Active tab copy — omitted when no tab has a body (e.g. component-only tab sets).
+  // Every body is stacked in a single grid cell so the block always reserves the height
+  // of the *longest* one: swapping tabs cross-fades in place instead of resizing the
+  // section and shunting everything below it up or down.
+  const copy = tabs.some((tb) => tb.body) ? (
+    <div className="mx-auto mt-7 grid max-w-[660px]">
+      {tabs.map((tb, i) => (
+        <motion.p
+          key={tb.title}
+          aria-hidden={i !== active}
+          initial={false}
+          animate={{ opacity: i === active ? 1 : 0 }}
+          transition={{ duration: 0.35 }}
+          className={`col-start-1 row-start-1 text-center ${BODY} ${
+            i === active ? "" : "pointer-events-none"
+          }`}
+        >
+          {tb.body}
+        </motion.p>
+      ))}
+    </div>
   ) : null;
 
   return (
@@ -214,6 +234,7 @@ export function FeatureTabs({
       </motion.div>
 
       <div className={`${shellClass} ${contentClass}`}>
+        
         {tabsTop ? (
           <>
             {tabRow}

@@ -56,7 +56,17 @@ const HEAD_SHADOW = "drop-shadow(0 2px 18px rgba(0,0,0,0.55))";
 const TEXT_SHADOW = "0 1px 12px rgba(0,0,0,0.8)";
 const emptySubscribe = () => () => {};
 
-function ScrollHero({ video, poster }: { video: string; poster?: string }) {
+function ScrollHero({
+  video,
+  poster,
+  // Total scroll length as a multiple of the viewport height. Lower = the beats
+  // arrive with less scrolling (e.g. 220 feels snappy, 380 is the cinematic default).
+  heightVh = 260,
+}: {
+  video: string;
+  poster?: string;
+  heightVh?: number;
+}) {
   // Gate reduced-motion behind mount so SSR and first client render match.
   const prefersReduced = useReducedMotion();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
@@ -124,7 +134,7 @@ function ScrollHero({ video, poster }: { video: string; poster?: string }) {
   }
 
   return (
-    <section ref={containerRef} data-nav-theme="dark" className="relative w-full" style={{ height: "380vh" }}>
+    <section ref={containerRef} data-nav-theme="dark" className="relative w-full" style={{ height: `${heightVh}vh` }}>
       <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
         <video
           src={video}

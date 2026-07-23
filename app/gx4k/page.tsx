@@ -503,6 +503,9 @@ const memoryAllocationTabs = [
         component: (
             <BarGraph
                 columns={2}
+                // Values are percentage splits of total storage — pin the scale to 100
+                // so bar lengths are true proportions and comparable across tabs.
+                max={100}
                 data={[
                     { label: "Driving", value: 70 },
                     { label: "Driving Event", value: 10 },
@@ -520,6 +523,9 @@ const memoryAllocationTabs = [
         component: (
             <BarGraph
                 columns={2}
+                // Values are percentage splits of total storage — pin the scale to 100
+                // so bar lengths are true proportions and comparable across tabs.
+                max={100}
                 data={[
                     { label: "Driving", value: 45 },
                     { label: "Driving Event", value: 20 },
@@ -537,6 +543,9 @@ const memoryAllocationTabs = [
         component: (
             <BarGraph
                 columns={2}
+                // Values are percentage splits of total storage — pin the scale to 100
+                // so bar lengths are true proportions and comparable across tabs.
+                max={100}
                 data={[
                     { label: "Driving", value: 40 },
                     { label: "Driving Event", value: 10 },
@@ -554,6 +563,9 @@ const memoryAllocationTabs = [
         component: (
             <BarGraph
                 columns={2}
+                // Values are percentage splits of total storage — pin the scale to 100
+                // so bar lengths are true proportions and comparable across tabs.
+                max={100}
                 data={[
                     { label: "Driving", value: 85 },
                     { label: "Driving Event", value: 15 },

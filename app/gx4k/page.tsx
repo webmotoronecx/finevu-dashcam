@@ -61,11 +61,15 @@ function ScrollHero({
   poster,
   // Total scroll length as a multiple of the viewport height. Lower = the beats
   // arrive with less scrolling (e.g. 220 feels snappy, 380 is the cinematic default).
-  heightVh = 260,
+  heightVh = 220,
+  // Crossfade duration in ms. The fade is time-based, not scroll-scrubbed, so the
+  // transition stays smooth even when `heightVh` is short and you scroll past fast.
+  fadeMs = 260,
 }: {
   video: string;
   poster?: string;
   heightVh?: number;
+  fadeMs?: number;
 }) {
   // Gate reduced-motion behind mount so SSR and first client render match.
   const prefersReduced = useReducedMotion();
@@ -87,16 +91,11 @@ function ScrollHero({
       HERO_BEATS.forEach((beat, i) => {
         const el = beatRefs.current[i];
         if (!el) return;
-        const fade = 0.06;
-        let opacity = 0;
-        if (p >= beat.start && p <= beat.end) {
-          if (p - beat.start < fade) opacity = (p - beat.start) / fade;
-          else if (beat.end - p < fade) opacity = (beat.end - p) / fade;
-          else opacity = 1;
-          opacity = Math.max(0, Math.min(1, opacity));
-        }
-        el.style.opacity = String(opacity);
-        el.style.transform = `translateY(${20 * (1 - opacity)}px)`;
+        // Scroll only decides in/out of the window; CSS animates the crossfade
+        // over `fadeMs`, so the transition speed is independent of scroll length.
+        const active = p >= beat.start && p <= beat.end;
+        el.style.opacity = active ? "1" : "0";
+        el.style.transform = active ? "translateY(0)" : "translateY(20px)";
       });
     };
 
@@ -157,7 +156,11 @@ function ScrollHero({
               beatRefs.current[i] = el;
             }}
             className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
-            style={{ opacity: 0, transform: "translateY(20px)" }}
+            style={{
+              opacity: 0,
+              transform: "translateY(20px)",
+              transition: `opacity ${fadeMs}ms ease, transform ${fadeMs}ms ease`,
+            }}
           >
             <p
               className="mb-3 bg-clip-text text-[11.5px] font-bold uppercase tracking-[0.28em] text-transparent"
@@ -285,12 +288,15 @@ const mDualVision: MediaSectionData = {
   title: `Dual Vision`,
   description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
   image: "/gx4k/graphic-dual-vision.png",
+  video:"/gx4k/dual-sensors.mp4",
   aspectRatio: "2160/1207",
+  padTop: "pt-[250px] md:pt-0",
+  textTop:"top-[10%]",
   theme: "dark",
 };
 
 const mSecondEyes: MediaSectionData = {
-  title: `A second set of eyes`,
+  title: `A Second Set of Eyes`,
   description: `ADAS Plus watches the road with you, and speaks up before you need to.`,
   image: "/gx4k/graphic-second-eyes.png",
   aspectRatio: "2160/1484",
@@ -396,9 +402,13 @@ const warranty = [
 const memoryAllocationTabs = [
   {
     title: "Driving Priority",
+    video:"/gx4k/alloc-driving.mp4", 
+    componentStatic: true,    
+    componentOverlay: true, 
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
+      <div className="mx-auto w-full max-w-[600px] bg-[#1D1D1D] rounded-[32px] p-4 md:px-10 md:py-8">
       <BarGraph
+       columns={2}
         data={[
           { label: "Driving", value: 70 },
           { label: "Driving Event", value: 10 },
@@ -411,9 +421,13 @@ const memoryAllocationTabs = [
   },
   {
     title: "Event Priority",
+    video:"/gx4k/alloc-event.mp4",   
+    componentStatic: true,  
+    componentOverlay: true, 
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
+      <div className="mx-auto w-full max-w-[600px] bg-[#1D1D1D] rounded-[32px] p-4 md:px-10 md:py-8">
       <BarGraph
+       columns={2}
         data={[
           { label: "Driving", value: 45 },
           { label: "Driving Event", value: 20 },
@@ -426,9 +440,13 @@ const memoryAllocationTabs = [
   },
   {
     title: "Parking Priority",
+    image:"/gx4k/alloc-parking.png",   
+    componentStatic: true,  
+    componentOverlay: true, 
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
+      <div className="mx-auto w-full max-w-[600px] bg-[#1D1D1D] rounded-[32px] p-4 md:px-10 md:py-8">
       <BarGraph
+      columns={2}
         data={[
           { label: "Driving", value: 40 },
           { label: "Driving Event", value: 10 },
@@ -441,9 +459,13 @@ const memoryAllocationTabs = [
   },
   {
     title: "Driving Only",
+    video:"/gx4k/alloc-only.mp4",   
+    componentStatic: true,  
+    componentOverlay: true, 
     component: (
-      <div className="bg-[#1D1D1D] rounded-[32px] p-6 md:p-14">
+      <div className="mx-auto w-full max-w-[600px] bg-[#1D1D1D] rounded-[32px] p-4 md:px-10 md:py-8">
       <BarGraph
+       columns={2}
         data={[
           { label: "Driving", value: 85 },
           { label: "Driving Event", value: 15 },
@@ -464,7 +486,7 @@ export default function GX4KPage() {
   return (
     <main className="overflow-x-clip bg-[#08080c]">
       {/* Hero: scroll-pinned video */}
-      <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" />
+      <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp"   />
 
       {/* Scroll-scrubbed render: playback + annotation callouts driven by scroll position.
           NOTE: callout `pos`/`line` coords are a starting point (borrowed from OpticsSection);
@@ -501,6 +523,7 @@ export default function GX4KPage() {
           subtitle:
             "Sony STARVIS IMX515. A precision-engineered 8.5-megapixel sensor paired with F/1.8 wide-aperture glass, made to perform when it matters most.",
         }}
+        mobileObjectPosition="45% 50%"
         callouts={[
           {
             key: "front",
@@ -587,13 +610,19 @@ export default function GX4KPage() {
             caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive."
             className="lg:col-span-6  lg:row-span-2  aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
           />
-          <BentoCard theme="dark" img="/gx4k/bento-storage-dash.png" className="lg:col-span-12 aspect-[16/7]" />
+          {/* <BentoCard theme="dark" img="/gx4k/bento-storage-dash.png" className="lg:col-span-12 aspect-[16/7]" /> */}
         </div>
       </section>
   
 
       <section data-nav-theme="dark" className="pt-0 py-20">
-        <motion.div {...fadeUp} className={`${SHELL} text-center`}>
+        
+
+         <div className="flex items-center justify-center">
+            <FeatureTabs sectionClass={`py-10 min-w-0 md:min-w-[970px]`} title="" tabs={memoryAllocationTabs}  />
+         </div> 
+           
+         <motion.div {...fadeUp} className={`${SHELL} text-center`}>
           <Head pre="Memory Allocation" className="!text-[30px] md:!text-[38px]" />
           <p className={`mx-auto mt-5 max-w-[660px] ${BODY} text-center mb-6`}>
           Split storage to match how you drive, with Driving, Event, Parking or Driving-Only priority, so the card fills with the footage you actually need.
@@ -604,12 +633,6 @@ export default function GX4KPage() {
            <div>{`(After formatting, once you insert it into the device and supply it with power, the formatting will be in progress to set the memory.)`}</div>
           </small>
         </motion.div>
-
-         <div className="flex items-center justify-center">
-            <FeatureTabs sectionClass={`py-10 min-w-0 md:min-w-[970px]`} title="" tabs={memoryAllocationTabs} tabsPosition="top" />
-         </div> 
-           
-     
         
       </section>
 

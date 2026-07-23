@@ -106,7 +106,7 @@ const LERP = 0.15;
 /** One annotation block — shared by the pinned overlay and the mobile stack. */
 function CalloutBlock({ data }: { data: ScrubCallout }) {
   return (
-    <div className="w-[248px] xl:w-[300px]">
+    <div className="w-full md:w-[248px] xl:w-[300px]">
       <p className={`text-[28px] font-semibold leading-none xl:text-[34px] ${CO_TITLE}`} style={{ filter: HEAD_SHADOW }}>
         {data.title}
       </p>
@@ -420,7 +420,7 @@ export function ScrollScrubVideo({
               they stay put (don't drift to the edges) on large screens. lg+ only; mobile stacks below. */}
           {callouts.length > 0 && (
             <div
-              className="pointer-events-none absolute left-1/2 top-1/2 hidden w-[1200px] h-[600px] -translate-x-1/2 -translate-y-1/2 lg:block"
+              className="pointer-events-none absolute left-1/2 top-1/2 hidden w-[full] h-[600px] -translate-x-1/2 -translate-y-1/2 lg:block"
               style={{ maxWidth: stageMaxWidth, aspectRatio: stageAspect }}
             >
               <svg viewBox={stageViewBox} preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">

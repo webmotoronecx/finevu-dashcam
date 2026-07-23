@@ -2,10 +2,11 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { PageHero } from "@/components/sections/PageHero";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Phone, Mail, Smartphone, ChevronDown, ChevronRight } from "lucide-react";
 
 // Support page — dark hero, phone/email cards, per-model download/guide hubs, troubleshooting accordion, registration and warranty panels, and fine print.
@@ -102,6 +103,38 @@ function DownloadList({ heading, items }: { heading: string; items: [string, str
   );
 }
 
+function ModelPanel({ active }: { active: ModelHub }) {
+  return (
+    <motion.div
+      key={active.id + "-panel"}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mt-5 overflow-hidden rounded-[28px] border border-[var(--finevu-orange)] bg-white shadow-[0_4px_33px_5px_rgba(0,0,0,0.05)]"
+    >
+      <div className="border-b border-[var(--finevu-orange)] bg-[#fef0e2] px-8 py-7 sm:px-11">
+        <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--finevu-orange)]">Model support</div>
+        <h3 className="mt-1 text-[26px] font-semibold text-[#1d1d1f] sm:text-[32px]">{active.name}</h3>
+      </div>
+      <div className="px-8 py-9 sm:px-11">
+        <div className="grid gap-x-12 gap-y-9 sm:grid-cols-2 sm:divide-x sm:divide-[#e7e7ea]">
+          <div className="sm:pr-10">
+            <DownloadList heading="Downloads" items={active.downloads} />
+          </div>
+          <div className="sm:pl-10">
+            <DownloadList heading="Guides" items={active.guides} />
+          </div>
+        </div>
+        <div className="mt-9 flex flex-wrap items-center gap-4 border-t border-[#e7e7ea] pt-7">
+          <a href="#register" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Register this product</a>
+          <Link href="/contact" className="rounded-full border border-[#1d1d1f] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-[#1d1d1f] transition-colors hover:bg-[#1d1d1f] hover:text-white">Contact support</Link>
+          <span className="text-[14px] text-[#6c6c6c] sm:ml-auto">Serial number is on the sticker on the camera body.</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function ModelHubs() {
   const [open, setOpen] = useState<string | null>(null);
   const active = models.find((m) => m.id === open) ?? null;
@@ -112,65 +145,50 @@ function ModelHubs() {
           const selected = open === m.id;
           const short = m.name.replace("FineVu ", "");
           return (
-            <button
-              key={m.id}
-              type="button"
-              aria-expanded={selected}
-              onClick={() => setOpen((o) => (o === m.id ? null : m.id))}
-              className={`flex flex-col items-center rounded-[28px] bg-white px-8 pb-8 pt-9 text-center transition-colors ${
-                selected
-                  ? "border-2 border-[var(--finevu-orange)]"
-                  : "border border-[#bbbbbb] hover:border-[var(--finevu-orange)]"
-              }`}
-            >
-              <div className="text-[26px] font-semibold text-[#0a0a0a] sm:text-[28px]">{m.name}</div>
-              <div className="mt-1 text-[14px] text-[#5b5e66]">{m.line}</div>
-              <div className="relative my-6 h-[150px] w-full max-w-[240px]">
-                <Image src={m.img} alt={m.name} fill sizes="240px" className="object-contain" />
-              </div>
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-6 py-2.5 text-[15px] font-semibold ${
+            <Fragment key={m.id}>
+              <button
+                type="button"
+                aria-expanded={selected}
+                onClick={() => setOpen((o) => (o === m.id ? null : m.id))}
+                className={`flex flex-col items-center rounded-[28px] bg-white px-8 pb-8 pt-9 text-center transition-colors ${
                   selected
-                    ? "bg-[var(--finevu-orange)] text-white"
-                    : "border border-[var(--finevu-orange)] text-[var(--finevu-orange)]"
+                    ? "border-2 border-[var(--finevu-orange)]"
+                    : "border border-[#bbbbbb] hover:border-[var(--finevu-orange)]"
                 }`}
               >
-                {selected ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                {selected ? `Close ${short} support` : `Open ${short} support`}
-              </span>
-            </button>
+                <div className="text-[26px] font-semibold text-[#0a0a0a] sm:text-[28px]">{m.name}</div>
+                <div className="mt-1 text-[14px] text-[#5b5e66]">{m.line}</div>
+                <div className="relative my-6 h-[150px] w-full max-w-[240px]">
+                  <Image src={m.img} alt={m.name} fill sizes="240px" className="object-contain" />
+                </div>
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-6 py-2.5 text-[15px] font-semibold ${
+                    selected
+                      ? "bg-[var(--finevu-orange)] text-white"
+                      : "border border-[var(--finevu-orange)] text-[var(--finevu-orange)]"
+                  }`}
+                >
+                  {selected ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {selected ? `Close ${short} support` : `Open ${short} support`}
+                </span>
+              </button>
+
+              {/* Mobile: panel opens directly under the tapped card */}
+              {selected ? (
+                <div className="sm:hidden">
+                  <ModelPanel active={m} />
+                </div>
+              ) : null}
+            </Fragment>
           );
         })}
       </div>
 
+      {/* Desktop: panel spans full width below both cards */}
       {active ? (
-        <motion.div
-          key={active.id + "-panel"}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mt-5 overflow-hidden rounded-[28px] border border-[var(--finevu-orange)] bg-white shadow-[0_4px_33px_5px_rgba(0,0,0,0.05)]"
-        >
-          <div className="border-b border-[var(--finevu-orange)] bg-[#fef0e2] px-8 py-7 sm:px-11">
-            <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--finevu-orange)]">Model support</div>
-            <h3 className="mt-1 text-[26px] font-semibold text-[#1d1d1f] sm:text-[32px]">{active.name}</h3>
-          </div>
-          <div className="px-8 py-9 sm:px-11">
-            <div className="grid gap-x-12 gap-y-9 sm:grid-cols-2 sm:divide-x sm:divide-[#e7e7ea]">
-              <div className="sm:pr-10">
-                <DownloadList heading="Downloads" items={active.downloads} />
-              </div>
-              <div className="sm:pl-10">
-                <DownloadList heading="Guides" items={active.guides} />
-              </div>
-            </div>
-            <div className="mt-9 flex flex-wrap items-center gap-4 border-t border-[#e7e7ea] pt-7">
-              <a href="#register" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Register this product</a>
-              <Link href="/contact" className="rounded-full border border-[#1d1d1f] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-[#1d1d1f] transition-colors hover:bg-[#1d1d1f] hover:text-white">Contact support</Link>
-              <span className="text-[14px] text-[#6c6c6c] sm:ml-auto">Serial number is on the sticker on the camera body.</span>
-            </div>
-          </div>
-        </motion.div>
+        <div className="hidden sm:block">
+          <ModelPanel active={active} />
+        </div>
       ) : null}
     </div>
   );
@@ -195,17 +213,18 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative text-white" data-nav-theme="dark">
-        <Image src="/support/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,rgba(8,8,9,.5) 0%,rgba(8,8,9,.28) 45%,rgba(8,8,9,.55) 100%)" }} />
-        <div className="relative z-10 mx-auto max-w-[760px] px-6 pt-36 pb-28 text-center md:pt-48 md:pb-36">
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.02em] md:text-[64px] md:leading-[76px]">
+      <PageHero
+        id="top"
+        image="/support/hero.webp"
+        maxWidth="max-w-[760px]"
+        title={
+          <>
             Welcome to FineVu
             <br />
             Support Centre
-          </motion.h1>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* How can we help */}
       <section className="bg-white py-24 md:py-[96px]" data-nav-theme="light">
@@ -245,8 +264,8 @@ export default function Page() {
               <h3 className="text-[18px] font-semibold text-[#17181a]">FineVu app support</h3>
               <p className="text-[14px] text-[#6b6b72]">Change settings, view live footage and download clips over Wi-Fi. Works with both GX4K and GX35.</p>
             </div>
-            <Link href="/how-it-works" className="rounded-full border-[1.5px] border-[#e7e7ea] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-[#17181a] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]">App Setup Guide</Link>
-            <Link href="/how-it-works" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white">Get the App</Link>
+            <Link href="/how-it-works" className="rounded-full border-[1.5px] border-[#e7e7ea] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-[#17181a] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)] w-full md:w-auto">App Setup Guide</Link>
+            <Link href="/how-it-works" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white  w-full md:w-auto">Get the App</Link>
           </motion.div>
         </div>
       </section>

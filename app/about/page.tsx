@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { PageHero } from "@/components/sections/PageHero";
 import { motion } from "motion/react";
 import Image from "next/image";
 import {
@@ -128,37 +129,22 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative text-white" data-nav-theme="dark">
-        <Image src="/about/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg,rgba(8,8,9,.5) 0%,rgba(8,8,9,.3) 45%,rgba(8,8,9,.55) 100%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[940px] px-6 pt-36 pb-28 text-center md:pt-48 md:pb-36">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-[40px] font-semibold leading-[48px] tracking-[-0.5px] md:text-[64px] md:leading-[77px]"
-          >
+      <PageHero
+        image="/about/hero.webp"
+        title={
+          <>
             Engineered in Korea.
             <br />
             Trusted on Australian roads.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-[736px] text-[16px] leading-[1.55] tracking-[-0.44px] text-white/[0.88] md:text-[18px]"
-          >
-            Since 1992, FineVu has been designing dash cams that hold up when it matters. Today, we&apos;re
-            bringing that same reliability to drivers right across Australia.
-          </motion.p>
-        </div>
-      </section>
+          </>
+        }
+        subtitle={
+          <>
+            Since 1992, FineVu has been designing dash cams that hold up when it matters. Today,
+            we&apos;re bringing that same reliability to drivers right across Australia.
+          </>
+        }
+      />
 
       {/* Split 1: heritage */}
       <section className="bg-white py-24 md:py-[96px]" data-nav-theme="light">

@@ -40,6 +40,12 @@ export type MediaSectionData = {
   padTop?: string;
   /** Extra breathing room below the media — see `padTop`. */
   padBottom?: string;
+  /**
+   * Vertical position of the title/description block, as a Tailwind top-*
+   * class (e.g. "top-[8%]", "top-1/4", "top-[120px]"). Overrides the default
+   * (`top-[8%]` in aspect mode, `top-[14%]` in banner mode).
+   */
+  textTop?: string;
   /** Dark top-to-bottom legibility gradient over the media */
   scrim?: boolean;
   /** Drives text colour and the navbar contrast signal */
@@ -70,6 +76,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     aspectRatio = "825/451",
     padTop = "",
     padBottom = "",
+    textTop,
     scrim = false,
     theme = "dark",
     className = "",
@@ -127,9 +134,20 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
         />
       )}
 
+      {/* Top legibility gradient behind the title/description (dark theme). */}
+      {dark && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+          style={{
+            background: "linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
+          }}
+        />
+      )}
+
       <div
         className={`absolute inset-x-0 flex flex-col items-center px-6 text-center ${
-          banner ? "top-[14%]" : "top-[8%]"
+          textTop ?? (banner ? "top-[14%]" : "top-[8%]")
         }`}
       >
         <motion.h2

@@ -22,6 +22,13 @@ export type FeatureTab = {
   /** Custom content rendered in place of the banner media (e.g. a <BarGraph />).
    *  Takes precedence over `video`/`image` for this tab. */
   component?: ReactNode;
+  /** When true, `component` floats over the banner media (bottom-center, inside the
+   *  frame) instead of replacing it. Requires a `video`/`image` (or falls over the
+   *  grey placeholder). */
+  componentOverlay?: boolean;
+  /** When true, the `component` container renders without the fade/slide-up entrance
+   *  animation (applies to both bare-replace and overlay modes). */
+  componentStatic?: boolean;
   /** Per-tab banner video (public path or remote URL). Takes precedence over `image`. */
   video?: string;
   /** Per-tab banner image; used when the tab has no `video`. */
@@ -97,17 +104,37 @@ export function FeatureTabs({
     "--ba-d": bannerAspect,
   } as CSSProperties;
 
-  // Banner — active tab's custom component > video > image > blank placeholder (Figma 110:2716).
-  // A custom component renders bare (it controls its own sizing), keyed to re-run entrance
+  // Overlay mode: `component` floats over the banner media instead of replacing it.
+  const overlayMode = t.componentOverlay && t.component;
+
+  // Entrance animation for the component/overlay container — opt out per tab via
+  // `componentStatic` (keeps the tab-change remount but drops the fade/slide-up).
+  const componentAnim = t.componentStatic ? {} : fadeUp;
+
+  // Floating overlay element — bottom-center, inside the banner frame. Keyed to `active`
+  // so it re-runs its entrance animation on tab change (mirrors the bare-component swap).
+  const overlayEl = overlayMode ? (
+    <motion.div
+      {...componentAnim}
+      key={active}
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-4"
+    >
+      <div className="pointer-events-auto w-full max-w-full">{t.component}</div>
+    </motion.div>
+  ) : null;
+
+  // Banner — active tab's custom component (bare) > video > image > blank placeholder
+  // (Figma 110:2716). In overlay mode the media renders normally and `overlayEl` floats
+  // over it. A bare custom component controls its own sizing, keyed to re-run entrance
   // animations on tab change.
-  const banner = t.component ? (
-    <motion.div {...fadeUp} key={active} className="w-full">
+  const banner = t.component && !overlayMode ? (
+    <motion.div {...componentAnim} key={active} className="w-full">
       {t.component}
     </motion.div>
   ) : bVideo || bImage ? (
       <motion.div
         {...fadeUp}
-        className="w-full overflow-hidden rounded-[32px] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
+        className="relative w-full overflow-hidden rounded-[32px] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
         style={bannerRatioVars}
       >
         {bVideo ? (
@@ -133,26 +160,29 @@ export function FeatureTabs({
             className="h-full w-full object-cover"
           />
         )}
+        {overlayEl}
       </motion.div>
     ) : (
       <motion.div
         {...fadeUp}
-        className="w-full rounded-[32px] bg-[#656565] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
+        className="relative w-full rounded-[32px] bg-[#656565] aspect-[var(--ba-m)] md:aspect-[var(--ba-d)]"
         style={bannerRatioVars}
-      />
+      >
+        {overlayEl}
+      </motion.div>
     );
 
   // Tab selector — pills wrap onto centered rows below `md`, collapse to a single
   // pill at `md+`. Top layout hugs the title (mb) instead of sitting below the banner (mt).
   const tabRow = (
-    <div className={` ` + (tabsTop ? "mb-8" : "mt-8") }>
-      <div className="bg-[#202020] rounded-[26px] md:rounded-full mx-auto flex flex-wrap md:flex-nowrap justify-center w-max max-w-full gap-2 p-1.5 md:p-0">
+    <div className={` ` + (tabsTop ? "mb-4 md:mb-8" : "mt-4 md:mt-8") }>
+      <div className="bg-[#202020] rounded-[26px] md:rounded-full mx-auto flex flex-wrap md:flex-nowrap justify-center w-full md:w-max max-w-full gap-2 p-1.5 md:p-0">
         {tabs.map((t, i) => (
           <button
             key={t.title}
             onClick={() => setActive(i)}
             aria-pressed={active === i}
-            className={`cta-hover flex min-h-[44px] shrink-0 items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-[13px] font-semibold ${
+            className={`cta-hover flex min-h-[44px] grow md:grow-0 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-[13px] font-semibold ${
               active === i ? "text-white" : "text-zinc-500 hover:text-zinc-300"
             }`}
             style={active === i ? { backgroundImage: "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)" } : undefined}

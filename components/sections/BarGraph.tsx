@@ -2,7 +2,7 @@
 
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { motion, useInView } from "motion/react";
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 
 // Brand accent gradient — identical to the active FeatureTabs pill so bars read on-brand.
 const BAR_GRADIENT = "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)";
@@ -19,6 +19,7 @@ export function BarGraph({
   max,
   suffix = "",
   animate = true,
+  columns = 1,
   className = "",
 }: {
   data: BarDatum[];
@@ -28,21 +29,37 @@ export function BarGraph({
   suffix?: string;
   /** Grow bars + count numbers up on scroll into view (default true). */
   animate?: boolean;
+  /** Lay the bars out across this many columns (fills top-to-bottom). Default 1. */
+  columns?: number;
   className?: string;
 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const cap = max ?? Math.max(...data.map((d) => d.value), 1);
+  const multi = columns > 1;
+  // Column-major fill: each column fills top-to-bottom before the next. Rows are the
+  // ceiling of items / columns so the last column can be short.
+  const gridStyle: CSSProperties | undefined = multi
+    ? {
+        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${Math.ceil(data.length / columns)}, auto)`,
+        gridAutoFlow: "column",
+      }
+    : undefined;
 
   return (
-    <div ref={ref} className={`flex flex-col gap-6 ${className}`}>
+    <div
+      ref={ref}
+      className={`${multi ? "grid gap-x-4 gap-y-6" : "flex flex-col gap-3"} ${className}`}
+      style={gridStyle}
+    >
       {data.map((d, i) => {
         const pct = `${Math.min(100, (d.value / cap) * 100)}%`;
         return (
           <div key={d.label}>
             {/* Bar + value; the number hugs the end of each bar. The bar is capped so it
                 never crowds the number gutter, keeping every value's proportion intact. */}
-            <div className="flex items-center">
+            <div className="flex items-center space-between">
               <motion.div
                 className="h-2 min-w-[8px] max-w-[calc(100%-3.5rem)] rounded-full"
                 style={{ background: BAR_GRADIENT }}
@@ -54,7 +71,7 @@ export function BarGraph({
                 {animate ? <AnimatedCounter end={d.value} suffix={suffix} /> : `${d.value}${suffix}`}
               </span>
             </div>
-            <p className="mt-2 text-[13px] md:text-[15px] text-white/70">{d.label}</p>
+            <p className="mt-0 text-[13px] md:text-[15px] text-white/70">{d.label}</p>
           </div>
         );
       })}

@@ -373,18 +373,27 @@ const mDualVision: MediaSectionData = {
     image: "/gx4k/graphic-dual-vision.png",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
-    videoScrub: true,
-    // Last frame lands 80% through the section, then holds.
-    videoScrubEnd: 0.6,
+    background:'#000',
     aspectRatio: "2160/1207",
-    padTop: "pt-[250px] md:pt-0",
-    textTop: "top-[10%]",
+    // padTop: "pt-[250px] md:pt-0",
+    textPosition: "14%",
     theme: "dark",
     // Top legibility gradient in the page background colour instead of pure black.
     topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
     fade: true,
     fadeColor: "#000", // matches the page background
     fadeRange: 0.2,
+    textFrom: "bottom",     // starts above, drops into place
+    textOffsetY: 120,
+    textReplay: true,
+
+    pin: true,
+    pinHeightVh: 250, 
+    videoScrub: true,
+    videoScrubStart: 0.2,
+    videoScrubEnd: 0.8,
+
+    // mediaClass:"object-contain md:object-cover"
 };
 
 const mSecondEyes: MediaSectionData = {
@@ -393,6 +402,10 @@ const mSecondEyes: MediaSectionData = {
     image: "/gx4k/graphic-second-eyes.png",
     aspectRatio: "2160/1484",
     theme: "dark",
+    heightVh: 100,
+    textPosition:"8%",
+    heightVhMobile: false
+    
 };
 
 const mInYourHand: MediaSectionData = {
@@ -401,16 +414,28 @@ const mInYourHand: MediaSectionData = {
     image: "/gx4k/graphic-your-dashcam.png",
     aspectRatio: "2160/1484",
     theme: "dark",
+    textPosition:"8%",
+    heightVh: 100,
+    heightVhMobile: false
 };
 
 const mDiscreet: MediaSectionData = {
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/discreet_scrub.mp4",
-    videoScrub: true,
+    background:'#000',
     title: "Discreet by Design.",
     description: "A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind.",
     aspectRatio: "2160/1484",
     theme: "dark",
+    
+    textPosition: "14%",
+    textReplay: true,
+
+    pin: true,
+    pinHeightVh: 250, 
+    videoScrub: true,
+    videoScrubStart: 0.2,
+    videoScrubEnd: 0.9,
 };
 
 const disappearTabs = [

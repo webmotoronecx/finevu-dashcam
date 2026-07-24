@@ -293,6 +293,28 @@ code, kbd, samp, pre {
   }
 }
 
+/* MediaSection viewport-height mode: --ms-h is the height, with an optional
+   phone override. A media query is the only way to size per-breakpoint, and
+   inline styles can't hold one — so the values come in as custom properties. */
+.media-vh {
+  height: var(--ms-h);
+}
+@media (max-width: 767px) {
+  .media-vh {
+    height: var(--ms-h-mobile, var(--ms-h));
+  }
+  /* Opt out of fixed height on phones and let the media's own ratio decide. */
+  .media-vh-aspect {
+    height: auto;
+    aspect-ratio: var(--ms-aspect);
+  }
+  /* The mirror image: aspect-ratio everywhere, fixed height on phones only.
+     A set height overrides the inline aspect-ratio, so nothing to undo. */
+  .media-vh-mobile {
+    height: var(--ms-h-mobile);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cta-hover:hover,
   .tile-hover:hover,

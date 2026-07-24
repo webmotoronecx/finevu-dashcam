@@ -418,7 +418,7 @@ export default function GX4KPage() {
     return (
         <main className="overflow-x-clip bg-[#08080c]">
             {/* Hero: scroll-pinned video */}
-            <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" beats={HERO_BEATS} />
+            <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" beats={HERO_BEATS}  fadeTo = "#08080c" />
 
             {/* Scroll-scrubbed render: playback + annotation callouts driven by scroll position.
           NOTE: callout `pos`/`line` coords are a starting point (borrowed from OpticsSection);

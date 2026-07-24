@@ -491,16 +491,8 @@ export default function Page() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {/* Carousel nav (desktop) */}
-            <div className="pointer-events-none absolute left-0 top-0 hidden w-[72%] pl-[50px] sm:block lg:w-[58%]">
-              <div className="invisible aspect-[1047/562]" aria-hidden />
-              <div className="pointer-events-auto flex justify-end gap-3 pt-[18px]">
-                <CarouselPrevious className="static h-11 w-11 translate-x-0 translate-y-0 border-0 bg-[#ececec] text-[#1d1d1f] hover:bg-[#e0e0e0]" />
-                <CarouselNext className="static h-11 w-11 translate-x-0 translate-y-0 border-0 bg-[#ececec] text-[#1d1d1f] hover:bg-[#e0e0e0]" />
-              </div>
-            </div>
-            {/* Carousel nav (mobile) */}
-            <div className="mt-8 flex justify-center gap-3 sm:hidden">
+            {/* Carousel nav — below the carousel */}
+            <div className="mt-10 flex justify-center gap-3 md:mt-12">
               <CarouselPrevious className="static h-11 w-11 translate-x-0 translate-y-0 border-0 bg-[#ececec] text-[#1d1d1f] hover:bg-[#e0e0e0]" />
               <CarouselNext className="static h-11 w-11 translate-x-0 translate-y-0 border-0 bg-[#ececec] text-[#1d1d1f] hover:bg-[#e0e0e0]" />
             </div>

@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { motion } from "motion/react";
 import { useMemo, useRef, useState, Fragment } from "react";
@@ -251,8 +252,24 @@ function BookingWizard() {
                 })}
               </div>
               <div className="mt-8">
-                <label className={FIELD_LABEL}>Street address</label>
-                <input className={INPUT} placeholder="123 Smith St" value={form.street} onChange={(e) => set("street", e.target.value)} />
+                <label htmlFor="street" className={FIELD_LABEL}>Street address</label>
+                <AddressAutocomplete
+                  id="street"
+                  className={INPUT}
+                  placeholder="Start typing your address…"
+                  value={form.street}
+                  onChange={(v) => set("street", v)}
+                  onSelect={(p) => {
+                    setForm((f) => ({
+                      ...f,
+                      street: p.street || f.street,
+                      suburb: p.suburb || f.suburb,
+                      stateAu: STATES.includes(p.state) ? p.state : f.stateAu,
+                      postcode: p.postcode || f.postcode,
+                    }));
+                    setHint({ msg: "", cls: "" });
+                  }}
+                />
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-4">
                 <div className="sm:col-span-2"><label className={FIELD_LABEL}>Suburb</label><input className={INPUT} placeholder="Melbourne" value={form.suburb} onChange={(e) => set("suburb", e.target.value)} /></div>

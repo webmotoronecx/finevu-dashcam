@@ -7,7 +7,29 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 
 // Default page shell width (GX4K). Override per-page via the `shellClass` prop.
 const DEFAULT_SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
-const BODY = "text-[15px] md:text-[18px] leading-[1.6] text-[#a6a6a6]";
+
+export type FeatureTabsTheme = "dark" | "light";
+
+// Only the tokens that actually differ between the two product pages.
+const THEME: Record<
+  FeatureTabsTheme,
+  { body: string; rail: string; pillActive: string; pillIdle: string; activePill: string }
+> = {
+  dark: {
+    body: "text-[#a6a6a6]",
+    rail: "bg-[#202020]",
+    pillActive: "text-white",
+    pillIdle: "text-zinc-500 hover:text-zinc-300",
+    activePill: "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)",
+  },
+  light: {
+    body: "text-[#6E6E73]",
+    rail: "bg-[#e6e6e6]",
+    pillActive: "text-white",
+    pillIdle: "text-[#6b6b6b] hover:text-[#1D1D1F]",
+    activePill: "linear-gradient(167deg, #ffb682 0%, #f68428 65%, #f68428 100%)",
+  },
+};
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -59,6 +81,7 @@ export function FeatureTabs({
   shellClass = DEFAULT_SHELL,
   contentClass = "",
   sectionClass = "",
+  theme = "dark",
 }: {
   title?: string;
   tabs: FeatureTab[];
@@ -84,7 +107,9 @@ export function FeatureTabs({
   contentClass?: string;
   /** Extra classes on the outer <section> (e.g. background, custom padding). */
   sectionClass?: string;
+  theme?: FeatureTabsTheme;
 }) {
+  const th = THEME[theme];
   const [active, setActive] = useState(0);
 
   // Banner reflects the active tab's media, falling back to the section-level props.
@@ -186,18 +211,18 @@ export function FeatureTabs({
   // pill at `md+`. Top layout hugs the title (mb) instead of sitting below the banner (mt).
   const tabRow = (
     <div className={` ` + (tabsTop ? "mb-4 md:mb-8" : "mt-4 md:mt-8") }>
-      <div className="bg-[#202020] rounded-[26px] md:rounded-full mx-auto flex flex-wrap md:flex-nowrap justify-center w-full md:w-max max-w-full gap-2 p-1.5 md:p-0">
-        {tabs.map((t, i) => (
+      <div className={`${th.rail} rounded-[26px] md:rounded-full mx-auto flex flex-wrap md:flex-nowrap justify-center w-full md:w-max max-w-full gap-2 p-1.5 md:p-0`}>
+        {tabs.map((tb, i) => (
           <button
-            key={t.title}
+            key={tb.title}
             onClick={() => setActive(i)}
             aria-pressed={active === i}
             className={`cta-hover flex min-h-[44px] grow md:grow-0 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-[13px] font-semibold ${
-              active === i ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+              active === i ? th.pillActive : th.pillIdle
             }`}
-            style={active === i ? { backgroundImage: "linear-gradient(90deg, #4f2d74 0%, #6284d8 100%)" } : undefined}
+            style={active === i ? { backgroundImage: th.activePill } : undefined}
           >
-            {t.title}
+            {tb.title}
           </button>
         ))}
       </div>
@@ -217,7 +242,7 @@ export function FeatureTabs({
           initial={false}
           animate={{ opacity: i === active ? 1 : 0 }}
           transition={{ duration: 0.35 }}
-          className={`col-start-1 row-start-1 text-center ${BODY} ${
+          className={`col-start-1 row-start-1 text-center text-[15px] md:text-[18px] leading-[1.6] ${th.body} ${
             i === active ? "" : "pointer-events-none"
           }`}
         >
@@ -228,9 +253,9 @@ export function FeatureTabs({
   ) : null;
 
   return (
-    <section data-nav-theme="dark" className={` ${sectionClass}`}>
+    <section data-nav-theme={theme} className={` ${sectionClass}`}>
       <motion.div {...fadeUp} className={`${shellClass} mb-8 text-center md:mb-12`}>
-        <Head pre={title} className="!text-[28px] md:!text-[42px]" />
+        <Head pre={title} theme={theme} className="!text-[28px] md:!text-[42px]" />
       </motion.div>
 
       <div className={`${shellClass} ${contentClass}`}>

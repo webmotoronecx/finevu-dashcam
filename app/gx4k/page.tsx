@@ -3,9 +3,9 @@
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { OpticsSection } from "@/components/sections/OpticsSection";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { Eye } from "lucide-react";
 import { MediaSection, type MediaSectionData } from "@/components/sections/MediaSection";
 import { Head } from "@/components/sections/Head";
@@ -13,6 +13,7 @@ import { Carousel, type Card } from "@/components/sections/Carousel";
 import { FeatureTabs } from "@/components/sections/FeatureTabs";
 import { BarGraph } from "@/components/sections/BarGraph";
 import { ScrollScrubVideo } from "@/components/sections/ScrollScrubVideo";
+import { ScrollHero, type HeroBeat } from "@/components/sections/ScrollHero";
 import { BentoCard } from "@/components/sections/BentoCard";
 
 /* FineVu GX4K product page — Figma frame 102:2004 (dark cinematic layout). */
@@ -29,9 +30,7 @@ const fadeUp = {
     transition: { duration: 0.6 },
 };
 
-/* Scroll-pinned video hero: a fixed video with headline "beats" that fade in and out as you scroll (Figma Make hero). */
-type HeroBeat = { start: number; end: number; kicker: string; headline: string; sub?: string };
-
+/* Scroll-pinned video hero beats — copy only; the component lives in components/sections/ScrollHero.tsx */
 const HERO_BEATS: HeroBeat[] = [
     {
         start: 0.08,
@@ -49,197 +48,6 @@ const HERO_BEATS: HeroBeat[] = [
     },
 ];
 
-// Kept light so the text reads over the video (no low-contrast dark stops).
-const KICKER_GRAD = "linear-gradient(90deg, #b3c4f5, #cbb0ee)";
-const HERO_HEAD_GRAD = "linear-gradient(120deg, #ffffff 0%, #d0dafb 46%, #c1abec 100%)";
-const HEAD_SHADOW = "drop-shadow(0 2px 18px rgba(0,0,0,0.55))";
-const TEXT_SHADOW = "0 1px 12px rgba(0,0,0,0.8)";
-const emptySubscribe = () => () => {};
-
-function ScrollHero({
-    video,
-    poster,
-    // Total scroll length as a multiple of the viewport height. Lower = the beats
-    // arrive with less scrolling (e.g. 220 feels snappy, 380 is the cinematic default).
-    heightVh = 220,
-    // Crossfade duration in ms. The fade is time-based, not scroll-scrubbed, so the
-    // transition stays smooth even when `heightVh` is short and you scroll past fast.
-    fadeMs = 260,
-}: {
-    video: string;
-    poster?: string;
-    heightVh?: number;
-    fadeMs?: number;
-}) {
-    // Gate reduced-motion behind mount so SSR and first client render match.
-    const prefersReduced = useReducedMotion();
-    const mounted = useSyncExternalStore(
-        emptySubscribe,
-        () => true,
-        () => false,
-    );
-    const reduce = mounted && prefersReduced;
-
-    const containerRef = useRef<HTMLDivElement>(null);
-    const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-    // Native scroll drives the beat fades — instant, locked to the scrollbar.
-    useEffect(() => {
-        if (reduce) return;
-        const container = containerRef.current;
-        if (!container) return;
-
-        const update = () => {
-            const scrollable = container.offsetHeight - window.innerHeight;
-            const p = scrollable > 0 ? Math.max(0, Math.min(1, -container.getBoundingClientRect().top / scrollable)) : 0;
-            HERO_BEATS.forEach((beat, i) => {
-                const el = beatRefs.current[i];
-                if (!el) return;
-                // Scroll only decides in/out of the window; CSS animates the crossfade
-                // over `fadeMs`, so the transition speed is independent of scroll length.
-                const active = p >= beat.start && p <= beat.end;
-                el.style.opacity = active ? "1" : "0";
-                el.style.transform = active ? "translateY(0)" : "translateY(20px)";
-            });
-        };
-
-        window.addEventListener("scroll", update, { passive: true });
-        update();
-        return () => window.removeEventListener("scroll", update);
-    }, [reduce]);
-
-    /* Reduced motion: static hero, first beat only, no pin */
-    if (reduce) {
-        const beat = HERO_BEATS[0];
-        return (
-            <section
-                data-nav-theme="dark"
-                className="relative flex h-[100dvh] w-full items-center justify-center overflow-hidden"
-                style={{ background: "radial-gradient(ellipse at 50% 40%, #0f1424 0%, #08080c 70%)" }}
-            >
-                <div className="px-6 text-center">
-                    <p
-                        className="mb-3 bg-clip-text text-[11.5px] font-bold uppercase tracking-[0.28em] text-transparent"
-                        style={{ backgroundImage: KICKER_GRAD, WebkitBackgroundClip: "text", filter: HEAD_SHADOW }}
-                    >
-                        {beat.kicker}
-                    </p>
-                    <h1
-                        className="bg-clip-text font-bold text-transparent"
-                        style={{
-                            fontSize: "clamp(2.5rem, 7vw, 5.5rem)",
-                            lineHeight: 1.08,
-                            letterSpacing: "-0.02em",
-                            backgroundImage: HERO_HEAD_GRAD,
-                            WebkitBackgroundClip: "text",
-                            filter: HEAD_SHADOW,
-                        }}
-                    >
-                        {beat.headline}
-                    </h1>
-                    {beat.sub && (
-                        <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/90" style={{ textShadow: TEXT_SHADOW }}>
-                            {beat.sub}
-                        </p>
-                    )}
-                </div>
-            </section>
-        );
-    }
-
-    return (
-        <section ref={containerRef} data-nav-theme="dark" className="relative w-full" style={{ height: `${heightVh}vh` }}>
-            <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
-                <video src={video} poster={poster} autoPlay loop muted playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover" />
-                {/* Legibility scrim plus a bottom fade into the next section */}
-                <div
-                    className="pointer-events-none absolute inset-0"
-                    style={{
-                        background:
-                            "radial-gradient(ellipse 78% 58% at 50% 50%, rgba(6,7,11,0.62) 0%, rgba(6,7,11,0.34) 46%, rgba(6,7,11,0.06) 74%, transparent 100%)",
-                    }}
-                />
-                <div
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
-                    style={{ background: "linear-gradient(to bottom, transparent, #08080c)" }}
-                />
-
-                {HERO_BEATS.map((beat, i) => (
-                    <div
-                        key={i}
-                        ref={(el) => {
-                            beatRefs.current[i] = el;
-                        }}
-                        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
-                        style={{
-                            opacity: 0,
-                            transform: "translateY(20px)",
-                            transition: `opacity ${fadeMs}ms ease, transform ${fadeMs}ms ease`,
-                        }}
-                    >
-                        <p
-                            className="mb-3 bg-clip-text text-[11.5px] font-bold uppercase tracking-[0.28em] text-transparent"
-                            style={{ backgroundImage: KICKER_GRAD, WebkitBackgroundClip: "text", filter: HEAD_SHADOW }}
-                        >
-                            {beat.kicker}
-                        </p>
-                        {i === 0 ? (
-                            <h1
-                                className="bg-clip-text font-bold text-transparent"
-                                style={{
-                                    fontSize: "clamp(2.5rem, 7vw, 5.5rem)",
-                                    lineHeight: 1.08,
-                                    letterSpacing: "-0.02em",
-                                    backgroundImage: HERO_HEAD_GRAD,
-                                    WebkitBackgroundClip: "text",
-                                    filter: HEAD_SHADOW,
-                                }}
-                            >
-                                {beat.headline}
-                            </h1>
-                        ) : (
-                            <h2
-                                className="font-bold text-white"
-                                style={{ fontSize: "clamp(2.2rem, 6vw, 4.8rem)", lineHeight: 1.1, letterSpacing: "-0.02em", textShadow: TEXT_SHADOW }}
-                            >
-                                {beat.headline}
-                            </h2>
-                        )}
-                        {beat.sub && (
-                            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/90" style={{ textShadow: TEXT_SHADOW }}>
-                                {beat.sub}
-                            </p>
-                        )}
-                    </div>
-                ))}
-
-                {/* scroll hint */}
-                <motion.div
-                    className="pointer-events-none absolute bottom-10 left-1/2 h-10 w-px -translate-x-1/2 origin-top"
-                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }}
-                    animate={{ scaleY: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 1.6, ease: "easeInOut", repeat: Infinity }}
-                />
-            </div>
-        </section>
-    );
-}
-
-/* Bento tile for the "reasons to choose" grid — image with label overlay. */
-function BentoTile({ img, label, sup, className = "", imgClass = "" }: { img: string; label: string; sup?: string; className?: string; imgClass?: string }) {
-    return (
-        // Figma 133:58 tile — image cover-fills to the edges, white label overlaid at the bottom
-        <div className={`tile-hover relative overflow-hidden rounded-[32px] ${className}`}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img} alt={label} className={`absolute inset-0 h-full w-full object-cover ${imgClass}`} />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <p className="absolute inset-x-0 bottom-6 px-4 text-center text-[16px] font-semibold text-white md:text-[22px]">
-                {label}
-                {sup && <sup className="ml-0.5 align-super text-[11px] font-medium md:text-[13px]">[{sup}]</sup>}
-            </p>
-        </div>
-    );
-}
 
 /* Two-tone label ("Front camera" → first word white, rest blue). */
 function TwoTone({ text, className = "" }: { text: string; className?: string }) {
@@ -397,9 +205,9 @@ const mDualVision: MediaSectionData = {
 };
 
 const mSecondEyes: MediaSectionData = {
-    title: `A Second Set of Eyes`,
+    title: `A second set of eyes`,
     description: `ADAS Plus watches the road with you, and speaks up before you need to.`,
-    image: "/gx4k/graphic-second-eyes.png",
+    image: "/gx4k/second-eyes.png",
     aspectRatio: "2160/1484",
     theme: "dark",
     heightVh: 100,
@@ -610,7 +418,7 @@ export default function GX4KPage() {
     return (
         <main className="overflow-x-clip bg-[#08080c]">
             {/* Hero: scroll-pinned video */}
-            <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" />
+            <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" beats={HERO_BEATS} />
 
             {/* Scroll-scrubbed render: playback + annotation callouts driven by scroll position.
           NOTE: callout `pos`/`line` coords are a starting point (borrowed from OpticsSection);
@@ -650,7 +458,7 @@ export default function GX4KPage() {
                 // already moving as it slides up into the pin.
                 startVisible={.8}
                 // ...and hold on the finished frame for a beat before the section unsticks.
-                holdLength="10vh"
+                holdLength="100vh"
                 head={{
                     title: "The Optics Behind the Image.",
                     subtitle:
@@ -812,18 +620,19 @@ export default function GX4KPage() {
                     {/* Figma 133:58 bento — taller top row, two equal tiles below. */}
                     <div className={`${SHELL} space-y-4 sm:space-y-5`}>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
-                            <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
-                            <BentoTile
+                            <BentoCard variant="overlayLabel" img="/gx4k/no1.webp" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
+                            <BentoCard
+                                variant="overlayLabel"
                                 img="/gx4k/warranty3.webp"
-                                label="3 Year Warranty"
+                                title="3 Year Warranty"
                                 sup="1"
                                 imgClass="object-[50%_42%]"
                                 className="aspect-[550/600] sm:aspect-auto sm:h-full"
                             />
                         </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-                            <BentoTile img="/gx4k/microsd.webp" label="Includes 128GB MicroSD Card" sup="2" className="aspect-[640/400]" />
-                            <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
+                            <BentoCard variant="overlayLabel" img="/gx4k/microsd.webp" title="Includes 128GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+                            <BentoCard variant="overlayLabel" img="/gx4k/cables.webp" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
                         </div>
                     </div>
                 </section>

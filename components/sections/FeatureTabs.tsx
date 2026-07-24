@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { useState, type CSSProperties, type ReactNode } from "react";
 
 // Default page shell width (GX4K). Override per-page via the `shellClass` prop.
-const DEFAULT_SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
+const DEFAULT_SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-8";
 
 export type FeatureTabsTheme = "dark" | "light";
 

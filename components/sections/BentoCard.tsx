@@ -123,7 +123,7 @@ export function BentoCard({
     return (
       <motion.div
         {...fadeUp}
-        className={`${t.hover} relative flex flex-col justify-center overflow-hidden border ${t.border} ${t.radius} ${t.panel} px-8 py-10 md:px-12 ${className}`}
+        className={`relative flex flex-col justify-center overflow-hidden ${t.radius} px-8 py-10 md:px-12 ${className}`}
       >
         <h3 className={`text-[26px] md:text-[38px] font-semibold leading-[1.08] ${t.panelTitle}`}>
           {title}

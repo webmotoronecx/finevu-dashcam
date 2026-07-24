@@ -505,18 +505,18 @@ export default function GX35Page() {
         </motion.div>
 
         <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-          <BentoCard theme="light" {...storageFormat[0]} title="" className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+          <BentoCard theme="light" {...storageFormat[0]} title="" className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
           <BentoCard
             theme="light"
             variant="displayText"
             title="Format Free 2.0"
             caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive."
-            className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
+            className="lg:col-span-5 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
           />
         </div>
       </section>
 
-      <section data-nav-theme="light" className=" pt-0 pb-20">
+      <section data-nav-theme="light" className=" max-w-[1180px] pt-0 pb-20 mx-auto">
         <FeatureTabs theme="light" sectionClass="pb-10 min-w-0 md:min-w-[970px]" title="" tabs={memoryAllocationTabs} />
 
         <motion.div {...fadeUp} className={`${SHELL} text-center`}>
@@ -539,10 +539,11 @@ export default function GX35Page() {
       <Carousel theme="light" grad="Connected" post=" in Your Pocket" cards={cConnected} />
 
       {/* Discreet by Design showcase */}
-      <MediaSection data={mDiscreet} />
+      {/* <MediaSection data={mDiscreet} /> */}
 
       {/* Designed to Disappear tabs and detail gallery */}
-      <section data-nav-theme="light" className=" py-20 md:py-28">
+      {false && (
+      <section data-nav-theme="light" className=" pb-20 md:pb-28">
         <FeatureTabs
           theme="light"
           title="Designed to Disappear"
@@ -592,6 +593,7 @@ export default function GX35Page() {
           </motion.div>
         </div>
       </section>
+      )}
 
       {/* More Reasons to Choose FineVu bento */}
       <section data-nav-theme="light" className="py-16 md:py-24">
@@ -604,7 +606,7 @@ export default function GX35Page() {
             <BentoCard
               theme="light"
               variant="overlayLabel"
-              img="/gx4k/warranty3.webp"
+              img="/gx35/warranty3.png"
               title="3 Year Warranty"
               sup="1"
               imgClass="object-[50%_42%]"
@@ -727,7 +729,7 @@ export default function GX35Page() {
                   <img
                     src="/gx35/compare-gx4k.png"
                     alt="FineVu GX4K front and rear cameras"
-                    className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[180px]"
+                    className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[264px]"
                   />
                 </div>
                 <Link
@@ -754,7 +756,7 @@ export default function GX35Page() {
                   <img
                     src="/gx35/compare-gx35.png"
                     alt="FineVu GX35"
-                    className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[180px]"
+                    className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[264px]"
                   />
                 </div>
                 <Link
@@ -785,7 +787,7 @@ export default function GX35Page() {
       </section>
 
       {/* Firmware / Downloads */}
-      <section data-nav-theme="light" className=" py-16 md:py-24">
+      <section data-nav-theme="light" className=" pb-16 md:pb-24">
         <div className={`${SHELL} !max-w-[1050px] flex flex-col gap-10`}>
           <div className=" flex w-full rounded-full border border-[#e3e3e6] bg-[#eaeaea] p-1">
             {(["Firmware", "User Manual", "Speed Cam Data"] as const).map((t) => (

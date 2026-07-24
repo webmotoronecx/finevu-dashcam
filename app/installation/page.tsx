@@ -40,6 +40,13 @@ const DOWS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TOTAL = 5;
 const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details", "Checkout"];
 
+const HERO_STATS = [
+  { value: "$250 AUD", label: "One price, every install" },
+  { value: "Mobile service", label: "We come to home or work" },
+  { value: "60–90 mins", label: "Typical install time" },
+  { value: "No payment to book", label: "Pay on the day" },
+];
+
 const THREE = [
   { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
   { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat — no payment required to reserve.", img: "/installation/step-book.webp" },
@@ -453,6 +460,23 @@ export default function Page() {
             <a href="#how" className="cta-hover rounded-full border border-white/60 bg-white/5 px-[29px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] text-white transition-colors hover:bg-white/10">See How It Works</a>
           </motion.div>
         </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.36 }}
+          className="absolute inset-x-0 bottom-0 z-10"
+        >
+          <div className="mx-auto max-w-[1160px] px-6 pb-8 md:pb-12">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-6 border-t border-white/15 pt-6 text-left sm:grid-cols-4">
+              {HERO_STATS.map((stat) => (
+                <div key={stat.value}>
+                  <div className="text-[20px] font-semibold leading-tight text-white md:text-[22px]">{stat.value}</div>
+                  <div className="mt-1 text-[13px] leading-snug text-white/70">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Wizard */}

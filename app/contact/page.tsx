@@ -6,7 +6,8 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Check } from "lucide-react";
+import { submitForm } from "@/lib/submitForm";
 
 // Contact page: dark hero, support cards, message form section and learn more strip
 
@@ -63,15 +64,49 @@ const INPUT =
 
 function ContactForm() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", subject: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
+  const [error, setError] = useState("");
+  const [botcheck, setBotcheck] = useState("");
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const subject = encodeURIComponent(form.subject ? `FineVu enquiry — ${form.subject}` : "FineVu enquiry");
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nPhone: ${form.phone}\nEmail: ${form.email}\nSubject: ${form.subject}\n\n${form.message}`,
+    if (botcheck) {
+      setStatus("done");
+      return;
+    }
+    setStatus("sending");
+    setError("");
+    const res = await submitForm(
+      { name: form.name, phone: form.phone, email: form.email, subject: form.subject, message: form.message },
+      {
+        subject: form.subject ? `FineVu enquiry — ${form.subject}` : "FineVu enquiry — Contact form",
+        replyTo: form.email,
+      },
     );
-    window.location.href = `mailto:support@finevuaustralia.com?subject=${subject}&body=${body}`;
+    if (res.ok) {
+      setStatus("done");
+    } else {
+      setStatus("idle");
+      setError(res.error);
+    }
+  }
+
+  if (status === "done") {
+    return (
+      <motion.div
+        {...fadeUp}
+        className="rounded-[16px] border border-[#e7e7ea] bg-white p-10 text-center"
+      >
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white">
+          <Check className="h-6 w-6" strokeWidth={2.4} />
+        </div>
+        <h3 className="mb-2 text-[22px] font-semibold text-[#17181a]">Message sent</h3>
+        <p className="text-[16px] text-[#6b6b72]">
+          Thanks — our support team will get back to you shortly, usually within one business day.
+        </p>
+      </motion.div>
+    );
   }
 
   return (
@@ -80,6 +115,16 @@ function ContactForm() {
       onSubmit={submit}
       className="grid grid-cols-1 gap-x-4 gap-y-[18px] rounded-[16px] border border-[#e7e7ea] bg-white p-8 sm:grid-cols-2"
     >
+      <input
+        type="text"
+        name="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={botcheck}
+        onChange={(e) => setBotcheck(e.target.value)}
+        className="hidden"
+      />
       <div>
         <label className={LABEL} htmlFor="f-name">
           Your name <span className="text-[var(--finevu-orange)]">*</span>
@@ -132,10 +177,12 @@ function ContactForm() {
       </div>
       <button
         type="submit"
-        className="cta-hover col-span-full rounded-full bg-[var(--finevu-orange)] px-7 py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white"
+        disabled={status === "sending"}
+        className="cta-hover col-span-full rounded-full bg-[var(--finevu-orange)] px-7 py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70"
       >
-        Send Message
+        {status === "sending" ? "Sending…" : "Send Message"}
       </button>
+      {error && <p className="col-span-full text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
       <p className="col-span-full text-center text-[12.5px] text-[#707784]">
         By submitting this form, you agree to our{" "}
         <Link href="/support" className="font-semibold text-[var(--finevu-orange)]">

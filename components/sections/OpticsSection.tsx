@@ -109,7 +109,7 @@ const THEMES: Record<"dark" | "light", OpticsTheme> = {
 /* One callout block — shared by the desktop overlay and the mobile stack. */
 function CalloutCard({ data, t }: { data: Callout; t: OpticsTheme }) {
   return (
-    <div className="w-[248px] xl:w-[300px]">
+    <div className="w-full xl:w-[300px]">
       <p className={`text-[28px] font-semibold leading-none xl:text-[34px] ${t.calloutTitle}`}>{data.title}</p>
       <p className={`mt-1.5 text-[12px] font-semibold tracking-wide xl:text-[13.6px] ${t.calloutSub}`}>{data.sub}</p>
       <div className="mt-3 h-px w-full" style={{ backgroundImage: t.calloutLine }} />

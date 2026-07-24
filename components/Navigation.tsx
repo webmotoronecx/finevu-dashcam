@@ -149,6 +149,9 @@ export function Navigation() {
     : "text-zinc-600 hover:text-zinc-950";
   const lActive = isDarkBackground ? "text-white" : "text-zinc-950";
 
+  // Plain, chrome-free routes render the page content only (no site nav).
+  if (pathname === "/fv-specialist") return null;
+
   return (
     <>
       {/* Click-away backdrop while the Products panel is open */}

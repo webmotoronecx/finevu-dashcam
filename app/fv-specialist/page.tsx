@@ -10,9 +10,8 @@ export default function FvSpecialistPage() {
             <video
                 className="h-auto w-full max-w-[500px] object-contain md:h-[100svh] md:w-auto md:max-w-none"
                 controls
-                autoPlay
-                loop
-                muted
+         
+             
                 playsInline
                 preload="metadata"
             >

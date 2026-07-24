@@ -4,10 +4,16 @@ import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { OpticsSection } from "@/components/sections/OpticsSection";
 import { BentoCard } from "@/components/sections/BentoCard";
+import { MediaSection, type MediaSectionData } from "@/components/sections/MediaSection";
+import { Head } from "@/components/sections/Head";
+import { Carousel, type Card } from "@/components/sections/Carousel";
+import { FeatureTabs } from "@/components/sections/FeatureTabs";
+import { BarGraph } from "@/components/sections/BarGraph";
+import { ScrollHero, type HeroBeat } from "@/components/sections/ScrollHero";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { useState } from "react";
+import { Eye } from "lucide-react";
 
 // FineVu GX35 product page — light alternating layout with real photography and grey placeholders per the Figma frame.
 
@@ -24,368 +30,34 @@ const fadeUp = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-// Section heading with an optional orange-highlighted word
-function Head({
-  pre = "",
-  hi = "",
-  post = "",
-  className = "",
-  as: Tag = "h2",
-}: {
-  pre?: string;
-  hi?: string;
-  post?: string;
-  className?: string;
-  as?: "h1" | "h2" | "h3";
-}) {
-  return (
-    <Tag
-      className={`font-semibold tracking-[-0.02em] leading-[1.08] text-[#1D1D1F] text-[30px] md:text-[42px] ${className}`}
-    >
-      {pre}
-      {hi && <span className="text-[#f68428]">{hi}</span>}
-      {post}
-    </Tag>
-  );
-}
-
-// Grey placeholder box for client-supplied footage or lifestyle stills
-function ImgBlock({
-  ratio = "aspect-[16/9]",
-  label,
-  className = "",
-}: {
-  ratio?: string;
-  label?: string;
-  className?: string;
-}) {
-  return (
-    <div className={`relative w-full overflow-hidden rounded-[24px] bg-[#656565] ${ratio} ${className}`}>
-      {label && (
-        <span className="absolute inset-0 flex items-center justify-center px-8 text-center text-[13px] text-white/50">
-          {label}
-        </span>
-      )}
-    </div>
-  );
-}
-
-// Full-bleed showcase divider: image with centered heading and subtitle
-function Showcase({
-  img,
-  title,
-  subtitle,
-}: {
-  img?: string;
-  title: string;
-  subtitle: string;
-}) {
-  return (
-    <section data-nav-theme="dark" className="relative">
-      <div className="relative h-[440px] md:h-[600px] w-full overflow-hidden">
-        {img ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={img} alt={title} className="absolute inset-0 h-full w-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 bg-[#656565]" />
-        )}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(8,8,12,0.55) 0%, rgba(8,8,12,0.12) 34%, rgba(8,8,12,0.18) 68%, rgba(8,8,12,0.7) 100%)",
-          }}
-        />
-        <motion.div
-          {...fadeUp}
-          className="absolute inset-x-0 top-[16%] mx-auto max-w-[720px] px-6 text-center"
-        >
-          <h2 className="text-[28px] md:text-[44px] font-semibold leading-[1.1] tracking-[-0.02em] text-white">
-            {title}
-          </h2>
-          <p className="mx-auto mt-4 max-w-[520px] text-[14px] md:text-[17px] leading-[1.5] text-white/70">
-            {subtitle}
-          </p>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// Bento tile for the "More reasons" grid — image with a white label overlay
-function BentoTile({
-  img,
-  label,
-  sup,
-  className = "",
-  imgClass = "",
-}: {
-  img?: string;
-  label: string;
-  sup?: string;
-  className?: string;
-  imgClass?: string;
-}) {
-  return (
-    <div className={`tile-hover relative overflow-hidden rounded-[32px] border border-[#ececf0] ${className}`}>
-      {img ? (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={img} alt={label} className={`absolute inset-0 h-full w-full object-cover ${imgClass}`} />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
-          <p className="absolute inset-x-0 bottom-6 px-4 text-center text-[16px] md:text-[22px] font-semibold text-white">
-            {label}
-            {sup && <sup className="ml-0.5 align-super text-[11px] font-medium md:text-[13px]">[{sup}]</sup>}
-          </p>
-        </>
-      ) : (
-        <>
-          <div className="absolute inset-0 bg-[#656565]" />
-          <p className="absolute inset-x-0 bottom-6 px-4 text-center text-[16px] md:text-[22px] font-semibold text-white">
-            {label}
-            {sup && <sup className="ml-0.5 align-super text-[11px] font-medium md:text-[13px]">[{sup}]</sup>}
-          </p>
-        </>
-      )}
-    </div>
-  );
-}
-
-// Horizontal feature carousel — peek cards on a drag/prev/next track, with a fixed gutter beside the active card
-type Card = { title: string; body: string; img?: string; note?: string };
-function Carousel({
-  pre,
-  hi,
-  post,
-  sub,
-  cards,
-  alignEnd,
-  pinGutter,
-  gutterRight,
-  imgAspect = "1047 / 562",
-}: {
-  pre?: string;
-  hi?: string;
-  post?: string;
-  sub?: string;
-  cards: Card[];
-  alignEnd?: boolean;
-  pinGutter?: boolean;
-  gutterRight?: boolean;
-  imgAspect?: string;
-}) {
-  const vpRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [tx, setTx] = useState(0);
-  const [range, setRange] = useState({ min: 0, max: 0, step: 1 });
-  const [gutter, setGutter] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const drag = useRef({ x: 0, tx: 0, active: false, min: 0, max: 0, step: 1 });
-
-  // On mobile, disable the right-gutter mirror so every carousel slides the same way
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const sync = () => setIsMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  const rightGutter = !!gutterRight && !isMobile;
-
-  const measure = useCallback(() => {
-    const vp = vpRef.current;
-    const card = trackRef.current?.querySelector<HTMLElement>("[data-card]");
-    if (!vp || !card) return null;
-    const cardW = card.offsetWidth;
-    const gap = 24;
-    const step = cardW + gap;
-    if (pinGutter) {
-      // Fixed gutter: active card lands at a set spot; gutterRight mirrors it to the right with cards reversed
-      const fullVw = document.documentElement.clientWidth;
-      const g = Math.max(0, (fullVw - cardW) / 2);
-      const span = (cards.length - 1) * step;
-      setGutter(g);
-      const r = rightGutter
-        ? { min: fullVw - g - cardW - span, max: fullVw - g - cardW, step }
-        : { min: -span, max: 0, step };
-      setRange(r);
-      return r;
-    }
-    const trackW = cards.length * cardW + (cards.length - 1) * gap;
-    const vw = vp.clientWidth;
-    const max = (vw - cardW) / 2;
-    const min = Math.min(max, (vw + cardW) / 2 - trackW);
-    const r = { min, max, step };
-    setRange(r);
-    return r;
-  }, [cards.length, pinGutter, rightGutter]);
-
-  const snap = useCallback(
-    (rawTx: number, r: { min: number; max: number; step: number }) => {
-      const i = Math.round((r.max - rawTx) / r.step);
-      const clamped = Math.max(0, Math.min(cards.length - 1, i));
-      setTx(Math.max(r.min, Math.min(r.max, r.max - clamped * r.step)));
-    },
-    [cards.length]
-  );
-
-  const positioned = useRef(false);
-  useEffect(() => {
-    const vp = vpRef.current;
-    if (!vp) return;
-    let raf = 0;
-    const init = () => {
-      const r = measure();
-      if (!r) {
-        raf = requestAnimationFrame(init);
-        return;
-      }
-      positioned.current = true;
-      setTx(alignEnd || (pinGutter && rightGutter) ? r.min : r.max);
-    };
-    raf = requestAnimationFrame(init);
-    const ro = new ResizeObserver(() => {
-      const r = measure();
-      if (r && positioned.current) setTx((p) => Math.max(r.min, Math.min(r.max, p)));
-    });
-    ro.observe(vp);
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-    };
-  }, [measure, alignEnd, pinGutter, rightGutter]);
-
-  const stepBy = (d: number) => {
-    const cur = Math.round((range.max - tx) / range.step);
-    snap(range.max - (cur + d) * range.step, range);
-  };
-
-  const onDown = (e: React.PointerEvent) => {
-    const r = measure() ?? range;
-    drag.current = { x: e.clientX, tx, active: true, ...r };
-    setDragging(true);
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      /* ignore */
-    }
-  };
-  const onMove = (e: React.PointerEvent) => {
-    const d = drag.current;
-    if (!d.active) return;
-    const raw = d.tx + (e.clientX - d.x);
-    const v = raw > d.max ? d.max + (raw - d.max) * 0.3 : raw < d.min ? d.min + (raw - d.min) * 0.3 : raw;
-    setTx(v);
-  };
-  const onUp = () => {
-    if (!drag.current.active) return;
-    drag.current.active = false;
-    setDragging(false);
-    snap(tx, { min: drag.current.min, max: drag.current.max, step: drag.current.step });
-  };
-
-  const atStart = tx >= range.max - 1;
-  const atEnd = tx <= range.min + 1;
-
-  // Right-gutter renders cards reversed, so prev/next direction and disabled-ends are mirrored
-  const flip = !!(pinGutter && rightGutter);
-  const displayCards = flip ? [...cards].reverse() : cards;
-  const goPrev = () => stepBy(flip ? 1 : -1);
-  const goNext = () => stepBy(flip ? -1 : 1);
-  const prevOff = flip ? atEnd : atStart;
-  const nextOff = flip ? atStart : atEnd;
-
-  return (
-    <section data-nav-theme="light" className="py-16 md:py-24">
-      <div className={`${SHELL} mb-8 text-center md:mb-12`}>
-        <Head pre={pre} hi={hi} post={post} className="!text-[26px] md:!text-[38px]" />
-        {sub && <p className="mx-auto mt-4 max-w-[520px] text-[15px] leading-[1.6] text-[#6E6E73] md:text-[18px]">{sub}</p>}
-      </div>
-      <div
-        ref={vpRef}
-        className="overflow-hidden"
-        style={{
-          touchAction: "pan-y",
-          marginLeft: pinGutter && !rightGutter ? gutter : undefined,
-          marginRight: pinGutter && rightGutter ? gutter : undefined,
-        }}
-      >
-        <div
-          ref={trackRef}
-          onPointerDown={onDown}
-          onPointerMove={onMove}
-          onPointerUp={onUp}
-          onPointerCancel={onUp}
-          className={`flex select-none gap-6 pb-4 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
-          style={{
-            transform: `translate3d(${tx}px,0,0)`,
-            transition: dragging ? "none" : "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-          }}
-        >
-          {displayCards.map((c) => (
-            <motion.article
-              key={c.title}
-              data-card
-              {...fadeUp}
-              className="w-[80vw] shrink-0 md:w-[62vw] lg:w-[min(48vw,1040px)]"
-            >
-              {c.img ? (
-                <div
-                  className="tile-scale relative overflow-hidden rounded-[22px]"
-                  style={{ aspectRatio: imgAspect }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.img} alt={c.title} draggable={false} className="h-full w-full object-cover" />
-                </div>
-              ) : (
-                // solid #656565 — matches the Figma placeholder cards
-                <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
-              )}
-              <h3 className="mt-6 text-[22px] md:text-2xl font-semibold text-[#1D1D1F]">{c.title}</h3>
-              <p className="mt-3 max-w-[540px] text-[14px] md:text-[16px] leading-[1.6] text-[#6E6E73]">{c.body}</p>
-              {c.note && (
-                <p className="mt-3 max-w-[540px] text-[12px] font-medium leading-[1.6] text-[#9aa0ad]">{c.note}</p>
-              )}
-            </motion.article>
-          ))}
-        </div>
-      </div>
-      {/* Nav row — pinGutter aligns the arrows to the featured card's right edge. */}
-      <div
-        className={`mt-2 flex items-center justify-end gap-3 ${pinGutter ? "" : SHELL}`}
-        style={pinGutter ? { marginRight: gutter } : undefined}
-      >
-        <button
-          onClick={goPrev}
-          disabled={prevOff}
-          aria-label="Previous"
-          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-[#dcdce0] text-[#6E6E73] hover:text-[#1D1D1F] disabled:cursor-default disabled:opacity-30"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={goNext}
-          disabled={nextOff}
-          aria-label="Next"
-          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-[#dcdce0] text-[#6E6E73] hover:text-[#1D1D1F] disabled:cursor-default disabled:opacity-30"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
-    </section>
-  );
-}
 
 // Data
 
+/* Scroll-pinned video hero beats — copy only; the component lives in components/sections/ScrollHero.tsx */
+const HERO_BEATS: HeroBeat[] = [
+  {
+    start: 0.08,
+    end: 0.42,
+    kicker: "FineVu GX35 · 2-Channel QHD",
+    headline: "Perfectly Compact.",
+    sub: "2K QHD clarity and Sony's newest STARVIS 2 sensor, in a body smaller than a business card.",
+  },
+  {
+    start: 0.55,
+    end: 0.88,
+    kicker: "Dual-Channel Recording",
+    headline: "In Sharp QHD.",
+    sub: "2560 × 1440 front. Full HD rear. Simultaneous. Nothing missed.",
+  },
+];
+
 // "Every detail" bento; the field-of-view tile stays a placeholder until the client supplies that shot
 const featureTiles = [
-  { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", img: "/gx35/detail-front.webp" },
-  { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.webp" },
-  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", img: "/gx35/detail-night.webp" },
-  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.webp" },
-  { title: "147° / 143° Field of View", caption: "Front & Rear", img: "" },
+  { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", video: "/gx35/detail-front-camera.mp4" },
+  { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.png" },
+  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", img: "/gx35/detail-night.png" },
+  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.png" },
+  { title: "147° / 143° Field of View", caption: "Front & Rear", img: "/gx35/detail-field.png" },
 ];
 
 // Optics callouts in front to core to rear order, matching the pinned reveal timing
@@ -414,7 +86,7 @@ const cSeeDetail: Card[] = [
   {
     title: "True 2K Quad HD",
     body: "Front records in 2560×1440 QHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
-    img: "/gx4k/see-uhd.webp",
+    video: "/gx35/day-true-2k.mp4",
   },
   {
     title: "Sony STARVIS 2 Sensor",
@@ -424,7 +96,7 @@ const cSeeDetail: Card[] = [
   {
     title: "AI Auto Night Vision",
     body: "Smart AI reads the light around you and adjusts brightness and contrast on its own — clear night footage with nothing to switch on.",
-    img: "/gx4k/card-night.webp",
+    video: "/gx35/day-ai-auto.mp4",
   },
 ];
 
@@ -432,42 +104,41 @@ const cParked: Card[] = [
   {
     title: "Power Saving Parking Mode",
     body: "Prolonged recording time. Consuming 98% less power, GX35 records 13,950 more hours than standard parking mode.",
-    img: "/gx4k/parking.webp",
-  },
-  {
-    title: "Smart Time-Lapse",
-    body: "Records at 10fps while parked, then jumps to 30fps the instant something happens — up to 743 minutes of coverage without filling the card.",
-  },
-  {
-    title: "AI Heat Monitoring",
-    body: "Built-in temperature sensing powers the camera down before heat becomes a risk — protection made for hot climates and long summer parks.",
+    img: "/gx35/protected-power.png",
   },
   {
     title: "20-Second Impact Capture",
     body: "Every impact saves the 10 seconds before and 10 seconds after — front and rear — so the full scene is locked in, not just the moment of contact.",
-    img: "/gx4k/impact.webp",
+    img: "/gx35/protected-20-sec.png",
   },
+  {
+    title: "Smart Time-Lapse",
+    body: "Records at 10fps while parked, then jumps to 30fps the instant something happens — up to 743 minutes of coverage without filling the card.",
+    img: "/gx35/protected-smart.png",
+  },
+  {
+    title: "AI Heat Monitoring",
+    body: "Built-in temperature sensing powers the camera down before heat becomes a risk — protection made for hot climates and long summer parks.",
+    img: "/gx35/protected-heat.png",
+  },
+  {
+    title: "A Minute of Motion",
+    body: "Any movement caught while parked is saved as a full minute of footage, so nothing around your car goes unrecorded.",
+    img: "/gx35/protected-minute.png",
+  },
+ 
 ];
 
 const cSafer: Card[] = [
   {
     title: "ADAS Plus Driver Assistance",
     body: "Forward Vehicle Moving Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
+    img: "/gx35/smarter-adas.png",
   },
   {
     title: "Speed Camera Alert",
     body: "Quarterly safety-camera database updates with voice and visual alerts. Fewer surprises, fewer tickets. Requires GPS reception.",
-  },
-];
-
-const cStorage: Card[] = [
-  {
-    title: "Format Free 2.0",
-    body: "Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive.",
-  },
-  {
-    title: "Memory Allocation",
-    body: "Split storage to match how you drive, with Driving, Event, Parking or Driving-Only priority, so the card fills with the footage you actually need.",
+    img: "/gx35/smarter-speed.png",
   },
 ];
 
@@ -475,38 +146,53 @@ const cConnected: Card[] = [
   {
     title: "FineVu App",
     body: "View live video, download clips, change settings and update firmware right from your phone. Android and iOS, plus FineVu Player 2.0 on desktop.",
+    img: "/gx35/connected-app.png",
   },
   {
     title: "5GHz Wi-Fi",
     body: "Fast dual-band Wi-Fi streams live footage to your phone and pulls clips straight off the camera. No removing the SD card.",
+    video: "/gx35/connected-5g.mp4",
   },
   {
     title: "Built-in GPS",
     body: "Records speed, location and route. Every clip stamped with exactly where and how fast you were going.",
+    img: "/gx35/connected-gps.png",
   },
 ];
 
 const cBuilt: Card[] = [
   {
-    title: "Supercapacitor, Not Battery",
-    body: "A supercapacitor replaces the traditional battery for better heat tolerance and a longer service life. Engineered for reliability, not shortcuts.",
-  },
-  {
     title: "Built In-House",
     body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That's reliability you can count on.",
+    img: "/gx35/built-in-house.png",
   },
+  {
+    title: "Supercapacitor, Not Battery",
+    body: "A supercapacitor replaces the traditional battery for better heat tolerance and a longer service life. Engineered for reliability, not shortcuts.",
+    img: "/gx35/built-supercapacitor.png",
+  },
+
   {
     title: "Battery Protection Integrated",
     body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
     note: "* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system.",
+    img: "/gx35/built-battery.png",
   },
 ];
 
-// "Designed to disappear" interactive tabs
+
+const storageFormat = [
+  { img: "/gx35/storage-format.png" },
+  { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8" }
+];
+
+// "Designed to disappear" interactive tabs. Tabs without media fall back to
+// FeatureTabs' grey placeholder until GX35 footage is supplied.
 const disappearTabs = [
   {
     title: "Screen-Free by Design",
     body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it's recording, keeping your attention where it belongs, on the road.",
+    video: "/gx4k/disappear-screen-free.mp4", // TODO(gx35-asset)
   },
   {
     title: "Disappears Behind the Mirror",
@@ -519,6 +205,154 @@ const disappearTabs = [
   {
     title: "Details That Think Ahead",
     body: "Thoughtful touches throughout. A microSD slot with an on/off switch lets you pause recording without unplugging, QR-code pairing gets you set up in seconds, and simple physical buttons handle mic, emergency and Wi-Fi.",
+  },
+];
+
+/* Full-bleed MediaSection dividers (title + description over image/video).
+ * These replace the old local `Showcase` component. Media is borrowed from /gx4k
+ * until GX35 art is supplied — every such path is tagged TODO(gx35-asset). */
+
+const mDualVision: MediaSectionData = {
+  title: "Dual Vision",
+  description:
+    "GX35 pairs the Sony STARVIS 2 IMX675 — a 5.12MP next-generation sensor — up front with a 2MP CMOS sensor at the rear. STARVIS 2 lifts low-light clarity while drawing 30% less power than the sensor before it, capturing sharper detail and cleaner footage after dark. Together the dual-sensor setup records every journey front and back with exceptional clarity, less noise and reduced motion blur.",
+  image: "/gx4k/graphic-dual-vision.png", // TODO(gx35-asset)
+  video: "/gx4k/dual-sensors_scrub.mp4", // TODO(gx35-asset) — all-keyframe build, see CLAUDE.md
+  background: "#000",
+  aspectRatio: "2160/1207",
+  textPosition: "14%",
+  theme: "dark",
+  topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+  fade: true,
+  fadeColor: "#000",
+  fadeRange: 0.2,
+  textFrom: "bottom",
+  textOffsetY: 120,
+  textReplay: true,
+  pin: true,
+  pinHeightVh: 250,
+  videoScrub: true,
+  videoScrubStart: 0.2,
+  videoScrubEnd: 0.8,
+};
+
+const mSecondEyes: MediaSectionData = {
+  title: "A second set of eyes.",
+  description: "ADAS Plus watches the road with you, and speaks up before you need to.",
+  image: "/gx35/second-eyes.png", // TODO(gx35-asset)
+  aspectRatio: "2160/1484",
+  theme: "dark",
+  heightVh: 100,
+  textPosition: "8%",
+  heightVhMobile: false,
+};
+
+const mInYourHand: MediaSectionData = {
+  title: "Your Dashcam. In Your Hand.",
+  description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
+  image: "/gx35/your-dashcam.png", 
+  theme: "dark",
+  textPosition: "8%",
+  heightVh: 100,
+  heightVhMobile: false,
+};
+
+const mDiscreet: MediaSectionData = {
+  video: "/gx4k/discreet_scrub.mp4", // TODO(gx35-asset) — all-keyframe build, see CLAUDE.md
+  background: "#000",
+  title: "Discreet by Design.",
+  description:
+    "A screen-free body smaller than a business card, tucked behind your mirror and out of your mind.",
+  aspectRatio: "2160/1484",
+  theme: "dark",
+  textPosition: "14%",
+  textReplay: true,
+  pin: true,
+  pinHeightVh: 250,
+  videoScrub: true,
+  videoScrubStart: 0.2,
+  videoScrubEnd: 0.9,
+};
+
+/* "Memory allocation" tabs — each tab overlays a light-theme BarGraph on its clip.
+ * Values are percentage splits of total storage; `max={100}` pins the scale so bar
+ * lengths are true proportions and stay comparable across tabs. */
+const memoryAllocationTabs = [
+  {
+    title: "Driving Priority",
+    video: "/gx4k/alloc-driving.mp4", // TODO(gx35-asset)
+    componentStatic: true,
+    componentOverlay: true,
+    component: (
+      <BarGraph
+        theme="light"
+        columns={2}
+        max={100}
+        data={[
+          { label: "Driving", value: 70 },
+          { label: "Driving Event", value: 10 },
+          { label: "Parking Motion", value: 15 },
+          { label: "Parking Event", value: 5 },
+        ]}
+      />
+    ),
+  },
+  {
+    title: "Event Priority",
+    video: "/gx4k/alloc-event.mp4", // TODO(gx35-asset)
+    componentStatic: true,
+    componentOverlay: true,
+    component: (
+      <BarGraph
+        theme="light"
+        columns={2}
+        max={100}
+        data={[
+          { label: "Driving", value: 45 },
+          { label: "Driving Event", value: 20 },
+          { label: "Parking Motion", value: 20 },
+          { label: "Parking Event", value: 15 },
+        ]}
+      />
+    ),
+  },
+  {
+    title: "Parking Priority",
+    image: "/gx4k/alloc-parking.png", // TODO(gx35-asset)
+    componentStatic: true,
+    componentOverlay: true,
+    component: (
+      <BarGraph
+        theme="light"
+        columns={2}
+        max={100}
+        data={[
+          { label: "Driving", value: 40 },
+          { label: "Driving Event", value: 10 },
+          { label: "Parking Motion", value: 45 },
+          { label: "Parking Event", value: 5 },
+        ]}
+      />
+    ),
+  },
+  {
+    title: "Driving Only",
+    video: "/gx4k/alloc-only.mp4", // TODO(gx35-asset)
+    componentStatic: true,
+    componentOverlay: true,
+    component: (
+      <BarGraph
+        theme="light"
+        columns={2}
+        max={100}
+        data={[
+          { label: "Driving", value: 85 },
+          { label: "Driving Event", value: 15 },
+          { label: "Parking Motion", value: 0 },
+          { label: "Parking Event", value: 0 },
+        ]}
+      />
+    ),
   },
 ];
 
@@ -577,57 +411,24 @@ const warranty = [
 
 export default function GX35Page() {
   const [fwTab, setFwTab] = useState<"Firmware" | "User Manual" | "Speed Cam Data">("Firmware");
-  const [dtd, setDtd] = useState(0);
 
   return (
-    <main className="overflow-x-clip bg-white">
-      {/* Hero */}
-      <section
-        data-nav-theme="light"
-        className="relative min-h-[600px] sm:min-h-[720px] lg:min-h-[820px] bg-[#eceef0] bg-cover bg-center"
-        style={{ backgroundImage: "url(/products/gx35-hero-scene.jpg)" }}
-      >
-        {/* Legibility scrim keeping the light hero copy readable, stronger on mobile */}
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[600px] sm:h-[560px]"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(236,238,240,0.94) 0%, rgba(236,238,240,0.86) 40%, rgba(236,238,240,0.6) 66%, rgba(236,238,240,0) 100%)",
-          }}
-        />
-        <motion.div
-          className="relative z-10 mx-auto w-full max-w-[840px] px-6 pt-[150px] text-center"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-        >
-          <p className="text-[12.5px] font-semibold uppercase tracking-[0.24em] text-[#6E6E73]">
-            FineVu GX35 · 2-Channel QHD
-          </p>
-          <h1 className="mt-4 text-[2.5rem] sm:text-6xl lg:text-[72px] font-semibold leading-[1.04] tracking-[-0.02em]">
-            <span className="text-[#f68428]">Perfectly Compact.</span>
-            <br />
-            <span className="text-[#1D1D1F]">In Sharp QHD.</span>
-          </h1>
-          <p className="mt-6 mx-auto max-w-full sm:max-w-[520px] text-[18px] leading-[1.55] text-[#6E6E73]">
-            2K QHD clarity and Sony&apos;s newest STARVIS 2 sensor, in a body smaller than a business
-            card.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <Link
-              href="/retailers"
-              className="cta-hover inline-flex h-12 items-center justify-center rounded-full bg-[#f68428] px-9 text-[14px] font-semibold uppercase leading-[20px] text-white"
-            >
-              Find a Retailer
-            </Link>
-          </div>
-        </motion.div>
-      </section>
+    <main className="overflow-x-clip bg-[#F5F5F7]">
+      {/* Hero: scroll-pinned video. `fadeTo` is white so the pinned stage lands on the
+          light page background instead of GX4K's near-black. */}
+      {/* TODO(gx35-asset): borrowed GX4K hero clip until a GX35 one is supplied. */}
+      <ScrollHero
+        video="/gx35/hero.mp4"
+        // poster="/gx4k/hero-bg.webp"
+        beats={HERO_BEATS}
+        theme="light"
+
+      />
 
       {/* Every detail feature bento */}
-      <section data-nav-theme="light" className="bg-white py-20 md:py-28">
+      <section data-nav-theme="light" className=" py-20 md:py-28">
         <motion.div {...fadeUp} className={`${SHELL} mb-12 text-center md:mb-16`}>
-          <Head pre="Every detail. " hi="In Sharp QHD." className="!text-[30px] md:!text-[46px]" />
+          <Head theme="light" pre="Every detail. " grad="In Sharp QHD." className="!text-[30px] md:!text-[46px]" />
           <p className="mx-auto mt-5 max-w-[560px] text-[18px] leading-[1.6] text-[#6E6E73]">
             2K QHD at 30fps across two channels — licence plates, road signs, and low-light
             intersections rendered with uncompromised clarity.
@@ -679,96 +480,79 @@ export default function GX35Page() {
         callouts={opticsCallouts}
       />
 
-      {/* In Sharp QHD showcase */}
-      <Showcase
-        title="In Sharp QHD."
-        subtitle="2560 × 1440 across the front channel — plates, faces and signage rendered with clarity."
-      />
+      {/* Dual Vision showcase */}
+      {/* <MediaSection data={mDualVision} /> */}
 
       {/* See Every Detail carousel */}
-      <Carousel pre="See Every " hi="Detail" cards={cSeeDetail} pinGutter />
+      <Carousel theme="light" pre="Every Detail. " grad="Day or night." cards={cSeeDetail} pinGutter />
 
       {/* Protected While Parked carousel */}
-      <Carousel hi="Protected" post=" While Parked" cards={cParked} pinGutter gutterRight />
+      <Carousel theme="light" grad="Protected" post=" While Parked" cards={cParked} pinGutter gutterRight />
 
       {/* A Second Set of Eyes showcase (ADAS) */}
-      <Showcase
-        title="A Second Set of Eyes."
-        subtitle="ADAS Plus watches the road with you, and speaks up before you need to."
-      />
+      <MediaSection data={mSecondEyes} />
 
       {/* Smarter, Safer Driving carousel */}
-      <Carousel pre="Smarter, " hi="Safer Driving" cards={cSafer} pinGutter />
+      <Carousel theme="light" pre="Smarter, " grad="Safer Driving" cards={cSafer} pinGutter />
 
       {/* Built to Last carousel */}
-      <Carousel pre="Built to Last" cards={cBuilt} pinGutter gutterRight />
+      <Carousel theme="light" pre="Built to Last" cards={cBuilt} pinGutter gutterRight />
 
-      {/* Storage That Manages Itself carousel */}
-      <Carousel pre="Storage That Manages Itself" cards={cStorage} pinGutter />
-
-      {/* Your Dashcam in Your Hand showcase (app) */}
-      <Showcase
-        title="Your Dashcam. In Your Hand."
-        subtitle="Live view, instant downloads and settings, all from your phone. No cables, no card removal."
-      />
-
-      {/* Connected in Your Pocket carousel */}
-      <Carousel hi="Connected" post=" in Your Pocket" cards={cConnected} pinGutter gutterRight />
-
-      {/* Discreet by Design showcase */}
-      <Showcase
-        title="Discreet by Design."
-        subtitle="A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind."
-      />
-
-      {/* Designed to Disappear tabs and detail gallery */}
-      <section data-nav-theme="light" className="bg-white py-20 md:py-28">
-        <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
-          <Head pre="Designed to Disappear" className="!text-[28px] md:!text-[42px]" />
+      {/* Storage That Manages Itself */}
+      <section data-nav-theme="light" className=" pt-20 md:pt-28">
+        <motion.div {...fadeUp} className={`${SHELL} mb-12 text-center md:mb-16`}>
+          <Head theme="light" pre="Storage That Manages Itself" className="!text-[30px] md:!text-[46px]" />
         </motion.div>
 
-        <div className={SHELL}>
-          {/* Banner placeholder for the hidden-behind-mirror still */}
-          <motion.div {...fadeUp} className="aspect-[1297/562] w-full rounded-[32px] bg-[#656565]" />
-
-          {/* Tab selector — active tab is an orange-gradient pill, scrolls on mobile */}
-          <div className="mt-8 overflow-x-auto px-6 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div className="mx-auto flex w-max items-center rounded-full bg-[#e6e6e6]">
-              {disappearTabs.map((t, i) => (
-                <button
-                  key={t.title}
-                  onClick={() => setDtd(i)}
-                  aria-pressed={dtd === i}
-                  className={`cta-hover shrink-0 whitespace-nowrap rounded-full px-6 py-3.5 text-[13px] transition-colors ${
-                    dtd === i ? "font-semibold text-white" : "font-medium text-[#6b6b6b] hover:text-[#1D1D1F]"
-                  }`}
-                  style={
-                    dtd === i
-                      ? { backgroundImage: "linear-gradient(167deg, #ffb682 0%, #f68428 65%, #f68428 100%)" }
-                      : undefined
-                  }
-                >
-                  {t.title}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Active tab copy */}
-          <motion.p
-            key={dtd}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-            className="mx-auto mt-7 max-w-[660px] text-center text-[15px] leading-[1.6] text-[#6E6E73] md:text-[18px]"
-          >
-            {disappearTabs[dtd].body}
-          </motion.p>
+        <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
+          <BentoCard theme="light" {...storageFormat[0]} title="" className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+          <BentoCard
+            theme="light"
+            variant="displayText"
+            title="Format Free 2.0"
+            caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive."
+            className="lg:col-span-6 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
+          />
         </div>
+      </section>
+
+      <section data-nav-theme="light" className=" pt-0 pb-20">
+        <FeatureTabs theme="light" sectionClass="pb-10 min-w-0 md:min-w-[970px]" title="" tabs={memoryAllocationTabs} />
+
+        <motion.div {...fadeUp} className={`${SHELL} text-center`}>
+          <Head theme="light" pre="Memory Allocation" className="!text-[30px] md:!text-[38px]" />
+          <p className="mx-auto mt-5 mb-6 max-w-[660px] text-center text-[15px] leading-[1.6] text-[#6E6E73] md:text-[18px]">
+          Split storage to match how you drive, with Driving, Event, Parking or Driving-Only priority, so the card fills with the footage you actually need.
+          </p>
+          <small className="text-[#9aa0ad]">
+            <div>{`* The MicroSD card is formatted when changing the memory allocation.`}</div>
+            <div>{`* The memory format type is FAT32, and if the format type is different, the dashcam proceeds with formatting automatically.`}</div>
+            <div>{`(After formatting, once you insert it into the device and supply it with power, the formatting will be in progress to set the memory.)`}</div>
+          </small>
+        </motion.div>
+      </section>
+
+      {/* Your Dashcam in Your Hand showcase (app) */}
+      <MediaSection data={mInYourHand} />
+
+      {/* Connected in Your Pocket carousel */}
+      <Carousel theme="light" grad="Connected" post=" in Your Pocket" cards={cConnected} />
+
+      {/* Discreet by Design showcase */}
+      <MediaSection data={mDiscreet} />
+
+      {/* Designed to Disappear tabs and detail gallery */}
+      <section data-nav-theme="light" className=" py-20 md:py-28">
+        <FeatureTabs
+          theme="light"
+          title="Designed to Disappear"
+          tabs={disappearTabs}
+          shellClass={SHELL}
+        />
 
         {/* Small in size, rich in detail macro gallery */}
         <motion.div {...fadeUp} className={`${SHELL} mb-8 mt-16 text-center md:mb-12 md:mt-24`}>
-          <Head pre="Small in size. " hi="Rich in detail." className="!text-[26px] md:!text-[40px]" />
+          <Head theme="light" pre="Small in size. " grad="Rich in detail." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
         <div className={`${SHELL} space-y-4`}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[746fr_527fr]">
@@ -810,33 +594,35 @@ export default function GX35Page() {
       </section>
 
       {/* More Reasons to Choose FineVu bento */}
-      <section data-nav-theme="light" className="py-16 md:py-24" style={{ background: BACKING }}>
+      <section data-nav-theme="light" className="py-16 md:py-24">
         <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
-          <Head pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
+          <Head theme="light" pre="More reasons to choose FineVu." className="!text-[26px] md:!text-[40px]" />
         </motion.div>
         <div className={`${SHELL} space-y-4 sm:space-y-5`}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
-            <BentoTile img="/gx4k/no1.webp" label="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
-            <BentoTile
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/no1.png" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
+            <BentoCard
+              theme="light"
+              variant="overlayLabel"
               img="/gx4k/warranty3.webp"
-              label="3 Year Warranty"
+              title="3 Year Warranty"
               sup="1"
               imgClass="object-[50%_42%]"
               className="aspect-[550/600] sm:aspect-auto sm:h-full"
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-            <BentoTile img="/gx4k/microsd.webp" label="Includes 64GB MicroSD Card" sup="2" className="aspect-[640/400]" />
-            <BentoTile img="/gx4k/cables.webp" label="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/microsd.png" title="Includes 64GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/cables.png" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
           </div>
         </div>
       </section>
 
       {/* Leave the Wiring to the Experts install */}
-      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+      <section data-nav-theme="light" className="py-16 md:py-24">
         <div className={`${SHELL} text-center`}>
           <motion.div {...fadeUp}>
-            <Head pre="Leave the Wiring to the Experts." className="!text-[28px] md:!text-[42px]" />
+            <Head theme="light" pre="Leave the Wiring to the Experts." className="!text-[28px] md:!text-[42px]" />
           </motion.div>
           <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[28px] border border-[#ececf0]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -861,10 +647,10 @@ export default function GX35Page() {
       </section>
 
       {/* Full Specifications */}
-      <section data-nav-theme="light" className="py-16 md:py-24" style={{ background: BACKING }}>
+      <section data-nav-theme="light" className="py-16 md:py-24">
         <div className={SHELL}>
           <motion.div {...fadeUp} className="mb-10 text-center">
-            <Head pre="Full Specifications" className="!text-[28px] md:!text-[40px]" />
+            <Head theme="light" pre="Full Specifications" className="!text-[28px] md:!text-[40px]" />
           </motion.div>
           <div className="mx-auto max-w-[900px] border-t border-[#e3e3e6]">
             {specRows.map(([label, value], i) => (
@@ -887,10 +673,10 @@ export default function GX35Page() {
       </section>
 
       {/* What's in the Box */}
-      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
+      <section data-nav-theme="light" className=" py-16 md:py-24">
         <div className={`${SHELL} text-center`}>
           <motion.div {...fadeUp}>
-            <Head pre="What’s in The Box?" className="!text-[28px] md:!text-[40px]" />
+            <Head theme="light" pre="What’s in The Box?" className="!text-[28px] md:!text-[40px]" />
           </motion.div>
           <div className="mx-auto mt-10 grid max-w-[760px] grid-cols-2 gap-x-10 gap-y-5 sm:grid-cols-3 md:mt-12">
             {boxItems.map((it) => (
@@ -908,21 +694,23 @@ export default function GX35Page() {
               </p>
             ))}
           </div>
-          <motion.div {...fadeUp} className="mt-10 md:mt-12">
-            <ImgBlock ratio="aspect-[1300/519]" label="GX35 box contents — front & rear cameras, cables, mount, MicroSD card and manual" />
+          <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[32px] md:mt-12">
+            {/* TODO(gx35-asset): borrowed GX4K box shot until a GX35 one is supplied. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/gx35/box.png" alt="FineVu GX35 box contents" className="aspect-[1300/519] w-full object-cover" />
           </motion.div>
         </div>
       </section>
 
       {/* FineVu Series Comparison */}
-      <section data-nav-theme="light" className="py-16 md:py-24" style={{ background: BACKING }}>
+      <section data-nav-theme="light" className="py-16 md:py-24" >
         <div className={SHELL}>
           <motion.div
             {...fadeUp}
-            className="mx-auto max-w-[992px] rounded-[32px] bg-white px-5 py-10 shadow-[0_20px_60px_rgba(20,22,40,0.08)] sm:px-10 md:rounded-[46px] md:px-14 md:py-16"
+            className="mx-auto max-w-[992px] rounded-[32px] bg-[#eaeaea] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16"
           >
             <div className="text-center">
-              <Head pre="FineVu Series Comparison" className="!text-[26px] md:!text-[40px]" />
+              <Head theme="light" pre="FineVu Series Comparison" className="!text-[26px] md:!text-[40px]" />
             </div>
 
             <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-8 md:mt-12">
@@ -937,7 +725,7 @@ export default function GX35Page() {
                 <div className="flex flex-1 items-center justify-center py-6 md:py-8">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/gx4k/compare-gx4k.webp"
+                    src="/gx35/compare-gx4k.png"
                     alt="FineVu GX4K front and rear cameras"
                     className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[180px]"
                   />
@@ -964,7 +752,7 @@ export default function GX35Page() {
                 <div className="flex flex-1 items-center justify-center py-6 md:py-8">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/gx4k/compare-gx35.webp"
+                    src="/gx35/compare-gx35.png"
                     alt="FineVu GX35"
                     className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[180px]"
                   />
@@ -997,9 +785,9 @@ export default function GX35Page() {
       </section>
 
       {/* Firmware / Downloads */}
-      <section data-nav-theme="light" className="bg-white py-16 md:py-24">
-        <div className={`${SHELL} max-w-[820px]`}>
-          <div className="mx-auto flex w-full max-w-[440px] rounded-full border border-[#e3e3e6] p-1">
+      <section data-nav-theme="light" className=" py-16 md:py-24">
+        <div className={`${SHELL} !max-w-[1050px] flex flex-col gap-10`}>
+          <div className=" flex w-full rounded-full border border-[#e3e3e6] bg-[#eaeaea] p-1">
             {(["Firmware", "User Manual", "Speed Cam Data"] as const).map((t) => (
               <button
                 key={t}
@@ -1013,7 +801,7 @@ export default function GX35Page() {
             ))}
           </div>
 
-          <div className="mt-10">
+          <div  className=" w-full rounded-[32px] bg-[#eaeaea] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16">
             <h3 className="text-lg font-semibold text-[#1D1D1F]">Instructions</h3>
             {fwTab === "Firmware" ? (
               <>
@@ -1038,12 +826,12 @@ export default function GX35Page() {
       </section>
 
       {/* Help / quick links — Where to buy, Install, Support */}
-      <LearnMoreLinks />
+      <LearnMoreLinks  />
 
       {/* Warranty disclaimer */}
-      <section data-nav-theme="light" className="py-12 md:py-14" style={{ background: BACKING }}>
+      <section data-nav-theme="light" className="py-12 md:py-14">
         <div className={SHELL}>
-          <ol className="mx-auto max-w-[1220px] list-decimal space-y-4 ps-5 text-[12px] font-medium leading-[18px] text-[#9aa0ad]">
+          <ol className="max-w-[1220px] list-decimal space-y-4 ps-5 text-[12px] font-medium leading-[18px] text-[#9aa0ad]">
             {warranty.map(([h, body]) => (
               <li key={h}>
                 {h}

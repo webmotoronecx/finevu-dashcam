@@ -20,7 +20,7 @@ import { useEffect, useRef } from "react";
  */
 
 export type BentoCardTheme = "dark" | "light";
-export type BentoCardVariant = "image" | "displayText";
+export type BentoCardVariant = "image" | "displayText" | "overlayLabel";
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -38,6 +38,10 @@ const THEME: Record<
     radius: string;
     placeholder: string;
     scrim: string;
+    /** "reasons"-grid tile: rounder, bottom-only scrim under a centered white label. */
+    labelRadius: string;
+    labelBorder: string;
+    labelScrim: string;
     panel: string;
     panelTitle: string;
     panelCaption: string;
@@ -49,6 +53,9 @@ const THEME: Record<
     radius: "rounded-[22px]",
     placeholder: "bg-[#26262b]",
     scrim: "from-black/55 via-transparent to-black/70",
+    labelRadius: "rounded-[32px]",
+    labelBorder: "",
+    labelScrim: "from-black/70 via-black/20 to-transparent",
     panel: "bg-[#0d0d0d]",
     panelTitle: "text-white",
     panelCaption: "text-white/55",
@@ -59,6 +66,9 @@ const THEME: Record<
     radius: "rounded-[24px]",
     placeholder: "bg-[#656565]",
     scrim: "from-black/45 via-transparent to-black/55",
+    labelRadius: "rounded-[32px]",
+    labelBorder: "border border-[#ececf0]",
+    labelScrim: "from-black/45 via-black/10 to-transparent",
     panel: "bg-white",
     panelTitle: "text-[#1d1d1f]",
     panelCaption: "text-[#6E6E73]",
@@ -72,6 +82,8 @@ export function BentoCard({
   caption,
   img,
   video,
+  sup,
+  imgClass = "",
   className = "",
 }: {
   theme?: BentoCardTheme;
@@ -79,6 +91,10 @@ export function BentoCard({
   title?: string;
   caption?: string;
   img?: string;
+  /** `overlayLabel` only — footnote marker rendered as `[n]` after the label. */
+  sup?: string;
+  /** `overlayLabel` only — extra classes on the media element (e.g. "object-top"). */
+  imgClass?: string;
   /** Banner video (public path or remote URL). Takes precedence over `img`; `img` is
    *  used as its poster. Plays muted/looped only while the tile is on-screen. */
   video?: string;
@@ -117,6 +133,45 @@ export function BentoCard({
             {caption}
           </p>
         )}
+      </motion.div>
+    );
+  }
+
+  // "More reasons to choose FineVu" tile: full-bleed media, bottom-only scrim, and a
+  // single centered white label (optionally footnoted). Shared by both product pages.
+  if (variant === "overlayLabel") {
+    return (
+      <motion.div
+        {...fadeUp}
+        className={`tile-hover relative overflow-hidden ${t.labelRadius} ${t.labelBorder} ${className}`}
+      >
+        {video || img ? (
+          <>
+            {video ? (
+              <video
+                ref={videoRef}
+                src={video}
+                poster={img}
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                aria-label={title}
+                className={`absolute inset-0 h-full w-full object-cover ${imgClass}`}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={img} alt={title} className={`absolute inset-0 h-full w-full object-cover ${imgClass}`} />
+            )}
+            <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t ${t.labelScrim}`} />
+          </>
+        ) : (
+          <div className={`absolute inset-0 ${t.placeholder}`} />
+        )}
+        <p className="absolute inset-x-0 bottom-6 px-4 text-center text-[16px] md:text-[22px] font-semibold text-white">
+          {title}
+          {sup && <sup className="ml-0.5 align-super text-[11px] font-medium md:text-[13px]">[{sup}]</sup>}
+        </p>
       </motion.div>
     );
   }

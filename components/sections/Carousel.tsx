@@ -8,7 +8,31 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // Default page shell width (GX4K). Override per-page via the `shellClass` prop.
 const DEFAULT_SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
-const BODY = "text-[15px] md:text-[18px] leading-[1.6] text-[#a6a6a6]";
+
+export type CarouselTheme = "dark" | "light";
+
+// Only the tokens that actually differ between the two product pages.
+const THEME: Record<
+  CarouselTheme,
+  { title: string; body: string; note: string; sub: string; border: string; navBtn: string }
+> = {
+  dark: {
+    title: "text-white",
+    body: "text-[#a6a6a6]",
+    note: "text-[#8f8f8f]",
+    sub: "text-[#a6a6a6]",
+    border: "border border-white/[0.06]",
+    navBtn: "border-white/15 text-white/80 hover:text-white",
+  },
+  light: {
+    title: "text-[#1D1D1F]",
+    body: "text-[#6E6E73]",
+    note: "text-[#9aa0ad]",
+    sub: "text-[#6E6E73]",
+    border: "",
+    navBtn: "border-[#dcdce0] text-[#6E6E73] hover:text-[#1D1D1F]",
+  },
+};
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -38,20 +62,26 @@ export function Carousel({
   pre,
   grad,
   post,
+  sub,
   cards,
   alignEnd,
   pinGutter,
   gutterRight,
-  imgAspect = "73 / 50",
+  // Matches the Figma card frame; both product pages use it, so it's the default
+  // rather than something every call site has to remember to pass.
+  imgAspect = "1047 / 562",
   shellClass = DEFAULT_SHELL,
   bgImage,
   bgImageSrcSet,
   bgImageSizes,
   bgClassName = "",
+  theme = "dark",
 }: {
   pre?: string;
   grad?: string;
   post?: string;
+  /** Optional subtitle under the heading. */
+  sub?: string;
   cards: Card[];
   alignEnd?: boolean;
   pinGutter?: boolean;
@@ -66,7 +96,9 @@ export function Carousel({
   bgImageSizes?: string;
   /** Section background utility classes, e.g. a color or gradient ("bg-black") */
   bgClassName?: string;
+  theme?: CarouselTheme;
 }) {
+  const t = THEME[theme];
   const vpRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [tx, setTx] = useState(0);
@@ -214,7 +246,7 @@ export function Carousel({
   const nextOff = atEnd;
 
   return (
-    <section data-nav-theme="dark" className={`relative py-16 md:py-24 ${bgClassName}`}>
+    <section data-nav-theme={theme} className={`relative py-16 md:py-24 ${bgClassName}`}>
       {bgImage && (
         <ImageWithFallback
           src={bgImage}
@@ -225,7 +257,12 @@ export function Carousel({
         />
       )}
       <div className={`relative z-10 ${shellClass} mb-8 md:mb-12 text-center`}>
-        <Head pre={pre} grad={grad} post={post} className="!text-[26px] md:!text-[38px]" />
+        <Head pre={pre} grad={grad} post={post} theme={theme} className="!text-[26px] md:!text-[38px]" />
+        {sub && (
+          <p className={`mx-auto mt-4 max-w-[520px] text-[15px] leading-[1.6] md:text-[18px] ${t.sub}`}>
+            {sub}
+          </p>
+        )}
       </div>
       <div
         ref={vpRef}
@@ -257,7 +294,7 @@ export function Carousel({
             >
               {c.video || c.img ? (
                 <div
-                  className="tile-scale relative overflow-hidden rounded-[22px] border border-white/[0.06]"
+                  className={`tile-scale relative overflow-hidden rounded-[22px] ${t.border}`}
                   style={{ aspectRatio: imgAspect }}
                 >
                   {c.video ? (
@@ -287,15 +324,15 @@ export function Carousel({
                 // placeholder until real imagery is supplied — Figma 113:3760 (#656565)
                 <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
               )}
-              <h3 className="mt-6 text-[22px] md:text-2xl font-semibold text-white">
+              <h3 className={`mt-6 text-[22px] md:text-2xl font-semibold ${t.title}`}>
                 {c.title}
               </h3>
-              <p className={`mt-3 max-w-[540px] ${BODY} !text-[14px] md:!text-[16px]`}>
+              <p className={`mt-3 max-w-[540px] text-[14px] md:text-[16px] leading-[1.6] ${t.body}`}>
                 {c.body}
               </p>
               {c.note && (
-                // per-card footnote — Figma 113:3785 (#8f8f8f, 12px medium)
-                <p className="mt-3 max-w-[540px] text-[12px] font-medium leading-[1.6] text-[#8f8f8f]">
+                // per-card footnote — Figma 113:3785 (12px medium)
+                <p className={`mt-3 max-w-[540px] text-[12px] font-medium leading-[1.6] ${t.note}`}>
                   {c.note}
                 </p>
               )}
@@ -312,7 +349,7 @@ export function Carousel({
           onClick={goPrev}
           disabled={prevOff}
           aria-label="Previous"
-          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white disabled:cursor-default disabled:opacity-30"
+          className={`cta-hover flex h-11 w-11 items-center justify-center rounded-full border ${t.navBtn} disabled:cursor-default disabled:opacity-30`}
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
@@ -320,7 +357,7 @@ export function Carousel({
           onClick={goNext}
           disabled={nextOff}
           aria-label="Next"
-          className="cta-hover flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/80 hover:text-white disabled:cursor-default disabled:opacity-30"
+          className={`cta-hover flex h-11 w-11 items-center justify-center rounded-full border ${t.navBtn} disabled:cursor-default disabled:opacity-30`}
         >
           <ChevronRight className="h-5 w-5" />
         </button>

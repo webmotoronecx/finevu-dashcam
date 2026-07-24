@@ -70,7 +70,7 @@ function Hero({
         // Readability scrim so overlaid copy stays legible over the video.
         <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/20" />
       )}
-      <div className="absolute inset-x-0 top-[15.1%] flex flex-col items-center text-center px-6">
+      <div className="absolute inset-x-0 top-[55%] -translate-y-50 md:top-[15.1%] md:translate-y-0 flex flex-col items-center text-center px-6">
         <motion.p
           className={`${text}${shadow} font-bold text-[11.5px] leading-[17px] tracking-[0.28em] uppercase`}
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}

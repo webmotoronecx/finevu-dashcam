@@ -14,6 +14,11 @@ export type BrandLogo = {
   invert?: boolean;
 };
 
+export type Disclaimer = {
+  title: string;
+  body: string;
+};
+
 export type SiteConfig = {
   /** Site metadata */
   name: string;
@@ -63,6 +68,19 @@ export type SiteConfig = {
 
   /** Routes that render the Coming Soon placeholder instead of their content */
   comingSoon: string[];
+
+  /**
+   * Legal fine print, rendered by <LegalDisclaimers>.
+   *
+   * ORDER IS LOAD-BEARING. The sup="1|2|3" footnote markers on the BentoCard tiles
+   * (gx4k, gx35) and the homepage `reasons` tiles reference these entries **by
+   * position**: 1 = Warranty, 2 = SD Cards, 3 = Hardwire Kit. Reordering silently
+   * breaks those references — there is no build or type error to catch it. Append
+   * new entries at the end; never reorder.
+   *
+   * Numbering is rendered from <ol> order, so never hardcode "1." into a title.
+   */
+  disclaimers: Disclaimer[];
 };
 
 export const siteConfig: SiteConfig = {
@@ -126,14 +144,35 @@ export const siteConfig: SiteConfig = {
   // Routes here render the Coming Soon placeholder instead of their page content.
   // e.g. ["/services", "/about"]
   comingSoon: [
-   
-    "/become-a-retailer", 
-    "/contact", 
+
+    "/become-a-retailer",
+    "/contact",
     "/faq",
     "/how-it-works",
     "/learn",
     "/retailers",
     "/services",
-    
+
+  ],
+
+  // Order is load-bearing — see the `disclaimers` docs on SiteConfig above.
+  disclaimers: [
+    {
+      title: "Warranty",
+      body:
+        "3-Year Warranty applies to FineVu dash cam main units only, including front and rear cameras, for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6-month warranty. Proof of purchase required. Full warranty terms apply. Your rights under the Australian Consumer Law are not excluded.",
+    },
+    {
+      title: "SD Cards",
+      body:
+        "GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6-month warranty.",
+    },
+    {
+      // NOTE: inclusion of the Hardwire Kit is pending confirmation from ops —
+      // see item D in docs/content-accuracy-audit-2026-07-24.md.
+      title: "Hardwire Kit & Power Cable",
+      body:
+        "GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6-month warranty.",
+    },
   ],
 };

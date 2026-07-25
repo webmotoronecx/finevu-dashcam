@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { PageHero } from "@/components/sections/PageHero";
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -242,21 +243,10 @@ export default function Page() {
       {/* Learn more strip */}
       <LearnMoreLinks />
 
-      {/* Fine print */}
-      <section className="bg-[#f4f4f5] pb-16" data-nav-theme="light">
-        <div className="mx-auto max-w-[900px] px-6">
-          <ol className="list-decimal border-t border-[#e7e7ea] ps-[18px] pt-8">
-            <li className="text-[12px] font-medium leading-[18px] text-[#838383]">
-              Warranty
-              <br />
-              3 Year Warranty applies to FineVu dash cam main units only, including front and rear cameras,
-              for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6 month
-              warranty. Proof of purchase required. Full warranty terms apply. Your rights under the
-              Australian Consumer Law are not excluded.
-            </li>
-          </ol>
-        </div>
-      </section>
+      {/* Fine print — copy lives in siteConfig.disclaimers.
+          limit={1}: this page only cites the warranty ([1] on the trust card), not the
+          SD-card or hardwire-kit claims. */}
+     <LegalDisclaimers theme="light" limit={1} />
 
       <Footer />
     </div>

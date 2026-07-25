@@ -3,6 +3,7 @@
 import { Footer } from '@/components/Footer';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 import { LearnMoreLinks } from '@/components/LearnMoreLinks';
+import { LegalDisclaimers } from '@/components/LegalDisclaimers';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { articles } from '@/lib/data/articles';
 import {
@@ -136,20 +137,13 @@ const reviews = [
     body: "I was surprised by the quality of the video, super good in day and especially better in night! The camera doesn't overheat, and the mobile app is very user friendly, easy to change the settings and download the files I require.",
   },
   {
-    thumb: '/products/gx35-studio.jpg', product: 'FineVu GX35', tagline: 'Video recording was extremely clear',
-    body: 'Really compact and the video recording was extremely clear. Value for money as well',
+    thumb: '/products/gx35-studio.jpg', product: 'FineVu GX35', tagline: 'Crispy clear image',
+    body: 'Crispy clear image. easy connection to phone for straight forward download.',
   },
   {
-    thumb: '/products/gx4k-studio.jpg', product: 'FineVu GX1000', tagline: 'Easy to navigate the app and program',
-    body: 'I am very satisfied with my product GX1000. Great quality. Easy to navigate the app and program. Reliable brand with excellent after sales service. Best parts is able inform speed camera. Value for money.',
+    thumb: '/products/gx4k-studio.jpg', product: 'FineVu GX4K', tagline: 'Would definitely recommend',
+    body: 'Great product, excellent for my current usage. Will definitely recommend to all my friends and family.',
   },
-];
-
-/* Disclaimers */
-const disclaimers = [
-  { n: 1, title: 'Warranty', body: '3 Year Warranty applies to FineVu dash cam main units only, including front and rear cameras, for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6 month warranty. Proof of purchase required. Full warranty terms apply. Your rights under the Australian Consumer Law are not excluded.' },
-  { n: 2, title: 'SD Cards', body: 'GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6 month warranty.' },
-  { n: 3, title: 'Hardwire Kit & Power Cable', body: 'GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6 month warranty.' },
 ];
 
 export default function Page() {
@@ -179,9 +173,9 @@ export default function Page() {
         theme="dark"
         image="/home/hero-gx35.jpg"
         video="/home/GX35_Hero_Video_v2.mp4"
-        eyebrow="FineVu GX35 2k · 2-Channel 2k QHD"
+        eyebrow="FineVu GX35 · 2-Channel QHD"
         title="GX35"
-        sub="QHD 2K clarity in a camera smaller than a credit card - now with a live view of your car from anywhere in the world."
+        sub="QHD 2K clarity in a camera smaller than a credit card - with in-app live view straight from your phone."
         href="/gx35"
       />
 
@@ -234,7 +228,7 @@ export default function Page() {
           <motion.div className="text-center max-w-[760px] mx-auto mb-14" {...fadeUp}>
             <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dashcams.</h2>
             <p className={`${SUB} mt-5`}>
-              Built by FINEDIGITAL, an automotive-IT specialist since 2009, held to a standard the numbers prove.
+              Built by FINEDIGITAL, an automotive-IT specialist since 1992, held to a standard the numbers prove.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -317,17 +311,8 @@ export default function Page() {
       {/* Where to buy / Install / Support */}
       <LearnMoreLinks className='!pt-0' />
 
-      {/* Disclaimers */}
-      <section className="bg-[#ededf0] py-10" data-nav-theme="light">
-        <div className="max-w-[1240px] mx-auto px-6 space-y-5">
-          {disclaimers.map((d) => (
-            <div key={d.n} className="text-[#8b8b95] text-[13px] leading-[19px]">
-              <p className="mb-0.5">{d.n}. {d.title}</p>
-              <p className="pl-4 max-w-[1219px]">{d.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Disclaimers — copy lives in siteConfig.disclaimers */}
+      <LegalDisclaimers theme="light" />
 
       <Footer />
     </div>

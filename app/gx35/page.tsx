@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { OpticsSection } from "@/components/sections/OpticsSection";
 import { BentoCard } from "@/components/sections/BentoCard";
 import { MediaSection, type MediaSectionData } from "@/components/sections/MediaSection";
@@ -10,9 +11,9 @@ import { Carousel, type Card } from "@/components/sections/Carousel";
 import { FeatureTabs } from "@/components/sections/FeatureTabs";
 import { BarGraph } from "@/components/sections/BarGraph";
 import { ScrollHero, type HeroBeat } from "@/components/sections/ScrollHero";
+import { FirmwareDownloads, type FirmwareTab } from "@/components/sections/FirmwareDownloads";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
 import { Eye } from "lucide-react";
 
 // FineVu GX35 product page — light alternating layout with real photography and grey placeholders per the Figma frame.
@@ -113,7 +114,7 @@ const cParked: Card[] = [
   },
   {
     title: "Smart Time-Lapse",
-    body: "Records at 10fps while parked, then jumps to 30fps the instant something happens — up to 743 minutes of coverage without filling the card.",
+    body: "Records a lightweight time-lapse while parked, then jumps to full 30fps the instant an impact is detected — up to 1,129 minutes of coverage without filling the card.",
     img: "/gx35/protected-smart.png",
   },
   {
@@ -196,7 +197,7 @@ const disappearTabs = [
   },
   {
     title: "Disappears Behind the Mirror",
-    body: "At just 74mm wide and 76g, the front unit is smaller than a standard business card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g.",
+    body: "At just 74mm wide and 57g, the front unit is smaller than a standard business card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g.",
   },
   {
     title: "One Cable, Clean Install",
@@ -358,13 +359,13 @@ const memoryAllocationTabs = [
 
 const specRows: [string, string][] = [
   ["Front camera", "SONY STARVIS 2 IMX675 · 5.12 MP · 2560 × 1440 (Quad HD) · 147.4° FOV"],
-  ["Rear camera", "2.13 MP CMOS · 1920 × 1080 (Full HD) · 143.2° FOV"],
+  ["Rear camera", "2 MP CMOS · 1920 × 1080 (Full HD) · 143.2° FOV"],
   ["Processor", "Dual-core"],
   ["Night vision", "HDR + Auto Night Vision with AI light-environment adjustment"],
   ["Recording modes", "Continuous · Impact · Emergency · Parking (motion + impact) · Smart Time-Lapse"],
   ["Parking mode", "Power Saving Parking — up to 98% less power · 20-sec event capture with 10-sec pre-buffer"],
   ["Driver assistance", "ADAS Plus — FVMA (front vehicle motion alert) · LDWS (lane departure)"],
-  ["Connectivity", "Built-in Wi-Fi · External GPS · FineVu Wi-Fi App"],
+  ["Connectivity", "Built-in Wi-Fi · Built-in GPS · FineVu Wi-Fi App"],
   ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
   ["Protection", "Low voltage cut-off · G-sensor · AI heat monitoring · Supercapacitor"],
   ["Safety database", "Speed camera alerts, GPS-supported"],
@@ -385,7 +386,7 @@ const compareRows: [string, string, string][] = [
   ["Rear Resolution", "Full HD 1920×1080", "Full HD 1920×1080"],
   ["Max Video", "4K 30fps", "2K 30fps"],
   ["Field of View", "136°F · 143°R", "147°F · 143°R"],
-  ["GPS", "Built-in", "External (included)"],
+  ["GPS", "Built-in", "Built-in"],
   ["Parking Standby", "+2,325 hrs", "+13,950 hrs"],
   ["Processor", "Allwinner V536", "Allwinner V536"],
   ["Warranty", "3 Years", "3 Years"],
@@ -393,25 +394,50 @@ const compareRows: [string, string, string][] = [
 
 const firmwareSteps = [
   "Download the latest firmware.",
-  "Remove the Micro SD card from your dashcam. Insert it into a Micro SD card reader and connect the reader to the PC.",
+  "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
   "When the reader is connected to the PC, a USB drive or new disk drive will be created. (It's recommended to format the Micro SD card used for another device before you upgrade the firmware.)",
-  "Copy the downloaded firmware onto the top-level root of the memory card.",
-  "Insert the Micro SD card into the device. Turn on the vehicle or start the engine to turn on the device.",
+  "Copy the downloaded firmware on the top-level root of the memory card.",
+  "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
   "The firmware update starts automatically.",
   "The system will automatically restart once the firmware update is completed.",
 ];
 
-const warranty = [
-  ["Warranty", "3 Year Warranty applies to FineVu dash cam main units only, including front and rear cameras, for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6 month warranty. Proof of purchase required. Full warranty terms apply. Your rights under the Australian Consumer Law are not excluded."],
-  ["SD Cards", "GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6 month warranty."],
-  ["Hardwire Kit & Power Cable", "GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6 month warranty."],
+const speedCamSteps = [
+  "Download the latest Speed Cam data file.",
+  "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
+  "When the reader is connected to the PC, a USB drive or new disk drive will be created.",
+  "Copy the downloaded Speed Cam data file on the top-level root of the memory card.",
+  "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
+  "The Speed Cam data file update starts automatically.",
+  "The system will automatically restart once the Speed Cam data file update is completed.",
+];
+
+const downloadTabs: FirmwareTab[] = [
+  {
+    name: "Firmware",
+    heading: "Instructions",
+    steps: firmwareSteps,
+    warning:
+      "Do not power off your dashcam until it begins continuous recording, as it may cause permanent damage to the dashcam.",
+    // downloadLabel: "Download Firmware",
+  },
+  {
+    name: "User Manual",
+    // heading: "User Manual",
+    intro: "Coming soon",
+    // downloadLabel: "Download User Manual (PDF)",
+  },
+  {
+    name: "Speed Cam Data",
+    heading: "Instructions",
+    steps: speedCamSteps,
+    // downloadLabel: "Download Speed Cam Data",
+  },
 ];
 
 // Component
 
 export default function GX35Page() {
-  const [fwTab, setFwTab] = useState<"Firmware" | "User Manual" | "Speed Cam Data">("Firmware");
-
   return (
     <main className="overflow-x-clip bg-[#F5F5F7]">
       {/* Hero: scroll-pinned video. `fadeTo` is white so the pinned stage lands on the
@@ -667,10 +693,6 @@ export default function GX35Page() {
               </motion.div>
             ))}
           </div>
-          <p className="mx-auto mt-6 max-w-[900px] text-xs text-[#9aa0ad]">
-            Specifications compiled from FineVu published materials — confirm final figures against
-            the official GX35 spec sheet before publishing.
-          </p>
         </div>
       </section>
 
@@ -787,63 +809,13 @@ export default function GX35Page() {
       </section>
 
       {/* Firmware / Downloads */}
-      <section data-nav-theme="light" className=" pb-16 md:pb-24">
-        <div className={`${SHELL} !max-w-[1050px] flex flex-col gap-10`}>
-          <div className=" flex w-full rounded-full border border-[#e3e3e6] bg-[#eaeaea] p-1">
-            {(["Firmware", "User Manual", "Speed Cam Data"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setFwTab(t)}
-                className={`flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors ${
-                  fwTab === t ? "bg-[#f68428] text-white" : "text-[#6E6E73] hover:text-[#1D1D1F]"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          <div  className=" w-full rounded-[32px] bg-[#eaeaea] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16">
-            <h3 className="text-lg font-semibold text-[#1D1D1F]">Instructions</h3>
-            {fwTab === "Firmware" ? (
-              <>
-                <ol className="mt-4 list-decimal space-y-2.5 pl-5 text-[14px] leading-relaxed text-[#6E6E73]">
-                  {firmwareSteps.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ol>
-                <p className="mt-5 text-[13px] text-[#e5484d]">
-                  Do not power off your dashcam until it begins continuous recording, as it may cause
-                  permanent damage to the dashcam.
-                </p>
-              </>
-            ) : (
-              <p className="mt-4 text-[14px] leading-relaxed text-[#6E6E73]">
-                Download the latest {fwTab.toLowerCase()} for your GX35 from the FineVu support
-                library, then follow the included guide.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      <FirmwareDownloads tabs={downloadTabs} theme="light" ariaLabel="GX35 downloads" />
 
       {/* Help / quick links — Where to buy, Install, Support */}
       <LearnMoreLinks  />
 
-      {/* Warranty disclaimer */}
-      <section data-nav-theme="light" className="py-12 md:py-14">
-        <div className={SHELL}>
-          <ol className="max-w-[1220px] list-decimal space-y-4 ps-5 text-[12px] font-medium leading-[18px] text-[#9aa0ad]">
-            {warranty.map(([h, body]) => (
-              <li key={h}>
-                {h}
-                <br />
-                {body}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      {/* Warranty disclaimer — copy lives in siteConfig.disclaimers */}
+      <LegalDisclaimers theme="light" />
 
       {/* CTA + footer band (shared component matches the frame's closing) */}
       <Footer />

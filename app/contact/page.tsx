@@ -32,10 +32,10 @@ const channels = [
     icon: Mail,
     title: "Email Support",
     desc: "Send us a detailed inquiry",
-    big: "support@finevuaustralia.com",
+    big: "support@finevuaustralia.com.au",
     small: "Response within 24 hours",
     cta: "Send Email",
-    href: "mailto:support@finevuaustralia.com",
+    href: "mailto:support@finevuaustralia.com.au",
   },
 ];
 

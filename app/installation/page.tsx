@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { submitForm } from "@/lib/submitForm";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
@@ -33,7 +34,7 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT", "NT"];
+const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT"];
 const SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DOWS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -78,12 +79,6 @@ const FAQS = [
   { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. There's no payment to book — your installer collects the $250 on the day and you'll get a receipt then." },
   { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we're expanding. If we can't reach you right now, we'll let you know promptly and help you find a suitable local option. Installation is not currently available in the Northern Territory." },
   { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we'll move it to a time that suits. There's no fee to reschedule with notice." },
-];
-
-const FINE_PRINT = [
-  ["1. Warranty:", "3-Year Warranty applies to FineVu dash cam main unit cameras, including front and rear cameras, for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6-month warranty. Proof of purchase required. Full warranty terms apply. Your rights under the Australian Consumer Law are not excluded."],
-  ["2. SD Cards:", "GX4K includes a FineVu 128GB MicroSD Card and Adapter. GX35 includes a FineVu 64GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6-month warranty."],
-  ["3. Hardwire Kit & Power Cable:", "GX4K and GX35 include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6-month warranty."],
 ];
 
 type Coverage ={ msg: string; cls: "ok" | "warn" | "err" | "" };
@@ -566,12 +561,8 @@ export default function Page() {
       {/* Learn more strip */}
       <LearnMoreLinks />
 
-      {/* Fine print */}
-      <section className="bg-[#f7f7f7] pb-16" data-nav-theme="light">
-        <div className="mx-auto max-w-[900px] px-6">
-          <ol className="grid gap-3.5 border-t border-[#e7e7ea] pt-8">{FINE_PRINT.map(([n, t]) => <li key={n} className="text-[12px] leading-[1.6] text-[#9c9ca3]"><b className="font-semibold text-[#6e6e73]">{n}</b> {t}</li>)}</ol>
-        </div>
-      </section>
+      {/* Fine print — copy lives in siteConfig.disclaimers */}
+      <LegalDisclaimers theme="light" />
 
       <Footer />
     </div>

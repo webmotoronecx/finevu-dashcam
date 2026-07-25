@@ -817,8 +817,8 @@ export const installationTermsSections: PolicySection[] = [
           "Level 9, 3 Nexus Court",
           "Mulgrave VIC 3170",
           "Australia",
-          "Telephone: (03) 8809 2700",
-          "Email: support@finevudashcam.com.au",
+          "Telephone: 1800 818 288",
+          "Email: support@finevuaustralia.com.au",
         ],
       },
       {

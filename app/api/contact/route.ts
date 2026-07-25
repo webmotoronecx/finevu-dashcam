@@ -5,7 +5,7 @@ import { Resend } from "resend";
 // secret RESEND_API_KEY (never exposed to the browser). Recipient and sender are
 // overridable via env; the sender must be on a domain verified in Resend once
 // finevuaustralia.com.au is set up (until then Resend only allows onboarding@resend.dev).
-const TO_EMAIL = process.env.CONTACT_TO_EMAIL || "support@finevuaustralia.com";
+const TO_EMAIL = process.env.CONTACT_TO_EMAIL || "support@finevuaustralia.com.au";
 const FROM_EMAIL = process.env.CONTACT_FROM_EMAIL || "FineVu Website <onboarding@resend.dev>";
 
 type Payload = {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { ok: false, error: "This form isn’t configured yet. Please email support@finevuaustralia.com directly." },
+      { ok: false, error: "This form isn’t configured yet. Please email support@finevuaustralia.com.au directly." },
       { status: 503 },
     );
   }

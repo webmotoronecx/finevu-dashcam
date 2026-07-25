@@ -4,18 +4,155 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-FineVu is a marketing/brochure site for a premium dash-cam brand (Australian distributor: AutoXtreme). It is a Next.js 16 App Router app (React 19, Tailwind CSS v4, `motion`/Framer Motion, shadcn-style Radix UI). No backend, database, or auth — every page is static content plus client-side animation. Forms (e.g. `BusinessEnquiryForm`) are presentation-only.
+FineVu is a marketing/brochure site for a premium dash-cam brand (Australian distributor: AutoXtreme). It is a Next.js 16 App Router app (React 19, Tailwind CSS v4, `motion`/Framer Motion, shadcn-style Radix UI). No database or auth — nearly every page is static content plus client-side animation. The one server-side piece is `app/api/contact/route.ts`, which emails contact/enquiry form submissions via **Resend** (needs `RESEND_API_KEY`; see `.env.example`). Any remaining presentation-only forms just post to that route or do nothing.
 
 ## MVP scope
 
-The launch MVP is **four pages**. These are the only routes that should ship complete, polished content:
+The launch MVP is **eight pages**. These are the only routes that should ship complete, polished content:
+
+**Core four** (highest priority — richest content, most scrutiny):
 
 - **Homepage** — `app/page.tsx` (`/`)
 - **GX4K** — `app/gx4k/page.tsx` (`/gx4k`)
 - **GX35** — `app/gx35/page.tsx` (`/gx35`)
 - **Installation** — `app/installation/page.tsx` (`/installation`)
 
+**Supporting four** (promoted to MVP 2026-07-24):
+
+- **Warranty** — `app/warranty/page.tsx` (`/warranty`)
+- **Terms of Service** — `app/terms-of-service/page.tsx` (`/terms-of-service`)
+- **Support** — `app/support/page.tsx` (`/support`)
+- **About** — `app/about/page.tsx` (`/about`)
+
+All eight are already ungated (none appear in `comingSoon`). Note the supporting four
+carry **legal and warranty commitments** — warranty periods, ACL wording, returns and
+support terms — so they need the same content-accuracy scrutiny as the product pages
+before launch, and they have **not** yet been through the audit in
+`docs/content-accuracy-audit-2026-07-24.md` (which covered only `/`, `/gx4k`, `/gx35`).
+
 Every other route exists but is not part of the MVP. Non-MVP pages can be hidden behind the **Coming Soon gate**: add their path to `comingSoon: string[]` in `config/site.config.ts` and `ComingSoonGate` (wired in `app/layout.tsx`) renders the branded `ComingSoon` placeholder instead of the page. Preview a gated page's real content with `?showpage=true`. Prioritise the four MVP pages; treat the rest as secondary until they're promoted out of the coming-soon list.
+
+## 🚩 Open items — remind the user before launch
+
+**Raise these unprompted whenever launch, deployment, or content accuracy comes up.**
+They are unresolved decisions, not tasks that can just be done.
+
+1. **Hardwire Kit in "What's in the Box" — awaiting higher ops.** The site claims the
+   hardwire kit is included in **seven** places (homepage tile + disclaimer 3, both
+   product tiles + warranties, support, and repeatedly on the installation page), but
+   `boxItems` in `app/gx4k/page.tsx` and `app/gx35/page.tsx` **omits it**. One side is
+   wrong either way. A fix was drafted then deliberately **reverted** pending that
+   decision — do not change `boxItems` until ops confirms. Matters because parking mode
+   *requires* the kit and the $250 install is sold on "everything's in the box." Detail:
+   item D in `docs/content-accuracy-audit-2026-07-24.md`.
+2. **Unverified specs still need a FineVu source:** processor ("Dual-core" /
+   "Allwinner V536"), "F/1.8" aperture, "microSD up to 256 GB", "defects below 0.2%",
+   and the "6-metre / 9-metre" cable lengths. None appear in the official spec sheets.
+3. **`app/gx35/page_bak.tsx`** is a stale backup holding *pre-fix* values (wrong GPS
+   spec, etc.). Not routed so it doesn't ship, but it's a trap for anyone grepping the
+   codebase. Recommend deleting.
+4. **The four supporting MVP pages have not been content-audited.** `/warranty`,
+   `/terms-of-service`, `/support` and `/about` were promoted to MVP on 2026-07-24 but
+   the accuracy audit only covered `/`, `/gx4k` and `/gx35`. These carry legal/warranty
+   commitments (warranty periods, ACL wording, support terms) and repeat spec claims —
+   e.g. `app/support/page.tsx` restates the hardwire-kit disclaimer, so item 1 above
+   affects that page too. Audit before launch.
+
+## Going live — launch steps
+
+Work top to bottom. **Steps 1–3 are hard gates: do not deploy to production until each
+passes.** This is a public marketing site with a live email backend, so treat launch as
+a gate, not a formality.
+
+### 1. Security pass (hard gate)
+
+- **Secrets:** `RESEND_API_KEY` (and any other secret) is set only in the host's
+  environment (marked Sensitive in Vercel), **never** committed, **never** prefixed
+  `NEXT_PUBLIC_`. Verify no keys are hardcoded (`grep -rn "re_" app`).
+- **Contact route hardening (`app/api/contact/route.ts`):** add **rate limiting** and/or
+  CAPTCHA — currently only a honeypot protects it, so it can be scripted to spam the
+  support inbox and burn Resend quota. Keep `to`/`from` env-controlled (never
+  user-supplied) so it can't become an open relay. Keep HTML-escaping on all input.
+- **Resend sender domain:** `finevuaustralia.com.au` must be verified in Resend and
+  `CONTACT_FROM_EMAIL` moved off `onboarding@resend.dev`.
+- **Dependencies:** run `npm audit`, resolve high/critical findings, then re-run
+  `npm run build` clean.
+- **Headers/HTTPS:** confirm security headers (CSP where feasible, HSTS, etc.) and that
+  the deploy is HTTPS-only.
+
+### 2. Content accuracy (hard gate)
+
+- All product specs verified against official FineVu data — see
+  `docs/content-accuracy-audit-*.md`. **Don't launch with open ⏸/⚠/🟡 items**, and
+  settle the Open items listed above first.
+- Remember AU-market figures may legitimately differ from the Korean spec sheet (e.g.
+  the GX35 ships a **64GB** card here vs 128GB officially — that's correct, not a bug).
+
+**Audit change log — keep it current.** Every time you run or update a content-accuracy
+audit, you MUST also update the single canonical change log `docs/content-accuracy-changes.csv`
+in the same pass — it's part of the audit, not a separate request.
+
+It is a **living tracker**, not an append-only ledger: **one row per issue**, keyed by a
+stable `ID` (`CA-01`, `CA-02`, …). Per-cell rules:
+
+- **`Old value` is FROZEN** — the value as first found. Once written it never changes.
+- **`New value`, `Why it changed`, `Status`** are editable — a later pass may refine the
+  target/reasoning, and `Status` moves `Ready → Applied → Verified` as work happens.
+- **`First found` is frozen; `Last updated`** = the date of the audit that last touched
+  the row. Per-audit history lives in **git** (`git blame`/commits), not in extra rows.
+
+Schema (exact column order): `ID, Page, Location, Old value, New value, Why it changed,
+Status, First found, Last updated`. **`Status` is one of exactly three values** — the axis
+is *decision authority* (can you + the user settle it, or must it go higher?):
+
+- **`Applied`** — decided by us and the change is in the code.
+- **`Pending`** — ours to decide, agreed, just not applied yet (the safe fixes).
+- **`Needs approval`** — beyond our call: needs ops/legal/business, or a fact we don't have
+  (absorbs the old "ops sign-off" / "business decision" / "needs source"). Anything a
+  source file tags `{!needs approval}`, and anything depending on it, is `Needs approval`.
+
+The *reason* something is `Needs approval` goes in the `Why` column, not the Status.
+
+Upsert, don't blind-append: if a finding already has a row (match on `ID` / same
+`Location` + issue), update its editable cells and bump `Last updated`; only add a new row
++ next `ID` for a genuinely new issue. When a fix is applied, set that row's `Status`.
+One row per concrete old→new change (same edit across several lines = one row listing them).
+The narrative still goes in `docs/content-accuracy-audit-*.md`; the CSV is the flat diff
+view. Keep the two consistent.
+
+### 3. Search-engine visibility (hard gate — decide deliberately)
+
+Indexing is **off by default** and controlled by one env var, `SITE_INDEXABLE`:
+
+- Unset / anything but `"true"` → **noindex** (fail-safe: a typo keeps the site hidden).
+- `SITE_INDEXABLE=true` → indexable; also adds the sitemap line to `/robots.txt`.
+
+Enforced in three places that **must stay in sync** — change one, change all:
+`robots` metadata in `app/layout.tsx` (HTML), the `X-Robots-Tag` header in
+`next.config.ts` (everything incl. images/API), and `app/robots.ts` (`/robots.txt`).
+
+**Do not add `Disallow: /` to robots.txt while noindex is active.** It looks right and is
+wrong: a crawler must be able to *fetch* a page to see its `noindex`. Blocking the fetch
+lets Google index bare URLs found elsewhere ("No information is available for this page")
+while never learning to drop them. Allowing the crawl is what makes noindex work.
+
+**noindex ≠ private.** It only makes the site unlisted, and only for crawlers that honour
+it (Google does; scrapers don't). Anyone with the URL can still view it. If the site must
+be genuinely unreachable pre-launch, use **Vercel Deployment Protection** (password/SSO) —
+that blocks at the network layer and is the only airtight option.
+
+If launching noindex, add a **sitemap (`app/sitemap.ts`)** before flipping to indexable —
+it doesn't exist yet.
+
+### 4. Verify the deploy
+
+```bash
+npm run build                                   # must be clean
+curl -sI https://<domain>/ | grep -i x-robots   # confirm the visibility state you intended
+```
+
+Then walk the four MVP pages (`/`, `/gx4k`, `/gx35`, `/installation`) in a browser, and
+submit the contact form once to confirm mail actually lands in the support inbox.
 
 ## Commands
 

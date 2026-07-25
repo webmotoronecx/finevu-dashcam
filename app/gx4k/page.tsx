@@ -2,10 +2,10 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { OpticsSection } from "@/components/sections/OpticsSection";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
 import { Eye } from "lucide-react";
 import { MediaSection, type MediaSectionData } from "@/components/sections/MediaSection";
 import { Head } from "@/components/sections/Head";
@@ -15,6 +15,7 @@ import { BarGraph } from "@/components/sections/BarGraph";
 import { ScrollScrubVideo } from "@/components/sections/ScrollScrubVideo";
 import { ScrollHero, type HeroBeat } from "@/components/sections/ScrollHero";
 import { BentoCard } from "@/components/sections/BentoCard";
+import { FirmwareDownloads, type FirmwareTab } from "@/components/sections/FirmwareDownloads";
 
 /* FineVu GX4K product page — Figma frame 102:2004 (dark cinematic layout). */
 
@@ -44,7 +45,7 @@ const HERO_BEATS: HeroBeat[] = [
         end: 0.88,
         kicker: "Dual-Channel Recording",
         headline: "Front & Rear. Every Detail.",
-        sub: "4K UHD front. 2K QHD rear. Simultaneous. No compromises.",
+        sub: "4K UHD front. Full HD rear. Simultaneous. No compromises.",
     },
 ];
 
@@ -102,8 +103,8 @@ const cParked: Card[] = [
         img: "/gx4k/protected-20-sec.png ",
     },
     {
-        title: "Smart Time-Lapse",
-        body: "Records at 10fps while parked, then jumps to 30fps the instant something happens — up to 743 minutes of coverage without filling the card.",
+        title: "Time-Lapse",
+        body: "Compresses long parked hours into a lightweight time-lapse — up to 743 minutes of coverage without filling the card.",
         img: "/gx4k/protected-smart-time.png",
     },
     {
@@ -253,7 +254,7 @@ const disappearTabs = [
     },
     {
         title: "Disappears Behind the Mirror",
-        body: "At 96.5mm wide and just 114g, the wedge-shaped front unit tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g. Always present, never in sight.",
+        body: "At 96.5mm wide and just 123g, the wedge-shaped front unit tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 18g. Always present, never in sight.",
         video: "",
     },
     {
@@ -275,13 +276,13 @@ const detailGallery = [
 
 const specRows: [string, string][] = [
     ["Front camera", "SONY STARVIS IMX515 · 8.5 MP · 3840 × 2160 (4K UHD) · 136° FOV"],
-    ["Rear camera", "2 MP CMOS · 1920 × 1080 (Full HD) · 143° FOV · 23 g module"],
+    ["Rear camera", "2 MP CMOS · 1920 × 1080 (Full HD) · 143° FOV · 18 g module"],
     ["Processor", "Dual-core"],
     ["Night vision", "HDR auto night vision (AI-controlled)"],
     ["Recording modes", "Continuous · Impact · Emergency · Parking (motion + impact) · Time-lapse"],
     ["Parking mode", "Power Saving Parking — up to 98% less power, +2,325 standby hours"],
     ["Driver assistance", "ADAS Plus — FVMA (front vehicle motion alert) · LDWS (lane departure)"],
-    ["Connectivity", "Built-in 5 GHz Wi-Fi · Built-in GPS"],
+    ["Connectivity", "Built-in dual-band Wi-Fi (2.4 / 5 GHz) · Built-in GPS"],
     ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
     ["Protection", "Low voltage cut-off · G-sensor · AI heat monitoring"],
     ["Safety database", "Speed camera alerts, updated quarterly"],
@@ -295,7 +296,7 @@ const compareRows: [string, string, string][] = [
     ["Rear Resolution", "Full HD 1920×1080", "Full HD 1920×1080"],
     ["Max Video", "4K 30fps", "2K 30fps"],
     ["Field of View", "136°F · 143°R", "147°F · 143°R"],
-    ["GPS", "Built-in", "External (included)"],
+    ["GPS", "Built-in", "Built-in"],
     ["Parking Standby", "+2,325 hrs", "+13,950 hrs"],
     ["Processor", "Allwinner V536", "Allwinner V536"],
     ["Warranty", "3 Years", "3 Years"],
@@ -303,27 +304,46 @@ const compareRows: [string, string, string][] = [
 
 const firmwareSteps = [
     "Download the latest firmware.",
-    "Remove the Micro SD card from your dashcam. Insert it into a Micro SD card reader and connect the reader to the PC.",
+    "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
     "When the reader is connected to the PC, a USB drive or new disk drive will be created. (It's recommended to format the Micro SD card used for another device before you upgrade the firmware.)",
-    "Copy the downloaded firmware onto the top-level root of the memory card.",
-    "Insert the Micro SD card into the device. Turn on the vehicle or start the engine to turn on the device.",
+    "Copy the downloaded firmware on the top-level root of the memory card.",
+    "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
     "The firmware update starts automatically.",
     "The system will automatically restart once the firmware update is completed.",
 ];
 
-const warranty = [
-    [
-        "Warranty",
-        "3 Year Warranty applies to FineVu dash cam main units only, including front and rear cameras, for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6 month warranty. Proof of purchase required. Full warranty terms apply. Your rights under the Australian Consumer Law are not excluded.",
-    ],
-    [
-        "SD Cards",
-        "GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6 month warranty.",
-    ],
-    [
-        "Hardwire Kit & Power Cable",
-        "GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6 month warranty.",
-    ],
+const speedCamSteps = [
+    "Download the latest Speed Cam data file.",
+    "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
+    "When the reader is connected to the PC, a USB drive or new disk drive will be created.",
+    "Copy the downloaded Speed Cam data file on the top-level root of the memory card.",
+    "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
+    "The Speed Cam data file update starts automatically.",
+    "The system will automatically restart once the Speed Cam data file update is completed.",
+];
+
+const downloadTabs: FirmwareTab[] = [
+    {
+        name: "Firmware",
+        heading: "Instructions",
+        steps: firmwareSteps,
+        warning:
+            "Do not power off your dashcam until it begins continuous recording, as it may cause permanent damage to the dashcam.",
+       // downloadLabel: "Download Firmware",
+    },
+    {
+        name: "User Manual",
+       // heading: "User Manual",
+        intro:
+            "Coming soon",
+        //downloadLabel: "Download User Manual (PDF)",
+    },
+    {
+        name: "Speed Cam Data",
+        heading: "Instructions",
+        steps: speedCamSteps,
+       // downloadLabel: "Download Speed Cam Data",
+    },
 ];
 
 const memoryAllocationTabs = [
@@ -412,7 +432,6 @@ const memoryAllocationTabs = [
 /* Component */
 
 export default function GX4KPage() {
-    const [fwTab, setFwTab] = useState<"Firmware" | "User Manual" | "Speed Cam Data">("Firmware");
 
     return (
         <main className="overflow-x-clip bg-[#08080c]">
@@ -496,7 +515,7 @@ export default function GX4KPage() {
                         key: "rear",
                         title: "Rear",
                         sub: "Full-HD wide",
-                        items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "23 g compact module"],
+                        items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "18 g compact module"],
                         start: 0.4,
                         end: 0.6,
                         at: [1553, 1061],
@@ -684,10 +703,6 @@ export default function GX4KPage() {
                                 </motion.div>
                             ))}
                         </div>
-                        <p className="mx-auto mt-6 max-w-[900px] text-xs text-zinc-600">
-                            Specifications compiled from FineVu published materials — confirm final figures against the official GX4K spec sheet before
-                            publishing.
-                        </p>
                     </div>
                 </section>
 
@@ -806,62 +821,14 @@ export default function GX4KPage() {
                     </div>
                 </section>
                 {/* Firmware and downloads */}
-                <section data-nav-theme="dark" className="pb-16 md:pb-24">
-                <div className={`${SHELL} !max-w-[1050px] flex flex-col gap-10`}>
-                        <div className=" mx-auto flex w-full max-w-[440px] rounded-full border border-white/10 p-1">
-                            {(["Firmware", "User Manual", "Speed Cam Data"] as const).map((t) => (
-                                <button
-                                    key={t}
-                                    onClick={() => setFwTab(t)}
-                                    className={`flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors ${
-                                        fwTab === t ? "bg-[#f68428] text-white" : "text-zinc-400 hover:text-white"
-                                    }`}
-                                >
-                                    {t}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div  className=" w-full rounded-[32px] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16">
-                            <h3 className="text-lg font-semibold text-white">Instructions</h3>
-                            {fwTab === "Firmware" ? (
-                                <>
-                                    <ol className="mt-4 list-decimal space-y-2.5 pl-5 text-[14px] leading-relaxed text-zinc-400">
-                                        {firmwareSteps.map((s) => (
-                                            <li key={s}>{s}</li>
-                                        ))}
-                                    </ol>
-                                    <p className="mt-5 text-[13px] text-[#e5484d]">
-                                        Do not power off your dashcam until it begins continuous recording, as it may cause permanent damage to the dashcam.
-                                    </p>
-                                </>
-                            ) : (
-                                <p className="mt-4 text-[14px] leading-relaxed text-zinc-400">
-                                    Download the latest {fwTab.toLowerCase()} for your GX4K from the FineVu support library, then follow the included guide.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                </section>
+                <FirmwareDownloads tabs={downloadTabs} theme="dark" ariaLabel="GX4K downloads" />
             </div>
 
             {/* Help and quick links */}
             <LearnMoreLinks theme="dark" />
 
-            {/* Warranty disclaimer */}
-            <section data-nav-theme="dark" className="bg-[#0f0f0f] py-12 md:py-14">
-                <div className={SHELL}>
-                    <ol className="mx-auto max-w-[1220px] list-decimal space-y-4 ps-5 text-[12px] font-medium leading-[18px] text-[#838383]">
-                        {warranty.map(([h, body]) => (
-                            <li key={h}>
-                                {h}
-                                <br />
-                                {body}
-                            </li>
-                        ))}
-                    </ol>
-                </div>
-            </section>
+            {/* Warranty disclaimer — copy lives in siteConfig.disclaimers */}
+            <LegalDisclaimers theme="dark" />
 
             <Footer />
         </main>

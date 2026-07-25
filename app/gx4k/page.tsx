@@ -554,8 +554,9 @@ export default function GX4KPage() {
                 </motion.div>
 
                 <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-                    <BentoCard theme="dark" title="" className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+                    <BentoCard theme="dark" img="/gx4k/format-free.png" title="" className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
                     <BentoCard
+                        
                         theme="dark"
                         variant="displayText"
                         title="Format Free 2.0"
@@ -643,7 +644,7 @@ export default function GX4KPage() {
                             <BentoCard variant="overlayLabel" img="/gx4k/no1.webp" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
                             <BentoCard
                                 variant="overlayLabel"
-                                img="/gx4k/warranty3.png"
+                                img="/gx4k/warranty3.webp"
                                 title="3 Year Warranty"
                                 sup="1"
                                 imgClass="object-[50%_42%]"
@@ -651,8 +652,8 @@ export default function GX4KPage() {
                             />
                         </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-                            <BentoCard variant="overlayLabel" img="/gx4k/microsd.png" title="Includes 128GB MicroSD Card" sup="2" className="aspect-[640/400]" />
-                            <BentoCard variant="overlayLabel" img="/gx4k/cables.png" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
+                            <BentoCard variant="overlayLabel" img="/gx4k/microsd.webp" title="Includes 128GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+                            <BentoCard variant="overlayLabel" img="/gx4k/cables.webp" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
                         </div>
                     </div>
                 </section>
@@ -731,7 +732,7 @@ export default function GX4KPage() {
                         </div>
                         <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[32px] md:mt-12">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src="/gx4k/box.png" alt="FineVu GX4K box contents" className="aspect-[1300/519] w-full object-cover" />
+                            <img src="/gx4k/box.webp" alt="FineVu GX4K box contents" className="aspect-[1300/519] w-full object-cover" />
                         </motion.div>
                     </div>
                 </section>
@@ -765,7 +766,7 @@ export default function GX4KPage() {
                                     <div className="flex flex-1 items-center justify-center py-6 md:py-8">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src="/gx4k/compare-gx4k.png"
+                                            src="/gx4k/compare-gx4k.webp"
                                             alt="FineVu GX4K front and rear cameras"
                                             className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[264px]"
                                         />
@@ -788,7 +789,7 @@ export default function GX4KPage() {
                                     <div className="flex flex-1 items-center justify-center py-6 md:py-8">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src="/gx4k/compare-gx35.png"
+                                            src="/gx4k/compare-gx35.webp"
                                             alt="FineVu GX35"
                                             className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[264px]"
                                         />

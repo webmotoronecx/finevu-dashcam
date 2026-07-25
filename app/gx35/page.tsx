@@ -55,10 +55,10 @@ const HERO_BEATS: HeroBeat[] = [
 // "Every detail" bento; the field-of-view tile stays a placeholder until the client supplies that shot
 const featureTiles = [
   { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", video: "/gx35/detail-front-camera.mp4" },
-  { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.png" },
-  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", img: "/gx35/detail-night.png" },
-  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.png" },
-  { title: "147° / 143° Field of View", caption: "Front & Rear", img: "/gx35/detail-field.png" },
+  { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.webp" },
+  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", img: "/gx35/detail-night.webp" },
+  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.webp" },
+  { title: "147° / 143° Field of View", caption: "Front & Rear", img: "/gx35/detail-field.webp" },
 ];
 
 // Optics callouts in front to core to rear order, matching the pinned reveal timing
@@ -105,27 +105,27 @@ const cParked: Card[] = [
   {
     title: "Power Saving Parking Mode",
     body: "Prolonged recording time. Consuming 98% less power, GX35 records 13,950 more hours than standard parking mode.",
-    img: "/gx35/protected-power.png",
+    img: "/gx35/protected-power.webp",
   },
   {
     title: "20-Second Impact Capture",
     body: "Every impact saves the 10 seconds before and 10 seconds after — front and rear — so the full scene is locked in, not just the moment of contact.",
-    img: "/gx35/protected-20-sec.png",
+    img: "/gx35/protected-20-sec.webp",
   },
   {
     title: "Smart Time-Lapse",
     body: "Records a lightweight time-lapse while parked, then jumps to full 30fps the instant an impact is detected — up to 1,129 minutes of coverage without filling the card.",
-    img: "/gx35/protected-smart.png",
+    img: "/gx35/protected-smart.webp",
   },
   {
     title: "AI Heat Monitoring",
     body: "Built-in temperature sensing powers the camera down before heat becomes a risk — protection made for hot climates and long summer parks.",
-    img: "/gx35/protected-heat.png",
+    img: "/gx35/protected-heat.webp",
   },
   {
     title: "A Minute of Motion",
     body: "Any movement caught while parked is saved as a full minute of footage, so nothing around your car goes unrecorded.",
-    img: "/gx35/protected-minute.png",
+    img: "/gx35/protected-minute.webp",
   },
  
 ];
@@ -134,12 +134,12 @@ const cSafer: Card[] = [
   {
     title: "ADAS Plus Driver Assistance",
     body: "Forward Vehicle Moving Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
-    img: "/gx35/smarter-adas.png",
+    img: "/gx35/smarter-adas.webp",
   },
   {
     title: "Speed Camera Alert",
     body: "Quarterly safety-camera database updates with voice and visual alerts. Fewer surprises, fewer tickets. Requires GPS reception.",
-    img: "/gx35/smarter-speed.png",
+    img: "/gx35/smarter-speed.webp",
   },
 ];
 
@@ -147,7 +147,7 @@ const cConnected: Card[] = [
   {
     title: "FineVu App",
     body: "View live video, download clips, change settings and update firmware right from your phone. Android and iOS, plus FineVu Player 2.0 on desktop.",
-    img: "/gx35/connected-app.png",
+    img: "/gx35/connected-app.webp",
   },
   {
     title: "5GHz Wi-Fi",
@@ -157,7 +157,7 @@ const cConnected: Card[] = [
   {
     title: "Built-in GPS",
     body: "Records speed, location and route. Every clip stamped with exactly where and how fast you were going.",
-    img: "/gx35/connected-gps.png",
+    img: "/gx35/connected-gps.webp",
   },
 ];
 
@@ -165,25 +165,25 @@ const cBuilt: Card[] = [
   {
     title: "Built In-House",
     body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That's reliability you can count on.",
-    img: "/gx35/built-in-house.png",
+    img: "/gx35/built-in-house.webp",
   },
   {
     title: "Supercapacitor, Not Battery",
     body: "A supercapacitor replaces the traditional battery for better heat tolerance and a longer service life. Engineered for reliability, not shortcuts.",
-    img: "/gx35/built-supercapacitor.png",
+    img: "/gx35/built-supercapacitor.webp",
   },
 
   {
     title: "Battery Protection Integrated",
     body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
     note: "* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system.",
-    img: "/gx35/built-battery.png",
+    img: "/gx35/built-battery.webp",
   },
 ];
 
 
 const storageFormat = [
-  { img: "/gx35/storage-format.png" },
+  { img: "/gx35/storage-format.webp" },
   { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8" }
 ];
 
@@ -240,7 +240,7 @@ const mDualVision: MediaSectionData = {
 const mSecondEyes: MediaSectionData = {
   title: "A second set of eyes.",
   description: "ADAS Plus watches the road with you, and speaks up before you need to.",
-  image: "/gx35/second-eyes.png", // TODO(gx35-asset)
+  image: "/gx35/second-eyes.webp", // TODO(gx35-asset)
   aspectRatio: "2160/1484",
   theme: "dark",
   heightVh: 100,
@@ -251,7 +251,7 @@ const mSecondEyes: MediaSectionData = {
 const mInYourHand: MediaSectionData = {
   title: "Your Dashcam. In Your Hand.",
   description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
-  image: "/gx35/your-dashcam.png", 
+  image: "/gx35/your-dashcam.webp", 
   theme: "dark",
   textPosition: "8%",
   heightVh: 100,
@@ -281,7 +281,7 @@ const mDiscreet: MediaSectionData = {
 const memoryAllocationTabs = [
   {
     title: "Driving Priority",
-    video: "/gx4k/alloc-driving.mp4", // TODO(gx35-asset)
+    video: "/gx35/alloc-driving.mp4",
     componentStatic: true,
     componentOverlay: true,
     component: (
@@ -300,7 +300,7 @@ const memoryAllocationTabs = [
   },
   {
     title: "Event Priority",
-    video: "/gx4k/alloc-event.mp4", // TODO(gx35-asset)
+    video: "/gx35/alloc-event.mp4", 
     componentStatic: true,
     componentOverlay: true,
     component: (
@@ -319,7 +319,7 @@ const memoryAllocationTabs = [
   },
   {
     title: "Parking Priority",
-    image: "/gx4k/alloc-parking.png", // TODO(gx35-asset)
+    image: "/gx35/alloc-parking.webp", 
     componentStatic: true,
     componentOverlay: true,
     component: (
@@ -338,7 +338,7 @@ const memoryAllocationTabs = [
   },
   {
     title: "Driving Only",
-    video: "/gx4k/alloc-only.mp4", // TODO(gx35-asset)
+    video: "/gx35/alloc-only.mp4", 
     componentStatic: true,
     componentOverlay: true,
     component: (
@@ -442,10 +442,10 @@ export default function GX35Page() {
     <main className="overflow-x-clip bg-[#F5F5F7]">
       {/* Hero: scroll-pinned video. `fadeTo` is white so the pinned stage lands on the
           light page background instead of GX4K's near-black. */}
-      {/* TODO(gx35-asset): borrowed GX4K hero clip until a GX35 one is supplied. */}
+    
       <ScrollHero
         video="/gx35/hero.mp4"
-        // poster="/gx4k/hero-bg.webp"
+     
         beats={HERO_BEATS}
         theme="light"
 
@@ -628,11 +628,11 @@ export default function GX35Page() {
         </motion.div>
         <div className={`${SHELL} space-y-4 sm:space-y-5`}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
-            <BentoCard theme="light" variant="overlayLabel" img="/gx35/no1.png" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/no1.webp" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
             <BentoCard
               theme="light"
               variant="overlayLabel"
-              img="/gx35/warranty3.png"
+              img="/gx35/warranty3.webp"
               title="3 Year Warranty"
               sup="1"
               imgClass="object-[50%_42%]"
@@ -640,8 +640,8 @@ export default function GX35Page() {
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-            <BentoCard theme="light" variant="overlayLabel" img="/gx35/microsd.png" title="Includes 64GB MicroSD Card" sup="2" className="aspect-[640/400]" />
-            <BentoCard theme="light" variant="overlayLabel" img="/gx35/cables.png" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/microsd.webp" title="Includes 64GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/cables.webp" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
           </div>
         </div>
       </section>
@@ -721,7 +721,7 @@ export default function GX35Page() {
           <motion.div {...fadeUp} className="mt-10 overflow-hidden rounded-[32px] md:mt-12">
             {/* TODO(gx35-asset): borrowed GX4K box shot until a GX35 one is supplied. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/gx35/box.png" alt="FineVu GX35 box contents" className="aspect-[1300/519] w-full object-cover" />
+            <img src="/gx35/box.webp" alt="FineVu GX35 box contents" className="aspect-[1300/519] w-full object-cover" />
           </motion.div>
         </div>
       </section>
@@ -749,7 +749,7 @@ export default function GX35Page() {
                 <div className="flex flex-1 items-center justify-center py-6 md:py-8">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/gx35/compare-gx4k.png"
+                    src="/gx35/compare-gx4k.webp"
                     alt="FineVu GX4K front and rear cameras"
                     className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[264px]"
                   />
@@ -776,7 +776,7 @@ export default function GX35Page() {
                 <div className="flex flex-1 items-center justify-center py-6 md:py-8">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/gx35/compare-gx35.png"
+                    src="/gx35/compare-gx35.webp"
                     alt="FineVu GX35"
                     className="h-auto max-h-[130px] w-auto max-w-full object-contain md:max-h-[264px]"
                   />

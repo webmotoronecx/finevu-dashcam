@@ -114,8 +114,8 @@ function Hero({
 const reasons = [
   { img: '/home/No.1_Banner.webp', label: 'No.1 Dash Cam in Korea' },
   { img: '/home/3YearWarranty_Tile.webp', label: '3 Year Warranty', sup: '1' },
-  { img: '/home/reason-microsd.jpg', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
-  { img: '/home/reason-hardwire.jpg', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
+  { img: '/home/reason-microsd.webp', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
+  { img: '/home/reason-hardwire.webp', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
 ];
 
 function ReasonCard({ img, label, sup, aspect }: { img: string; label: string; sup?: string; aspect: string }) {
@@ -133,15 +133,15 @@ function ReasonCard({ img, label, sup, aspect }: { img: string; label: string; s
 /* Reviews */
 const reviews = [
   {
-    thumb: '/products/gx4k-studio.jpg', product: 'FineVu GX4K', tagline: 'Very user friendly',
+    thumb: '/products/gx4k-studio.webp', product: 'FineVu GX4K', tagline: 'Very user friendly',
     body: "I was surprised by the quality of the video, super good in day and especially better in night! The camera doesn't overheat, and the mobile app is very user friendly, easy to change the settings and download the files I require.",
   },
   {
-    thumb: '/products/gx35-studio.jpg', product: 'FineVu GX35', tagline: 'Crispy clear image',
+    thumb: '/products/gx35-studio.webp', product: 'FineVu GX35', tagline: 'Crispy clear image',
     body: 'Crispy clear image. easy connection to phone for straight forward download.',
   },
   {
-    thumb: '/products/gx4k-studio.jpg', product: 'FineVu GX4K', tagline: 'Would definitely recommend',
+    thumb: '/products/gx4k-studio.webp', product: 'FineVu GX4K', tagline: 'Would definitely recommend',
     body: 'Great product, excellent for my current usage. Will definitely recommend to all my friends and family.',
   },
 ];
@@ -160,7 +160,7 @@ export default function Page() {
       {/* Hero — GX4K (dark cosmic) */}
       <Hero
         theme="dark"
-        image="/home/hero-gx4k.jpg"
+        image="/home/hero-gx4k.webp"
         video="/home/GX4K_Hero_Video_V2.mp4"
         eyebrow="FineVu GX4K · 2-Channel UHD"
         title="GX4K"
@@ -171,7 +171,7 @@ export default function Page() {
       {/* Hero — GX35 (video; white text over a readability scrim) */}
       <Hero
         theme="dark"
-        image="/home/hero-gx35.jpg"
+        image="/home/hero-gx35.webp"
         video="/home/GX35_Hero_Video_v2.mp4"
         eyebrow="FineVu GX35 · 2-Channel QHD"
         title="GX35"

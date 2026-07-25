@@ -67,10 +67,10 @@ function TwoTone({ text, className = "" }: { text: string; className?: string })
 
 const detailCards = [
     { title: "3840 × 2160 UHD Front Camera", caption: "Every pixel captured", video: "/gx4k/captured-front-cam.mp4" },
-    { title: "Sony STARVIS IMX515", caption: "8.5MP · F/1.8 · crystal-clear detail", img: "/gx4k/captured-starvis.png" },
+    { title: "Sony STARVIS IMX515", caption: "8.5MP · F/1.8 · crystal-clear detail", img: "/gx4k/captured-starvis.webp" },
     { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx4k/captured-night.mp4" },
-    { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/captured-ai-heat.png" },
-    { title: "136°/143° Field of View", caption: "Front & Rear", img: "/gx4k/captured-front-rear.png" },
+    { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/captured-ai-heat.webp" },
+    { title: "136°/143° Field of View", caption: "Front & Rear", img: "/gx4k/captured-front-rear.webp" },
 ];
 
 const cSeeDetail: Card[] = [
@@ -82,7 +82,7 @@ const cSeeDetail: Card[] = [
     {
         title: "Sony STARVIS Sensor",
         body: "The 8.5MP Sony STARVIS IMX515 delivers vivid, low-noise footage with the dynamic range to handle harsh glare and deep shadow alike.",
-        img: "/gx4k/detail-starvis.png",
+        img: "/gx4k/captured-starvis.webp",
     },
     {
         title: "AI Auto Night Vision",
@@ -100,17 +100,17 @@ const cParked: Card[] = [
     {
         title: "20-Second Impact Capture",
         body: "Every impact saves the 10 seconds before and 10 seconds after — front and rear — so the full scene is locked in, not just the moment of contact.",
-        img: "/gx4k/protected-20-sec.png ",
+        img: "/gx4k/protected-20-sec.webp",
     },
     {
         title: "Time-Lapse",
         body: "Compresses long parked hours into a lightweight time-lapse — up to 743 minutes of coverage without filling the card.",
-        img: "/gx4k/protected-smart-time.png",
+        img: "/gx4k/protected-smart-time.webp",
     },
     {
         title: "AI Heat Monitoring",
         body: "Built-in temperature sensing powers the camera down before heat becomes a risk — protection made for hot climates and long summer parks.",
-        img: "/gx4k/protected-ai-heating.png",
+        img: "/gx4k/protected-ai-heating.webp",
     },
 ];
 
@@ -118,12 +118,12 @@ const cSafer: Card[] = [
     {
         title: "ADAS Plus Driver Assistance",
         body: "Forward Vehicle Moving Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
-        img: "/gx4k/safer-adas.png",
+        img: "/gx4k/safer-adas.webp",
     },
     {
         title: "Speed Camera Alert",
         body: "Quarterly safety-camera database updates with voice and visual alerts. Fewer surprises, fewer tickets. Requires GPS reception.",
-        img: "/gx4k/safer-speed.png",
+        img: "/gx4k/safer-speed.webp",
     },
 ];
 
@@ -131,18 +131,18 @@ const cBuilt: Card[] = [
     {
         title: "Supercapacitor, Not Battery",
         body: "A supercapacitor replaces the traditional battery for better heat tolerance and a longer service life. Engineered for reliability, not shortcuts.",
-        img: "/gx4k/built-capacitor.png",
+        img: "/gx4k/built-capacitor.webp",
     },
     {
         title: "Built In-House",
         body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That's reliability you can count on.",
-        img: "/gx4k/built-in-house.png",
+        img: "/gx4k/built-in-house.webp",
     },
     {
         title: "Battery Protection Integrated",
         body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
         note: "* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system.",
-        img: "/gx4k/built-battery.png",
+        img: "/gx4k/built-battery.webp",
     },
 ];
 
@@ -161,7 +161,7 @@ const cConnected: Card[] = [
     {
         title: "FineVu App",
         body: "View live video, download clips, change settings and update firmware right from your phone. Android and iOS, plus FineVu Player 2.0 on desktop.",
-        img: "/gx4k/connected-app.png",
+        img: "/gx4k/connected-app.webp",
     },
     {
         title: "5GHz Wi-Fi",
@@ -171,7 +171,7 @@ const cConnected: Card[] = [
     {
         title: "Built-in GPS",
         body: "Records speed, location and route with no external GPS to buy or wire in. Every clip stamped with exactly where and how fast you were going.",
-        img: "/gx4k/connected-gps.png",
+        img: "/gx4k/connected-gps.webp",
     },
 ];
 
@@ -179,7 +179,7 @@ const cConnected: Card[] = [
 const mDualVision: MediaSectionData = {
     title: `Dual Vision`,
     description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
-    image: "/gx4k/graphic-dual-vision.png",
+    image: "/gx4k/graphic-dual-vision.webp",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
     background:'#000',
@@ -208,7 +208,7 @@ const mDualVision: MediaSectionData = {
 const mSecondEyes: MediaSectionData = {
     title: `A second set of eyes`,
     description: `ADAS Plus watches the road with you, and speaks up before you need to.`,
-    image: "/gx4k/second-eyes.png",
+    image: "/gx4k/second-eyes.webp",
   
     theme: "dark",
     textPosition:"8%",
@@ -219,7 +219,7 @@ const mSecondEyes: MediaSectionData = {
 const mInYourHand: MediaSectionData = {
     title: "Your Dashcam. In Your Hand.",
     description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
-    image: "/gx4k/graphic-your-dashcam.png",
+    image: "/gx4k/graphic-your-dashcam.webp",
   
     theme: "dark",
     textPosition:"8%",
@@ -389,7 +389,7 @@ const memoryAllocationTabs = [
     },
     {
         title: "Parking Priority",
-        image: "/gx4k/alloc-parking.png",
+        image: "/gx4k/alloc-parking.webp",
         componentStatic: true,
         componentOverlay: true,
         component: (

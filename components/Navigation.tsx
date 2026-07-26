@@ -211,12 +211,12 @@ export function Navigation() {
         <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center">
           {/* Centered pill */}
           <div
-            className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2.5 xl:px-10 xl:py-3"
+            className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2 xl:px-10 xl:py-3"
             style={pillStyle}
           >
             {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex min-h-[44px] items-center shrink-0">
-              <Logo variant="primary" className="w-[170px] h-[41px] object-contain transition-transform duration-300 hover:scale-105" />
+              <Logo variant="primary" className="w-[136px] h-[33px] sm:w-[170px] sm:h-[41px] object-contain transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}

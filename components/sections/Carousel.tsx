@@ -50,6 +50,8 @@ const fadeUp = {
 
 export type Card = {
   title: string;
+  /** Optional accent-coloured prefix on the title, e.g. a step number "1." */
+  n?: string;
   body: string;
   img?: string;
   /** Responsive sources for `img`, e.g. "photo.jpg 1x, photo@2x.jpg 2x" */
@@ -335,6 +337,7 @@ export function Carousel({
                 <div className="rounded-[22px] bg-[#656565]" style={{ aspectRatio: imgAspect }} />
               )}
               <h3 className={`mt-6 text-[22px] md:text-2xl font-semibold ${t.title}`}>
+                {c.n && <span className="text-[#f68428]">{c.n} </span>}
                 {c.title}
               </h3>
               <p className={`mt-3 max-w-[540px] text-[14px] md:text-[16px] leading-[1.6] ${t.body}`}>

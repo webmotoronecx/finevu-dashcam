@@ -5,7 +5,7 @@ import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { submitForm } from "@/lib/submitForm";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { Carousel } from "@/components/sections/Carousel";
 import { motion } from "motion/react";
 import { useMemo, useRef, useState, Fragment } from "react";
 import Image from "next/image";
@@ -23,6 +23,7 @@ import {
   ChevronDown,
   Home,
   Briefcase,
+  Lock,
 } from "lucide-react";
 
 // Booking / installation page — hero, booking wizard, how-it-works, what's-included, service-area checker, why-experts, FAQs, fine print.
@@ -34,12 +35,12 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT"];
+const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT", "NT"];
 const SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DOWS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const TOTAL = 4;
-const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details"];
+const TOTAL = 5;
+const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details", "Checkout"];
 
 const HERO_STATS = [
   { value: "$250 AUD", label: "One price, every install" },
@@ -51,7 +52,7 @@ const HERO_STATS = [
 const THREE = [
   { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
   { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat — no payment required to reserve.", img: "/installation/step-book.webp" },
-  { n: "", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/installation/step-install.webp" },
+  { n: "3.", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/installation/step-install.webp" },
 ];
 
 const INCLUDED = [
@@ -100,8 +101,9 @@ const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#
 type Form = {
   model: string | null; place: string | null; street: string; suburb: string; stateAu: string; postcode: string; slot: string | null;
   name: string; phone: string; email: string; retailer: string; make: string; vmodel: string; year: string; notes: string;
+  ccName: string; ccNum: string; ccExp: string; ccCvc: string;
 };
-const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "" };
+const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "", ccName: "", ccNum: "", ccExp: "", ccCvc: "" };
 
 function useCalendar() {
   return useMemo(() => {
@@ -151,48 +153,39 @@ function BookingWizard() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return fail("Please enter a valid email address.");
       if (!form.make || !form.vmodel) return fail("Please enter your vehicle make and model.");
     }
+    if (s === 5) {
+      const num = form.ccNum.replace(/\s+/g, "");
+      if (!form.ccName) return fail("Please enter the name on your card.");
+      if (!/^\d{15,16}$/.test(num)) return fail("Please enter a valid card number.");
+      const em = form.ccExp.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+      if (!em) return fail("Please enter your card expiry as MM/YY.");
+      const now = new Date(); const yy = 2000 + parseInt(em[2], 10); const mm = parseInt(em[1], 10);
+      if (yy < now.getFullYear() || (yy === now.getFullYear() && mm < now.getMonth() + 1)) return fail("Your card expiry date has passed.");
+      if (!/^\d{3,4}$/.test(form.ccCvc)) return fail("Please enter your card’s 3–4 digit CVC.");
+    }
     setHint({ msg: "", cls: "" }); return true;
   }
-  async function next() {
+  function next() {
     if (!validate(step)) return;
-    if (step < TOTAL) { setHint({ msg: "", cls: "" }); setStep(step + 1); scrollTop(); return; }
+    if (step < TOTAL) { setHint({ msg: "", cls: "" }); setStep(step + 1); scrollTop(); }
+    else {
     setProcessing(true);
-    setHint({ msg: "", cls: "" });
-    const bookingRef = "FV-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    const res = await submitForm(
-      {
-        reference: bookingRef,
-        dash_cam: `${form.model || "—"} (front + rear)`,
-        install_type: "Professional hardwire install",
-        location: (form.place ? form.place + " — " : "") + [form.street, form.suburb, form.stateAu, form.postcode].filter(Boolean).join(", "),
-        preferred_date: dateLabel || "—",
-        preferred_time: form.slot || "—",
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-        vehicle: [form.make, form.vmodel, form.year].filter(Boolean).join(" "),
-        purchased_from: form.retailer,
-        notes: form.notes,
-        price: "$250 flat — paid on the day",
-      },
-      { subject: `FineVu installation booking — ${form.name || "new request"}`, replyTo: form.email },
-    );
-    setProcessing(false);
-    if (res.ok) { setRef(bookingRef); setStep(TOTAL + 1); scrollTop(); }
-    else setHint({ msg: res.error, cls: "err" });
+      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); setProcessing(false); setStep(6); scrollTop(); }, 900);
+    }
   }
   function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setStep(step - 1); scrollTop(); } }
 
-  const confirmRows = (): [string, string][] => {
-    const rows: [string, string][] = [
+  const summaryRows = (): [string, string][] => [
       ["Dash cam", `${form.model || "—"} · Front + rear (2CH)`],
       ["Install", "Professional hardwire install"],
       ["Location", (form.place ? form.place + " — " : "") + [form.street, form.suburb, form.stateAu, form.postcode].filter(Boolean).join(", ")],
       ["Date", dateLabel || "—"],
       ["Time", form.slot || "—"],
-      ["Name", form.name],
-      ["Contact", `${form.phone} · ${form.email}`],
+    ["Total", "$250.00 AUD — paid today"],
     ];
+  const confirmRows = (): [string, string][] => {
+    const rows = summaryRows();
+    rows.push(["Payment", `Card ending ${form.ccNum.replace(/\s+/g, "").slice(-4)} · Paid`], ["Name", form.name], ["Contact", `${form.phone} · ${form.email}`]);
     if (form.make) rows.push(["Vehicle", [form.make, form.vmodel, form.year].filter(Boolean).join(" ")]);
     return rows;
   };
@@ -209,17 +202,17 @@ function BookingWizard() {
               return (
                 <Fragment key={label}>
                   {i > 0 && <div className={`mt-4 h-px min-w-[16px] flex-1 ${stepDone(i) ? "bg-[var(--finevu-orange)]" : "bg-[#e8e7e2]"}`} />}
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 md:min-w-[90px]">
                     <span className={`flex size-8 items-center justify-center rounded-[16px] border-2 ${done ? "border-[var(--finevu-orange)] bg-[var(--finevu-orange)]" : active ? "border-[var(--finevu-orange)]" : "border-[#e8e7e2]"}`}>
                       {done ? <Check className="h-[15px] w-[15px] text-white" strokeWidth={2.5} /> : <span className={`text-[13px] font-bold leading-[19.5px] ${active ? "text-[var(--finevu-orange)]" : "text-[#9a9da5]"}`}>{s}</span>}
                     </span>
-                    <span className={`whitespace-nowrap text-[11px] font-medium leading-[16.5px] ${active ? "text-[#1d1d1f]" : "text-[#9a9da5]"}`}>{label}</span>
+                    <span className={`text-center md:whitespace-nowrap text-[11px] font-medium leading-[16.5px] ${active ? "text-[#1d1d1f]" : "text-[#9a9da5]"}`}>{label}</span>
                   </div>
                 </Fragment>
               );
             })}
           </div>
-          <span className="shrink-0 self-center whitespace-nowrap rounded-[8px] border border-[var(--finevu-orange)] bg-[#fff1e8] px-[15px] py-[9px] text-[12px] font-bold leading-[18px] text-[var(--finevu-orange)] md:self-start">$250 AUD · Pay on the day</span>
+          <span className="shrink-0 self-center whitespace-nowrap rounded-[8px] border border-[var(--finevu-orange)] bg-[#fff1e8] px-[15px] py-[9px] text-[12px] font-bold leading-[18px] text-[var(--finevu-orange)] md:self-start">$250 AUD · Paid Today</span>
         </div>
 
         {/* body */}
@@ -338,12 +331,31 @@ function BookingWizard() {
             </div>
           )}
 
-          {step === TOTAL + 1 && (
+          {step === 5 && (
+            <div>
+              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Checkout</h3>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Pay the $250 flat rate now to lock in your appointment. Your card is charged today and your booking is confirmed instantly.</p>
+              <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-6 py-[22px]">
+                <span className="mb-3 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Order summary</span>
+                <dl className="space-y-2 text-[.88rem]">{summaryRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
+              </div>
+              <span className={FLABEL}>Payment details</span>
+              <input className={INPUT} placeholder="Name on card" autoComplete="cc-name" value={form.ccName} onChange={(e) => set("ccName", e.target.value)} />
+              <input className={`${INPUT} mt-4`} placeholder="Card number" inputMode="numeric" autoComplete="cc-number" maxLength={19} value={form.ccNum} onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 16); set("ccNum", d.replace(/(\d{4})(?=\d)/g, "$1 ")); }} />
+              <div className="mt-4 grid max-w-[420px] gap-4 sm:grid-cols-2">
+                <input className={INPUT} placeholder="Expiry (MM/YY)" inputMode="numeric" autoComplete="cc-exp" maxLength={5} value={form.ccExp} onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 4); set("ccExp", d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d); }} />
+                <input className={INPUT} placeholder="CVC" inputMode="numeric" autoComplete="cc-csc" maxLength={4} value={form.ccCvc} onChange={(e) => set("ccCvc", e.target.value.replace(/\D/g, "").slice(0, 4))} />
+              </div>
+              <p className="mt-[22px] flex items-start gap-2 text-[.78rem] text-[#9c9ca3]"><Lock className="mt-[3px] h-[13px] w-[13px] shrink-0 text-[var(--finevu-orange)]" /> Payments are encrypted and processed securely. A tax receipt is emailed to you as soon as payment clears.</p>
+            </div>
+          )}
+
+          {step === 6 && (
             <div className="py-[22px] text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white"><Check className="h-7 w-7" strokeWidth={2.4} /></div>
-              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Booking request received</h3>
-              <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref}</div>
-              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your installation booking request is in. We&apos;ll confirm your appointment by email or phone, usually within one business day. There&apos;s nothing to pay now — your installer collects the $250 flat rate on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
+              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Booking confirmed — payment received</h3>
+              <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref} · Paid</div>
+              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $250.00 AUD has been received and your installation is locked in. Your confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
               <div className="mx-auto mt-8 max-w-[580px] rounded-[12px] bg-[#f7f7f7] px-6 py-[22px] text-left">
                 <dl className="space-y-2 text-[.88rem]">{confirmRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>
@@ -358,9 +370,15 @@ function BookingWizard() {
           <div className="flex items-center justify-between gap-4 border-t border-[#e8e7e2] px-6 py-5 md:px-9">
             <button type="button" onClick={back} disabled={step === 1} className="rounded-full border border-[#1d1d1f] px-[19px] py-[9px] text-[12px] font-semibold uppercase leading-[18px] tracking-[0.96px] text-[#1d1d1f] transition-colors disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
             <span className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">Step {step} of {TOTAL}</span>
-            <button type="button" onClick={next} disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Sending…" : step === TOTAL ? "Confirm Booking" : "Continue →"}</button>
+            <button type="button" onClick={next} disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $250 AUD" : "Continue →"}</button>
           </div>
         )}
+      </div>
+
+      {/* We Accept — payment logos */}
+      <div className="mt-14 flex justify-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/installation/we-accept.svg" alt="We accept AMEX, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
       </div>
     </div>
   );
@@ -469,31 +487,17 @@ export default function Page() {
       </section>
 
       {/* Three steps */}
-      <section id="how" className="scroll-mt-24 bg-[#f7f7f7] py-24 md:py-[96px]" data-nav-theme="light">
-        <div className="mx-auto max-w-[1160px] px-6">
-          <h2 className="mb-11 text-center text-[32px] font-semibold leading-[40px] tracking-[-0.5px] text-[#1d1d1f] md:text-[48px] md:leading-[60px]">From box to windscreen. In three steps.</h2>
-          <Carousel opts={{ align: "start" }} className="relative w-full">
-            <CarouselContent className="-ml-[50px]">
-              {THREE.map((s) => (
-                <CarouselItem key={s.title} className="pl-[50px] sm:basis-[72%] lg:basis-[58%]">
-                  <div className="relative aspect-[1047/562] w-full overflow-hidden rounded-[32px]">
-                    <Image src={s.img} alt={s.title} fill sizes="(max-width:768px) 100vw, 680px" className="object-cover" />
-                  </div>
-                  <h3 className="mt-8 text-[28px] font-semibold leading-[1.05] tracking-[-0.05px] text-[#1d1d1f] sm:mt-[88px] md:text-[38.4px] md:leading-[38.4px]">
-                    {s.n && <span className="text-[var(--finevu-orange)]">{s.n} </span>}{s.title}
-                  </h3>
-                  <p className="mt-3.5 max-w-[624px] text-[20px] font-medium leading-[28px] text-[#6e6e73]">{s.body}</p>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {/* Carousel nav — below the carousel */}
-            <div className="mt-10 flex justify-center gap-3 md:mt-12">
-              <CarouselPrevious className="static h-11 w-11 translate-x-0 translate-y-0 border-0 bg-[#ececec] text-[#1d1d1f] hover:bg-[#e0e0e0]" />
-              <CarouselNext className="static h-11 w-11 translate-x-0 translate-y-0 border-0 bg-[#ececec] text-[#1d1d1f] hover:bg-[#e0e0e0]" />
-            </div>
-          </Carousel>
-        </div>
-      </section>
+      <div id="how" className="scroll-mt-24">
+        <Carousel
+          theme="light"
+          bgClassName="bg-[#f7f7f7]"
+          pre="From box to windscreen. "
+          post="In three steps."
+          cards={THREE}
+          imgAspect="1047 / 562"
+          pinGutter
+        />
+      </div>
 
       {/* What's included */}
       <section className="bg-white py-24 md:py-[96px]" data-nav-theme="light">

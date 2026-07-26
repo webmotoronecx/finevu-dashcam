@@ -216,7 +216,7 @@ export function Navigation() {
           >
             {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex min-h-[44px] items-center shrink-0">
-              <Logo variant="primary" className="w-[136px] h-[33px] sm:w-[170px] sm:h-[41px] object-contain transition-transform duration-300 hover:scale-105" />
+              <Logo variant="primary" className="w-[136px] h-[33px] sm:w-[150px] sm:h-[36px] object-contain transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}

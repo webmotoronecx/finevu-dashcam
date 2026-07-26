@@ -57,6 +57,21 @@ They are unresolved decisions, not tasks that can just be done.
    commitments (warranty periods, ACL wording, support terms) and repeat spec claims —
    e.g. `app/support/page.tsx` restates the hardwire-kit disclaimer, so item 1 above
    affects that page too. Audit before launch.
+5. **Image strategy needs triage — `next/image` vs. a `sharp` prebuild.** Unresolved,
+   raise it before anyone starts the responsive-images work below. Established
+   2026-07-26: `next/image` **already generates `srcSet` itself** — it omits `srcSet`
+   from its props type for exactly that reason, and the current build proves it
+   (`.next/server/app/installation.html` carries a real 640/828/1200/2048w set for
+   `/installation/hero.webp`). So for the ~95 **local `/public`** refs it does the whole
+   job the TODO describes — width variants, AVIF/WebP, no prebuild script, no manifest.
+   The `images.remotePatterns` blocker is real but applies **only to the 13 remote
+   Unsplash URLs**; that got over-generalized into "never use `next/image`," which is
+   why local images ship full-size today. **The decision is a cost/architecture call, not
+   a technical one:** `/_next/image` is a metered transformation quota on Vercel and a
+   runtime request per image, versus static files from a `sharp` prebuild. Needs the
+   user (billing owner) to choose. Related: `components/sections/Carousel.tsx` renders a
+   plain `<img>`, so every carousel image on `/gx4k`, `/gx35` and `/installation` — incl.
+   the 16 MB `detail-starvis.png` — currently ships unoptimized either way.
 
 ## Going live — launch steps
 
@@ -220,6 +235,12 @@ Groundwork already in place: **`ImageWithFallback` is a plain `<img>` that sprea
 `...rest`**, so `srcSet`/`sizes` already pass straight through (see
 `FeatureTabs`'s `imageSrcSet`/`imageSizes` props). We deliberately avoid `next/image`
 (remote Unsplash + no `images.remotePatterns` + static prerender).
+
+> ⚠️ **Read open item 5 first — that "avoid `next/image`" rule only holds for the 13
+> remote Unsplash URLs.** For local `/public` images `next/image` already emits a real
+> `srcSet` and would replace steps 1–2 below entirely. The prebuild plan is therefore
+> *one of two options*, not the settled approach — the choice is unmade and needs the
+> user. Don't start this work before it's triaged.
 
 Recommended approach when picked up:
 1. Add `sharp` and a **prebuild script** that generates width variants

@@ -183,9 +183,16 @@ const mDualVision: MediaSectionData = {
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
     mobileVideo: "/gx4k/dual-sensors_mobile.mp4",
+    
     pinOnMobile: false,
     background:'#000',
     aspectRatio: "2160/1207",
+// Phones: stack rather than overlay. The description is ~600 chars, which will not fit
+    // over the media, so the box gets a real height and `object-bottom` parks the letterboxed
+    // clip against the bottom edge — leaving the top clear for the copy. Padding cannot do
+    // this: the media is `absolute inset-0`, so it covers the padding box too.
+
+    mediaClass: "object-contain object-bottom md:object-cover md:object-center",
     // padTop: "pt-[250px] md:pt-0",
     textPosition: "14%",
     theme: "dark",
@@ -204,7 +211,6 @@ const mDualVision: MediaSectionData = {
     videoScrubStart: 0.2,
     videoScrubEnd: 0.8,
 
-    // mediaClass:"object-contain md:object-cover"
 };
 
 const mSecondEyes: MediaSectionData = {
@@ -440,10 +446,7 @@ export default function GX4KPage() {
     return (
         <main className="overflow-x-clip bg-[#08080c]">
             {/* Hero: scroll-pinned video */}
-            {/* The master runs ~13.4 Mbps for a muted background loop; `_desktop` is the same
-                1920×1080 at CRF 23, and below lg the browser fetches `_mobile` instead via
-                <source media>. The pin stays — unlike the scrub sections it reveals the beats.
-                Note the homepage still points its <Hero> at the untouched master. */}
+         
             <ScrollHero
                 video="/home/GX4K_Hero_Video_V2_desktop.mp4"
                 mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
@@ -452,9 +455,7 @@ export default function GX4KPage() {
                 fadeTo="#08080c"
             />
 
-            {/* Scroll-scrubbed render: playback + annotation callouts driven by scroll position.
-          NOTE: callout `pos`/`line` coords are a starting point (borrowed from OpticsSection);
-          tune them against the actual video framing. */}
+   
 
             {/* Every detail card grid */}
             <section data-nav-theme="dark" className="py-20 md:py-28">
@@ -476,26 +477,19 @@ export default function GX4KPage() {
 
             {/* Optics behind the image */}
             {/* <OpticsSection /> */}
-            {/* Optics → Dual Vision: card-cover stack. The Dual Vision MediaSection rides
-          up over the scrub's exit window (negative margin + z-10) so it covers the
-          releasing stage instead of following it. reverseOnExit is dropped so the
-          scrub holds its final frame beneath the cover rather than rewinding out of view. */}
+            
 
             <ScrollScrubVideo
-            scrollHint={false}
+                scrollHint={false}
                 video="/gx4k/gx4k_secondary_banner_scrub.mp4"
-                poster="/gx4k/hero_render.png"
-                reverseOnExit
-                // Below lg the callouts stack and there's nothing to scrub, so the pin would hold
-                // a viewport for ~3 screens for no payoff — drop it and just play the clip.
-                pinOnMobile={false}
-                // The scrub build is all-keyframe (7 MB) purely so seeking is exact; nothing seeks
-                // on mobile, so it plays a normal 1280-wide encode instead — 0.63 MB.
                 mobileVideo="/gx4k/gx4k_secondary_banner_mobile.mp4"
-                // Start scrubbing while the section is only half on screen, so the video is
-                // already moving as it slides up into the pin.
+                poster="/gx4k/hero_render.png"
+                themeOverrides={{stageBg: "bg-[#000]", sectionBg: "bg-[#000]"}}
+                reverseOnExit
+                pinOnMobile={false}
+               
                 startVisible={.8}
-                // ...and hold on the finished frame for a beat before the section unsticks.
+              
                 holdLength="100vh"
                 head={{
                     title: "The Optics Behind the Image.",
@@ -503,8 +497,6 @@ export default function GX4KPage() {
                         "Sony STARVIS IMX515. A precision-engineered 8.5-megapixel sensor paired with F/1.8 wide-aperture glass, made to perform when it matters most.",
                 }}
                 mobileObjectPosition="45% 50%"
-                // Must match the clip's real frame — the callout layer is sized to the video's
-                // object-cover box, so `at`/`line` coordinates below are literal video pixels.
                 stageViewBox="0 0 1920 1318"
                 callouts={[
                     {

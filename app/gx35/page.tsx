@@ -224,6 +224,12 @@ const mDualVision: MediaSectionData = {
   pinOnMobile: false,
   background: "#000",
   aspectRatio: "2160/1207",
+// Phones: stack rather than overlay. The description is ~600 chars, which will not fit
+  // over the media, so the box gets a real height and `object-bottom` parks the letterboxed
+  // clip against the bottom edge — leaving the top clear for the copy. Padding cannot do
+  // this: the media is `absolute inset-0`, so it covers the padding box too.
+  heightVhMobile: 100,
+  mediaClass: "object-contain object-bottom md:object-cover md:object-center",
   textPosition: "14%",
   theme: "dark",
   topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",

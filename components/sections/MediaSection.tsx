@@ -8,6 +8,25 @@ const enterViewport = { once: true, margin: "-80px" };
 const replayViewport = { once: false, margin: "-80px" };
 const emptySubscribe = () => () => {};
 
+// Tailwind's `lg`. The pin and the scrub are JS-driven — a tall track plus a rAF loop writing
+// `currentTime` — so unlike a purely visual tweak they can't be switched off with a class; the
+// component has to actually know the breakpoint.
+const LG = "(min-width: 1024px)";
+const subscribeLg = (cb: () => void) => {
+  const m = window.matchMedia(LG);
+  m.addEventListener("change", cb);
+  return () => m.removeEventListener("change", cb);
+};
+/** True at `lg` and up. SSR/first paint answers `true`, so the desktop treatment renders
+ *  immediately and phones correct on hydration — the other way round would flash an unpinned
+ *  section on every desktop load, which is the more common case and the more visible one. */
+const useIsDesktop = () =>
+  useSyncExternalStore(
+    subscribeLg,
+    () => window.matchMedia(LG).matches,
+    () => true,
+  );
+
 /**
  * Scrub stops are authored as percentages ("20%", 20) or 0..1 fractions (0.2)
  * — whichever reads better at the call site. A bare number above 1 can only
@@ -113,6 +132,16 @@ export type MediaSectionData = {
    * much scrolling the video takes.
    */
   pin?: boolean;
+  /** Keep the pin *and* the scrub below `lg` (default true).
+   *
+   *  Set false for anything whose payoff is the scrub itself: on a phone the pin holds the
+   *  viewport for `pinHeightVh` screens, and a scrub is awkward to drive by thumb. Released, the
+   *  section becomes an ordinary block and the clip autoplays on a loop. Pair with `mobileVideo`
+   *  — the scrub source is an all-keyframe build and far heavier than playback needs. */
+  pinOnMobile?: boolean;
+  /** Lighter source used once `pinOnMobile={false}` has released the section; defaults to `video`.
+   *  Encode 1280 wide, CRF 26, `-g 48` — see docs/scrollscrubvideo-work-2026-07-26.md. */
+  mobileVideo?: string;
   /**
    * How long the pin lasts, as a multiple of viewport height (default 200 =
    * two screens of scrolling held in place). Higher = slower scrub, more
@@ -289,6 +318,8 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     videoScrubEnd = 1,
     videoScrubLerp = 0.15,
     pin = false,
+    pinOnMobile = true,
+    mobileVideo,
     pinHeightVh = 200,
     heightVh,
     heightVhMobile,
@@ -320,12 +351,24 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     theme = "dark",
     className = "",
   } = data;
+  // Below lg, `pinOnMobile={false}` drops both the pin and the scrub: the section becomes an
+  // ordinary block and the clip just plays. Everything downstream reads `pinned`/`scrubbing`
+  // rather than the raw props, so the two stay in lockstep — a pin without a scrub would hold the
+  // viewport on a frozen frame, a scrub without a pin would race past.
+  const isDesktop = useIsDesktop();
+  const mobileRelease = !pinOnMobile && !isDesktop;
+  const pinned = pin && !mobileRelease;
+  const scrubbing = videoScrub && !mobileRelease;
+  // The scrub build is all-keyframe purely so seeking is exact; nothing seeks once released, so
+  // that encode is dead weight on a phone. Falls back to `video` when no mobile cut exists.
+  const videoSrc = (mobileRelease && mobileVideo) || video;
+
   // Viewport-height mode. `dvh` rather than `vh` so mobile browser chrome
   // collapsing doesn't leave a gap. The pin owns the height when it's on.
-  const vh = !pin && typeof heightVh === "number" && heightVh > 0 ? heightVh : undefined;
+  const vh = !pinned && typeof heightVh === "number" && heightVh > 0 ? heightVh : undefined;
   // `heightVhMobile` on its own: aspect mode on desktop, fixed height on phones.
   const mobileVhOnly =
-    vh === undefined && !pin && !heightClass && typeof heightVhMobile === "number" && heightVhMobile > 0;
+    vh === undefined && !pinned && !heightClass && typeof heightVhMobile === "number" && heightVhMobile > 0;
   // Both fixed-height modes crop to cover and share the banner text insets;
   // only aspect mode letterboxes the media to `aspectRatio`.
   const banner = Boolean(heightClass) || vh !== undefined;
@@ -338,6 +381,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
   const prefersReduced = useReducedMotion();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const reduce = mounted && prefersReduced;
+
   const dark = theme === "dark";
   const titleColor = dark ? "text-white" : "text-[#0b0b0c]";
   const descColor = dark ? (banner ? "text-white/60" : "text-white/80") : "text-[#5c6478]";
@@ -422,7 +466,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
   // sticky child locks to the top, 1 when the track runs out and it releases.
   // Unpinned, the clip spans the section's whole travel across the viewport.
   const scrubOffset =
-    videoScrubOffset ?? (pin ? ["start start", "end end"] : ["start end", "end start"]);
+    videoScrubOffset ?? (pinned ? ["start start", "end end"] : ["start end", "end start"]);
   const { scrollYProgress: videoProgress } = useScroll({
     target: sectionRef,
     offset: scrubOffset as never,
@@ -443,11 +487,11 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
   );
 
   useMotionValueEvent(videoProgress, "change", (p) => {
-    if (videoScrub) targetTimeRef.current = scrubTime(p);
+    if (scrubbing) targetTimeRef.current = scrubTime(p);
   });
 
   useEffect(() => {
-    if (!videoScrub || reduce) return;
+    if (!scrubbing || reduce) return;
     const v = videoRef.current;
     if (!v) return;
 
@@ -482,14 +526,14 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
       cancelAnimationFrame(raf);
       v.removeEventListener("loadedmetadata", onMeta);
     };
-  }, [videoScrub, reduce, videoProgress, videoScrubLerp, scrubTime]);
+  }, [scrubbing, reduce, videoProgress, videoScrubLerp, scrubTime]);
 
   // Play-once mode: rewind + play on every entry, pause + reset on exit, so the
   // clip runs start-to-finish each time the section scrolls in and never loops.
-  const playOnce = videoPlayOnce && !videoScrub && !reduce;
+  const playOnce = videoPlayOnce && !scrubbing && !reduce;
   // Watch the frame, not the section: a pinned section's track is several
   // screens tall and enters view long before the media is actually on screen.
-  const inView = useInView(pin ? frameRef : sectionRef, { margin: "-80px" });
+  const inView = useInView(pinned ? frameRef : sectionRef, { margin: "-80px" });
 
   useEffect(() => {
     if (!playOnce) return;
@@ -538,10 +582,10 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     : mobileVhOnly
       ? "media-vh-mobile"
       : "";
-  const frameClass = pin
+  const frameClass = pinned
     ? `sticky top-0 w-full overflow-hidden ${heightClass ?? "h-[100dvh]"}`
     : `relative w-full overflow-hidden ${banner ? (heightClass ?? "") : "min-h-[420px]"} ${vhClass} ${boxClass} ${pad} ${className}`;
-  const frameStyle = pin
+  const frameStyle = pinned
     ? undefined
     : useVh
       ? ({
@@ -564,13 +608,13 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
       {video ? (
         <video
           ref={videoRef}
-          src={video}
+          src={videoSrc}
           poster={poster ?? image}
           // Scrub mode owns playback: paused, seeked from scroll. Play-once mode
           // is driven by the in-view effect below. Reduced motion falls back to
           // a still first frame rather than any of those behaviours.
-          autoPlay={!videoScrub && !playOnce && !reduce}
-          loop={!videoScrub && !playOnce && !reduce}
+          autoPlay={!scrubbing && !playOnce && !reduce}
+          loop={!scrubbing && !playOnce && !reduce}
           muted
           playsInline
           preload="auto"
@@ -657,7 +701,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
   // Pinned: the section is the scroll track, and its height is what the pin
   // "spends" — `pinHeightVh` screens of scrolling pass while the sticky frame
   // stays put. Unpinned: the section is the frame.
-  return pin ? (
+  return pinned ? (
     <section
       ref={sectionRef}
       className={`relative w-full ${className}`}

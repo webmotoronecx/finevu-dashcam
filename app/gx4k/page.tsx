@@ -182,6 +182,8 @@ const mDualVision: MediaSectionData = {
     image: "/gx4k/graphic-dual-vision.webp",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
+    mobileVideo: "/gx4k/dual-sensors_mobile.mp4",
+    pinOnMobile: false,
     background:'#000',
     aspectRatio: "2160/1207",
     // padTop: "pt-[250px] md:pt-0",
@@ -230,6 +232,8 @@ const mInYourHand: MediaSectionData = {
 const mDiscreet: MediaSectionData = {
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/discreet_scrub.mp4",
+    mobileVideo: "/gx4k/discreet_mobile.mp4",
+    pinOnMobile: false,
     background:'#000',
     title: "Discreet by Design.",
     description: "A screen-free, wedge-shaped body that tucks behind your mirror and out of your mind.",
@@ -436,7 +440,17 @@ export default function GX4KPage() {
     return (
         <main className="overflow-x-clip bg-[#08080c]">
             {/* Hero: scroll-pinned video */}
-            <ScrollHero video="/home/GX4K_Hero_Video_V2.mp4" poster="/gx4k/hero-bg.webp" beats={HERO_BEATS}  fadeTo = "#08080c" />
+            {/* The master runs ~13.4 Mbps for a muted background loop; `_desktop` is the same
+                1920×1080 at CRF 23, and below lg the browser fetches `_mobile` instead via
+                <source media>. The pin stays — unlike the scrub sections it reveals the beats.
+                Note the homepage still points its <Hero> at the untouched master. */}
+            <ScrollHero
+                video="/home/GX4K_Hero_Video_V2_desktop.mp4"
+                mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
+                poster="/gx4k/hero-bg.webp"
+                beats={HERO_BEATS}
+                fadeTo="#08080c"
+            />
 
             {/* Scroll-scrubbed render: playback + annotation callouts driven by scroll position.
           NOTE: callout `pos`/`line` coords are a starting point (borrowed from OpticsSection);
@@ -468,10 +482,16 @@ export default function GX4KPage() {
           scrub holds its final frame beneath the cover rather than rewinding out of view. */}
 
             <ScrollScrubVideo
+            scrollHint={false}
                 video="/gx4k/gx4k_secondary_banner_scrub.mp4"
-                poster="/gx4k/hero-render.png"
+                poster="/gx4k/hero_render.png"
                 reverseOnExit
-                
+                // Below lg the callouts stack and there's nothing to scrub, so the pin would hold
+                // a viewport for ~3 screens for no payoff — drop it and just play the clip.
+                pinOnMobile={false}
+                // The scrub build is all-keyframe (7 MB) purely so seeking is exact; nothing seeks
+                // on mobile, so it plays a normal 1280-wide encode instead — 0.63 MB.
+                mobileVideo="/gx4k/gx4k_secondary_banner_mobile.mp4"
                 // Start scrubbing while the section is only half on screen, so the video is
                 // already moving as it slides up into the pin.
                 startVisible={.8}
@@ -494,9 +514,10 @@ export default function GX4KPage() {
                         items: ["SONY STARVIS IMX515", "8.5 MP sensor", "3840 × 2160 (4K UHD)", "136° field of view"],
                         start: 0.2,
                         end: 0.3,
-                        at: [417, 400],
-                        // underline runs right off the divider, then bends down to the front lens
-                        line: { lead: 700, points: [[813, 670]] },
+                        // `at` is the front lens itself; the leader runs up-left off it to the block.
+                        at: [720, 670],
+                        direction: "top-left",
+                        leader: { angle: 45, diag: 200,radius:6, run: 120 },
                         from: "right",
                     },
                     {
@@ -506,9 +527,9 @@ export default function GX4KPage() {
                         items: ["Dual-core processor", "HDR auto night vision", "microSD up to 256 GB", "Format Free 2.0"],
                         start: 0.3,
                         end: 0.4,
-                        at: [610, 1056],
-                        align: "bottom-left",
-                        line: { lead: 847, points: [[971, 700]] },
+                        at: [940, 710],
+                        direction: "bottom-left",
+                        leader: { angle: 65, diag: 240,radius:6, run: 55 },
                         from: "right",
                     },
                     {
@@ -518,12 +539,9 @@ export default function GX4KPage() {
                         items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "18 g compact module"],
                         start: 0.4,
                         end: 0.6,
-                        at: [1553, 1061],
-                        align: "bottom-right",
-                        // underline runs left off the divider, then bends up to the rear module.
-                        // attachDx pulls the start in off the block's right edge — tune this to
-                        // trim the underline without shifting the text.
-                        line: { lead: 1209, attachDx: -120, points: [[1152, 744]] },
+                        at: [1280, 744],
+                        direction: "bottom-right",
+                        leader: { angle: 65, diag: 165,radius:6, run: 35 },
                         from: "left",
                     },
                 ]}

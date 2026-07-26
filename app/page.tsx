@@ -28,11 +28,15 @@ const SUB = 'text-[#5c6478] text-base lg:text-[18px] leading-[27px]';
 
 /* Hero */
 function Hero({
-  theme, image, video, eyebrow, title, sub, href,
+  theme, image, video, mobileVideo, eyebrow, title, sub, href,
 }: {
   theme: 'dark' | 'light';
   image: string;
   video?: string;
+  /** Lighter source served below `lg`, picked by the browser at load time so a phone never
+   *  fetches the desktop file. Encode 1280 wide, CRF 26 — see
+   *  docs/scrollscrubvideo-work-2026-07-26.md. */
+  mobileVideo?: string;
   eyebrow: string;
   title: string;
   sub: string;
@@ -59,6 +63,8 @@ function Hero({
           poster={image}
           aria-hidden="true"
         >
+          {/* Order matters: the browser takes the first <source> whose media query matches. */}
+          {mobileVideo && <source src={mobileVideo} media="(max-width: 1023px)" type="video/mp4" />}
           <source src={video} type="video/mp4" />
         </video>
       ) : (
@@ -161,7 +167,9 @@ export default function Page() {
       <Hero
         theme="dark"
         image="/home/hero-gx4k.webp"
-        video="/home/GX4K_Hero_Video_V2.mp4"
+        // Master runs ~13.4 Mbps for a muted loop; these are the CRF 23 / 1280 cuts.
+        video="/home/GX4K_Hero_Video_V2_desktop.mp4"
+        mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
         eyebrow="FineVu GX4K · 2-Channel UHD"
         title="GX4K"
         sub="The clearest view of the road you've ever recorded - front and rear."
@@ -172,7 +180,10 @@ export default function Page() {
       <Hero
         theme="dark"
         image="/home/hero-gx35.webp"
-        video="/home/GX35_Hero_Video_v2.mp4"
+        // GX35_Hero_Video_v2.mp4 is byte-identical to /gx35/hero.mp4, so this reuses that page's
+        // cuts rather than encoding a second copy of the same footage.
+        video="/gx35/hero_desktop.mp4"
+        mobileVideo="/gx35/hero_mobile.mp4"
         eyebrow="FineVu GX35 · 2-Channel QHD"
         title="GX35"
         sub="QHD 2K clarity in a camera smaller than a credit card - with in-app live view straight from your phone."

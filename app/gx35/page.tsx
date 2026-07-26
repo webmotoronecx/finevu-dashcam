@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { OpticsSection } from "@/components/sections/OpticsSection";
+import { ScrollScrubVideo } from "@/components/sections/ScrollScrubVideo";
 import { BentoCard } from "@/components/sections/BentoCard";
 import { MediaSection, type MediaSectionData } from "@/components/sections/MediaSection";
 import { Head } from "@/components/sections/Head";
@@ -219,6 +220,8 @@ const mDualVision: MediaSectionData = {
     "GX35 pairs the Sony STARVIS 2 IMX675 — a 5.12MP next-generation sensor — up front with a 2MP CMOS sensor at the rear. STARVIS 2 lifts low-light clarity while drawing 30% less power than the sensor before it, capturing sharper detail and cleaner footage after dark. Together the dual-sensor setup records every journey front and back with exceptional clarity, less noise and reduced motion blur.",
   image: "/gx4k/graphic-dual-vision.png", // TODO(gx35-asset)
   video: "/gx4k/dual-sensors_scrub.mp4", // TODO(gx35-asset) — all-keyframe build, see CLAUDE.md
+  mobileVideo: "/gx4k/dual-sensors_mobile.mp4", // TODO(gx35-asset) — borrowed, as above
+  pinOnMobile: false,
   background: "#000",
   aspectRatio: "2160/1207",
   textPosition: "14%",
@@ -260,6 +263,8 @@ const mInYourHand: MediaSectionData = {
 
 const mDiscreet: MediaSectionData = {
   video: "/gx4k/discreet_scrub.mp4", // TODO(gx35-asset) — all-keyframe build, see CLAUDE.md
+  mobileVideo: "/gx4k/discreet_mobile.mp4", // TODO(gx35-asset) — borrowed, as above
+  pinOnMobile: false,
   background: "#000",
   title: "Discreet by Design.",
   description:
@@ -444,11 +449,14 @@ export default function GX35Page() {
           light page background instead of GX4K's near-black. */}
     
       <ScrollHero
-        video="/gx35/hero.mp4"
-     
+        // Re-encoded from hero.mp4 at the same 1920×1080 — the master ran ~12.7 Mbps, which is
+        // far past what a muted background loop needs. The 21.5 MB original is kept on disk.
+        video="/gx35/hero_desktop.mp4"
+        // Below lg the browser fetches this instead, via <source media> — so a phone never pulls
+        // the desktop file at all. The pin stays: unlike the scrub sections it reveals the beats.
+        mobileVideo="/gx35/hero_mobile.mp4"
         beats={HERO_BEATS}
         theme="light"
-
       />
 
       {/* Every detail feature bento */}
@@ -482,8 +490,65 @@ export default function GX35Page() {
         </div>
       </section>
 
-      {/* Optics pinned scroll-reveal */}
-      <OpticsSection
+      {/* Optics pinned scroll-reveal — trialling the ScrollScrubVideo treatment with a still
+          backdrop instead. The original light-theme OpticsSection is kept below, commented, until
+          that call is made. */}
+      <ScrollScrubVideo
+        scrollHint={false}
+        theme="light"
+        image="/gx35/optics.webp"
+        fit="contain"
+        // Below lg there are no callouts to reveal and nothing to scrub, so the pin would just
+        // hold a still image for ~3 screens. Off, the mobile section shows the frame in flow.
+        pinOnMobile={false}
+        themeOverrides={{ bottomFade: "", exitFade: "", stageBg: "bg-[#F4F4F6]", sectionBg: "bg-[#F7F7F7]", reducedBg: "#F4F4F6" }}
+        // Must match optics.webp's real pixel size — the callout layer is sized to the same box,
+        // so `at` values below are literal image pixels. Note this crop is 1.582 wide, NOT the
+        // 1.456 of the image OpticsSection used; anchors from that era do not carry over.
+        stageViewBox="0 0 2160 1365"
+
+        
+        nudgeY="7%"
+        head={{
+          title: "The Optics Behind the Image.",
+          subtitle:
+            "Sony STARVIS 2 IMX675. A next-generation 5.12-megapixel sensor paired with F/1.8 wide-aperture glass, drawing 30% less power than the previous STARVIS while lifting low-light clarity.",
+        }}
+        // `at` values are the OpticsSection line's product end (its x1/y1), rescaled from that
+        // component's 2160×1484 space into this one's 1920×1319 (×0.8889). Angles approximate the
+        // original leader directions — all of it wants eyeballing, the geometry model differs.
+        callouts={[
+          {
+            ...opticsCallouts[0],
+            start: 0.2,
+            end: 0.3,
+            at: [1100, 570],
+            direction: "top-right",
+            leader: { angle: 25, diag: 190, run: 60, radius: 6 },
+            from: "left",
+          },
+          {
+            ...opticsCallouts[1],
+            start: 0.3,
+            end: 0.4,
+            at: [904, 707],
+            direction: "bottom-left",
+            leader: { angle: 25, diag: 160, run: 60, radius: 6 },
+            from: "right",
+          },
+          {
+            ...opticsCallouts[2],
+            start: 0.4,
+            end: 0.6,
+            at: [1160, 860],
+            direction: "bottom-left",
+            leader: { angle: 40, diag: 40, run: 60, radius: 6 },
+            from: "right",
+          },
+        ]}
+      />
+
+      {/* <OpticsSection
         theme="light"
         image="/gx35/optics.webp"
         stageAspect="2160 / 1484"
@@ -504,7 +569,7 @@ export default function GX35Page() {
             "Sony STARVIS 2 IMX675. A next-generation 5.12-megapixel sensor paired with F/1.8 wide-aperture glass, drawing 30% less power than the previous STARVIS while lifting low-light clarity.",
         }}
         callouts={opticsCallouts}
-      />
+      /> */}
 
       {/* Dual Vision showcase */}
       {/* <MediaSection data={mDualVision} /> */}

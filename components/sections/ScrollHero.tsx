@@ -52,6 +52,7 @@ const emptySubscribe = () => () => {};
 
 export function ScrollHero({
   video,
+  mobileVideo,
   poster,
   beats,
   theme = "dark",
@@ -67,6 +68,10 @@ export function ScrollHero({
   fadeMs = 260,
 }: {
   video: string;
+  /** Lighter source served below `lg` (defaults to `video`). The pin stays — unlike the scrub
+   *  sections it earns itself here, since it is what reveals the beats — but a phone has no use
+   *  for a desktop-bitrate master. Encode 1280 wide, CRF 26, `-g 48`. */
+  mobileVideo?: string;
   poster?: string;
   beats: HeroBeat[];
   theme?: ScrollHeroTheme;
@@ -156,7 +161,20 @@ export function ScrollHero({
   return (
     <section ref={containerRef} data-nav-theme="dark" className="relative w-full" style={{ height: `${heightVh}vh` }}>
       <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
-        <video src={video} poster={poster} autoPlay loop muted playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover" />
+        <video
+          poster={poster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          {/* `media` picks the source at load time, so a phone never fetches the desktop master.
+              Order matters: the browser takes the first <source> whose media query matches. */}
+          {mobileVideo && <source src={mobileVideo} media="(max-width: 1023px)" type="video/mp4" />}
+          <source src={video} type="video/mp4" />
+        </video>
         {/* Legibility scrim plus a bottom fade into the next section */}
         <div
           className="pointer-events-none absolute inset-0"

@@ -183,20 +183,16 @@ const mDualVision: MediaSectionData = {
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
     mobileVideo: "/gx4k/dual-sensors_mobile.mp4",
-    
+
     pinOnMobile: false,
     background:'#000',
     aspectRatio: "2160/1207",
-// Phones: stack rather than overlay. The description is ~600 chars, which will not fit
-    // over the media, so the box gets a real height and `object-bottom` parks the letterboxed
-    // clip against the bottom edge — leaving the top clear for the copy. Padding cannot do
-    // this: the media is `absolute inset-0`, so it covers the padding box too.
-
-    mediaClass: "object-contain object-bottom md:object-cover md:object-center",
-    // padTop: "pt-[250px] md:pt-0",
+    
+    stackOnMobile: true,
+    padTop: "pt-[300px] md:pt-0",
     textPosition: "14%",
     theme: "dark",
-    // Top legibility gradient in the page background colour instead of pure black.
+
     topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
     fade: true,
     fadeColor: "#000", // matches the page background
@@ -208,6 +204,9 @@ const mDualVision: MediaSectionData = {
     pin: true,
     pinHeightVh: 250, 
     videoScrub: true,
+    // Mobile releases the scrub, so this takes over there: one play-through on entry
+    // rather than a loop. Inert on desktop, where the scrub still owns playback.
+    videoPlayOnce: true,
     videoScrubStart: 0.2,
     videoScrubEnd: 0.8,
 
@@ -252,6 +251,9 @@ const mDiscreet: MediaSectionData = {
     pin: true,
     pinHeightVh: 250, 
     videoScrub: true,
+    // Mobile releases the scrub, so this takes over there: one play-through on entry
+    // rather than a loop. Inert on desktop, where the scrub still owns playback.
+    videoPlayOnce: true,
     videoScrubStart: 0.2,
     videoScrubEnd: 0.9,
 };

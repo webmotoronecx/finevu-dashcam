@@ -982,7 +982,7 @@ export function ScrollScrubVideo({
 
       {/* Mobile / tablet (< lg): callouts stacked in normal flow instead of positioned. */}
       {callouts.length > 0 && (
-        <section data-nav-theme={t.nav} className={`${t.sectionBg} py-16 lg:hidden`}>
+        <section data-nav-theme={t.nav} className={`${t.sectionBg} pt-16 lg:hidden`}>
           {/* With the pin active the head is already shown over the media at every breakpoint, so
               repeating it here would duplicate the heading. When the pin is off below lg the track
               is display:none, so this section carries the head and the media itself. */}

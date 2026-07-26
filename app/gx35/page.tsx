@@ -224,12 +224,11 @@ const mDualVision: MediaSectionData = {
   pinOnMobile: false,
   background: "#000",
   aspectRatio: "2160/1207",
-// Phones: stack rather than overlay. The description is ~600 chars, which will not fit
-  // over the media, so the box gets a real height and `object-bottom` parks the letterboxed
-  // clip against the bottom edge — leaving the top clear for the copy. Padding cannot do
-  // this: the media is `absolute inset-0`, so it covers the padding box too.
-  heightVhMobile: 100,
-  mediaClass: "object-contain object-bottom md:object-cover md:object-center",
+  // Phones stack instead of overlaying: the section stops setting its own height, the
+  // media drops into flow with the aspect ratio above, and this padding opens the band
+  // the copy sits in. Tune padTop against the description length, not the viewport.
+  stackOnMobile: true,
+  padTop: "pt-[440px] md:pt-0",
   textPosition: "14%",
   theme: "dark",
   topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
@@ -242,6 +241,9 @@ const mDualVision: MediaSectionData = {
   pin: true,
   pinHeightVh: 250,
   videoScrub: true,
+  // Mobile releases the scrub, so this takes over there: one play-through on entry
+  // rather than a loop. Inert on desktop, where the scrub still owns playback.
+  videoPlayOnce: true,
   videoScrubStart: 0.2,
   videoScrubEnd: 0.8,
 };
@@ -282,6 +284,9 @@ const mDiscreet: MediaSectionData = {
   pin: true,
   pinHeightVh: 250,
   videoScrub: true,
+  // Mobile releases the scrub, so this takes over there: one play-through on entry
+  // rather than a loop. Inert on desktop, where the scrub still owns playback.
+  videoPlayOnce: true,
   videoScrubStart: 0.2,
   videoScrubEnd: 0.9,
 };

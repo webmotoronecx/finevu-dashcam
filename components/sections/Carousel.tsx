@@ -290,7 +290,7 @@ export function Carousel({
               key={c.title}
               data-card
               {...fadeUp}
-              className="w-[80vw] shrink-0 md:w-[62vw] lg:w-[min(48vw,1040px)]"
+              className="w-[90vw] shrink-0 md:w-[62vw] lg:w-[min(48vw,1040px)]"
             >
               {c.video || c.img ? (
                 <div

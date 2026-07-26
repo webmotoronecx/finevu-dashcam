@@ -90,7 +90,12 @@ export type MediaSectionData = {
   /**
    * Play the clip through **once** each time the section scrolls into view
    * instead of looping: it rewinds and plays on entry, and is paused/reset when
-   * the section leaves. Ignored under `videoScrub` (that mode owns playback).
+   * the section leaves.
+   *
+   * Ignored wherever the scrub is actually running, since that mode owns playback — but note
+   * `pinOnMobile={false}` releases the scrub below `lg`, so pairing the two gives you a scrub on
+   * desktop and a single play-through on phones, which is usually what you want: a loop is
+   * distracting in normal flow, and there is no scroll-pin left to drive it.
    */
   videoPlayOnce?: boolean;
   /**
@@ -139,6 +144,18 @@ export type MediaSectionData = {
    *  section becomes an ordinary block and the clip autoplays on a loop. Pair with `mobileVideo`
    *  — the scrub source is an all-keyframe build and far heavier than playback needs. */
   pinOnMobile?: boolean;
+  /** Phones (<md): stop overlaying and start stacking (default false).
+   *
+   *  The section gives up dictating its own height — no `aspectRatio`, no `heightVh`, no 420px
+   *  floor — and the media moves into normal flow inside a wrapper carrying `aspectRatio`. The
+   *  section is then as tall as its padding plus that box, so **`padTop` finally does what it
+   *  looks like it does**: it opens a band above the media for the copy to sit in. Without this
+   *  the media is `absolute inset-0` and simply covers the padding too.
+   *
+   *  The text stays an overlay, so `padTop` is still tuned against the copy length — but it is a
+   *  more honest number than a whole-section height, and the media keeps `object-cover` rather
+   *  than being letterboxed. At `md+` nothing changes. */
+  stackOnMobile?: boolean;
   /** Lighter source used once `pinOnMobile={false}` has released the section; defaults to `video`.
    *  Encode 1280 wide, CRF 26, `-g 48` — see docs/scrollscrubvideo-work-2026-07-26.md. */
   mobileVideo?: string;
@@ -319,6 +336,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     videoScrubLerp = 0.15,
     pin = false,
     pinOnMobile = true,
+    stackOnMobile = false,
     mobileVideo,
     pinHeightVh = 200,
     heightVh,
@@ -584,7 +602,9 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
       : "";
   const frameClass = pinned
     ? `sticky top-0 w-full overflow-hidden ${heightClass ?? "h-[100dvh]"}`
-    : `relative w-full overflow-hidden ${banner ? (heightClass ?? "") : "min-h-[420px]"} ${vhClass} ${boxClass} ${pad} ${className}`;
+    : `relative w-full overflow-hidden ${banner ? (heightClass ?? "") : "min-h-[420px]"} ${vhClass} ${
+        stackOnMobile ? "media-stack" : ""
+      } ${boxClass} ${pad} ${className}`;
   const frameStyle = pinned
     ? undefined
     : useVh
@@ -605,6 +625,14 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
       {/* Under everything, so letterboxed or transparent media sits on it. */}
       {background && <div aria-hidden="true" className="absolute inset-0" style={{ background }} />}
 
+      {/* Media wrapper. Normally `absolute inset-0`, so the media covers the section and
+          contributes no height. Under `stackOnMobile` it becomes an in-flow box carrying the
+          aspect ratio on phones, so it *is* the section's height and padding can sit above it.
+          At md+ the insets return and the aspect ratio is inert (over-constrained). */}
+      <div
+        className={stackOnMobile ? "relative w-full md:absolute md:inset-0" : "absolute inset-0"}
+        style={stackOnMobile ? { aspectRatio } : undefined}
+      >
       {video ? (
         <video
           ref={videoRef}
@@ -651,19 +679,24 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
         <div className="absolute inset-0 bg-[#26262b]" />
       )}
 
-      {scrim && (
-        <div
-          className="absolute inset-0"
-          style={{ background: scrimGradient }}
-        />
-      )}
-
-      {/* Top legibility gradient behind the title/description (dark theme). */}
+      {/* Softens the media's own top edge into the section background. Deliberately inside the
+          wrapper: under `stackOnMobile` the section's top is the padding band, so anchoring this
+          to the section would float it above the copy instead of over the media it is blending.
+          Outside stacked mode the wrapper is `absolute inset-0`, so this is exactly where it
+          always was. */}
       {showTopScrim && (
         <div
           aria-hidden="true"
           className={`pointer-events-none absolute inset-x-0 top-0 ${topScrimHeight}`}
           style={{ background: topScrimBackground }}
+        />
+      )}
+      </div>
+
+      {scrim && (
+        <div
+          className="absolute inset-0"
+          style={{ background: scrimGradient }}
         />
       )}
 

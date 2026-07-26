@@ -18,11 +18,13 @@ Two threads run through this:
 | `/gx4k` desktop leaders | **done** — point-first geometry, tuned by eye |
 | `/gx4k` mobile | **done** — pin dropped, 0.63 MB clip autoplays |
 | `/gx4k` MediaSection ×2 | **done** — pin + scrub released below lg, mobile cuts wired |
-| `/gx35` optics section | **working** — callout `at` values still WRONG, see §3 |
+| `/gx35` optics section | **done** — callouts re-authored by the user against the new crop |
 | `/gx35` MediaSection ×2 | **done** — same treatment |
 | `/gx35` hero (`ScrollHero`) | **done** — desktop re-encode + mobile cut |
 | `/gx4k` hero (`ScrollHero`) | **done** — desktop re-encode + mobile cut |
 | `/` homepage heroes ×2 | **done** — local `Hero` gained `mobileVideo`; GX35 reuses gx35's cuts |
+| site-wide video re-encode | **done** — 427.8 MB → 164.8 MB referenced |
+| `mDualVision` mobile layout | **done** — `stackOnMobile`, §5 |
 
 `npm run build`, `npx tsc --noEmit` clean. Lint sits at 33 problems vs a 29 baseline; the extra
 four are all `@next/next/no-img-element` on `<img>` tags, which this repo uses deliberately
@@ -108,8 +110,10 @@ All default to the previous behaviour, so adding them changed nothing on its own
 | `pinOnMobile` | keep the pinned full-height treatment below `lg` |
 | `mobileVideo` | lighter source for the mobile autoplay |
 
-**`MediaSection`** — `pinOnMobile`, `mobileVideo`. Same meaning, different mechanism: its pin is a
-JS-built track plus a rAF loop, so it needs `useIsDesktop()` rather than a CSS class. See §4.
+**`MediaSection`** — `pinOnMobile`, `mobileVideo`, `stackOnMobile`. The first two mean the same as
+above but need a different mechanism: its pin is a JS-built track plus a rAF loop, so it takes
+`useIsDesktop()` rather than a CSS class (§4). `stackOnMobile` is the layout half — overlay becomes
+stack below `md` (§5).
 
 **`ScrollHero`** — `mobileVideo` only, via `<source media>`. No `pinOnMobile`: it never scrubbed,
 and its pin is what reveals the beats.
@@ -159,11 +163,10 @@ themeOverrides={{ bottomFade: "", exitFade: "", stageBg: "bg-[#F4F4F6]", … }}
 
 ### Still to do
 
-- **Callout `at` / `angle` values are WRONG and must be re-authored.** They were ported from
-  `OpticsSection`'s `lines` (the `x1,y1` end is the product, confirmed against `overlayPos`) and
-  rescaled into the *old* 1920×1319 image. The 2026-07-26 `optics.webp` is a different crop
-  (2160×1365, aspect 1.582 vs 1.456), so a linear rescale does **not** fix them — the product sits
-  in a different place in frame. Re-pick each `at` against the new image.
+- ~~Callout `at` / `angle` values wrong after the crop change~~ — **fixed by the user 2026-07-26.**
+  For the record: the values had been rescaled into the *old* 1920×1319 image, and the new
+  `optics.webp` is a different crop (2160×1365, aspect 1.582 vs 1.456), so a linear rescale could
+  never have fixed them — the product sits elsewhere in frame.
 - `optics.webp` is only 33.7 KB at 2160×1365; may look soft on a large display.
 - Decide whether the commented `OpticsSection` block and its import get deleted.
 - **Asset state (2026-07-26):** `public/gx35/` holds `optics.webp` only — the 2.3 MB source PNG
@@ -193,6 +196,7 @@ lighter file.
 | `ScrollScrubVideo` | drop pin + scrub, autoplay in flow | track is `hidden lg:block`; a static block in the mobile section renders head + media |
 | `MediaSection` | drop pin + scrub, autoplay in place | `useIsDesktop()` (matchMedia) — the pin is a JS-built track + rAF loop, so CSS can't switch it off |
 | `ScrollHero` | **keep pin**, lighter source only | `<source media="(max-width: 1023px)">` — chosen at load time, no JS, no hydration flash |
+| homepage `Hero` (local to `app/page.tsx`) | lighter source only | same `<source media>` pattern |
 
 `MediaSection` derives **both** flags from one gate, deliberately:
 
@@ -284,8 +288,80 @@ anything else — `cmp -s a b` or `md5 -q`.
 
 ---
 
-## 5. Loose ends
+## 5. Mobile layout — stacking instead of overlaying
 
+Releasing the pin exposed a second problem: `MediaSection` overlays its copy on the media, which
+works on a pinned 100dvh stage and falls apart in normal flow. `mDualVision` has a ~600-character
+description; on a phone it landed on top of the product render.
+
+### What did not work, and why
+
+- **`padTop`** (`pt-[250px] md:pt-0`, which was sitting commented out in gx4k) — padding is on the
+  `<section>`, but the media is `absolute inset-0`, and absolute positioning resolves against the
+  **padding box**. The media simply grows to cover the padding. No separation.
+- **`heightVhMobile: 115` + `object-contain object-bottom`** — worked, but sized the section from a
+  guessed dvh figure and letterboxed the clip. Superseded; do not reinstate.
+
+### `stackOnMobile` (the fix)
+
+Below `md`, the section stops dictating its own height and the media moves into normal flow inside
+a wrapper that carries the aspect ratio. The section is then *content*-sized — padding plus that
+box — so `padTop` finally opens a real band above the media for the copy.
+
+Three pieces:
+
+1. **`components/sections/MediaSection.tsx`** — the media is wrapped in
+   `stackOnMobile ? "relative w-full md:absolute md:inset-0" : "absolute inset-0"` with
+   `style={{ aspectRatio }}` when stacking. At `md+` the insets return and the aspect ratio goes
+   **inert** (width and height both constrained), which is why desktop is unchanged.
+2. **`app/globals.css`** — `.media-stack` inside the existing `max-width: 767px` block sets
+   `height/aspect-ratio: auto` and `min-height: 0`, all `!important`. Deliberate: it must beat
+   `media-vh`, `media-vh-mobile`, the inline `aspectRatio` *and* the `min-h-[420px]` floor. Adding
+   one override was far less invasive than restructuring the existing height modes.
+3. **`topScrim` moved inside the media wrapper.** Its job is blending the media's top edge, not
+   text legibility (the old comment said otherwise and was wrong). Anchored to the section it
+   floated above the copy in stacked mode. Inside the wrapper it hugs the media at every
+   breakpoint — and it is a **no-op** outside stacked mode, where the wrapper *is* `inset-0`.
+
+`scrim` and `fade` stayed on the section on purpose: `scrim` is a full-cover wash (and defaults
+`false`), `fade` must cover the padding band too or the section will not fade out cleanly.
+
+Call site (`mDualVision`, both pages):
+
+```ts
+stackOnMobile: true,
+padTop: "pt-[440px] md:pt-0",
+```
+
+`padTop` is still tuned against the copy length, but it is now an honest number — "how much room
+does the text need" — rather than a whole-section height that had to happen to exceed it. Section
+height then tracks device width automatically (638–671px across common phones), which the dvh
+approach could not do.
+
+### Play-once on mobile
+
+`videoPlayOnce: true` is set on all four scrubbing sections. It needed no component change:
+`playOnce = videoPlayOnce && !scrubbing && !reduce`, and `scrubbing` is already false once
+`pinOnMobile` has released the section — so desktop scrubs and phones get a single play-through on
+entry instead of a loop. `autoPlay`/`loop` switch themselves off. The prop's doc comment used to
+say it was "ignored under `videoScrub`", which stopped being true when the guard became
+`!scrubbing`; it has been corrected.
+
+---
+
+## 6. Loose ends
+
+- **Site-wide video audit (2026-07-26):** every referenced clip re-encoded at ≤1920 wide, CRF 23,
+  `-g 48`. **427.8 MB → 164.8 MB.** None were scrub builds; they were shipped at 18–51 Mbps for web
+  cards (`alloc-event` was 38 MB for 6 seconds). Six byte-identical duplicate pairs exist and were
+  **kept as separate placeholder files** at the user's request — each pair was encoded once and
+  copied to both paths.
+  - `day-true-2k` took CRF 26, not 23: measured VMAF **97.5** at 12.03 MB vs 99.6 at 16.80 MB.
+  - **`alloc-only` is deliberately still 33 MB** — the one genuinely expensive clip. CRF 26 gives
+    22.71 MB but VMAF drops to **91.9**, below the bar for a silent downgrade. Largest referenced
+    video by a wide margin; the measurement is here if the trade is ever wanted.
+- **Not audited:** `/installation` and the remaining pages. `Carousel`, `FeatureTabs` and
+  `BentoCard` have no mobile-source switching — adding it is the same `<source media>` pattern.
 - **Cleanup deferred by the user ("I'll clean it later"):**
   - `public/gx35/hero.mp4` (21.54 MB) — **tracked in git**, now unreferenced. Prune once the
     `hero_desktop.mp4` re-encode is signed off; until then the repo carries it for nothing.

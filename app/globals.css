@@ -344,6 +344,15 @@ code, kbd, samp, pre {
   .media-vh-mobile {
     height: var(--ms-h-mobile);
   }
+
+  /* Stacked mode: the section stops dictating height entirely and lets its content
+     (padding + the media's own aspect box) size it. Wins over every mode above,
+     hence the !important — it is deliberately the last word on phones. */
+  .media-stack {
+    height: auto !important;
+    aspect-ratio: auto !important;
+    min-height: 0 !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -117,6 +117,37 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Minimal scrollbar — opt-in per scroll container via .scrollbar-minimal.
+   Deliberately NOT applied to the page scroller: styling ::-webkit-scrollbar there
+   forces a classic in-flow scrollbar whose gutter paints the white canvas background. */
+.scrollbar-minimal {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(10, 10, 11, 0.18) transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-track,
+.scrollbar-minimal::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-button {
+  display: none;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+  background-color: rgba(10, 10, 11, 0.18);
+  border-radius: 999px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(10, 10, 11, 0.32);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

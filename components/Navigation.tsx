@@ -97,8 +97,11 @@ export function Navigation() {
   };
 
   // Sample the section under the navbar to theme the glass + text colours.
+  // Keyed on `pathname` so a client-side navigation re-samples: no scroll event
+  // fires on route change, so without this the navbar keeps the previous page's
+  // theme (white text on a light page) until the user nudges the wheel.
   useEffect(() => {
-    const handleScroll = () => {
+    const sample = () => {
       const x = window.innerWidth / 2;
       const y = 40;
       const elements = document.elementsFromPoint(x, y);
@@ -112,10 +115,37 @@ export function Navigation() {
       }
       setIsDarkBackground(window.scrollY < 50);
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
+    window.addEventListener("scroll", sample, { passive: true });
+    window.addEventListener("resize", sample);
+
+    // Sample after the new route has painted — on navigation the pathname
+    // updates before the incoming section is in the document, so an immediate
+    // read would still hit the outgoing page (or nothing at all).
+    const raf = requestAnimationFrame(() => requestAnimationFrame(sample));
+
+    // Late-mounting content (ComingSoonGate's ?showpage swap, images/video that
+    // resize a hero) can change what sits under the navbar after that frame.
+    // Coalesce to one sample per frame — elementsFromPoint forces layout and
+    // AnimatePresence mounts fire this in bursts.
+    let pending = 0;
+    const observer = new MutationObserver(() => {
+      if (pending) return;
+      pending = requestAnimationFrame(() => {
+        pending = 0;
+        sample();
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener("scroll", sample);
+      window.removeEventListener("resize", sample);
+      cancelAnimationFrame(raf);
+      if (pending) cancelAnimationFrame(pending);
+      observer.disconnect();
+    };
+  }, [pathname]);
 
   // Close menus on route change.
   useEffect(() => {

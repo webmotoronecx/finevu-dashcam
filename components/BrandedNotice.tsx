@@ -2,16 +2,16 @@
 
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 
 const fade = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
 };
 
 type BrandedNoticeProps = {
-  /** Small uppercase label above the title, e.g. "404" */
+  /** Small uppercase label above the title, e.g. "Page not found" */
   eyebrow?: string;
   title: string;
   sub: string;
@@ -20,37 +20,49 @@ type BrandedNoticeProps = {
 };
 
 /**
- * Full-viewport branded message on the hero gradient, followed by <Footer />.
- * Shared shell for the Coming Soon placeholder and the 404 page. The global
- * <Navigation /> sits above it via the layout; `data-nav-theme="dark"` keeps
- * the navbar legible over the gradient (per the CLAUDE.md convention).
+ * Full-viewport branded message on a plain light background, followed by
+ * <Footer />. Shared shell for the Coming Soon placeholder and the 404 page.
+ * The global <Navigation /> sits above it via the layout; `data-nav-theme="light"`
+ * keeps the navbar legible over the white field (per the CLAUDE.md convention).
+ *
+ * The one accent is the recording indicator above the title — the dash-cam's own
+ * vernacular for "still running". Everything else stays quiet.
  */
 export function BrandedNotice({ eyebrow, title, sub, cta, logo = true }: BrandedNoticeProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <>
       <section
-        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
-        style={{ background: "var(--brand-gradient)" }}
-        data-nav-theme="dark"
+        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[var(--background)] px-6 py-32 text-center"
+        data-nav-theme="light"
       >
         {logo && (
           <motion.div {...fade} transition={{ duration: 0.6 }}>
-            <Logo variant="white" className="h-9 mb-10 mx-auto" />
+            <Logo className="mx-auto  h-8" />
           </motion.div>
         )}
 
-        {eyebrow && (
-          <motion.p
-            className="text-white/70 font-bold text-[15.5px] leading-[17px] tracking-[0.28em] uppercase mb-4"
-            {...fade}
-            transition={{ duration: 0.6, delay: 0.03 }}
-          >
-            {eyebrow}
-          </motion.p>
-        )}
+        <motion.div
+          {...fade}
+          transition={{ duration: 0.6, delay: 0.03 }}
+          className="mb-6 flex items-center gap-2.5"
+        >
+          {/* <motion.span
+            aria-hidden
+            className="h-[7px] w-[7px] rounded-full bg-[var(--brand-primary)]"
+            animate={reduceMotion ? undefined : { opacity: [1, 0.25, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          /> */}
+          {eyebrow && (
+            <span className="text-[11px] font-medium uppercase leading-none tracking-[0.22em] text-[var(--muted-foreground)]">
+              {eyebrow}
+            </span>
+          )}
+        </motion.div>
 
         <motion.h1
-          className="text-white font-bold uppercase text-5xl sm:text-6xl lg:text-[80px] leading-[1.04] tracking-[-0.01em]"
+          className="max-w-[14ch] text-4xl font-medium leading-[1.06] tracking-[-0.03em] text-[var(--foreground)] sm:text-5xl lg:text-[64px]"
           {...fade}
           transition={{ duration: 0.6, delay: 0.05 }}
         >
@@ -58,7 +70,7 @@ export function BrandedNotice({ eyebrow, title, sub, cta, logo = true }: Branded
         </motion.h1>
 
         <motion.p
-          className="text-white/85 text-base lg:text-[18px] leading-[30px] max-w-[470px] mt-6"
+          className="mt-5 max-w-[42ch] text-[15px] leading-[26px] text-[var(--muted-foreground)] lg:text-base"
           {...fade}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
@@ -68,7 +80,7 @@ export function BrandedNotice({ eyebrow, title, sub, cta, logo = true }: Branded
         <motion.div {...fade} transition={{ duration: 0.6, delay: 0.15 }} className="mt-10">
           <Link
             href={cta.href}
-            className="cta-hover inline-flex items-center justify-center h-12 px-9 rounded-full text-[14px] font-semibold uppercase leading-[20px] border border-white/70 text-white bg-white/5 hover:bg-white/10"
+            className="cta-hover inline-flex h-11 items-center justify-center rounded-full border border-[var(--border)] bg-transparent px-8 text-[13px] font-medium leading-none text-[var(--foreground)] transition-colors hover:border-[var(--foreground)]"
           >
             {cta.label}
           </Link>

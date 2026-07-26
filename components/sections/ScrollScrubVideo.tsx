@@ -590,6 +590,9 @@ export function ScrollScrubVideo({
             style={{ ["--ssv-pos" as string]: mobileObjectPosition, ["--ssv-scale" as string]: mobileScale }}
           />
 
+
+          <div className="absolute border border-red-500 w-[24px] h-[24px] block left-1/3 -translate-x-1/3 "></div>
+
           {overlayScrim && (
             /* Legibility scrim (matches ScrollHero). */
             <div

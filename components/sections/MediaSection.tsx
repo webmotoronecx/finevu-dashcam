@@ -351,7 +351,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     scrim = false,
     scrimGradient = "linear-gradient(180deg, rgba(8,8,12,0.72) 0%, rgba(8,8,12,0.15) 34%, rgba(8,8,12,0.2) 70%, rgba(8,8,12,0.85) 100%)",
     topScrim,
-    topScrimOpacity = 0.7,
+    topScrimOpacity = 0.5,
     topScrimHeight = "h-1/2",
     topScrimGradient,
     textDelay = 0,

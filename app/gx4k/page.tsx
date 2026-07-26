@@ -230,8 +230,10 @@ const mInYourHand: MediaSectionData = {
   
     theme: "dark",
     textPosition:"8%",
-    heightVh: 100,
-    heightVhMobile: false
+    heightVh: 120,
+    heightVhMobile: false,
+    mediaClass:"object-top"
+
 };
 
 const mDiscreet: MediaSectionData = {

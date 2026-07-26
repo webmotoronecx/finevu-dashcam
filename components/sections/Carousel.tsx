@@ -6,6 +6,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// Slack (px) between the cards and the viewport's horizontal clip, so a hovered card's
+// scale(1.02) isn't shaved at the edges. Added as padding with a matching negative
+// margin, so the cards themselves don't move. Must stay under the 24px inter-card gap
+// in measure() — at exactly 24 the clip lands on the next card and a sliver of it
+// peeks past the pinned card.
+const CLIP_SLACK = 18;
+
 // Default page shell width (GX4K). Override per-page via the `shellClass` prop.
 const DEFAULT_SHELL = "mx-auto w-full max-w-[1280px] px-6 lg:px-10";
 
@@ -140,7 +147,7 @@ export function Carousel({
       return r;
     }
     const trackW = cards.length * cardW + (cards.length - 1) * gap;
-    const vw = vp.clientWidth;
+    const vw = vp.clientWidth - 2 * CLIP_SLACK; // clientWidth includes the slack padding
     const max = (vw - cardW) / 2; // first card centred → margin on the left
     const min = Math.min(max, (vw + cardW) / 2 - trackW); // last card → margin on the right
     const r = { min, max, step };
@@ -266,11 +273,14 @@ export function Carousel({
       </div>
       <div
         ref={vpRef}
-        className="relative z-10 overflow-hidden"
+        className="carousel-clip relative z-10"
         style={{
           touchAction: "pan-y",
-          marginLeft: pinGutter && !rightGutter ? gutter : undefined,
-          marginRight: pinGutter && rightGutter ? gutter : undefined,
+          // margin + padding still equals the gutter, so the cards sit exactly where
+          // they did — only the clip edge moves outward by CLIP_SLACK.
+          marginLeft: (pinGutter && !rightGutter ? gutter : 0) - CLIP_SLACK,
+          marginRight: (pinGutter && rightGutter ? gutter : 0) - CLIP_SLACK,
+          paddingInline: CLIP_SLACK,
         }}
       >
         <div

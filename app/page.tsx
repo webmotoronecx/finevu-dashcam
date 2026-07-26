@@ -236,7 +236,7 @@ export default function Page() {
       {/* Reviews */}
       <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1340px] mx-auto px-6">
-          <motion.div className="text-center max-w-[760px] mx-auto mb-14" {...fadeUp}>
+          <motion.div className="text-center max-w-[760px] mx-auto mb-10 md:mb-14" {...fadeUp}>
             <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dashcams.</h2>
             <p className={`${SUB} mt-5`}>
               Built by FINEDIGITAL, an automotive-IT specialist since 1992, held to a standard the numbers prove.

@@ -307,6 +307,18 @@ code, kbd, samp, pre {
   transform: scale(1.02);
 }
 
+/* Carousel drag viewport clip. overflow-x: clip (not hidden) leaves the vertical axis
+   visible, so a hovered .tile-scale card isn't sliced at the top edge. The horizontal
+   cut is pushed off the card by inline padding with a matching negative margin, set in
+   Carousel.tsx (it has to compose with the pinGutter margins). padding-block does the
+   same job vertically; the negative margin keeps the section's rhythm unchanged. */
+.carousel-clip {
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-block: 20px;
+  margin-block: -20px;
+}
+
 /* Carousel track centre-mode: the active card (--card-w) is centred with neighbours peeking off both edges */
 .carousel-inset {
   --card-w: 80vw;

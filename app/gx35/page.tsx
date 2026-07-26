@@ -265,8 +265,9 @@ const mInYourHand: MediaSectionData = {
   image: "/gx35/your-dashcam.webp", 
   theme: "dark",
   textPosition: "8%",
-  heightVh: 100,
+  heightVh: 120,
   heightVhMobile: false,
+  mediaClass:"object-top"
 };
 
 const mDiscreet: MediaSectionData = {

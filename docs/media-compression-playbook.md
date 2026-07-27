@@ -1,13 +1,15 @@
-# Image Compression Playbook
+# Media Compression Playbook
 
-Repeatable steps for shrinking the `/public` **image** payload (PNG → WebP). Applied so far
-to **GX4K** and **GX35** (2026-07-25) — see results at the bottom.
+Repeatable steps for shrinking the `/public` payload — **images** (PNG → WebP) and, since
+2026-07-27, **video**. Applied to **GX4K** and **GX35** — see results at the bottom.
 
 The real problem is **payload, not markup**. `srcset` does nothing until smaller variants
 exist, so the fastest high-impact win is a straight compression pass: convert big PNGs to
 WebP and repoint the code refs.
 
-> **Scope:** images only. Video re-encoding is deliberately **not** part of this playbook.
+> **Scope note (changed 2026-07-27):** this playbook was images-only through the 2026-07-25
+> passes. Video is now covered — see [Video](#video-2026-07-27) below. The image steps 1–4
+> are unchanged; the `/png-webp` slash command automates them for a single file.
 
 **Tooling:** `cwebp` (already installed via Homebrew). **No `sharp`, no npm dependency, no
 `next/image`.** The site renders all images through `components/figma/ImageWithFallback.tsx`
@@ -102,6 +104,81 @@ rm public/<page>/<name>.png
 
 ---
 
+## Video (2026-07-27)
+
+Video is now the dominant payload sitewide. **There are two recipes and they are not
+interchangeable** — pick by how the clip is played, not by where it lives.
+
+### A. Normal playback (carousel cards, `MediaSection`, autoplay loops)
+
+```bash
+ffmpeg -v error -y -i in.mp4 -an \
+  -c:v libx264 -crf 26 -preset slow -vf "scale=1920:-2" \
+  -pix_fmt yuv420p -movflags +faststart out.mp4
+```
+
+- **`-an` is not optional.** Every one of these renders `muted` (`Carousel.tsx`,
+  `MediaSection`, the `ScrollScrubVideo` mobile stack), so an audio track is bytes nobody
+  can ever hear. The GX35 masters carried ~317 kbps of AAC each.
+- **`scale=1920:-2`** — carousel cards max out at 1040 CSS px, so 1920 still covers 2× DPR.
+  `-2` keeps the height even, which H.264 requires (a 2500×1082 source lands at 1920×830).
+- **CRF 26** is the default. Typical result is **83–93 % smaller**.
+- **`+faststart`** moves the moov atom to the front so playback starts before the full
+  download. Always include it.
+
+**When CRF 26 under-performs** (< 60 % saved), the source has grain or fine-detail motion
+and the encoder is spending bits on noise. Try a denoise pass before dropping quality:
+`-vf "hqdn3d=1.5:1.5:6:6,scale=1920:-2"`. `alloc-only` is the live example — 42 % where its
+siblings got 83 %, left as-is for now.
+
+### B. Scroll-scrubbed (`ScrollScrubVideo`'s `video` prop) — every frame a keyframe
+
+Seeking cost is *decoding*, so a normal GOP makes scrubbing stutter. Full rationale in
+CLAUDE.md § ScrollScrubVideo:
+
+```bash
+ffmpeg -v error -y -i in.mp4 -an \
+  -c:v libx264 -g 1 -keyint_min 1 -sc_threshold 0 -crf 23 -preset slow \
+  -vf "scale=1920:-2" -pix_fmt yuv420p -movflags +faststart out_scrub.mp4
+```
+
+- **CRF 23, not 26** — scrub frames are held still under the eye, so artefacts read as
+  defects rather than motion blur.
+- **Verify, don't assume.** I-frame count must equal frame count:
+  ```bash
+  ffprobe -v error -select_streams v -show_entries frame=pict_type -of csv=p=0 f.mp4 | grep -c I
+  ffprobe -v error -select_streams v -show_entries frame=pict_type -of csv=p=0 f.mp4 | wc -l
+  ```
+- All-keyframe usually **inflates** the file (GX4K `hero_render` 2.1 MB → 7.0 MB). It shrank
+  for GX35 `discreet` only because that master was very loosely compressed. Keep clips short.
+
+**Every scrub section also needs a mobile twin.** `mobileVideo` exists precisely because the
+scrub encode buys nothing on a phone (nothing seeks there) and costs the whole download:
+
+```bash
+ffmpeg -v error -y -i in.mp4 -an -c:v libx264 -crf 26 -preset slow -g 48 \
+  -vf "scale=1280:-2" -pix_fmt yuv420p -movflags +faststart out_mobile.mp4
+```
+
+Name them `<name>_scrub.mp4` / `<name>_mobile.mp4` so it's obvious which is which, and check
+**both** props are pointed at the right one — `/gx4k` optics shipped `mobileVideo` set to the
+8.9 MB master for a while, and nothing catches that but reading it.
+
+### Keeping the masters
+
+Keep the pre-compression original next to the output as `<name>_orig.<ext>`, so a re-encode
+at different settings never needs the client again. `.gitignore` carries
+**`public/**/*_orig.*`** — these must never be committed (they were tracked before, so
+renaming one to `_orig` without that rule would have committed ~72 MB of masters). Delete
+them once the page is signed off in a browser.
+
+### Verify
+
+`tsc`/`npm run build` **cannot** catch a bad media path — they're string literals. After any
+rename, run `/link-check` (or at minimum grep the old filename) before committing.
+
+---
+
 ## Results — GX4K (2026-07-25)
 
 Baseline `public/gx4k` = **301 MB**. **Images only.**
@@ -190,6 +267,41 @@ Folder 964K.
 
 ---
 
+## Results — Video, GX35 + GX4K (2026-07-27)
+
+`public/gx35` **290 MB → 93 MB** once masters are pruned. Six clips re-encoded, all with
+audio stripped:
+
+| File | Before | After | Saved |
+|------|--------|-------|-------|
+| `gx35/day-ai-auto.mp4` | 33.8 MB (2560×1440 +AAC) | 2.45 MB | 92.8 % |
+| `gx35/day-true-2k.mp4` | 38.0 MB (+AAC) | 5.15 MB | 86.4 % |
+| `gx35/alloc-driving.mp4` | 40.2 MB (2500×1082 +AAC) | 6.90 MB | 82.8 % |
+| `gx35/alloc-event.mp4` | 8.85 MB (+AAC) | 1.55 MB | 82.5 % |
+| `gx35/alloc-only.mp4` | 21.2 MB (+AAC) | 12.3 MB | **41.9 %** ← grainy, see denoise note |
+| `gx35/discreet.mp4` | 11.1 MB (2160×1200) | `_scrub` 1.73 MB + `_mobile` 251 KB | 82 % |
+
+**GX4K `optics`:** no encode needed. `optics_orig.mp4` was byte-identical (md5 `b9145e08…`)
+to `gx4k_secondary_banner.mp4`, whose `_scrub`/`_mobile` builds already existed and already
+met spec — renamed to `optics_*` and repointed. Check for this before encoding anything:
+`md5 -q a.mp4 b.mp4`.
+
+## Results — Images, second pass (2026-07-27)
+
+12 further PNGs → WebP at `-q 82`, refs repointed, originals pruned. **~34 MB → ~1.9 MB.**
+Biggest: `gx4k/second-eyes` 7.3 M→591 K, `gx35/disappear-details` 3.7 M→268 K,
+`gx4k/disappear-details` 4.4 M→357 K, `gx35/day-starvis` 1.9 M→33 K,
+`gx4k/disappear-one` 1.7 M→17 K.
+
+⚠️ **Three of these were content swaps, not compressions** — the supplied PNG was a
+*different photo* from the `.webp` it overwrote (`gx4k/second-eyes`, `gx4k/alloc-parking`,
+`gx35/alloc-parking`). Two looked like deliberate corrections (the GX35 page was showing a
+GX4K unit). This is the Step 1 ⚠️ hazard, and it is common enough that `/png-webp` now
+diffs dimensions and opens both images before overwriting.
+
+Also found: `gx4k/disappear-screen.webp` and `gx4k/alloc-parking.webp` are byte-identical
+(md5 `b49fbee1…`) — the same photo shipped twice under two names, in two sections.
+
 ## MVP status (2026-07-25)
 
 All 8 MVP pages checked. Image compression applied where PNGs/JPGs existed:
@@ -205,7 +317,15 @@ All 8 MVP pages checked. Image compression applied where PNGs/JPGs existed:
 | Support | ➖ already all WebP (424 KB) |
 | About | ➖ already all WebP (964 KB) |
 
-**Videos across all pages remain out of scope** (see the ⚠️ note at the top). The remaining
-large payload sitewide is video (hero clips, `alloc-*`, `day-*`) plus untouched non-MVP
-pages and `public/assets/*.png` (several 2–6 MB hash-named files — check references before
-converting).
+~~**Videos across all pages remain out of scope**~~ — **superseded 2026-07-27.** GX35's
+`day-*`, `alloc-*` and `discreet` clips are done (see Results above), as is GX4K `optics`.
+
+**Still outstanding:**
+
+- **`public/home` hero videos (~40 MB)** — the homepage's biggest remaining weight.
+- **GX4K video** — only `optics` was touched; `alloc-only.mp4` there is 34 MB, and
+  `captured-*` / `detail-*` are 3–5 MB each, all likely still carrying audio.
+- **`public/assets/*.png`** — several 2–6 MB hash-named files. Check references first.
+- **`alloc-only` (GX35)** — the 42 % outlier, deliberately left; a denoise pass should
+  roughly halve it again.
+- **Non-MVP pages** — untouched.

@@ -177,7 +177,7 @@ export function ScrollHero({
         </video>
         {/* Legibility scrim plus a bottom fade into the next section */}
         <div
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 opacity-50"
           style={{
             background:
               "radial-gradient(ellipse 78% 58% at 50% 50%, rgba(6,7,11,0.62) 0%, rgba(6,7,11,0.34) 46%, rgba(6,7,11,0.06) 74%, transparent 100%)",

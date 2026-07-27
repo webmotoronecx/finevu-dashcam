@@ -181,7 +181,7 @@ const mDualVision: MediaSectionData = {
     description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
     image: "/gx4k/graphic-dual-vision.webp",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
-    video: "/gx4k/dual_orig.mp4",
+    video: "/gx4k/dual-sensors_scrub.mp4",
     mobileVideo: "/gx4k/dual-sensors_mobile.mp4",
 
     pinOnMobile: false,

@@ -166,7 +166,7 @@ export default function Page() {
       {/* Hero — GX4K (dark cosmic) */}
       <Hero
         theme="dark"
-        image="/home/hero-gx4k.webp"
+        image="/home/gx4k-hero-poster.webp"
         // Master runs ~13.4 Mbps for a muted loop; these are the CRF 23 / 1280 cuts.
         video="/home/GX4K_Hero_Video_V2_desktop.mp4"
         mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
@@ -179,7 +179,7 @@ export default function Page() {
       {/* Hero — GX35 (video; white text over a readability scrim) */}
       <Hero
         theme="dark"
-        image="/home/hero-gx35.webp"
+        image="/gx35/hero-poster.webp"
         // GX35_Hero_Video_v2.mp4 is byte-identical to /gx35/hero.mp4, so this reuses that page's
         // cuts rather than encoding a second copy of the same footage.
         video="/gx35/hero_desktop.mp4"

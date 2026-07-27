@@ -477,6 +477,8 @@ export default function GX35Page() {
         // Below lg the browser fetches this instead, via <source media> — so a phone never pulls
         // the desktop file at all. The pin stays: unlike the scrub sections it reveals the beats.
         mobileVideo="/gx35/hero_mobile.mp4"
+        // Frame 1 of hero_desktop.mp4, so the still and the first decoded frame match exactly.
+        poster="/gx35/hero-poster.webp"
         beats={HERO_BEATS}
         theme="light"
       />

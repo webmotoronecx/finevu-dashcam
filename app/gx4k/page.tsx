@@ -455,7 +455,7 @@ export default function GX4KPage() {
             <ScrollHero
                 video="/home/GX4K_Hero_Video_V2_desktop.mp4"
                 mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
-                poster="/gx4k/hero-bg.webp"
+                poster="/gx4k/gx4k-hero-poster.webp"
                 beats={HERO_BEATS}
                 fadeTo="#08080c"
             />

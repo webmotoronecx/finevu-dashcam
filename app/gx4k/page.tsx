@@ -117,7 +117,7 @@ const cParked: Card[] = [
 const cSafer: Card[] = [
     {
         title: "ADAS Plus Driver Assistance",
-        body: "Forward Vehicle Moving Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
+        body: "Front Vehicle Motion Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
         img: "/gx4k/safer-adas.webp",
     },
     {
@@ -302,7 +302,8 @@ const specRows: [string, string][] = [
     ["Safety database", "Speed camera alerts, updated quarterly"],
 ];
 
-const boxItems = ["Front Camera", "Rear Camera", "MicroSD Card & Adapter", "Power Cable", "Hardwire Kit", "User Manual"];
+// Order follows docs/content-sources/gx4k.txt == IN THE BOX ==.
+const boxItems = ["Front Camera", "Rear Camera", "MicroSD Card & Adapter", "Power Cable", "Hardwire Kit", "Rear Cable", "User Manual"];
 
 const compareRows: [string, string, string][] = [
     ["Front Sensor", "Sony STARVIS IMX515 8.5MP", "Sony STARVIS 2 IMX675 5.12MP"],
@@ -310,7 +311,7 @@ const compareRows: [string, string, string][] = [
     ["Rear Resolution", "Full HD 1920×1080", "Full HD 1920×1080"],
     ["Max Video", "4K 30fps", "2K 30fps"],
     ["Field of View", "136°F · 143°R", "147°F · 143°R"],
-    ["GPS", "Built-in", "Built-in"],
+    ["GPS", "Built-in", "External antenna (included)"],
     ["Parking Standby", "+2,325 hrs", "+13,950 hrs"],
     ["Processor", "Allwinner V536", "Allwinner V536"],
     ["Warranty", "3 Years", "3 Years"],
@@ -568,7 +569,7 @@ export default function GX4KPage() {
                 </motion.div>
 
                 <div className={`${SHELL} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12`}>
-                    <BentoCard theme="dark" img="/gx4k/format-free.png" title="" className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
+                    <BentoCard theme="dark" img="/gx4k/format-free.webp" title="" className="lg:col-span-7 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]" />
                     <BentoCard
                         
                         theme="dark"

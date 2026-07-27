@@ -26,9 +26,10 @@ The launch MVP is **eight pages**. These are the only routes that should ship co
 
 All eight are already ungated (none appear in `comingSoon`). Note the supporting four
 carry **legal and warranty commitments** — warranty periods, ACL wording, returns and
-support terms — so they need the same content-accuracy scrutiny as the product pages
-before launch, and they have **not** yet been through the audit in
-`docs/content-accuracy-audit-2026-07-24.md` (which covered only `/`, `/gx4k`, `/gx35`).
+support terms — so they get the same content-accuracy scrutiny as the product pages.
+All eight were audited in full on 2026-07-27
+(`docs/content-accuracy-audit-2026-07-27.md`), along with `config/site.config.ts`,
+`lib/data/warranty.ts` and `lib/data/installation-terms.ts`.
 
 Every other route exists but is not part of the MVP. Non-MVP pages can be hidden behind the **Coming Soon gate**: add their path to `comingSoon: string[]` in `config/site.config.ts` and `ComingSoonGate` (wired in `app/layout.tsx`) renders the branded `ComingSoon` placeholder instead of the page. Preview a gated page's real content with `?showpage=true`. Prioritise the four MVP pages; treat the rest as secondary until they're promoted out of the coming-soon list.
 
@@ -37,26 +38,32 @@ Every other route exists but is not part of the MVP. Non-MVP pages can be hidden
 **Raise these unprompted whenever launch, deployment, or content accuracy comes up.**
 They are unresolved decisions, not tasks that can just be done.
 
-1. **Hardwire Kit in "What's in the Box" — awaiting higher ops.** The site claims the
-   hardwire kit is included in **seven** places (homepage tile + disclaimer 3, both
-   product tiles + warranties, support, and repeatedly on the installation page), but
-   `boxItems` in `app/gx4k/page.tsx` and `app/gx35/page.tsx` **omits it**. One side is
-   wrong either way. A fix was drafted then deliberately **reverted** pending that
-   decision — do not change `boxItems` until ops confirms. Matters because parking mode
-   *requires* the kit and the $250 install is sold on "everything's in the box." Detail:
-   item D in `docs/content-accuracy-audit-2026-07-24.md`.
-2. **Unverified specs still need a FineVu source:** processor ("Dual-core" /
+1. **The booking checkout charges nothing and submits nothing.** `/installation` step 5
+   collects a full card number, expiry and CVC, then step 6 tells the customer *"your
+   payment of $250.00 AUD has been received"* with a paid reference — but `next()`
+   (`app/installation/page.tsx:171-174`) just fakes a 900 ms delay and generates the
+   reference client-side, and the imported `submitForm` helper is **never called**. There
+   is no payment provider and no endpoint, while `installation-terms.ts` §5 makes
+   payment-at-booking a contractual term. A customer can complete the wizard, believe they
+   are booked and paid, and no record exists anywhere. Needs a real payment + booking
+   backend, or the wizard must be visibly a demo. **CA-36.**
+2. **The site's primary CTA is a dead end.** `/retailers` is in `comingSoon`, so
+   "Find Retailer" — the header button on every page, the footer CTA band, and one of the
+   three `LearnMoreLinks` tiles that ship on all eight MVP pages — renders the Coming Soon
+   placeholder. Same for every `/support` CTA including **"Start a Warranty Claim"**
+   (→ `/contact`). Decide between repointing the CTAs and promoting the routes; both are
+   product calls, not edits. **CA-38.**
+3. **Unverified specs still need a FineVu source:** processor ("Dual-core" /
    "Allwinner V536"), "F/1.8" aperture, "microSD up to 256 GB", "defects below 0.2%",
    and the "6-metre / 9-metre" cable lengths. None appear in the official spec sheets.
-3. **`app/gx35/page_bak.tsx`** is a stale backup holding *pre-fix* values (wrong GPS
+   Same class, added 2026-07-27: **"Global leader in dash cam technology"** ships in every
+   page's `<title>` via `siteConfig.tagline` (CA-37); **"No.1 dash cam in Korea"** on four
+   MVP pages, baked into the *artwork* so removing it means replacing images (CA-26); the
+   **1992 / "Fine Digital Inc." / "FINEDIGITAL" / Gyeonggi-do** heritage (CA-27); and the
+   `/support` **hours and 24-hour response SLA** (CA-24/25).
+4. **`app/gx35/page_bak.tsx`** is a stale backup holding *pre-fix* values (wrong GPS
    spec, etc.). Not routed so it doesn't ship, but it's a trap for anyone grepping the
    codebase. Recommend deleting.
-4. **The four supporting MVP pages have not been content-audited.** `/warranty`,
-   `/terms-of-service`, `/support` and `/about` were promoted to MVP on 2026-07-24 but
-   the accuracy audit only covered `/`, `/gx4k` and `/gx35`. These carry legal/warranty
-   commitments (warranty periods, ACL wording, support terms) and repeat spec claims —
-   e.g. `app/support/page.tsx` restates the hardwire-kit disclaimer, so item 1 above
-   affects that page too. Audit before launch.
 5. **Image strategy needs triage — `next/image` vs. a `sharp` prebuild.** Unresolved,
    raise it before anyone starts the responsive-images work below. Established
    2026-07-26: `next/image` **already generates `srcSet` itself** — it omits `srcSet`
@@ -88,6 +95,27 @@ They are unresolved decisions, not tasks that can just be done.
    `/support` are unsourced and its download links are dead. Same root cause (no correct
    files yet), so settle both together when the files arrive.
 
+### ✅ Settled — do not re-open
+
+**The Hardwire Kit is an in-box item.** Resolved 2026-07-27: `docs/content-sources/gx4k.txt`
+and `gx35.txt` both list a **Hardwire Kit** *and* a separate **Power Cable** under
+`IN THE BOX`, with the `{!needs approval}` tag removed and the `ADDITIONAL OPTIONS` sections
+deleted. So the seven site surfaces claiming "Includes Hardwire Kit & Power Cable" were
+right, and `boxItems` was the wrong side — both lists have since been corrected to match
+their source exactly (GX4K 7 items, GX35 9 including Cradle and GPS Antenna). Do not revert
+`boxItems` or disclaimer 3. **CA-03 / CA-06 / CA-29 / CA-31.**
+
+One narrow question survives: `/installation` calls the included Power Cable *"a simple
+plug-in DIY setup"*, which needs it to be self-powering — but the distributor tile shows a
+bare barrel jack with **no cigarette-lighter plug**, and no source states the termination.
+One photo of the AU retail cable settles it. **CA-01 / CA-02.**
+
+**GX35 GPS is external.** The GX35 spec sheet says only `GPS: O` (the GX4K says "Built-In"),
+the box ships a GPS(2.5Φ) antenna, and `lib/data/warranty.ts` §4 warrants a "Genuine FineVu
+external GPS accessory". Both `compareRows` copies, the spec row and the carousel card were
+corrected on 2026-07-27. The GX4K's "Built-in GPS" is correct and should stay.
+**CA-04 / CA-05.**
+
 ## Going live — launch steps
 
 Work top to bottom. **Steps 1–3 are hard gates: do not deploy to production until each
@@ -113,8 +141,9 @@ a gate, not a formality.
 ### 2. Content accuracy (hard gate)
 
 - All product specs verified against official FineVu data — see
-  `docs/content-accuracy-audit-*.md`. **Don't launch with open ⏸/⚠/🟡 items**, and
-  settle the Open items listed above first.
+  `docs/content-accuracy-audit-*.md` (latest: **2026-07-27**, a full pass over all eight
+  MVP pages). **Don't launch with open `Pending` / `Needs approval` rows** in
+  `docs/content-accuracy-changes.csv`, and settle the Open items listed above first.
 - Remember AU-market figures may legitimately differ from the Korean spec sheet (e.g.
   the GX35 ships a **64GB** card here vs 128GB officially — that's correct, not a bug).
 

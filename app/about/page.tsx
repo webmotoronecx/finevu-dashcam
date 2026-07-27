@@ -57,7 +57,7 @@ const commitments = [
   },
   {
     title: "Certified local installation",
-    body: "A nationwide network of certified installers hardwires your camera properly, for full-time parking protection done right.",
+    body: "A growing network of certified installers across the metro areas, hardwiring your camera properly for full-time parking protection done right.",
   },
   {
     title: "A team that actually answers",

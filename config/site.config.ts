@@ -168,8 +168,8 @@ export const siteConfig: SiteConfig = {
         "GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6-month warranty.",
     },
     {
-      // NOTE: inclusion of the Hardwire Kit is pending confirmation from ops —
-      // see item D in docs/content-accuracy-audit-2026-07-24.md.
+      // Confirmed 2026-07-27: docs/content-sources/{gx4k,gx35}.txt both list a Hardwire Kit
+      // AND a separate Power Cable under IN THE BOX, untagged. This wording is correct.
       title: "Hardwire Kit & Power Cable",
       body:
         "GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6-month warranty.",

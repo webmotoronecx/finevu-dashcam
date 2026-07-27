@@ -133,7 +133,7 @@ const cParked: Card[] = [
 const cSafer: Card[] = [
   {
     title: "ADAS Plus Driver Assistance",
-    body: "Forward Vehicle Moving Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
+    body: "Front Vehicle Motion Alert (FVMA) and Lane Departure Warning (LDWS) keep you sharp, with a nudge when the car ahead pulls away or you drift lanes.",
     img: "/gx35/smarter-adas.webp",
   },
   {
@@ -155,8 +155,8 @@ const cConnected: Card[] = [
     video: "/gx35/connected-5g.mp4",
   },
   {
-    title: "Built-in GPS",
-    body: "Records speed, location and route. Every clip stamped with exactly where and how fast you were going.",
+    title: "GPS Included",
+    body: "The included GPS antenna stamps every clip with speed, location and route — and powers the speed camera alerts.",
     img: "/gx35/connected-gps.webp",
   },
 ];
@@ -381,20 +381,24 @@ const specRows: [string, string][] = [
   ["Recording modes", "Continuous · Impact · Emergency · Parking (motion + impact) · Smart Time-Lapse"],
   ["Parking mode", "Power Saving Parking — up to 98% less power · 20-sec event capture with 10-sec pre-buffer"],
   ["Driver assistance", "ADAS Plus — FVMA (front vehicle motion alert) · LDWS (lane departure)"],
-  ["Connectivity", "Built-in Wi-Fi · Built-in GPS · FineVu Wi-Fi App"],
+  ["Connectivity", "Built-in Wi-Fi · External GPS antenna (included) · FineVu Wi-Fi App"],
   ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
   ["Protection", "Low voltage cut-off · G-sensor · AI heat monitoring · Supercapacitor"],
   ["Safety database", "Speed camera alerts, GPS-supported"],
 ];
 
+// Order follows docs/content-sources/gx35.txt == IN THE BOX ==. The Cradle and the
+// GPS(2.5Φ) antenna are GX35-only; the antenna is why the GPS spec row says "external".
 const boxItems = [
   "Front Camera",
   "Rear Camera",
+  "Cradle",
   "MicroSD Card & Adapter",
-  "Power Cable",
   "Hardwire Kit",
+  "Power Cable",
+  "Rear Cable",
+  "GPS Antenna",
   "User Manual"
-  
 ];
 
 const compareRows: [string, string, string][] = [
@@ -403,7 +407,7 @@ const compareRows: [string, string, string][] = [
   ["Rear Resolution", "Full HD 1920×1080", "Full HD 1920×1080"],
   ["Max Video", "4K 30fps", "2K 30fps"],
   ["Field of View", "136°F · 143°R", "147°F · 143°R"],
-  ["GPS", "Built-in", "Built-in"],
+  ["GPS", "Built-in", "External antenna (included)"],
   ["Parking Standby", "+2,325 hrs", "+13,950 hrs"],
   ["Processor", "Allwinner V536", "Allwinner V536"],
   ["Warranty", "3 Years", "3 Years"],

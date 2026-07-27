@@ -129,7 +129,7 @@ const regPanels = [
     },
     {
         title: "Warranty",
-        body: "Every FineVu dash cam is covered by a manufacturer’s warranty, no matter which authorised retailer you purchased from. Keep your receipt as proof of purchase.",
+        body: "Every FineVu dash cam is covered by our 3-year Australian warranty, no matter which authorised retailer you purchased from. Keep your receipt as proof of purchase.",
         items: [
             "Submit a claim with your model, serial number and receipt",
             "Our technicians assess and repair or replace",

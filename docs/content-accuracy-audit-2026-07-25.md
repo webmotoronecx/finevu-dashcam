@@ -33,7 +33,7 @@ wording cannot be called right *or* wrong — so **CA-01, CA-02, CA-03, CA-06** 
 | CA-05 | GX35/GX4K | `compareRows` GPS row (duplicated in both files) | ⏸ Needs ops sign-off |
 | CA-06 | GX35 | `boxItems` missing Cradle + GPS antenna (+ Hardwire Kit pending) | ⏸ Needs ops sign-off |
 | CA-07 | Support | GX35 called "FHD" — it's QHD 2560×1440 | ✅ Ready |
-| CA-08 | Install vs ToS | "pay on the day" vs "payment at booking" | 🔴 Business decision |
+| CA-08 | Install vs ToS | "pay on the day" vs "payment at booking" | ✅ Applied 2026-07-27 — pay-at-booking |
 | CA-09 | Home | Review #2 (GX35) not in any source | ✅ Ready |
 | CA-10 | GX4K | Wi-Fi spec row says "5 GHz"; it's dual-band | ✅ Ready |
 | CA-11 | About | `LegalDisclaimers` renders all 3; should be `limit={1}` | ✅ Ready |
@@ -41,8 +41,14 @@ wording cannot be called right *or* wrong — so **CA-01, CA-02, CA-03, CA-06** 
 | CA-13 | Support | Firmware versions unsourced; download links dead | 🟡 Needs source |
 | CA-14 | GX4K/GX35/About | Carry-over unverified spec claims | 🟡 Needs source |
 | CA-15 | GX4K/GX35 | Wrong weights in hidden blocks | ✅ Ready |
+| CA-28 | About | Named JB Hi-Fi / Repco / Autobarn with no source | ✅ Applied 2026-07-27 — generalised |
+| CA-32 | GX35 | "smaller than a business card" (3×) vs homepage "credit card" | ✅ Applied 2026-07-27 — credit card |
+| CA-33 | Retailers | Whole page + 16-store locator built on the same unsourced retailers | 🔴 Needs approval — blocks ungating |
 
-Split: **6 Ready · 6 Needs ops sign-off · 1 Business decision · 2 Needs source.**
+Split: **6 Ready · 6 Needs ops sign-off · 2 Needs source · 3 Applied 2026-07-27 (CA-08, CA-28, CA-32) · 1 new (CA-33).**
+
+> CA-16–CA-31 were added by the per-page `full` passes further down this document; CA-32 and
+> CA-33 are the out-of-cycle additions documented in the **2026-07-27 addendum** at the end.
 
 ---
 
@@ -91,13 +97,31 @@ Rear Cable, GPS Antenna, User Manual`.
 `app/support/page.tsx:48` — `line: "Compact FHD front & rear dash cam"`. Source: QHD
 2560×1440. → `"Compact 2K QHD front & Full HD rear dash cam"`. (`:40` GX4K line is correct.)
 
-## 🔴 CA-08 — installation page vs Terms on payment
+## ✅ CA-08 — installation page vs Terms on payment — **RESOLVED 2026-07-27, Applied**
 
-`app/installation/page.tsx` states "no payment to book / pay on the day" at `:48, :53, :79,
+`app/installation/page.tsx` stated "no payment to book / pay on the day" at `:48, :53, :79,
 :222, :346, :465`; `lib/data/installation-terms.ts:135` says "Payment is required at the
 time of booking," and §12's cancellation mechanics only work against a prepayment. Business
-decision — the Terms bind, the page is the pre-contractual representation. Also `:35` says
-submitting the form constitutes agreement, but the booking form never surfaces the Terms.
+decision — the Terms bind, the page is the pre-contractual representation.
+
+**Resolution (2026-07-27, decided by the user):** the real process is **upfront payment at
+the time of booking**. The Terms pole was correct, so the source of truth
+(`lib/data/installation-terms.ts` §5) is unchanged and the page copy moved to match. Three
+of the six locations (`:176/:222/:346`) had already been corrected by the step-5 checkout
+restore (commit `26c8637`, which charges the card in-wizard); the four remaining marketing
+claims are now fixed:
+
+- `:49` hero stat → "Secure checkout" / "Pay when you book"
+- `:54` step 2 → "$250 flat, paid at checkout — your slot is confirmed instantly"
+- `:80` FAQ "How much does it cost?" → "The $250 is paid at the time of booking, and your
+  tax receipt is emailed to you as soon as payment clears"
+- `:483` booking-section intro → "$250 flat rate, paid securely when you book"
+
+The two remaining "on the day" phrases on the page (`:314`, `:358`) refer to the installer
+*calling ahead / arriving* on the day, not payment — correct as written.
+
+**Still open on this page:** `:35` says submitting the form constitutes agreement to the
+Terms, but the booking form never surfaces them. Tracked separately from CA-08.
 
 ## ✅ CA-09 — homepage review #2 unsourced
 
@@ -800,3 +824,69 @@ Every MVP page has had a dedicated `full` pass this cycle: `/support`, `/about`,
 all-8 sweep at the top of this document (the homepage carries CA-03, CA-09, CA-14 — no
 `/`-specific `full` addendum was requested, so a standalone homepage pass remains the one
 outstanding deep-read if desired).
+
+---
+
+## Addendum — 2026-07-27 (source-of-truth edits, out-of-cycle)
+
+Two decisions came from the user and were applied directly; both changed the sources of
+truth as well as the pages.
+
+### CA-08 — payment timing resolved → pay at booking
+
+See the CA-08 section above (now ✅ Applied). Terms §5 was the correct pole; four remaining
+"pay on the day" claims on `/installation` were rewritten. `docs/content-sources/general.txt`
+gained an `== INSTALLATION SERVICE ==` section recording the committed figures only (price,
+payment timing, mobile service, duration, reschedule window) with a pointer to
+`lib/data/installation-terms.ts` as the prose anchor — no terms prose duplicated, per the
+content-sources README.
+
+### ✅ CA-32 — "business card" → "credit card" (new, Applied)
+
+`app/gx35/page.tsx:45, :201, :280` compared the GX35 body to a **business card**, while the
+homepage GX35 tile (`app/page.tsx:189`) already said **credit card**. Two defects: the
+product page contradicted the tile driving traffic to it, and a business card has no fixed
+dimensions, so the claim was unverifiable.
+
+All three now read "smaller than a credit card". The hero sub also dropped the unsourced
+superlative in "Sony's **newest** STARVIS 2" — `gx35.txt:17` confirms the sensor (SONY
+STARVIS 2 IMX675) but publishes no generation-ranking claim:
+
+> `:45` → "QHD 2K clarity from a Sony STARVIS 2 sensor, in a camera smaller than a credit card."
+
+**Locked into the source of truth** so future audits enforce it, rather than leaving it as a
+style preference: `docs/content-sources/general.txt` gained
+`== WORDING CONVENTIONS (site-wide — the audit enforces these) ==` naming the credit card
+(ID-1, 85.60 × 53.98 mm) as the only approved size-comparison object, plus a cross-reference
+under `gx35.txt`'s `Size / Weight` line.
+
+**⚠ The rule is GX35-only.** GX35 front = 74.1 × 37.1 mm (smaller on both axes → true).
+**GX4K front = 96.5 × 70.0 mm — larger than a credit card on both axes.** A credit-card size
+claim on any GX4K surface is a factual error, not a wording choice. `/gx4k` makes no such
+claim today (verified by grep); the convention block says so explicitly so nobody "fixes"
+consistency in the wrong direction.
+
+### ✅ CA-28 — named retailers generalised (Applied) + 🔴 CA-33 (new)
+
+`app/about/page.tsx:190` named **JB Hi-Fi, Repco and Autobarn** with no backing source. Per
+the user (2026-07-27) it now reads:
+
+> "FineVu is distributed in Australia exclusively by AutoXtreme, and sold only through
+> **leading authorised retailers**, so every unit you buy is genuine…"
+
+AU spelling kept — the site uses "authorised" 31× and "authorized" 0×.
+
+**`/about` was the only shipping surface naming them.** `app/retailers/page.tsx` is built
+entirely on the same three retailers *plus* a 16-entry store list with specific street
+addresses and phone numbers and outbound links to their sites. That page is currently gated
+(`comingSoon`, `config/site.config.ts:153`) so none of it ships — but it is a different order
+of risk from a line of body copy (a customer could drive to a listed address), so it is
+tracked separately as **CA-33, Needs approval**, blocking promotion of `/retailers` out of the
+gate. The user is reworking that page's design.
+
+**Source of truth:** `docs/content-sources/general.txt` gained `== RETAIL DISTRIBUTION ==`,
+which separates the *confirmed* distributor (AutoXtreme, nameable) from *unconfirmed*
+stockists (`Confirmed AU retail partners: (none) {!needs approval}`), and fixes
+"leading authorised retailers" as the approved generic wording. Because the list carries
+`{!needs approval}`, the standing convention holds every retailer-naming claim at
+`Needs approval` regardless of evidence — so this cannot silently regress.

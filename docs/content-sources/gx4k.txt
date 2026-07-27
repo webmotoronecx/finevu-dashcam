@@ -43,17 +43,12 @@ Warranty:         3-Years  (MicroSD card warranty: 6 months)
 == IN THE BOX (Basic Configuration) ==
 - Front Camera
 - Rear Camera
-- Micro SD Card & Adapter
+- 128 Micro SD Card & Adapter
 - Power Cable           
-- Hardwire Kit {!needs approval}
+- Hardwire Kit 
 - Rear Cable
-
 - User Manual
 
-== ADDITIONAL OPTIONS (sold separately) ==
-- Cigarette lighter power cable   <-- the plug-in DIY cable; NOT in the box
-- USB SD card reader
-- Micro SD card & Adaptor (spare)
 
 == FEATURE CLAIMS (verbatim, for wording checks) ==
 - "Consuming 98% less power, GX4K records 2,325 more hours than standard parking mode."

@@ -46,12 +46,12 @@ const HERO_STATS = [
   { value: "$250 AUD", label: "One price, every install" },
   { value: "Mobile service", label: "We come to home or work" },
   { value: "60–90 mins", label: "Typical install time" },
-  { value: "No payment to book", label: "Pay on the day" },
+  { value: "Secure checkout", label: "Pay when you book" },
 ];
 
 const THREE = [
   { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
-  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat — no payment required to reserve.", img: "/installation/step-book.webp" },
+  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat, paid at checkout — your slot is confirmed instantly.", img: "/installation/step-book.webp" },
   { n: "3.", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/installation/step-install.webp" },
 ];
 
@@ -77,7 +77,7 @@ const FAQS = [
   { q: "Where does the installation take place?", a: "Our installers are fully mobile and come to your home or workplace. All they need is level, off-street access to your vehicle — a driveway, garage, carport or accessible car park — and the vehicle available for the duration of the appointment." },
   { q: "Why is hardwire the standard install?", a: "Hardwiring connects your FineVu to the vehicle's fuse box using the hardwire kit already included in your box, so the camera can keep recording while the ignition is off. It unlocks parking mode and FineVu's battery protection system, which powers the camera down before your car's battery runs low — and it's the part that genuinely benefits from professional hands. If you only want recording while driving, the included power cable is a simple plug-in DIY setup, so there's no need to book an install for that." },
   { q: "Is it safe for my vehicle's electronics?", a: "Yes. Our installers use non-invasive fuse-tap connections matched to your vehicle — factory wiring is never cut or spliced. Cabling is routed behind existing trim, and everything is tested before handover, so your car's electronics and manufacturer warranty stay protected." },
-  { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. There's no payment to book — your installer collects the $250 on the day and you'll get a receipt then." },
+  { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $250 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
   { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we're expanding. If we can't reach you right now, we'll let you know promptly and help you find a suitable local option. Installation is not currently available in the Northern Territory." },
   { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we'll move it to a time that suits. There's no fee to reschedule with notice." },
 ];
@@ -480,7 +480,7 @@ export default function Page() {
         <div className="mx-auto max-w-[1160px] px-6">
           <div className="mx-auto mb-11 max-w-[720px] text-center">
             <h2 className="text-[32px] font-semibold leading-[40px] tracking-[-0.5px] text-[#1d1d1f] md:text-[48px] md:leading-[60px]">Book your installation</h2>
-            <p className="mt-4 text-[18px] leading-[27px] text-[#5b5e66]">Professional hardwire installation at your home or workplace. $250 flat rate — no payment to book, pay your installer on the day.</p>
+            <p className="mt-4 text-[18px] leading-[27px] text-[#5b5e66]">Professional hardwire installation at your home or workplace. $250 flat rate, paid securely when you book.</p>
           </div>
           <BookingWizard />
         </div>

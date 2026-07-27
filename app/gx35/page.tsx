@@ -23,7 +23,6 @@ import { Eye } from "lucide-react";
 const SHELL = "mx-auto w-full max-w-[1180px] px-6 lg:px-8";
 // Figma hex values inlined in classNames since Tailwind can't compile dynamic values
 const BACKING = "#F7F7F7"; // Light-mode backing off-white
-const BOX_GRAD = "linear-gradient(100deg, #1a1a1f 0%, #1a1a1f 30%, #f68428 100%)";
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -42,7 +41,7 @@ const HERO_BEATS: HeroBeat[] = [
     end: 0.42,
     kicker: "FineVu GX35 · 2-Channel QHD",
     headline: "Perfectly Compact.",
-    sub: "2K QHD clarity and Sony's newest STARVIS 2 sensor, in a body smaller than a business card.",
+    sub: "QHD 2K clarity from a Sony STARVIS 2 sensor, in a camera smaller than a credit card.",
   },
   {
     start: 0.55,
@@ -198,7 +197,7 @@ const disappearTabs = [
   },
   {
     title: "Disappears Behind the Mirror",
-    body: "At just 74mm wide and 57g, the front unit is smaller than a standard business card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g.",
+    body: "At just 74mm wide and 57g, the front unit is smaller than a credit card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g.",
   },
   {
     title: "One Cable, Clean Install",
@@ -277,7 +276,7 @@ const mDiscreet: MediaSectionData = {
   background: "#000",
   title: "Discreet by Design.",
   description:
-    "A screen-free body smaller than a business card, tucked behind your mirror and out of your mind.",
+    "A screen-free body smaller than a credit card, tucked behind your mirror and out of your mind.",
   aspectRatio: "2160/1484",
   theme: "dark",
   textPosition: "14%",
@@ -391,10 +390,11 @@ const specRows: [string, string][] = [
 const boxItems = [
   "Front Camera",
   "Rear Camera",
-  "Power Cable",
-  "Rear Cable",
-  "User Manual",
   "MicroSD Card & Adapter",
+  "Power Cable",
+  "Hardwire Kit",
+  "User Manual"
+  
 ];
 
 const compareRows: [string, string, string][] = [
@@ -783,13 +783,7 @@ export default function GX35Page() {
             {boxItems.map((it) => (
               <p
                 key={it}
-                className="text-[16px] font-medium md:text-[20px]"
-                style={{
-                  backgroundImage: BOX_GRAD,
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                }}
+                className="text-orange-gradient text-[16px] font-medium md:text-[20px]"
               >
                 {it}
               </p>
@@ -886,7 +880,7 @@ export default function GX35Page() {
       </section>
 
       {/* Firmware / Downloads */}
-      <FirmwareDownloads tabs={downloadTabs} theme="light" ariaLabel="GX35 downloads" />
+      {/* <FirmwareDownloads tabs={downloadTabs} theme="light" ariaLabel="GX35 downloads" /> */}
 
       {/* Help / quick links — Where to buy, Install, Support */}
       <LearnMoreLinks  />

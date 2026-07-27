@@ -187,7 +187,7 @@ export default function Page() {
             alt="FineVu GX4K and GX35 boxes on an Australian retail shelf"
             heading="Genuine stock. Local support. No grey imports."
             paras={[
-              "FineVu is distributed in Australia exclusively by AutoXtreme, and sold only through authorised retailers like JB Hi-Fi, Repco and Autobarn, so every unit you buy is genuine, running the correct AU firmware, and backed by local warranty support.",
+              "FineVu is distributed in Australia exclusively by AutoXtreme, and sold only through leading authorised retailers, so every unit you buy is genuine, running the correct AU firmware, and backed by local warranty support.",
               "We also run our own certified installation network, so full-time parking protection can be wired in properly, not left dangling off a cigarette lighter socket.",
             ]}
           />

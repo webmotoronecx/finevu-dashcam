@@ -72,6 +72,21 @@ They are unresolved decisions, not tasks that can just be done.
    user (billing owner) to choose. Related: `components/sections/Carousel.tsx` renders a
    plain `<img>`, so every carousel image on `/gx4k`, `/gx35` and `/installation` — incl.
    the 16 MB `detail-starvis.png` — currently ships unoptimized either way.
+6. **Firmware sections are HIDDEN on both product pages — restore before launch.** The user
+   deliberately commented them out on 2026-07-27 because the download files were not the
+   correct ones. **They must go back once the real files are in hand** — a dash-cam product
+   page without firmware downloads is a support gap, not a design choice.
+   - `app/gx35/page.tsx:883` — `{/* <FirmwareDownloads tabs={downloadTabs} theme="light" … /> */}`
+   - `app/gx4k/page.tsx:839` — `{/* <FirmwareDownloads tabs={downloadTabs} theme="dark" … /> */}`
+
+   The `downloadTabs` arrays (`gx35:432`, `gx4k:339`) and the `FirmwareDownloads` import are
+   **still in place**, so restoring is just uncommenting — but that also means TypeScript
+   reports `downloadTabs` as unused in both files. **Do not "clean up" those arrays**; that
+   would delete the restore path. Ask before touching them.
+
+   Related: **CA-13** in `docs/content-accuracy-changes.csv` — firmware versions on
+   `/support` are unsourced and its download links are dead. Same root cause (no correct
+   files yet), so settle both together when the files arrive.
 
 ## Going live — launch steps
 

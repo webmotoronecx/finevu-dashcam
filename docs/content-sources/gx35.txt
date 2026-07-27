@@ -38,6 +38,10 @@ High-Temp Cut-Off: AI Heat Monitoring
 Low Voltage Cut-Off: O (winter: cuts off at 0.2V above set value)
 Temperature:      Operating -20℃~70℃  |  Storage -30℃~80℃
 Size / Weight:    Front 74.1×37.1×23.0mm / 57g  |  Rear 46.85×36.5×29.2mm / 23g
+                  ^ Front is smaller than a credit card (ID-1, 85.60×53.98mm) on both
+                    axes. Approved size comparison for the GX35 is "smaller than a
+                    credit card" — never "business card". See general.txt
+                    == WORDING CONVENTIONS ==.
 Mobile App:       FineVu Wi-Fi App (Android, iOS)
 PC Viewer:        FineVu PC Player 2.0 (Windows, Mac)
 Warranty:         3-Years  (MicroSD card warranty: 6 months)
@@ -46,19 +50,13 @@ Warranty:         3-Years  (MicroSD card warranty: 6 months)
 - Front Camera
 - Rear Camera
 - Cradle                 <-- GX35 only
-- Micro SD Card & Adapter
-- Hardwire Kit {!needs approval}
+- 64GB Micro SD Card & Adapter
+- Hardwire Kit
 - Power Cable           
 - Rear Cable
 - GPS(2.5Φ) antenna      <-- GX35 only; external GPS puck on a 2.5mm lead
 - User Manual
 
-== ADDITIONAL OPTIONS (sold separately) ==
-- High Capacity Micro SD
-- USB SD card reader
-- CPL Filter
-- Cigarette lighter power cable   <-- the plug-in DIY cable; NOT in the box
-- OBD-II Power Cable
 
 == FEATURE CLAIMS (verbatim, for wording checks) ==
 - "STARVIS 2 sensor reduces power consumption by 30% compared to SONY STARVIS 1."

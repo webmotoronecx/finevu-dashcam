@@ -9,6 +9,57 @@ ABN:            31 097 188 219
 Website:        finevuaustralia.com.au
 Support email:  support@finevuaustralia.com.au
 Phone:          1800 818 288
-Address:        Level 9, 3 Nexus Court, Mulgrave VIC 3170 {!needs approval}
+Address:        Level 9, 3 Nexus Court, Mulgrave VIC 3170
+
+== INSTALLATION SERVICE ==
+
+Only the committed FIGURES / process facts live here. The full legal wording stays in
+lib/data/installation-terms.ts (the anchor) — do not copy prose into this file.
+
+Price:            $250 AUD flat, every vehicle, GST included
+Payment timing:   UPFRONT — paid in full at the time of booking, online at checkout.
+                  NOT pay-on-the-day. Confirmed 2026-07-27. This is the CA-08 resolution:
+                  installation-terms.ts §5 ("Payment is required at the time of booking")
+                  is correct; any page copy promising "no payment to book" is wrong.
+Service model:    Mobile — installer comes to the customer's home or workplace
+Typical duration: 60–90 minutes
+Reschedule:       Free with >24 hours notice (see anchor §14 for the binding wording)
+
+== WORDING CONVENTIONS (site-wide — the audit enforces these) ==
+
+Size comparison — always a CREDIT CARD, never a business card.
+  The reference object is a standard ID-1 credit card: 85.60 x 53.98 mm.
+  Any copy comparing a camera's footprint to an everyday object MUST use
+  "smaller than a credit card". Do not use "business card" (no fixed
+  dimensions, varies by country) or any other object.
+
+  GX35 ONLY. Front unit 74.1 x 37.1 mm — smaller than 85.60 x 53.98 on both
+  axes, so the claim is literally true. Confirmed 2026-07-27.
+
+  DO NOT apply to the GX4K. Its front unit is 96.5 x 70.0 mm — LARGER than a
+  credit card on both axes. Any credit-card size claim on a GX4K page is a
+  factual error, not a wording preference.
+
+== RETAIL DISTRIBUTION ==
+
+Distributor:      AutoXtreme (Motor One Group Pty Ltd) — exclusive Australian distributor.
+                  This is confirmed and may be named on the site.
+
+Named stockists:  NONE APPROVED. There is no confirmed list of Australian retail partners.
+                  Until a real one is supplied, NO retailer may be named anywhere on the
+                  site — not in body copy, not as a logo, not as a store locator entry,
+                  not as an outbound link.
+
+Approved wording: "leading authorised retailers"
+                  Use this generic phrase wherever the site refers to where FineVu is
+                  sold. Applied 2026-07-27 (CA-28). Note the AU spelling "authorised" —
+                  the site uses it 31x and "authorized" 0x; keep it consistent.
+
+  To approve real stockists, replace the "NONE APPROVED" line above with the confirmed
+  list, one per line, and drop the {!needs approval} tag below. Only then may pages name
+  them. Add the store-locator data (addresses, phone numbers) as its own file — that is
+  operational data, not marketing copy, and it must come from the retailers themselves.
+
+  Confirmed AU retail partners: (none) {!needs approval}
 
 == NOTES ==

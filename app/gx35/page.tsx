@@ -56,7 +56,7 @@ const HERO_BEATS: HeroBeat[] = [
 const featureTiles = [
   { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", video: "/gx35/detail-front-camera.mp4" },
   { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.webp" },
-  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", img: "/gx35/detail-night.webp" },
+  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx35/detail-night.mp4" },
   { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.webp" },
   { title: "147° / 143° Field of View", caption: "Front & Rear", img: "/gx35/detail-field.webp" },
 ];
@@ -398,12 +398,9 @@ const specRows: [string, string][] = [
 const boxItems = [
   "Front Camera",
   "Rear Camera",
-  "Cradle",
   "MicroSD Card & Adapter",
-  "Hardwire Kit",
   "Power Cable",
-  "Rear Cable",
-  "GPS Antenna",
+"Hardwire Kit",
   "User Manual"
 ];
 

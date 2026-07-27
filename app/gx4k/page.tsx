@@ -303,7 +303,7 @@ const specRows: [string, string][] = [
 ];
 
 // Order follows docs/content-sources/gx4k.txt == IN THE BOX ==.
-const boxItems = ["Front Camera", "Rear Camera", "MicroSD Card & Adapter", "Power Cable", "Hardwire Kit", "Rear Cable", "User Manual"];
+const boxItems = ["Front Camera", "Rear Camera", "MicroSD Card & Adapter", "Power Cable", "Hardwire Kit", "User Manual"];
 
 const compareRows: [string, string, string][] = [
     ["Front Sensor", "Sony STARVIS IMX515 8.5MP", "Sony STARVIS 2 IMX675 5.12MP"],

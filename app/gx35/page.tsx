@@ -276,15 +276,19 @@ const mDiscreet: MediaSectionData = {
   video: "/gx35/discreet_scrub.mp4",
   mobileVideo: "/gx35/discreet_mobile.mp4",
   pinOnMobile: false,
-  background: "#000",
+  background: "#fff",
   title: "Discreet by Design.",
   description:
     "A screen-free body smaller than a credit card, tucked behind your mirror and out of your mind.",
   aspectRatio: "2160/1484",
-  theme: "dark",
+  theme: "light",
   titleClass: "text-orange-gradient",
   descriptionClass: "text-[#6E6E73]",
-  topScrim: false,
+  // White, not the default black — the section background is #fff, so this fades the top of
+  // the clip into the page rather than darkening it. `topScrim` must be true to render at all.
+  // topScrim: true,
+  // topScrimGradient: "linear-gradient(180deg, #fff 90%, rgba(255,255,255,0) 100%)",
+  // topScrimHeight: "h-1/4",
   textPosition: "14%",
   textReplay: true,
   pin: true,
@@ -295,6 +299,7 @@ const mDiscreet: MediaSectionData = {
   videoPlayOnce: true,
   videoScrubStart: 0.2,
   videoScrubEnd: 0.9,
+  mediaClass:"object-top"
 };
 
 /* "Memory allocation" tabs — each tab overlays a light-theme BarGraph on its clip.

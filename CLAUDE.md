@@ -101,9 +101,24 @@ They are unresolved decisions, not tasks that can just be done.
 and `gx35.txt` both list a **Hardwire Kit** *and* a separate **Power Cable** under
 `IN THE BOX`, with the `{!needs approval}` tag removed and the `ADDITIONAL OPTIONS` sections
 deleted. So the seven site surfaces claiming "Includes Hardwire Kit & Power Cable" were
-right, and `boxItems` was the wrong side — both lists have since been corrected to match
-their source exactly (GX4K 7 items, GX35 9 including Cradle and GPS Antenna). Do not revert
-`boxItems` or disclaimer 3. **CA-03 / CA-06 / CA-29 / CA-31.**
+right, and `boxItems` was the wrong side. Do not revert disclaimer 3.
+**CA-03 / CA-06 / CA-29 / CA-31.**
+
+**⛔ `boxItems` is a DESIGN decision — leave both arrays exactly as they are.** Superseding
+the correction above, the user deliberately shortened both lists on 2026-07-27 (commit
+`b3d1fd2`) to the items the pages are meant to show:
+
+- `app/gx4k/page.tsx` — **6 items**, no Rear Cable.
+- `app/gx35/page.tsx` — **6 items**, no Cradle, Rear Cable or GPS Antenna.
+
+**This is intentional and settled — do not "fix" it.** The lists are therefore *shorter than*
+`docs/content-sources/gx4k.txt` / `gx35.txt`, which still enumerate the full Korean box. That
+mismatch is expected and is **not** an audit finding: an audit reading the source alone will
+want to add the items back, and must not. Tracked as **CA-42 / CA-43** so the divergence stays
+visible. If the box lists ever need to change again, that's a design call — ask first.
+
+Note the GX35 GPS antenna is *in the box* regardless of being listed here; see the GPS entry
+below, which is unaffected.
 
 One narrow question survives: `/installation` calls the included Power Cable *"a simple
 plug-in DIY setup"*, which needs it to be self-powering — but the distributor tile shows a

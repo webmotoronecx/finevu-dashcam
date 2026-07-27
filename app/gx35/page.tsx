@@ -92,7 +92,7 @@ const cSeeDetail: Card[] = [
   {
     title: "Sony STARVIS 2 Sensor",
     body: "The 5.12MP Sony STARVIS 2 IMX675 is a full generation newer, with sharper low-light detail and 30% less power draw than the sensor before it.",
-    img: "/gx4k/see-sensor.webp",
+    img: "/gx35/day-starvis.webp",
   },
   {
     title: "AI Auto Night Vision",
@@ -193,19 +193,22 @@ const disappearTabs = [
   {
     title: "Screen-Free by Design",
     body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it's recording, keeping your attention where it belongs, on the road.",
-    video: "/gx4k/disappear-screen-free.mp4", // TODO(gx35-asset)
+    image: "/gx35/disappear-screen.webp", 
   },
   {
-    title: "Disappears Behind the Mirror",
+    title: "Smaller Than a Business Card",
     body: "At just 74mm wide and 57g, the front unit is smaller than a credit card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g.",
+    image: "/gx35/disappear-smaller.webp", 
   },
   {
     title: "One Cable, Clean Install",
     body: "A single 6-metre cable links the rear camera and powers it at the same time, so there's no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
+    image: "/gx35/disappear-one.webp", 
   },
   {
     title: "Details That Think Ahead",
     body: "Thoughtful touches throughout. A microSD slot with an on/off switch lets you pause recording without unplugging, QR-code pairing gets you set up in seconds, and simple physical buttons handle mic, emergency and Wi-Fi.",
+    image: "/gx35/disappear-details.webp", 
   },
 ];
 
@@ -270,8 +273,8 @@ const mInYourHand: MediaSectionData = {
 };
 
 const mDiscreet: MediaSectionData = {
-  video: "/gx4k/discreet_scrub.mp4", // TODO(gx35-asset) — all-keyframe build, see CLAUDE.md
-  mobileVideo: "/gx4k/discreet_mobile.mp4", // TODO(gx35-asset) — borrowed, as above
+  video: "/gx35/discreet_scrub.mp4",
+  mobileVideo: "/gx35/discreet_mobile.mp4",
   pinOnMobile: false,
   background: "#000",
   title: "Discreet by Design.",
@@ -279,6 +282,9 @@ const mDiscreet: MediaSectionData = {
     "A screen-free body smaller than a credit card, tucked behind your mirror and out of your mind.",
   aspectRatio: "2160/1484",
   theme: "dark",
+  titleClass: "text-orange-gradient",
+  descriptionClass: "text-[#6E6E73]",
+  topScrim: false,
   textPosition: "14%",
   textReplay: true,
   pin: true,
@@ -517,6 +523,7 @@ export default function GX35Page() {
         // Below lg there are no callouts to reveal and nothing to scrub, so the pin would just
         // hold a still image for ~3 screens. Off, the mobile section shows the frame in flow.
         pinOnMobile={false}
+        mobileMediaClass="scale-150"
         themeOverrides={{ bottomFade: "", exitFade: "", stageBg: "bg-[#F4F4F6]", sectionBg: "bg-[#F7F7F7]", reducedBg: "#F4F4F6" }}
         // Must match optics.webp's real pixel size — the callout layer is sized to the same box,
         // so `at` values below are literal image pixels. Note this crop is 1.582 wide, NOT the
@@ -646,11 +653,12 @@ export default function GX35Page() {
       <Carousel theme="light" grad="Connected" post=" in Your Pocket" cards={cConnected} />
 
       {/* Discreet by Design showcase */}
-      {/* <MediaSection data={mDiscreet} /> */}
+      <MediaSection data={mDiscreet} />
 
       {/* Designed to Disappear tabs and detail gallery */}
-      {false && (
-      <section data-nav-theme="light" className=" pb-20 md:pb-28">
+     
+      <section data-nav-theme="light" className="pt-16 pb-20 md:pb-28">
+
         <FeatureTabs
           theme="light"
           title="Designed to Disappear"
@@ -700,7 +708,7 @@ export default function GX35Page() {
           </motion.div>
         </div>
       </section>
-      )}
+      
 
       {/* More Reasons to Choose FineVu bento */}
       <section data-nav-theme="light" className="py-16 md:py-24">

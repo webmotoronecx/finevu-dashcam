@@ -181,7 +181,7 @@ const mDualVision: MediaSectionData = {
     description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
     image: "/gx4k/graphic-dual-vision.webp",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
-    video: "/gx4k/dual-sensors_scrub.mp4",
+    video: "/gx4k/dual_orig.mp4",
     mobileVideo: "/gx4k/dual-sensors_mobile.mp4",
 
     pinOnMobile: false,
@@ -264,22 +264,22 @@ const disappearTabs = [
     {
         title: "Screen-Free by Design",
         body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it's recording, keeping your attention where it belongs, on the road.",
-        video: "/gx4k/disappear-screen-free.mp4",
+        image: "/gx4k/disappear-screen.webp",
     },
     {
         title: "Disappears Behind the Mirror",
         body: "At 96.5mm wide and just 123g, the wedge-shaped front unit tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 18g. Always present, never in sight.",
-        video: "",
+        image: "/gx4k/disappear-behind.webp",
     },
     {
         title: "One Cable, Clean Install",
         body: "A single 6-metre cable links the rear camera and powers it at the same time, so there's no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
-        video: "",
+        image: "/gx4k/disappear-one.webp",
     },
     {
         title: "Details That Think Ahead",
         body: "Thoughtful touches throughout. A microSD slot with an on/off switch lets you pause recording without unplugging, QR-code pairing gets you set up in seconds, and simple physical buttons handle mic, emergency and Wi-Fi.",
-        video: "",
+        image: "/gx4k/disappear-details.webp",
     },
 ];
 
@@ -486,8 +486,8 @@ export default function GX4KPage() {
 
             <ScrollScrubVideo
                 scrollHint={false}
-                video="/gx4k/gx4k_secondary_banner_scrub.mp4"
-                mobileVideo="/gx4k/gx4k_secondary_banner_mobile.mp4"
+                video="/gx4k/optics_scrub.mp4"
+                mobileVideo="/gx4k/optics_mobile.mp4"
                 poster="/gx4k/hero_render.png"
                 themeOverrides={{stageBg: "bg-[#000]", sectionBg: "bg-[#000]"}}
                 reverseOnExit
@@ -609,13 +609,13 @@ export default function GX4KPage() {
             <MediaSection data={mDiscreet} />
 
             {/* Designed to disappear band — temporarily disabled */}
-            {false && (
+          
             <div data-nav-theme="dark" style={{ background: "linear-gradient(180deg, #241C38 0%, #130F1E 7.2%, #08080C 59.6%)" }}>
                 {/* Designed to disappear tabs */}
-                <FeatureTabs sectionClass={`py-20 md:py-28`} title="Designed to Disappear" tabs={disappearTabs} />
+                 <FeatureTabs sectionClass={`py-20 md:py-28`} title="Designed to Disappear" tabs={disappearTabs} /> 
 
                 {/* Small in size gallery */}
-                <section className="py-16 md:py-24">
+                <section className="pb-16 md:py-24">
                     <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
                         <Head pre="Small in Size. " grad="Rich in Detail." className="!text-[26px] md:!text-[40px]" />
                     </motion.div>
@@ -644,7 +644,7 @@ export default function GX4KPage() {
                     </div>
                 </section>
             </div>
-            )}
+          
 
             {/* More reasons and wiring band */}
             <div data-nav-theme="dark" style={{ background: "#0B0B0B" }}>

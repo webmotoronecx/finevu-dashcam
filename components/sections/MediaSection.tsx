@@ -303,6 +303,16 @@ export type MediaSectionData = {
   fadeHold?: number;
   /** Drives text colour and the navbar contrast signal */
   theme?: "dark" | "light";
+  /**
+   * Replaces the theme's colour classes on the title (and its legibility
+   * text-shadow). Use for a headline that isn't plain white/black — e.g.
+   * `text-orange-gradient`, which clips the brand gradient to the glyphs and
+   * so must not carry the shadow, since a transparent fill would render it as
+   * a dark blob behind the letters.
+   */
+  titleClass?: string;
+  /** Same, for the description. */
+  descriptionClass?: string;
   className?: string;
 };
 
@@ -367,6 +377,8 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     fadeColor = "#000",
     fadeHold = 0.15,
     theme = "dark",
+    titleClass,
+    descriptionClass,
     className = "",
   } = data;
   // Below lg, `pinOnMobile={false}` drops both the pin and the scrub: the section becomes an
@@ -707,13 +719,13 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
         style={placementStyle}
       >
         <motion.h2
-          className={`${titleColor}${shadow} text-[28px] font-semibold leading-[1.12] tracking-[-0.01em] md:text-[42px]`}
+          className={`${titleClass ?? `${titleColor}${shadow}`} text-[28px] font-semibold leading-[1.12] tracking-[-0.01em] md:text-[42px]`}
           {...titleAnim}
         >
           {title}
         </motion.h2>
         <motion.p
-          className={`${descColor}${shadow} mt-4 max-w-[640px] text-[15px] leading-[1.6] md:text-[18px]`}
+          className={`${descriptionClass ?? `${descColor}${shadow}`} mt-4 max-w-[640px] text-[15px] leading-[1.6] md:text-[18px]`}
           {...descAnim}
         >
           {description}

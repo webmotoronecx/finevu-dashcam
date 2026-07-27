@@ -29,3 +29,6 @@ next-env.d.ts
 
 # Local image intake (source files converted into public/)
 _incoming/
+
+# Pre-compression masters kept on disk for re-encoding — never ship or commit these
+public/**/*_orig.*

@@ -291,6 +291,7 @@ export function ScrollScrubVideo({
   fit = "cover",
   pinOnMobile = true,
   mobileVideo,
+  mobileMediaClass = "",
 }: {
   /** Video source (public path or remote URL). Encode with dense keyframes — see file header.
    *  Mutually exclusive with `image`; pass exactly one. */
@@ -414,6 +415,14 @@ export function ScrollScrubVideo({
    *  that encode buys nothing and costs a phone the whole download. Point this at a small,
    *  normally-encoded copy: 1280 wide, CRF 26, `-g 48`. */
   mobileVideo?: string;
+  /** Extra classes on the media in the `pinOnMobile={false}` stack, which is otherwise
+   *  `block h-auto w-full` — the full frame at the full column width.
+   *
+   *  This is the knob for "too big on mobile": the pinned track is `hidden` below lg, so
+   *  `mobileObjectPosition`/`mobileScale` (which live on `MEDIA_CLASS`) never apply here.
+   *  Prefer sizing over transforms — `w-[85%] mx-auto` shrinks the laid-out box, whereas
+   *  `scale-90` only paints it smaller and leaves the original height reserved. */
+  mobileMediaClass?: string;
 }) {
   // Memoised so `t` is referentially stable — `paint`/`syncCallouts` don't depend on it today, but
   // a fresh object each render would be a live trap for anything that later does.
@@ -993,7 +1002,7 @@ export function ScrollScrubVideo({
                   clip falls back to its own first frame rather than `poster`, so a missing or
                   mistyped poster path can't blank the section (it silently did for GX4K). */}
               {image ? (
-                <img src={image} alt="" className="block h-auto w-full" />
+                <img src={image} alt="" className={`block h-auto w-full ${mobileMediaClass}`} />
               ) : video ? (
                 /* Plays normally here — nothing is scrubbing it, so it just loops. `muted` +
                    `playsInline` are what iOS requires to autoplay at all. */
@@ -1005,14 +1014,16 @@ export function ScrollScrubVideo({
                   loop
                   playsInline
                   preload="metadata"
-                  className="block h-auto w-full"
+                  className={`block h-auto w-full ${mobileMediaClass}`}
                 />
               ) : poster ? (
-                <img src={poster} alt="" className="block h-auto w-full" />
+                <img src={poster} alt="" className={`block h-auto w-full ${mobileMediaClass}`} />
               ) : null}
             </div>
           )}
-          <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-6 sm:grid-cols-3">
+          {/* White only on the light theme: it lifts the callouts off a tinted `sectionBg`
+              (GX35 overrides that to #F7F7F7). On dark it would be a glaring slab. */}
+          <div className={`mx-auto relative ${theme === "light" ? "bg-white" : ""} py-6 grid max-w-[1280px] grid-cols-1 gap-10 px-6 sm:grid-cols-3`}>
             {callouts.map((c, i) => (
               <motion.div
                 key={c.key}

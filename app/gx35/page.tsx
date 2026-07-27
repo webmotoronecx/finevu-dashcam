@@ -253,7 +253,7 @@ const mDualVision: MediaSectionData = {
 const mSecondEyes: MediaSectionData = {
   title: "A second set of eyes.",
   description: "ADAS Plus watches the road with you, and speaks up before you need to.",
-  image: "/gx35/second-eyes.webp", // TODO(gx35-asset)
+  image: "/gx35/second-eyes.webp", 
   aspectRatio: "2160/1484",
   theme: "dark",
   heightVh: 100,

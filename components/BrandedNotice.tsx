@@ -34,7 +34,7 @@ export function BrandedNotice({ eyebrow, title, sub, cta, logo = true }: Branded
   return (
     <>
       <section
-        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[var(--background)] px-6 py-32 text-center"
+        className="relative flex flex-col items-center justify-center overflow-hidden bg-[var(--background)] px-6 pt-54 pb-32 text-center"
         data-nav-theme="light"
       >
         {logo && (

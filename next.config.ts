@@ -5,7 +5,23 @@ const nextConfig: NextConfig = {
   turbopack: {
     rules: {
       "*.svg": {
-        loaders: ["@svgr/webpack"],
+        loaders: [
+          {
+            loader: "@svgr/webpack",
+            options: {
+              // Drop the hardcoded width/height so the icon is sized purely by CSS...
+              dimensions: false,
+              // ...and keep viewBox, which SVGO strips by default. Without it the SVG
+              // cannot scale: CSS resizes the canvas while the artwork stays at its
+              // native size, so anything past the new box is clipped.
+              svgoConfig: {
+                plugins: [
+                  { name: "preset-default", params: { overrides: { removeViewBox: false } } },
+                ],
+              },
+            },
+          },
+        ],
         as: "*.js",
       },
     },

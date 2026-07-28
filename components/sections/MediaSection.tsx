@@ -485,7 +485,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
 
   const dark = theme === "dark";
   const titleColor = dark ? "text-white" : "text-[#0b0b0c]";
-  const descColor = dark ? (banner ? "text-white/60" : "text-white/80") : "text-[#5c6478]";
+  const descColor = dark ? (banner ? "text-[#ddd]" : "text-[#ddd]") : "text-[#5c6478]";
   // Guarantee legibility over varied media (same trick the Hero uses for video).
   const shadow = dark ? " [text-shadow:0_2px_18px_rgba(0,0,0,0.6)]" : "";
   const showTopScrim = topScrim ?? dark;

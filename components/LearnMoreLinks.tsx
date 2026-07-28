@@ -41,8 +41,9 @@ export function LearnMoreLinks({
           const Icon = it.icon;
           return (
             <div key={it.label} className="w-[240px] max-w-full">
-              <div className="mx-auto mb-4 flex h-16 w-20 items-center justify-center text-[var(--finevu-orange)]">
-                <Icon/>
+              {/* Icons are ~76px intrinsic; 65px renders them 15% smaller */}
+              <div className="mx-auto mb-4 flex h-[65px] w-20 items-center justify-center text-[var(--finevu-orange)]">
+                <Icon className="h-[60px] w-[60px]" />
               </div>
               <h3 className={`text-[22px] font-semibold leading-[27.5px] ${titleColor}`}>{it.label}</h3>
               <Link

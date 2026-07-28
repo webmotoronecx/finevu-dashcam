@@ -48,6 +48,31 @@ export type MediaSectionData = {
   imageSrcSet?: string;
   /** `sizes` hint, only needed when `imageSrcSet` uses width (w) descriptors */
   imageSizes?: string;
+  /**
+   * Art-directed source for phones — a *reframed* crop, not a smaller encode of
+   * `image`. Swaps below `lg` (1024px) via `<picture>`, so the browser picks one
+   * file before any JS runs and a phone never downloads the desktop image first.
+   *
+   * Deliberately not modelled on `mobileVideo`: that swaps on `mobileRelease`
+   * (i.e. `pinOnMobile`), which is playback state, not viewport. Art direction
+   * has to follow the viewport or a pinned section never gets its mobile crop.
+   *
+   * A portrait source almost always needs `mobileAspectRatio` with it —
+   * `object-cover` will otherwise crop it straight back to a landscape sliver,
+   * which is the very thing this prop exists to fix.
+   *
+   * For payload alone, reach for `imageSrcSet`/`imageSizes` instead.
+   */
+  mobileImage?: string;
+  /**
+   * Aspect ratio for the media box below `lg`, e.g. "420/593" for a portrait
+   * `mobileImage`. Falls back to `aspectRatio`.
+   *
+   * Only reaches the two modes that let the phone pick its own box: aspect mode,
+   * and `heightVh` + `heightVhMobile={false}`. A fixed `heightVhMobile` number or
+   * a `heightClass` is an explicit height and still wins.
+   */
+  mobileAspectRatio?: string;
   imageAlt?: string;
   /**
    * Drift the image against the scroll so it moves slower than the page — the
@@ -316,6 +341,50 @@ export type MediaSectionData = {
   className?: string;
 };
 
+/** Complement of `LG` — everything below the desktop breakpoint, for `<source media>`. */
+const BELOW_LG = "(max-width: 1023.98px)";
+
+/**
+ * The section's `<img>`, rendered identically by the parallax and plain paths.
+ *
+ * `<picture>` rather than a JS swap on `useIsDesktop`: that hook answers `true`
+ * during SSR and first paint (deliberately — see its comment), so a JS swap would
+ * make every phone fetch the desktop source and *then* replace it. `<source media>`
+ * is resolved by the browser before any JS, which also survives static prerender.
+ *
+ * `imageSrcSet`/`imageSizes` stay on the `<img>`, so they keep describing `image`
+ * only. Below `lg` the `<source>` wins outright and `mobileImage` is used as-is.
+ */
+function SectionImage({
+  image,
+  imageSrcSet,
+  imageSizes,
+  mobileImage,
+  alt,
+  className,
+}: {
+  image: string;
+  imageSrcSet?: string;
+  imageSizes?: string;
+  mobileImage?: string;
+  alt: string;
+  className: string;
+}) {
+  const img = (
+    <ImageWithFallback src={image} srcSet={imageSrcSet} sizes={imageSizes} alt={alt} className={className} />
+  );
+  if (!mobileImage) return img;
+  // `contents` keeps <picture> out of the box tree entirely. Without it the element
+  // is an inline box and becomes the <img>'s parent, so `h-full` (the parallax path)
+  // would resolve its percentage against an auto height and collapse.
+  return (
+    <picture className="contents">
+      <source media={BELOW_LG} srcSet={mobileImage} />
+      {img}
+    </picture>
+  );
+}
+
 /**
  * Full-bleed background media (image or video) with a centered title +
  * description overlaid near the top. Drop-in on any page.
@@ -332,6 +401,8 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     image,
     imageSrcSet,
     imageSizes,
+    mobileImage,
+    mobileAspectRatio,
     imageAlt = "",
     imageParallax = false,
     mediaClass = "",
@@ -612,12 +683,21 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     : mobileVhOnly
       ? "media-vh-mobile"
       : "";
+  // The phone gets its own aspect box only where nothing more explicit already owns the
+  // height: a pin, a `heightClass`, a numeric `heightVhMobile`, or `stackOnMobile` (which
+  // hands sizing to the content and is the last word on phones) all outrank it.
+  const useMobileAspect =
+    Boolean(mobileAspectRatio) &&
+    !pinned &&
+    !heightClass &&
+    !stackOnMobile &&
+    typeof heightVhMobile !== "number";
   const frameClass = pinned
     ? `sticky top-0 w-full overflow-hidden ${heightClass ?? "h-[100dvh]"}`
     : `relative w-full overflow-hidden ${banner ? (heightClass ?? "") : "min-h-[420px]"} ${vhClass} ${
         stackOnMobile ? "media-stack" : ""
-      } ${boxClass} ${pad} ${className}`;
-  const frameStyle = pinned
+      } ${useMobileAspect ? "media-aspect-mobile" : ""} ${boxClass} ${pad} ${className}`;
+  const baseFrameStyle = pinned
     ? undefined
     : useVh
       ? ({
@@ -631,6 +711,11 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
         : mobileVhOnly
           ? ({ aspectRatio, "--ms-h-mobile": `${heightVhMobile}dvh` } as CSSProperties)
           : { aspectRatio };
+  // `.media-aspect-mobile` reads this; it's the only value the class needs, so it rides
+  // along on whichever height mode the section is already in.
+  const frameStyle = useMobileAspect
+    ? ({ ...baseFrameStyle, "--ms-aspect-mobile": mobileAspectRatio } as CSSProperties)
+    : baseFrameStyle;
 
   const body = (
     <>
@@ -649,7 +734,11 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
         <video
           ref={videoRef}
           src={videoSrc}
-          poster={poster ?? image}
+          // `mobileImage` replaces `image` in the fallback chain on phones, but never
+          // outranks an explicit `poster` — that one is extracted as frame 1 of the clip
+          // (see /opt-vid) precisely so the poster→video handover doesn't flash, and an
+          // art-directed still would put the flash back.
+          poster={poster ?? ((!isDesktop && mobileImage) || image)}
           // Scrub mode owns playback: paused, seeked from scroll. Play-once mode
           // is driven by the in-view effect below. Reduced motion falls back to
           // a still first frame rather than any of those behaviours.
@@ -670,19 +759,21 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
           className="absolute inset-x-0 overflow-hidden"
           style={{ top: `-${drift}%`, height: `${100 + drift * 2}%`, y: imageY }}
         >
-          <ImageWithFallback
-            src={image}
-            srcSet={imageSrcSet}
-            sizes={imageSizes}
+          <SectionImage
+            image={image}
+            imageSrcSet={imageSrcSet}
+            imageSizes={imageSizes}
+            mobileImage={mobileImage}
             alt={imageAlt}
             className={`h-full w-full object-cover ${mediaClass}`}
           />
         </motion.div>
       ) : image ? (
-        <ImageWithFallback
-          src={image}
-          srcSet={imageSrcSet}
-          sizes={imageSizes}
+        <SectionImage
+          image={image}
+          imageSrcSet={imageSrcSet}
+          imageSizes={imageSizes}
+          mobileImage={mobileImage}
           alt={imageAlt}
           className={`absolute inset-0 h-full w-full object-cover ${mediaClass}`}
         />

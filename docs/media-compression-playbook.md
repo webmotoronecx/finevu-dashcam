@@ -9,7 +9,8 @@ WebP and repoint the code refs.
 
 > **Scope note (changed 2026-07-27):** this playbook was images-only through the 2026-07-25
 > passes. Video is now covered — see [Video](#video-2026-07-27) below. The image steps 1–4
-> are unchanged; the `/png-webp` slash command automates them for a single file.
+> are unchanged; the `/png-webp` slash command automates them for a single file, and
+> `/opt-vid` does the same for a single video (encode + poster).
 
 **Tooling:** `cwebp` (already installed via Homebrew). **No `sharp`, no npm dependency, no
 `next/image`.** The site renders all images through `components/figma/ImageWithFallback.tsx`
@@ -106,8 +107,14 @@ rm public/<page>/<name>.png
 
 ## Video (2026-07-27)
 
-Video is now the dominant payload sitewide. **There are two recipes and they are not
-interchangeable** — pick by how the clip is played, not by where it lives.
+Video is now the dominant payload sitewide. **There are two encode recipes and they are not
+interchangeable** — pick by how the clip is played, not by where it lives. Whichever you
+pick, finish with the **poster extraction in C**; that step applies to every clip.
+
+> **`/opt-vid` automates this whole section for a single file** — it probes the source,
+> picks the recipe from the call site, keeps the master as `_orig`, builds the `_mobile`
+> twin when needed, extracts the poster and repoints the refs. The steps below are the
+> reference it encodes; read them when you need to deviate.
 
 ### A. Normal playback (carousel cards, `MediaSection`, autoplay loops)
 
@@ -163,6 +170,37 @@ ffmpeg -v error -y -i in.mp4 -an -c:v libx264 -crf 26 -preset slow -g 48 \
 Name them `<name>_scrub.mp4` / `<name>_mobile.mp4` so it's obvious which is which, and check
 **both** props are pointed at the right one — `/gx4k` optics shipped `mobileVideo` set to the
 8.9 MB master for a while, and nothing catches that but reading it.
+
+### C. Poster frame — extract one for every clip
+
+**Every video encode ends with a poster.** Not optional, not a follow-up pass: a `<video>`
+with no `poster` shows a blank box until the first frame decodes, and on a scrub section
+that blank can persist for the whole download.
+
+Pull it from the **final encoded MP4**, not the master — the poster and the first decoded
+frame must be the *same* image, or the handover flashes:
+
+```bash
+ffmpeg -v error -y -i out.mp4 -frames:v 1 -f image2 /tmp/frame.png
+cwebp -q 82 /tmp/frame.png -o public/<page>/<name>-poster.webp
+```
+
+- **Naming: `<name>-poster.webp`** — same basename as the video, `-poster` suffix. So
+  `discreet.mp4` → `discreet-poster.webp`, `alloc-driving.mp4` → `alloc-driving-poster.webp`.
+  For a clip with `_scrub`/`_mobile` builds, one poster off the desktop/scrub build serves
+  both — name it after the base clip (`discreet-poster.webp`, not `discreet_scrub-poster.webp`).
+  Note the dash: the `_scrub` / `_mobile` / `_orig` suffixes mark *which encode of the video*
+  a file is, so a poster — which isn't a video at all — stays on the dash.
+- **Always WebP**, `-q 82`. These land at 20–60 KB; anything much bigger means you extracted
+  before the `scale=` step.
+- Then wire it up: `poster={...}` on the raw `<video>`, or the `poster` prop on
+  `MediaSection` / `ScrollHero` / `FeatureTabs` (all three accept one, and all three fall
+  back to `image` if you omit it — which is exactly how a section silently ships the wrong
+  still). `BentoCard` uses its `img` as the poster by design.
+
+> The three 2026-07-27 hero posters already follow this — `/home/gx4k-hero-poster.webp`,
+> `/gx4k/gx4k-hero-poster.webp`, `/gx35/hero-poster.webp`. The rule is that convention
+> written down, so nothing needs renaming.
 
 ### Keeping the masters
 
@@ -328,4 +366,8 @@ All 8 MVP pages checked. Image compression applied where PNGs/JPGs existed:
 - **`public/assets/*.png`** — several 2–6 MB hash-named files. Check references first.
 - **`alloc-only` (GX35)** — the 42 % outlier, deliberately left; a denoise pass should
   roughly halve it again.
+- **Posters for the already-encoded clips** — the poster rule (Video § C) landed
+  2026-07-28, after the GX35/GX4K video pass. Only the three hero stills exist; the six
+  GX35 `day-*` / `alloc-*` / `discreet` clips and GX4K `optics` still have no
+  `<name>-poster.webp`. Backfill them from the shipped MP4s.
 - **Non-MVP pages** — untouched.

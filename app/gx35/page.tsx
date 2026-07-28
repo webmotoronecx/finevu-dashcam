@@ -551,7 +551,7 @@ export default function GX35Page() {
             end: 0.3,
             at: [1100, 570],
             direction: "top-right",
-            leader: { angle: 25, diag: 190, run: 60, radius: 6 },
+            leader: { angle: 25, diag: 220, run: 60, radius: 6 },
             from: "left",
           },
           {
@@ -560,7 +560,7 @@ export default function GX35Page() {
             end: 0.4,
             at: [904, 707],
             direction: "bottom-left",
-            leader: { angle: 25, diag: 160, run: 60, radius: 6 },
+            leader: { angle: 25, diag: 180, run: 60, radius: 6 },
             from: "right",
           },
           {
@@ -569,7 +569,7 @@ export default function GX35Page() {
             end: 0.6,
             at: [1160, 860],
             direction: "bottom-left",
-            leader: { angle: 40, diag: 40, run: 60, radius: 6 },
+            leader: { angle: 45, diag: 50, run: 70, radius: 6 },
             from: "right",
           },
         ]}

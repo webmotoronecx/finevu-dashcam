@@ -95,7 +95,7 @@ const cParked: Card[] = [
     {
         title: "Power Saving Parking Mode",
         body: "Prolonged recording time. Consuming 98% less power, GX4K records 2,325 more hours than standard parking mode.",
-        img: "/gx4k/parking.webp",
+        img: "/gx4k/protected-parking.webp",
     },
     {
         title: "20-Second Impact Capture",
@@ -215,8 +215,12 @@ const mDualVision: MediaSectionData = {
 const mSecondEyes: MediaSectionData = {
     title: `A second set of eyes`,
     description: `ADAS Plus watches the road with you, and speaks up before you need to.`,
+
     image: "/gx4k/second-eyes.webp",
-  
+    mobileImage: "/gx4k/second-eyes-mobile.webp",
+    mobileAspectRatio: "420/593",
+
+
     theme: "dark",
     textPosition:"8%",
     heightVh: 100,
@@ -226,8 +230,12 @@ const mSecondEyes: MediaSectionData = {
 const mInYourHand: MediaSectionData = {
     title: "Your Dashcam. In Your Hand.",
     description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
-    image: "/gx4k/graphic-your-dashcam.webp",
-  
+    
+    image: "/gx4k/your-dashcam.webp",
+
+    mobileImage: "/gx4k/your-dashcam-mobile.webp",
+    mobileAspectRatio: "420/593",
+
     theme: "dark",
     textPosition:"8%",
     heightVh: 120,
@@ -488,7 +496,7 @@ export default function GX4KPage() {
                 scrollHint={false}
                 video="/gx4k/optics_scrub.mp4"
                 mobileVideo="/gx4k/optics_mobile.mp4"
-                poster="/gx4k/hero_render.png"
+                poster="/gx4k/optics-poster.webp"
                 themeOverrides={{stageBg: "bg-[#000]", sectionBg: "bg-[#000]"}}
                 reverseOnExit
                 pinOnMobile={false}

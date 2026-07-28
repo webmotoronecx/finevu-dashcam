@@ -387,6 +387,25 @@ code, kbd, samp, pre {
   }
 }
 
+/* Art-directed mobile crop (`mobileImage` + `mobileAspectRatio`): a portrait source
+   needs a portrait box, or object-cover crops it straight back to a landscape sliver.
+
+   Breakpoint is lg, matching the <picture> swap — deliberately NOT the 767px above,
+   which is md. Between 768 and 1023 the phone source is already showing, so the box
+   has to have changed with it.
+
+   !important because aspect mode sets `aspect-ratio` as an inline style, which would
+   otherwise beat any class. MediaSection withholds this class for the modes that
+   outrank it — `heightClass`, a numeric `heightVhMobile`, and `stackOnMobile` — so
+   the !important never fights a deliberate height. */
+@media (max-width: 1023.98px) {
+  .media-aspect-mobile {
+    height: auto !important;
+    aspect-ratio: var(--ms-aspect-mobile) !important;
+    min-height: 0 !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cta-hover:hover,
   .tile-hover:hover,

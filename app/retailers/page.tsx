@@ -98,7 +98,7 @@ function mapsUrl(s: Store) {
 const whyAuth = [
   { icon: ShieldCheck, title: "Genuine FineVu stock", node: <>Authorised retailers sell genuine FineVu units imported by AutoXtreme, the official Australian distributor — with the correct AU firmware, not grey-market imports.</> },
   { icon: Shield, title: "Full 3-year warranty", node: <>Every FineVu bought through an authorised retailer is covered by a 3-year Australian warranty, with support and servicing handled locally.</> },
-  { icon: ClipboardCheck, title: "Expert help & installation", node: <>Buy in-store for hands-on advice, or once your camera arrives, <Link href="/booking" className="font-medium text-[var(--finevu-orange)] hover:underline">book a certified hardwire install</Link> to come to your home or workplace.</> },
+  { icon: ClipboardCheck, title: "Expert help & installation", node: <>Buy in-store for hands-on advice, or once your camera arrives, <Link href="/installation" className="font-medium text-[var(--finevu-orange)] hover:underline">book a certified hardwire install</Link> to come to your home or workplace.</> },
 ];
 
 const INPUT = "w-full rounded-[12px] border-[1.5px] border-[#e8e7e2] bg-white px-4 py-[13px] text-[15px] text-[#17181b] outline-none transition-colors focus:border-[var(--finevu-orange)]";
@@ -436,7 +436,7 @@ export default function Page() {
           </motion.div>
           <motion.p {...fadeUp} className="mx-auto mb-9 mt-9 max-w-[600px] text-[16px] leading-[1.6] text-[#5b5e66] md:text-[18px]">The GX4K records straight out of the box, but full-time parking protection means hardwiring it properly into your fuse box. Our certified installers fit it cleanly, hide every cable and set it up right the first time.</motion.p>
           <motion.div {...fadeUp}>
-            <Link href="/booking" className="cta-hover inline-flex rounded-full bg-[var(--finevu-orange)] px-9 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Book Installation</Link>
+            <Link href="/installation" className="cta-hover inline-flex rounded-full bg-[var(--finevu-orange)] px-9 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Book Installation</Link>
           </motion.div>
         </div>
       </section>

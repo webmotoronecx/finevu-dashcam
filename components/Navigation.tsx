@@ -97,8 +97,11 @@ export function Navigation() {
   };
 
   // Sample the section under the navbar to theme the glass + text colours.
+  // Keyed on `pathname` so a client-side navigation re-samples: no scroll event
+  // fires on route change, so without this the navbar keeps the previous page's
+  // theme (white text on a light page) until the user nudges the wheel.
   useEffect(() => {
-    const handleScroll = () => {
+    const sample = () => {
       const x = window.innerWidth / 2;
       const y = 40;
       const elements = document.elementsFromPoint(x, y);
@@ -112,10 +115,37 @@ export function Navigation() {
       }
       setIsDarkBackground(window.scrollY < 50);
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
+    window.addEventListener("scroll", sample, { passive: true });
+    window.addEventListener("resize", sample);
+
+    // Sample after the new route has painted — on navigation the pathname
+    // updates before the incoming section is in the document, so an immediate
+    // read would still hit the outgoing page (or nothing at all).
+    const raf = requestAnimationFrame(() => requestAnimationFrame(sample));
+
+    // Late-mounting content (ComingSoonGate's ?showpage swap, images/video that
+    // resize a hero) can change what sits under the navbar after that frame.
+    // Coalesce to one sample per frame — elementsFromPoint forces layout and
+    // AnimatePresence mounts fire this in bursts.
+    let pending = 0;
+    const observer = new MutationObserver(() => {
+      if (pending) return;
+      pending = requestAnimationFrame(() => {
+        pending = 0;
+        sample();
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener("scroll", sample);
+      window.removeEventListener("resize", sample);
+      cancelAnimationFrame(raf);
+      if (pending) cancelAnimationFrame(pending);
+      observer.disconnect();
+    };
+  }, [pathname]);
 
   // Close menus on route change.
   useEffect(() => {
@@ -149,6 +179,9 @@ export function Navigation() {
     : "text-zinc-600 hover:text-zinc-950";
   const lActive = isDarkBackground ? "text-white" : "text-zinc-950";
 
+  // Plain, chrome-free routes render the page content only (no site nav).
+  if (pathname === "/fv-specialist") return null;
+
   return (
     <>
       {/* Click-away backdrop while the Products panel is open */}
@@ -174,15 +207,16 @@ export function Navigation() {
             floating to the right — per Figma v4 (pill 113:3561, button 113:3356). */}
         {/* xl:pr reserves a gutter on the right so the centered pill can never
             slide under the absolutely-positioned Find Retailer button. */}
-        <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center xl:pr-[210px]">
+         {/* ZEUS remove the padding right coz we already have a mobile view for navigation    */}
+        <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center">
           {/* Centered pill */}
           <div
-            className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2.5 xl:px-10 xl:py-3"
+            className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2 xl:px-10 xl:py-3"
             style={pillStyle}
           >
             {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex min-h-[44px] items-center shrink-0">
-              <Logo variant="primary" className="w-[170px] h-[41px] object-contain transition-transform duration-300 hover:scale-105" />
+              <Logo variant="primary" className="w-[136px] h-[33px] sm:w-[150px] sm:h-[36px] object-contain transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}

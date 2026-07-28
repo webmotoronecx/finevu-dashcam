@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { submitForm } from "@/lib/submitForm";
 import {
   Star,
   BarChart3,
@@ -156,10 +157,16 @@ function RetailerForm() {
   const [f, setF] = useState({ biz: "", abn: "", btype: "", cname: "", email: "", phone: "", state: "", web: "", msg: "" });
   const [err, setErr] = useState("");
   const [done, setDone] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [botcheck, setBotcheck] = useState("");
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (botcheck) {
+      setDone(true);
+      return;
+    }
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim());
     if (!f.biz.trim() || !f.btype || !f.cname.trim() || !f.email.trim() || !f.phone.trim() || !f.state) {
       setErr("Please complete the required fields marked with *.");
@@ -170,7 +177,27 @@ function RetailerForm() {
       return;
     }
     setErr("");
-    setDone(true);
+    setSending(true);
+    const res = await submitForm(
+      {
+        business_name: f.biz,
+        abn: f.abn,
+        business_type: f.btype,
+        contact_name: f.cname,
+        email: f.email,
+        phone: f.phone,
+        state: f.state,
+        website: f.web,
+        message: f.msg,
+      },
+      { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email },
+    );
+    setSending(false);
+    if (res.ok) {
+      setDone(true);
+    } else {
+      setErr(res.error);
+    }
   }
 
   if (done) {
@@ -187,6 +214,7 @@ function RetailerForm() {
 
   return (
     <form onSubmit={submit} noValidate className="rounded-[20px] border border-[#e7e7e3] bg-white p-[34px] shadow-[0_10px_17px_rgba(20,21,25,0.06)]">
+      <input type="text" name="botcheck" tabIndex={-1} autoComplete="off" aria-hidden="true" value={botcheck} onChange={(e) => setBotcheck(e.target.value)} className="hidden" />
       <h3 className="text-[21px] font-bold tracking-[-0.01em] text-[#1d1d1f]">Apply to stock FineVu</h3>
       <p className="mb-6 mt-1.5 text-[15.68px] text-[#5b5e66]">Tell us about your business and we&apos;ll be in touch within 1–2 business days.</p>
 
@@ -239,8 +267,8 @@ function RetailerForm() {
         <textarea className={`${INPUT} min-h-[110px] resize-y`} placeholder="Where you're based, what you sell, and roughly how many units you'd expect to move." value={f.msg} onChange={(e) => set("msg", e.target.value)} />
       </div>
 
-      <button type="submit" className="cta-hover mt-2 w-full rounded-full bg-[var(--finevu-orange)] px-7 py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white">
-        Submit Application
+      <button type="submit" disabled={sending} className="cta-hover mt-2 w-full rounded-full bg-[var(--finevu-orange)] px-7 py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70">
+        {sending ? "Submitting…" : "Submit Application"}
       </button>
       {err && <p className="mt-3.5 text-[13px] font-medium text-[#D93816]">{err}</p>}
       <p className="mt-3.5 text-center text-[13.6px] text-[#9a9da5]">

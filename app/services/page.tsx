@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
+import { submitForm } from "@/lib/submitForm";
 import {
   CalendarDays,
   Cable,
@@ -87,6 +88,37 @@ const labelClass = "block text-[11px] font-semibold uppercase tracking-wider tex
 function BookingForm() {
   const [submitted, setSubmitted] = useState(false);
   const [installType, setInstallType] = useState<"front" | "rear">("front");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    if (fd.get("botcheck")) {
+      setSubmitted(true);
+      return;
+    }
+    setSending(true);
+    setError("");
+    const email = String(fd.get("email") || "");
+    const res = await submitForm(
+      {
+        first_name: String(fd.get("firstName") || ""),
+        last_name: String(fd.get("lastName") || ""),
+        email,
+        mobile: String(fd.get("mobile") || ""),
+        dash_cam_model: String(fd.get("model") || ""),
+        vehicle: String(fd.get("vehicle") || ""),
+        install_type: installType === "front" ? "Front only" : "Front + Rear",
+        preferred_datetime: String(fd.get("datetime") || ""),
+        notes: String(fd.get("notes") || ""),
+      },
+      { subject: "FineVu installation booking request", replyTo: email },
+    );
+    setSending(false);
+    if (res.ok) setSubmitted(true);
+    else setError(res.error);
+  }
 
   return (
     <div
@@ -107,13 +139,8 @@ function BookingForm() {
           </p>
         </div>
       ) : (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSubmitted(true);
-          }}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input type="text" name="botcheck" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass} htmlFor="firstName">First Name</label>
@@ -186,10 +213,12 @@ function BookingForm() {
 
           <button
             type="submit"
-            className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-semibold uppercase leading-[20px] text-white"
+            disabled={sending}
+            className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-semibold uppercase leading-[20px] text-white disabled:opacity-70"
           >
-            Request Booking <ArrowUpRight className="w-4 h-4" />
+            {sending ? "Sending…" : (<>Request Booking <ArrowUpRight className="w-4 h-4" /></>)}
           </button>
+          {error && <p className="text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
           <p className="text-center text-[11px] text-zinc-400 pt-1">
             By appointment only · Clayton South VIC · We&apos;ll confirm by email or phone
           </p>

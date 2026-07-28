@@ -1,0 +1,89 @@
+========================================================================
+FINEVU GX35 — SOURCE OF TRUTH
+========================================================================
+SOURCE:  https://en.finevu.com  (GX35 product + specifications tab)
+SCRAPED: 2026-07-24  (from finevu/data/scraped-gx35.html)
+NOTE:    This is the official FineVu Korea data. AU-bundle figures may
+         legitimately differ (see AU OVERRIDES at the bottom). When they
+         do, the AU value wins for the site but must be listed there.
+
+== IDENTITY ==
+Model:        FineVu GX35
+Tagline:      COMPACT AND PERFECT, QHD DASHCAM
+Channels:     2CH (front + rear)
+Class:        QHD / 2K front, FHD rear
+
+== SPECS (official spec sheet) ==
+Image Sensor:     Front: SONY STARVIS 2 IMX675 5.12MP (HDR)  |  Rear: CMOS 2MP
+Resolution:       Front: 2560×1440 (Quad HD)  |  Rear: 1920×1080 (Full HD)
+Frames Per Second: Driving 30/15/6fps (Smart Time Lapse); Parking 30/15/2fps
+Viewing Angle:    Front 147.4°  |  Rear 143.2° (diagonal)
+Bitrate:          Front 16~12 Mbps  |  Rear 12~8 Mbps
+Recording Mode:   Drive / Parking / Smart Time Lapse / 15fps / Emergency
+Display:          Non-LCD (spec sheet: X)
+Acceleration:     3-Axis +2g / -2g
+GPS:              O                             <-- note wording: just "O", NOT "Built-In"
+                                                    (GX4K says "Built-In"; GX35 does not.)
+                                                    Box ships a GPS(2.5Φ) antenna -> external.
+Wi-Fi:            O (2.4GHz / 5.0GHz), no dongle required
+Bluetooth:        X (not present)
+Storage:          FineVu MicroSD 128GB; Class 10+, UHS-1 recommended, SDXC compatible
+Battery:          Supercapacitor
+Microphone:       O
+Speaker:          O
+Security LED:     Front White / Blue / Blue  |  Rear White
+Input Power:      DC 12V–24V
+Power Consumption: Parking 4.32W  |  Power Saving Parking 0.012W
+High-Temp Cut-Off: AI Heat Monitoring
+Low Voltage Cut-Off: O (winter: cuts off at 0.2V above set value)
+Temperature:      Operating -20℃~70℃  |  Storage -30℃~80℃
+Size / Weight:    Front 74.1×37.1×23.0mm / 57g  |  Rear 46.85×36.5×29.2mm / 23g
+                  ^ Front is smaller than a credit card (ID-1, 85.60×53.98mm) on both
+                    axes. Approved size comparison for the GX35 is "smaller than a
+                    credit card" — never "business card". See general.txt
+                    == WORDING CONVENTIONS ==.
+Mobile App:       FineVu Wi-Fi App (Android, iOS)
+PC Viewer:        FineVu PC Player 2.0 (Windows, Mac)
+Warranty:         3-Years  (MicroSD card warranty: 6 months)
+
+== IN THE BOX (Basic Configuration) ==
+- Front Camera
+- Rear Camera
+- Cradle                 <-- GX35 only
+- 64GB Micro SD Card & Adapter
+- Hardwire Kit
+- Power Cable           
+- Rear Cable
+- GPS(2.5Φ) antenna      <-- GX35 only; external GPS puck on a 2.5mm lead
+- User Manual
+
+
+== FEATURE CLAIMS (verbatim, for wording checks) ==
+- "STARVIS 2 sensor reduces power consumption by 30% compared to SONY STARVIS 1."
+- "Consuming 98% less power, GX35 records 13,950 more hours than standard parking mode."
+- "SMART TIME-LAPSE feature captures up to 1,129 minutes with no data loss." (under 32GB)
+- Absolute Parking Mode: "secures vital 20-seconds ... 10-seconds prior ... 10-seconds after."
+- "Secure the right moment with included hardwire cable. * Requires hardwire cable installation"
+- "This product is built-in Wi-Fi and does not require a separate Wi-Fi dongle."
+- NO "Built-in GPS" feature section exists on the GX35 page (GX4K has one; GX35 does not).
+- Customizing OSD Phrases: up to 20 chars (English letters, numbers, special characters)
+- CPL filter: "sold separately"
+- ADAS PLUS: FVMA + LDWS; Speed Camera Alert requires GPS reception
+
+== REVIEWS (SGcarmart — the only sourced testimonials) ==
+- Donny Ang, Owner of Honda Shuttle Hybrid: "Crispy clear image. easy connection to phone
+  for straight forward download."
+- Baharudin Bin Selamat, Owner of Honda Stepwagon Hybrid Spada: "The camera, compact and it
+  nicely on the front and rear."
+- Kevin, Owner of Mazda 3: "Clear video and easy to use! Will recommend to friends for
+  installation."
+
+== AU OVERRIDES (AutoXtreme bundle — differs from Korea; AU value wins) ==
+- Storage: AU bundle ships a 64GB card (Korea: 128GB). AU value is correct, not a bug.
+
+== NOT IN SOURCE (claims on the site with NO basis here — verify or remove) ==
+- Processor "Dual-core" / "Allwinner V536"   (no processor row exists on the spec sheet)
+- "F/1.8" aperture                            (no aperture figure published)
+- "microSD up to 256GB"                       (official states only the bundled card)
+- "defects below 0.2%" / "Built In-House"
+- "6-metre / 9-metre" cable lengths

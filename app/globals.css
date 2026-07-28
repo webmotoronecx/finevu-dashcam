@@ -22,6 +22,14 @@
   --brand-gradient: linear-gradient(65deg, #000000 6%, #4F2D74 34%, #0C4D97 60%, #234088 84%);
   --brand-gradient-soft: linear-gradient(65deg, #4F2D74 0%, #0C4D97 52%, #234088 100%);
 
+  /* Orange gradient (Figma "Orange-Gradient"). NOTE: its stops use #F68428, which is NOT
+     --finevu-orange (#F47920, PANTONE 165C). Both oranges ship today — see the raw #F68428
+     hexes across app/ and components/. Reconciling them is a separate pass; until then this
+     token intentionally mirrors Figma so gradients match the design file. */
+  --orange-gradient: linear-gradient(135deg, #FFB682 0%, #F68428 65.38%, #F68428 100%);
+  /* 90° variant — the angle BarGraph and OpticsSection were already hand-writing */
+  --orange-gradient-90: linear-gradient(90deg, #FFB682 0%, #F68428 65.38%, #F68428 100%);
+
   /* Back-compat aliases consumed by existing components */
   --brand-primary: var(--finevu-orange);   /* the accent/highlight everywhere */
   --brand-dark: #0A0A0B;
@@ -117,6 +125,37 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Minimal scrollbar — opt-in per scroll container via .scrollbar-minimal.
+   Deliberately NOT applied to the page scroller: styling ::-webkit-scrollbar there
+   forces a classic in-flow scrollbar whose gutter paints the white canvas background. */
+.scrollbar-minimal {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(10, 10, 11, 0.18) transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-track,
+.scrollbar-minimal::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-button {
+  display: none;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+  background-color: rgba(10, 10, 11, 0.18);
+  border-radius: 999px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(10, 10, 11, 0.32);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -174,6 +213,18 @@ code, kbd, samp, pre {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Orange gradient — background and clipped-to-text variants */
+.orange-gradient {
+  background: var(--orange-gradient);
+}
+.text-orange-gradient {
+  background-image: var(--orange-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Add the -webkit- prefix for clip-to-text so gradient headings aren't invisible on older iOS */
@@ -276,6 +327,18 @@ code, kbd, samp, pre {
   transform: scale(1.02);
 }
 
+/* Carousel drag viewport clip. overflow-x: clip (not hidden) leaves the vertical axis
+   visible, so a hovered .tile-scale card isn't sliced at the top edge. The horizontal
+   cut is pushed off the card by inline padding with a matching negative margin, set in
+   Carousel.tsx (it has to compose with the pinGutter margins). padding-block does the
+   same job vertically; the negative margin keeps the section's rhythm unchanged. */
+.carousel-clip {
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-block: 20px;
+  margin-block: -20px;
+}
+
 /* Carousel track centre-mode: the active card (--card-w) is centred with neighbours peeking off both edges */
 .carousel-inset {
   --card-w: 80vw;
@@ -290,6 +353,37 @@ code, kbd, samp, pre {
 @media (min-width: 1024px) {
   .carousel-inset {
     --card-w: min(48vw, 1040px);
+  }
+}
+
+/* MediaSection viewport-height mode: --ms-h is the height, with an optional
+   phone override. A media query is the only way to size per-breakpoint, and
+   inline styles can't hold one — so the values come in as custom properties. */
+.media-vh {
+  height: var(--ms-h);
+}
+@media (max-width: 767px) {
+  .media-vh {
+    height: var(--ms-h-mobile, var(--ms-h));
+  }
+  /* Opt out of fixed height on phones and let the media's own ratio decide. */
+  .media-vh-aspect {
+    height: auto;
+    aspect-ratio: var(--ms-aspect);
+  }
+  /* The mirror image: aspect-ratio everywhere, fixed height on phones only.
+     A set height overrides the inline aspect-ratio, so nothing to undo. */
+  .media-vh-mobile {
+    height: var(--ms-h-mobile);
+  }
+
+  /* Stacked mode: the section stops dictating height entirely and lets its content
+     (padding + the media's own aspect box) size it. Wins over every mode above,
+     hence the !important — it is deliberately the last word on phones. */
+  .media-stack {
+    height: auto !important;
+    aspect-ratio: auto !important;
+    min-height: 0 !important;
   }
 }
 

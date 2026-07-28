@@ -2,6 +2,8 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { LegalDisclaimers } from "@/components/LegalDisclaimers";
+import { PageHero } from "@/components/sections/PageHero";
 import { motion } from "motion/react";
 import Image from "next/image";
 import {
@@ -55,7 +57,7 @@ const commitments = [
   },
   {
     title: "Certified local installation",
-    body: "A nationwide network of certified installers hardwires your camera properly, for full-time parking protection done right.",
+    body: "A growing network of certified installers across the metro areas, hardwiring your camera properly for full-time parking protection done right.",
   },
   {
     title: "A team that actually answers",
@@ -128,37 +130,22 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative text-white" data-nav-theme="dark">
-        <Image src="/about/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg,rgba(8,8,9,.5) 0%,rgba(8,8,9,.3) 45%,rgba(8,8,9,.55) 100%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[940px] px-6 pt-36 pb-28 text-center md:pt-48 md:pb-36">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-[40px] font-semibold leading-[48px] tracking-[-0.5px] md:text-[64px] md:leading-[77px]"
-          >
+      <PageHero
+        image="/about/hero.webp"
+        title={
+          <>
             Engineered in Korea.
             <br />
             Trusted on Australian roads.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-[736px] text-[16px] leading-[1.55] tracking-[-0.44px] text-white/[0.88] md:text-[18px]"
-          >
-            Since 1992, FineVu has been designing dash cams that hold up when it matters. Today, we&apos;re
-            bringing that same reliability to drivers right across Australia.
-          </motion.p>
-        </div>
-      </section>
+          </>
+        }
+        subtitle={
+          <>
+            Since 1992, FineVu has been designing dash cams that hold up when it matters. Today,
+            we&apos;re bringing that same reliability to drivers right across Australia.
+          </>
+        }
+      />
 
       {/* Split 1: heritage */}
       <section className="bg-white py-24 md:py-[96px]" data-nav-theme="light">
@@ -200,7 +187,7 @@ export default function Page() {
             alt="FineVu GX4K and GX35 boxes on an Australian retail shelf"
             heading="Genuine stock. Local support. No grey imports."
             paras={[
-              "FineVu is distributed in Australia exclusively by AutoXtreme, and sold only through authorised retailers like JB Hi-Fi, Repco and Autobarn, so every unit you buy is genuine, running the correct AU firmware, and backed by local warranty support.",
+              "FineVu is distributed in Australia exclusively by AutoXtreme, and sold only through leading authorised retailers, so every unit you buy is genuine, running the correct AU firmware, and backed by local warranty support.",
               "We also run our own certified installation network, so full-time parking protection can be wired in properly, not left dangling off a cigarette lighter socket.",
             ]}
           />
@@ -256,21 +243,10 @@ export default function Page() {
       {/* Learn more strip */}
       <LearnMoreLinks />
 
-      {/* Fine print */}
-      <section className="bg-[#f4f4f5] pb-16" data-nav-theme="light">
-        <div className="mx-auto max-w-[900px] px-6">
-          <ol className="list-decimal border-t border-[#e7e7ea] ps-[18px] pt-8">
-            <li className="text-[12px] font-medium leading-[18px] text-[#838383]">
-              Warranty
-              <br />
-              3 Year Warranty applies to FineVu dash cam main units only, including front and rear cameras,
-              for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6 month
-              warranty. Proof of purchase required. Full warranty terms apply. Your rights under the
-              Australian Consumer Law are not excluded.
-            </li>
-          </ol>
-        </div>
-      </section>
+      {/* Fine print — copy lives in siteConfig.disclaimers.
+          limit={1}: this page only cites the warranty ([1] on the trust card), not the
+          SD-card or hardwire-kit claims. */}
+     <LegalDisclaimers theme="light" limit={1} />
 
       <Footer />
     </div>

@@ -3,6 +3,7 @@
 import { Footer } from '@/components/Footer';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 import { LearnMoreLinks } from '@/components/LearnMoreLinks';
+import { LegalDisclaimers } from '@/components/LegalDisclaimers';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { articles } from '@/lib/data/articles';
 import {
@@ -27,11 +28,15 @@ const SUB = 'text-[#5c6478] text-base lg:text-[18px] leading-[27px]';
 
 /* Hero */
 function Hero({
-  theme, image, video, eyebrow, title, sub, href,
+  theme, image, video, mobileVideo, eyebrow, title, sub, href,
 }: {
   theme: 'dark' | 'light';
   image: string;
   video?: string;
+  /** Lighter source served below `lg`, picked by the browser at load time so a phone never
+   *  fetches the desktop file. Encode 1280 wide, CRF 26 — see
+   *  docs/scrollscrubvideo-work-2026-07-26.md. */
+  mobileVideo?: string;
   eyebrow: string;
   title: string;
   sub: string;
@@ -43,7 +48,7 @@ function Hero({
   const shadow = video ? ' [text-shadow:0_2px_18px_rgba(0,0,0,0.7)]' : '';
   return (
     <section
-      className="relative w-full overflow-hidden aspect-[2160/1245] min-h-[560px]"
+      className="relative w-full overflow-hidden m:aspect-[2160/1245] min-h-screen"
       data-nav-theme={theme}
     >
       {video ? (
@@ -58,6 +63,8 @@ function Hero({
           poster={image}
           aria-hidden="true"
         >
+          {/* Order matters: the browser takes the first <source> whose media query matches. */}
+          {mobileVideo && <source src={mobileVideo} media="(max-width: 1023px)" type="video/mp4" />}
           <source src={video} type="video/mp4" />
         </video>
       ) : (
@@ -70,7 +77,7 @@ function Hero({
         // Readability scrim so overlaid copy stays legible over the video.
         <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/20" />
       )}
-      <div className="absolute inset-x-0 top-[15.1%] flex flex-col items-center text-center px-6">
+      <div className="absolute inset-x-0 top-[55%] -translate-y-50 md:top-[15.1%] md:translate-y-0 flex flex-col items-center text-center px-6">
         <motion.p
           className={`${text}${shadow} font-bold text-[11.5px] leading-[17px] tracking-[0.28em] uppercase`}
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
@@ -113,8 +120,8 @@ function Hero({
 const reasons = [
   { img: '/home/No.1_Banner.webp', label: 'No.1 Dash Cam in Korea' },
   { img: '/home/3YearWarranty_Tile.webp', label: '3 Year Warranty', sup: '1' },
-  { img: '/home/reason-microsd.jpg', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
-  { img: '/home/reason-hardwire.jpg', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
+  { img: '/home/reason-microsd.webp', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
+  { img: '/home/reason-hardwire.webp', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
 ];
 
 function ReasonCard({ img, label, sup, aspect }: { img: string; label: string; sup?: string; aspect: string }) {
@@ -132,24 +139,17 @@ function ReasonCard({ img, label, sup, aspect }: { img: string; label: string; s
 /* Reviews */
 const reviews = [
   {
-    thumb: '/products/gx4k-studio.jpg', product: 'FineVu GX4K', tagline: 'Very user friendly',
+    thumb: '/products/gx4k-studio.webp', product: 'FineVu GX4K', tagline: 'Very user friendly',
     body: "I was surprised by the quality of the video, super good in day and especially better in night! The camera doesn't overheat, and the mobile app is very user friendly, easy to change the settings and download the files I require.",
   },
   {
-    thumb: '/products/gx35-studio.jpg', product: 'FineVu GX35', tagline: 'Video recording was extremely clear',
-    body: 'Really compact and the video recording was extremely clear. Value for money as well',
+    thumb: '/products/gx35-studio.webp', product: 'FineVu GX35', tagline: 'Crispy clear image',
+    body: 'Crispy clear image. easy connection to phone for straight forward download.',
   },
   {
-    thumb: '/products/gx4k-studio.jpg', product: 'FineVu GX1000', tagline: 'Easy to navigate the app and program',
-    body: 'I am very satisfied with my product GX1000. Great quality. Easy to navigate the app and program. Reliable brand with excellent after sales service. Best parts is able inform speed camera. Value for money.',
+    thumb: '/products/gx4k-studio.webp', product: 'FineVu GX4K', tagline: 'Would definitely recommend',
+    body: 'Great product, excellent for my current usage. Will definitely recommend to all my friends and family.',
   },
-];
-
-/* Disclaimers */
-const disclaimers = [
-  { n: 1, title: 'Warranty', body: '3 Year Warranty applies to FineVu dash cam main units only, including front and rear cameras, for 36 months from the date of purchase. Genuine FineVu accessories are covered by a 6 month warranty. Proof of purchase required. Full warranty terms apply. Your rights under the Australian Consumer Law are not excluded.' },
-  { n: 2, title: 'SD Cards', body: 'GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6 month warranty.' },
-  { n: 3, title: 'Hardwire Kit & Power Cable', body: 'GX35 and GX4K include a Hardwire Kit and Power Cable. Included Hardwire Kits and Power Cables are covered by a 6 month warranty.' },
 ];
 
 export default function Page() {
@@ -166,8 +166,10 @@ export default function Page() {
       {/* Hero — GX4K (dark cosmic) */}
       <Hero
         theme="dark"
-        image="/home/hero-gx4k.jpg"
-        video="/home/GX4K_Hero_Video_V2.mp4"
+        image="/home/gx4k-hero-poster.webp"
+        // Master runs ~13.4 Mbps for a muted loop; these are the CRF 23 / 1280 cuts.
+        video="/home/GX4K_Hero_Video_V2_desktop.mp4"
+        mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
         eyebrow="FineVu GX4K · 2-Channel UHD"
         title="GX4K"
         sub="The clearest view of the road you've ever recorded - front and rear."
@@ -177,16 +179,19 @@ export default function Page() {
       {/* Hero — GX35 (video; white text over a readability scrim) */}
       <Hero
         theme="dark"
-        image="/home/hero-gx35.jpg"
-        video="/home/GX35_Hero_Video_v2.mp4"
-        eyebrow="FineVu GX35 2k · 2-Channel 2k QHD"
+        image="/gx35/hero-poster.webp"
+        // GX35_Hero_Video_v2.mp4 is byte-identical to /gx35/hero.mp4, so this reuses that page's
+        // cuts rather than encoding a second copy of the same footage.
+        video="/gx35/hero_desktop.mp4"
+        mobileVideo="/gx35/hero_mobile.mp4"
+        eyebrow="FineVu GX35 · 2-Channel QHD"
         title="GX35"
-        sub="QHD 2K clarity in a camera smaller than a credit card - now with a live view of your car from anywhere in the world."
+        sub="QHD 2K clarity in a camera smaller than a credit card - with in-app live view straight from your phone."
         href="/gx35"
       />
 
       {/* More reasons to choose FineVu — bento */}
-      <section className="bg-[#f7f7f7] py-24" data-nav-theme="light">
+      <section className="bg-[#f7f7f7] py-16 md:py-24" data-nav-theme="light">
         <div className="max-w-[1340px] mx-auto px-6">
           <motion.h2 className={`${HEAD} text-center mb-12`} {...fadeUp}>
             More reasons to choose FineVu.
@@ -203,7 +208,7 @@ export default function Page() {
       </section>
 
       {/* We'll come to you */}
-      <section className="bg-[#f7f7f7] pb-24" data-nav-theme="light">
+      <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1705px] mx-auto px-6 text-center">
           <motion.h2 className={HEAD} {...fadeUp}>We&apos;ll come to you</motion.h2>
           <motion.p className={`${SUB} max-w-[660px] mx-auto mt-4`} {...fadeUp}>
@@ -211,7 +216,7 @@ export default function Page() {
           </motion.p>
           <motion.div className="mt-8" {...fadeUp}>
             <Link
-              href="/booking"
+              href="/installation"
               className="cta-hover inline-flex items-center justify-center h-12 px-9 rounded-full bg-[var(--finevu-orange)] text-white text-[14px] font-semibold uppercase leading-[20px]"
             >
               Book Installation
@@ -219,21 +224,22 @@ export default function Page() {
           </motion.div>
           <motion.div className="mt-10 overflow-hidden rounded-[24px]" {...fadeUp}>
             <ImageWithFallback
-              src="/home/FineVu_Homepage_Install_Banner.webp"
+              src="/home/hero-book.webp"
               alt="A FineVu mobile installer at a customer's home"
-              className="w-full h-auto object-cover aspect-[2688/1520]"
+              className="w-full h-auto object-cover aspect-[2688/1000] object-middle"
+           
             />
           </motion.div>
         </div>
       </section>
 
       {/* Reviews */}
-      <section className="bg-[#f7f7f7] pb-24" data-nav-theme="light">
+      <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1340px] mx-auto px-6">
-          <motion.div className="text-center max-w-[760px] mx-auto mb-14" {...fadeUp}>
+          <motion.div className="text-center max-w-[760px] mx-auto mb-10 md:mb-14" {...fadeUp}>
             <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dashcams.</h2>
             <p className={`${SUB} mt-5`}>
-              Built by FINEDIGITAL, an automotive-IT specialist since 2009, held to a standard the numbers prove.
+              Built by FINEDIGITAL, an automotive-IT specialist since 1992, held to a standard the numbers prove.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -314,19 +320,10 @@ export default function Page() {
       )}
 
       {/* Where to buy / Install / Support */}
-      <LearnMoreLinks />
+      <LearnMoreLinks className='!pt-0' />
 
-      {/* Disclaimers */}
-      <section className="bg-[#ededf0] py-10" data-nav-theme="light">
-        <div className="max-w-[1240px] mx-auto px-6 space-y-5">
-          {disclaimers.map((d) => (
-            <div key={d.n} className="text-[#8b8b95] text-[13px] leading-[19px]">
-              <p className="mb-0.5">{d.n}. {d.title}</p>
-              <p className="pl-4 max-w-[1219px]">{d.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Disclaimers — copy lives in siteConfig.disclaimers */}
+      <LegalDisclaimers theme="light" />
 
       <Footer />
     </div>

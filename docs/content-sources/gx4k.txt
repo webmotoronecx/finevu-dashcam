@@ -1,0 +1,82 @@
+========================================================================
+FINEVU GX4K — SOURCE OF TRUTH
+========================================================================
+SOURCE:  https://en.finevu.com  (GX4K product + specifications tab)
+SCRAPED: 2026-07-24  (from finevu/data/scraped-gx4k.html)
+NOTE:    This is the official FineVu Korea data. AU-bundle figures may
+         legitimately differ (see AU OVERRIDES at the bottom). When they
+         do, the AU value wins for the site but must be listed there.
+
+== IDENTITY ==
+Model:        FineVu GX4K
+Tagline:      FINEVU 4K BEGINS, GX4K
+Channels:     2CH (front + rear)
+Class:        UHD / 4K front, FHD rear
+
+== SPECS (official spec sheet) ==
+Image Sensor:     Front: SONY STARVIS IMX515 8.5MP  |  Rear: CMOS 2MP
+Resolution:       Front: 3840×2160 (Ultra HD)  |  Rear: 1920×1080 (Full HD)
+Frames Per Second: Driving 30fps / 6fps time-lapse; Parking 30fps / 2fps time-lapse
+Viewing Angle:    Front 136°  |  Rear 143° (diagonal)
+Bitrate:          Front 24 Mbps  |  Rear 8 Mbps
+Recording Mode:   Drive / Parking / Time Lapse / Emergency
+Display:          Non-LCD
+Acceleration:     3-Axis +2g / -2g
+GPS:              Built-In                       <-- note wording: "Built-In"
+Wi-Fi:            Built-In (2.4GHz / 5.0GHz), no dongle required
+Bluetooth:        (not listed)
+Storage:          FineVu MicroSD 128GB; Class 10+, UHS-1 recommended, SDXC compatible
+Battery:          Supercapacitor
+Microphone:       Built-In
+Speaker:          Built-In
+Security LED:     Front White  |  Rear White
+Input Power:      DC 12V–24V
+Power Consumption: Parking 4.8W  |  Power Saving Parking 0.06W (2CH, GPS off / Wi-Fi off)
+High-Temp Cut-Off: AI Heat Monitoring (during parking mode)
+Low Voltage Cut-Off: Supported
+Temperature:      Operating -20℃~70℃  |  Storage -30℃~80℃
+Size / Weight:    Front 96.5×70.0×26.5mm / 123g  |  Rear 46.85×36.5×29.2mm / 18g
+Mobile App:       FineVu Wi-Fi App (Android, iOS)
+PC Viewer:        FineVu PC Player 2.0 (Windows, Mac)
+Warranty:         3-Years  (MicroSD card warranty: 6 months)
+
+== IN THE BOX (Basic Configuration) ==
+- Front Camera
+- Rear Camera
+- 128 Micro SD Card & Adapter
+- Power Cable           
+- Hardwire Kit 
+- Rear Cable
+- User Manual
+
+
+== FEATURE CLAIMS (verbatim, for wording checks) ==
+- "Consuming 98% less power, GX4K records 2,325 more hours than standard parking mode."
+- "TIME-LAPSE feature captures up to 743 minutes with no data loss." (measured under 32GB)
+- Absolute Parking Mode: "secures vital 20-seconds ... 10-seconds prior ... 10-seconds after."
+- "Secure the right moment with included hardwire cable. * Requires hardwire cable installation"
+- "BUILT-IN GPS — WITHOUT THE BURDEN OF PURCHASING ADDITIONAL EXTERNAL GPS"  <-- GX4K only
+- "This product has built-in Wi-Fi and does not require a separate Wi-Fi dongle."
+- ADAS PLUS: Front Vehicle Motion Alert (FVMA), Lane Departure Warning (LDWS)
+- Speed Camera Alert: database updated quarterly, requires GPS reception
+- Format Free 2.0, Memory Allocation (Driving/Event/Parking Priority, Driving Only)
+
+== REVIEWS (SGcarmart — the only sourced testimonials) ==
+- Jian Yang Mok, Owner of BMW 420i: "Great product, excellent for my current usage.
+  Will definitely recommend to all my friends and family."
+- Willy, Owner of Honda Stepwagon: "UHD 4k is very clear. Love the sleek design at a
+  reasonable price."
+- Kenneth Chuan, Owner of BMW 535i: "I was surprised by the quality of the video, super
+  good in day and especially better in night! The camera doesn't overheat, and the mobile
+  app is very user friendly, easy to change the settings and download the files I require."
+
+== AU OVERRIDES (AutoXtreme bundle — differs from Korea; AU value wins) ==
+(none recorded for GX4K yet)
+
+== NOT IN SOURCE (claims on the site with NO basis here — verify or remove) ==
+- Processor "Dual-core" / "Allwinner V536"   (no processor row exists on the spec sheet)
+- "F/1.8" aperture                            (no aperture figure published)
+- "microSD up to 256GB"                       (official states only the bundled 128GB card)
+- "defects below 0.2%" / "Built In-House"
+- "6-metre / 9-metre" cable lengths
+- "4 million+ sold"

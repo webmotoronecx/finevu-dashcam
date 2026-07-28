@@ -13,7 +13,7 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
         {/* CTA */}
         {cta && (
-        <div className="text-center pt-24 md:pt-32 pb-12">
+        <div className="text-center pt-12 md:pt-32 pb-12">
           <motion.h2
             className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1] mb-5 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
@@ -53,9 +53,9 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
         {/* Footer panel, set over the product image */}
         <div className={`pb-28 ${cta ? "" : "pt-24 md:pt-32"}`}>
           <footer className="rounded-[2rem] border border-white/10 px-8 md:px-12 lg:px-16 py-14 lg:py-16">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-10 lg:gap-14 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 mb-10">
               {/* Brand */}
-              <div className="space-y-5 md:col-span-2">
+              <div className="space-y-5 md:col-span-6">
                 <Logo className="h-8" />
                 <p className="text-zinc-400 leading-relaxed text-sm max-w-xs">
                   Premium 4K &amp; 2K front and rear dash cams with SONY STARVIS image
@@ -83,36 +83,24 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
               </div>
 
               {/* Products */}
-              <div>
+              <div className="md:col-span-3">
                 <h4 className="text-white mb-5 font-semibold text-sm">Dash Cams</h4>
                 <ul className="space-y-3">
                   <li><Link href="/gx4k" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX4K - 4K 2CH</Link></li>
                   <li><Link href="/gx35" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX35 - 2K 2CH</Link></li>
-                  <li><Link href="/how-it-works" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Features &amp; App</Link></li>
                   <li><Link href="/services" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Installation</Link></li>
                 </ul>
               </div>
 
               {/* Company */}
-              <div>
+              <div className="md:col-span-3">
                 <h4 className="text-white mb-5 font-semibold text-sm">Company</h4>
                 <ul className="space-y-3">
                   <li><Link href="/about" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">About FineVu</Link></li>
-                  <li><Link href="/retailers" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Where to Buy</Link></li>
-                  <li><Link href="/become-a-retailer" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Become a Retailer</Link></li>
-                  <li><Link href="/learn" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Learn</Link></li>
+                  <li><Link href="/installation" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
                   <li><Link href="/contact" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Contact</Link></li>
-                </ul>
-              </div>
-
-              {/* Support */}
-              <div>
-                <h4 className="text-white mb-5 font-semibold text-sm">Support</h4>
-                <ul className="space-y-3">
                   <li><Link href="/support" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Help &amp; Support</Link></li>
-                  <li><Link href="/faq" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">FAQs</Link></li>
-                  <li><Link href="/booking" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
-                  <li><span className="text-zinc-400 text-sm">{contact.warranty}</span></li>
+                  <li><Link href="/warranty" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">{contact.warranty}</Link></li>
                 </ul>
               </div>
             </div>
@@ -121,12 +109,9 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
             <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-xs text-zinc-500 font-mono">© 2026 FINEVU. ALL RIGHTS RESERVED.</p>
               <div className="flex flex-wrap justify-center gap-8 text-xs font-mono uppercase tracking-wider">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Instagram</a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Facebook</a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">YouTube</a>
                 <span className="text-zinc-700 hidden md:inline">|</span>
-                <a href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Privacy Policy</a>
-                <a href="#" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Terms of Service</a>
+                <a href="https://motoronegroup.com/privacy-policy/" target="_blank" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Privacy Policy</a>
+                <a href="/terms-of-service" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Terms of Service</a>
               </div>
             </div>
           </footer>

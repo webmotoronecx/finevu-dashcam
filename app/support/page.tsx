@@ -367,12 +367,7 @@ export default function Page() {
                                 Change settings, view live footage and download clips over Wi-Fi. Works with both GX4K and GX35.
                             </p>
                         </div>
-                        <Link
-                            href="/how-it-works"
-                            className="rounded-full border-[1.5px] border-[#e7e7ea] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-[#17181a] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)] w-full md:w-auto"
-                        >
-                            App Setup Guide
-                        </Link>
+                      
                         <Link
                             href="/how-it-works"
                             className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white  w-full md:w-auto"

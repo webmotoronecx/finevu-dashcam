@@ -194,6 +194,7 @@ const mDualVision: MediaSectionData = {
     theme: "dark",
 
     topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+    
     fade: true,
     fadeColor: "#000", // matches the page background
     fadeRange: 0.2,
@@ -219,8 +220,6 @@ const mSecondEyes: MediaSectionData = {
     image: "/gx4k/second-eyes.webp",
     mobileImage: "/gx4k/second-eyes-mobile.webp",
     mobileAspectRatio: "420/593",
-
-
     theme: "dark",
     textPosition:"8%",
     heightVh: 100,

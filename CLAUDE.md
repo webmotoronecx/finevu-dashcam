@@ -33,6 +33,18 @@ All eight were audited in full on 2026-07-27
 
 Every other route exists but is not part of the MVP. Non-MVP pages can be hidden behind the **Coming Soon gate**: add their path to `comingSoon: string[]` in `config/site.config.ts` and `ComingSoonGate` (wired in `app/layout.tsx`) renders the branded `ComingSoon` placeholder instead of the page. Preview a gated page's real content with `?showpage=true`. Prioritise the four MVP pages; treat the rest as secondary until they're promoted out of the coming-soon list.
 
+**That `comingSoon` list is the PRODUCTION gate.** Staging ungates everything via
+`config/site.config.staging.ts` — a `Partial<SiteConfig>` shallow-merged over the base
+when `NEXT_PUBLIC_SITE_ENV=staging` (set in the staging Vercel project; put it in
+`.env.local` for a staging-shaped `npm run dev`). Unset or any other value ⇒ the gated
+production config, so a typo fails safe. It must stay `NEXT_PUBLIC_` because
+`ComingSoonGate`/`Navigation` are client components, and the value is inlined at build
+time — each Vercel project bakes in its own.
+
+**Never fork these files per branch.** `config/site.config.ts` and
+`config/site.config.staging.ts` must stay identical on `main` and `staging`; the
+environment decides, not the branch. `git diff main staging -- config/` should be empty.
+
 ## 🚩 Open items — remind the user before launch
 
 **Raise these unprompted whenever launch, deployment, or content accuracy comes up.**

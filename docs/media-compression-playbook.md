@@ -16,6 +16,69 @@ WebP and repoint the code refs.
 `next/image`.** The site renders all images through `components/figma/ImageWithFallback.tsx`
 (a plain `<img>`), so a WebP path just works.
 
+Install on a fresh machine — the formula is `webp`, the binaries are `cwebp`/`dwebp`:
+
+```bash
+brew install webp      # cwebp
+brew install ffmpeg    # ffmpeg + ffprobe, for the video recipes
+```
+
+---
+
+## Manual quick reference
+
+Copy-paste versions of what `/png-webp` and `/opt-vid` run. **The guards below the fold are
+the point of those commands** — read the linked step before running one on a live asset.
+
+**PNG/JPG → WebP** ([Step 2](#step-2--png--webp)):
+
+```bash
+cwebp -q 82 -metadata none -mt in.png -o out.webp && rm in.png
+```
+
+> ⚠️ Before overwriting an existing `.webp`, compare dimensions — **a `.webp` twin is
+> frequently a different photo, not a smaller copy** ([Step 1](#step-1--find-the-heavy-assets)):
+> ```bash
+> sips -g pixelWidth -g pixelHeight FILE.png | tail -2
+> ffprobe -v error -select_streams v -show_entries stream=width,height -of default=nw=1 FILE.webp
+> ```
+> Then repoint refs, or the pruned PNG becomes a 404:
+> `grep -rn "FILE.png" app components lib config src`
+
+**Video** — pick the recipe from how the clip is *played*, not where it lives
+([Video](#video-2026-07-27)). Preserve the master first: `mv FILE.mp4 FILE_orig.mp4`.
+
+```bash
+# A — normal playback (carousel, MediaSection, autoplay loops)
+ffmpeg -v error -y -i FILE_orig.mp4 -an \
+  -c:v libx264 -crf 26 -preset slow -vf "scale=1920:-2" \
+  -pix_fmt yuv420p -movflags +faststart FILE.mp4
+
+# B — scroll-scrubbed (ScrollScrubVideo `video` prop): every frame a keyframe
+ffmpeg -v error -y -i FILE_orig.mp4 -an \
+  -c:v libx264 -g 1 -keyint_min 1 -sc_threshold 0 -crf 23 -preset slow \
+  -vf "scale=1920:-2" -pix_fmt yuv420p -movflags +faststart FILE_scrub.mp4
+
+# C — mobile twin (`mobileVideo` prop); the scrub encode buys nothing on a phone
+ffmpeg -v error -y -i FILE_orig.mp4 -an -c:v libx264 -crf 26 -preset slow -g 48 \
+  -vf "scale=1280:-2" -pix_fmt yuv420p -movflags +faststart FILE_mobile.mp4
+
+# Poster — MANDATORY, and extracted from the ENCODED output, never the master
+ffmpeg -v error -y -i FILE.mp4 -frames:v 1 -f image2 /tmp/frame.png
+cwebp -q 82 -metadata none /tmp/frame.png -o FILE-poster.webp && rm -f /tmp/frame.png
+
+# Verify recipe B landed — these two numbers must be EQUAL
+ffprobe -v error -select_streams v -show_entries frame=pict_type -of csv=p=0 FILE_scrub.mp4 | grep -c I
+ffprobe -v error -select_streams v -show_entries frame=pict_type -of csv=p=0 FILE_scrub.mp4 | wc -l
+```
+
+Naming: `_scrub` / `_mobile` / `_orig` (underscore) mark *which encode of the video* a file
+is; the poster isn't a video, so it takes a dash — `discreet.mp4` → `discreet-poster.webp`.
+One poster per clip, named after the base clip.
+
+**A build cannot catch a bad media path** — they're string literals. The grep is the real
+check; `/link-check` sweeps them all.
+
 ---
 
 ## Step 1 — Find the heavy assets
@@ -53,12 +116,19 @@ for f in public/<page>/*.png; do b="${f%.png}"; [ -f "$b.webp" ] && echo "TWIN: 
 ## Step 2 — PNG → WebP
 
 ```bash
-cwebp -q 80 -mt public/<page>/<name>.png -o public/<page>/<name>.webp
+cwebp -q 82 -metadata none -mt public/<page>/<name>.png -o public/<page>/<name>.webp
 ```
 
-- `-q 80` is a good default for photographic / gradient UI art (typically **80–95 %
-  smaller**). Drop to `-q 75` for very large hero art if 80 is still heavy; raise toward
-  `-q 90` only if you see banding on a gradient.
+- `-q 82` is the default for photographic / gradient UI art (typically **80–95 % smaller**)
+  and is what `/png-webp` runs. Drop to `-q 75` for very large hero art if 82 is still
+  heavy; raise toward `-q 90` only if you see banding on a gradient or the image carries
+  small UI text.
+- `-metadata none` strips EXIF/ICC — smaller files, and no camera or location data rides
+  along into `/public`.
+
+  > **Note (2026-07-29):** this was `-q 80` until now, and the 2026-07-25 GX4K/GX35 passes
+  > were encoded at 80. The difference is not worth re-encoding shipped assets over — 82 is
+  > simply the going-forward default, matching the slash command.
 - **ALWAYS encode from the `.png`, and overwrite any existing `.webp` of the same name.**
   `cwebp -o` overwrites by default — do not trust a pre-existing twin (it may be a
   *different image*, see ⚠️ in Step 1). Re-generating from the correct PNG guarantees the

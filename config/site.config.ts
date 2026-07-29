@@ -1,5 +1,9 @@
 // Per-client content config: nav, hero, CTAs and trust marquee (single source of truth)
 
+// Staging overrides. site.config.staging.ts imports the SiteConfig *type* back from here,
+// which is erased at compile time — so there is no runtime import cycle.
+import { stagingOverrides } from "./site.config.staging";
+
 export type NavLink = {
   href: string;
   label: string;
@@ -83,7 +87,13 @@ export type SiteConfig = {
   disclaimers: Disclaimer[];
 };
 
-export const siteConfig: SiteConfig = {
+/**
+ * PRODUCTION config. Staging does not get its own copy of this file — it applies the
+ * partial overrides in `config/site.config.staging.ts` on top, selected by the
+ * NEXT_PUBLIC_SITE_ENV env var (see the export at the bottom of this file). Keep
+ * `main` and `staging` byte-identical here so the two branches never conflict on it.
+ */
+const baseConfig: SiteConfig = {
   name: "FineVu",
   tagline: "Global leader in dash cam technology",
   description:
@@ -143,6 +153,7 @@ export const siteConfig: SiteConfig = {
 
   // Routes here render the Coming Soon placeholder instead of their page content.
   // e.g. ["/services", "/about"]
+  // This list is the PRODUCTION gate. Staging ungates everything via site.config.staging.ts.
   comingSoon: [
 
     "/become-a-retailer",
@@ -176,3 +187,22 @@ export const siteConfig: SiteConfig = {
     },
   ],
 };
+
+/**
+ * The config this build ships.
+ *
+ * Set NEXT_PUBLIC_SITE_ENV=staging in the staging Vercel project to layer
+ * `stagingOverrides` on top; leave it unset in production. The check is fail-safe by
+ * design — an unset var or a typo yields the gated production config, never an
+ * accidentally ungated one (same convention as SITE_INDEXABLE).
+ *
+ * It must stay NEXT_PUBLIC_: ComingSoonGate and Navigation are client components, so a
+ * server-only var would read as `undefined` in the browser bundle. Next inlines the
+ * value at BUILD time, which is what we want — each Vercel project bakes in its own.
+ *
+ * The merge is SHALLOW. Overrides replace whole top-level fields.
+ */
+export const siteConfig: SiteConfig =
+  process.env.NEXT_PUBLIC_SITE_ENV === "staging"
+    ? { ...baseConfig, ...stagingOverrides }
+    : baseConfig;

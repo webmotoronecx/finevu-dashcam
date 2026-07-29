@@ -217,44 +217,32 @@ const disappearTabs = [
  * until GX35 art is supplied — every such path is tagged TODO(gx35-asset). */
 
 const mDualVision: MediaSectionData = {
-  title: "Dual Vision",
+  title: "Dual vision. Zero compromise.",
   description:
-    "GX35 pairs the Sony STARVIS 2 IMX675 — a 5.12MP next-generation sensor — up front with a 2MP CMOS sensor at the rear. STARVIS 2 lifts low-light clarity while drawing 30% less power than the sensor before it, capturing sharper detail and cleaner footage after dark. Together the dual-sensor setup records every journey front and back with exceptional clarity, less noise and reduced motion blur.",
-  image: "/gx4k/graphic-dual-vision.png", // TODO(gx35-asset)
-  video: "/gx4k/dual-sensors_scrub.mp4", // TODO(gx35-asset) — all-keyframe build, see CLAUDE.md
-  mobileVideo: "/gx4k/dual-sensors_mobile.mp4", // TODO(gx35-asset) — borrowed, as above
-  pinOnMobile: false,
-  background: "#000",
-  aspectRatio: "2160/1207",
-  // Phones stack instead of overlaying: the section stops setting its own height, the
-  // media drops into flow with the aspect ratio above, and this padding opens the band
-  // the copy sits in. Tune padTop against the description length, not the viewport.
-  stackOnMobile: true,
-  padTop: "pt-[440px] md:pt-0",
-  textPosition: "14%",
-  theme: "dark",
-  topScrimGradient: "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-  fade: true,
-  fadeColor: "#000",
-  fadeRange: 0.2,
-  textFrom: "bottom",
-  textOffsetY: 120,
-  textReplay: true,
-  pin: true,
-  pinHeightVh: 250,
-  videoScrub: true,
-  // Mobile releases the scrub, so this takes over there: one play-through on entry
-  // rather than a loop. Inert on desktop, where the scrub still owns playback.
-  videoPlayOnce: true,
-  videoScrubStart: 0.2,
-  videoScrubEnd: 0.8,
+    "GX35 is equipped with the SONY STARVIS 2 IMX675, a 5.12MP flagship image sensor up front, paired with a 2.13MP CMOS sensor at the rear. The IMX675 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.",
+
+  image: "/gx35/dual-vision.png", 
+  mobileImage: "/gx35/dual-vision-mobile.png",
+  mobileAspectRatio: "420/593",
+
+  heightVh: 100,
+  heightVhMobile: false,
+
+  background: "#fff",
+
+
+  textPosition: "10%",
+  theme: "light",
+
 };
 
 const mSecondEyes: MediaSectionData = {
   title: "A second set of eyes.",
   description: "ADAS Plus watches the road with you, and speaks up before you need to.",
   image: "/gx35/second-eyes.webp", 
+  mobileImage:"/gx35/second-eyes-mobile.webp",
   aspectRatio: "2160/1484",
+  mobileAspectRatio: "420/593",
   theme: "dark",
   heightVh: 100,
   textPosition: "8%",
@@ -265,11 +253,13 @@ const mInYourHand: MediaSectionData = {
   title: "Your Dashcam. In Your Hand.",
   description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
   image: "/gx35/your-dashcam.webp", 
+  mobileImage:"/gx35/your-dashcam-mobile.webp",
+  mobileAspectRatio: "420/593",
   theme: "dark",
   textPosition: "8%",
   heightVh: 120,
   heightVhMobile: false,
-  mediaClass:"object-top"
+  mediaClass:"object-middle"
 };
 
 const mDiscreet: MediaSectionData = {
@@ -599,7 +589,7 @@ export default function GX35Page() {
       /> */}
 
       {/* Dual Vision showcase */}
-      {/* <MediaSection data={mDualVision} /> */}
+      <MediaSection data={mDualVision} />
 
       {/* See Every Detail carousel */}
       <Carousel theme="light" pre="Every Detail. " grad="Day or night." cards={cSeeDetail} pinGutter />

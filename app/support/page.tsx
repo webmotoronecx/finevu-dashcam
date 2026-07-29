@@ -137,7 +137,7 @@ const regPanels = [
             "Return shipping included on approved claims",
         ],
         cta: "Start a Warranty Claim",
-        href: "/contact",
+        href: "/warranty-claim",
         primary: false,
     },
 ];

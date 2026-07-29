@@ -1,8 +1,8 @@
 "use client";
 
 import { Footer } from "@/components/Footer";
+import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { Check, UploadCloud } from "lucide-react";
@@ -18,9 +18,7 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-// Vercel serverless caps the request body at ~4.5 MB; base64 inflates by ~1/3, so
-// keep receipts small enough that the encoded payload stays under that limit.
-const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
+const MAX_RECEIPT_BYTES = 10 * 1024 * 1024;
 
 const models = [
   { value: "GX4K", label: "FineVu GX4K" },
@@ -83,7 +81,7 @@ function RegisterForm() {
     if (f.size > MAX_RECEIPT_BYTES) {
       setFile(null);
       setFileError(
-        "That file is over 3 MB. Please choose a smaller file — or email your receipt to support@finevuaustralia.com.au after registering.",
+        "That file is over 10 MB. Please choose a smaller file — or email your receipt to support@finevuaustralia.com.au after registering.",
       );
       return;
     }
@@ -265,7 +263,7 @@ function RegisterForm() {
               <><span className="text-[#de6f12]">Choose a file</span> or drag it here</>
             )}
           </p>
-          <p className="mt-1 text-[12.5px] text-[#8a8a92]">JPG, PNG, HEIC or PDF — up to 3 MB</p>
+          <p className="mt-1 text-[12.5px] text-[#8a8a92]">JPG, PNG, HEIC or PDF — up to 10 MB</p>
         </div>
         {fileError && <p className={ERR}>{fileError}</p>}
       </div>
@@ -292,19 +290,14 @@ function RegisterForm() {
 export default function Page() {
   return (
     <div className="min-h-screen bg-[#f5f5f7]">
-      {/* Hero */}
-      <section className="relative text-white" data-nav-theme="dark">
-        <Image src="/support/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg,rgba(8,8,9,.5) 0%,rgba(8,8,9,.3) 45%,rgba(8,8,9,.55) 100%)" }}
-        />
-        <div className="relative z-10 mx-auto max-w-[760px] px-6 pt-36 pb-28 text-center md:pt-48 md:pb-36">
+      {/* Page head */}
+      <section data-nav-theme="light">
+        <div className="mx-auto max-w-[760px] px-6 pt-36 pb-10 text-center md:pt-44 md:pb-14">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-[40px] font-semibold leading-[48px] tracking-[-0.02em] md:text-[64px] md:leading-[76px]"
+            className="text-[34px] font-bold leading-[1.1] tracking-[-0.02em] text-[#111114] md:text-[46px]"
           >
             Register your product
           </motion.h1>
@@ -312,7 +305,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-[620px] text-[16px] leading-[1.6] text-white/85 md:text-[18px]"
+            className="mx-auto mt-3.5 max-w-[620px] text-[16.5px] leading-[1.6] text-[#55555c]"
           >
             Registering takes two minutes and makes any future warranty claim faster — we&apos;ll already have
             your details on file.
@@ -321,7 +314,7 @@ export default function Page() {
       </section>
 
       {/* Form + aside */}
-      <section className="py-20 md:py-[96px]" data-nav-theme="light">
+      <section className="pb-20 pt-4 md:pb-[96px] md:pt-6" data-nav-theme="light">
         <div className="mx-auto grid max-w-[1040px] items-start gap-6 px-6 lg:grid-cols-[1.5fr_1fr]">
           <RegisterForm />
 
@@ -348,6 +341,7 @@ export default function Page() {
         </div>
       </section>
 
+      <LearnMoreLinks />
       <Footer />
     </div>
   );

@@ -224,8 +224,8 @@ const mDualVision: MediaSectionData = {
   description:
     "GX35 is equipped with the SONY STARVIS 2 IMX675, a 5.12MP flagship image sensor up front, paired with a 2.13MP CMOS sensor at the rear. The IMX675 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.",
 
-  image: "/gx35/dual-vision.png", 
-  mobileImage: "/gx35/dual-vision-mobile.png",
+  image: "/gx35/dual-vision.webp",
+  mobileImage: "/gx35/dual-vision-mobile.webp",
   mobileAspectRatio: "420/593",
 
   heightVh: 100,

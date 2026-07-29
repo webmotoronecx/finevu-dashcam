@@ -166,13 +166,13 @@ export default function Page() {
       {/* Hero — GX4K (dark cosmic) */}
       <Hero
         theme="dark"
-        // image="/home/gx4k-hero-poster.webp"
-        // video="/home/GX4K_Hero_Video_V2_desktop.mp4"
-        // mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
+        image="/home/gx4k-hero-poster.webp"
+        video="/home/GX4K_Hero_Video_V2_desktop.mp4"
+        mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
 
-        video="/gx4k/hero_v2.mp4"
-        mobileVideo="/gx4k/hero_v2_mobile.mp4"
-        image="/gx4k/gx4k-hero-poster.webp"
+        // video="/gx4k/hero_v2.mp4"
+        // mobileVideo="/gx4k/hero_v2_mobile.mp4"
+        // image="/gx4k/gx4k-hero-poster.webp"
 
 
         eyebrow="FineVu GX4K · 2-Channel UHD"

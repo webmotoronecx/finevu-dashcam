@@ -295,10 +295,10 @@ const disappearTabs = [
 ];
 
 const detailGallery = [
-    { src: "/gx4k/rich-lens.png", alt: "GX4K lens macro", ratio: "746/562" },
-    { src: "/gx4k/rich-logo.png", alt: "FineVu machined body", ratio: "527/562" },
-    { src: "/gx4k/rich-mic.png", alt: "GX4K lens macro", ratio: " 527/562" },
-    { src: "/gx4k/rich-front.png", alt: "FineVu machined body", ratio: "746/562" },
+    { src: "/gx4k/rich-lens.webp", alt: "GX4K lens macro", ratio: "746/562" },
+    { src: "/gx4k/rich-logo.webp", alt: "FineVu machined body", ratio: "527/562" },
+    { src: "/gx4k/rich-mic.webp", alt: "GX4K lens macro", ratio: " 527/562" },
+    { src: "/gx4k/rich-front.webp", alt: "FineVu machined body", ratio: "746/562" },
 ];
 
 const specRows: [string, string][] = [

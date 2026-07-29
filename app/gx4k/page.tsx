@@ -470,14 +470,14 @@ export default function GX4KPage() {
          
             <ScrollHero
 
-                 poster="/home/gx4k-hero-poster.webp"
-                 video="/home/GX4K_Hero_Video_V2_desktop.mp4"
-                 mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
+                //  poster="/home/gx4k-hero-poster.webp"
+                //  video="/home/GX4K_Hero_Video_V2_desktop.mp4"
+                //  mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
 
 
-                // video="/gx4k/hero_v2.mp4"
-                // mobileVideo="/gx4k/hero_v2_mobile.mp4"
-                // poster="/gx4k/gx4k-hero-poster.webp"
+                video="/gx4k/hero_v2.mp4"
+                mobileVideo="/gx4k/hero_v2_mobile.mp4"
+                poster="/gx4k/gx4k-hero-poster.webp"
 
                 beats={HERO_BEATS}
                 fadeTo="#08080c"

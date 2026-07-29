@@ -295,8 +295,10 @@ const disappearTabs = [
 ];
 
 const detailGallery = [
-    { src: "/gx4k/detail-lens.webp", alt: "GX4K lens macro", ratio: "746/562" },
-    { src: "/gx4k/detail-body.webp", alt: "FineVu machined body", ratio: "527/562" },
+    { src: "/gx4k/rich-lens.png", alt: "GX4K lens macro", ratio: "746/562" },
+    { src: "/gx4k/rich-logo.png", alt: "FineVu machined body", ratio: "527/562" },
+    { src: "/gx4k/rich-mic.png", alt: "GX4K lens macro", ratio: " 527/562" },
+    { src: "/gx4k/rich-front.png", alt: "FineVu machined body", ratio: "746/562" },
 ];
 
 const specRows: [string, string][] = [
@@ -635,7 +637,7 @@ export default function GX4KPage() {
                     </motion.div>
                     <div className={`${SHELL} space-y-4`}>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1.42fr_1fr]">
-                            {detailGallery.map((g) => (
+                            {detailGallery.slice(0, 2).map((g) => (
                                 <motion.div
                                     key={g.src}
                                     {...fadeUp}
@@ -647,14 +649,28 @@ export default function GX4KPage() {
                                 </motion.div>
                             ))}
                         </div>
-                        <motion.div
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1.42fr]">
+                            {detailGallery.slice(2, 4).map((g) => (
+                                <motion.div
+                                    key={g.src}
+                                    {...fadeUp}
+                                    className="tile-hover-purple overflow-hidden rounded-[22px] border border-white/[0.06]"
+                                    style={{ aspectRatio: g.ratio.replace("/", " / ") }}
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={g.src} alt={g.alt} className="h-full w-full object-cover" />
+                                </motion.div>
+                            ))}
+                        </div>
+                        
+                        {/* <motion.div
                             {...fadeUp}
                             className="tile-hover-purple overflow-hidden rounded-[22px] border border-white/[0.06]"
                             style={{ aspectRatio: "1297 / 427" }}
                         >
                           
                             <img src="/gx4k/detail-angle.webp" alt="GX4K angled macro" className="h-full w-full object-cover" />
-                        </motion.div>
+                        </motion.div> */}
                     </div>
                 </section>
             </div>

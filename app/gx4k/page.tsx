@@ -247,6 +247,7 @@ const mDiscreet: MediaSectionData = {
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/discreet_scrub.mp4",
     mobileVideo: "/gx4k/discreet_mobile.mp4",
+    poster: "/gx4k/discreet-poster.webp",
     pinOnMobile: false,
     background:'#000',
     title: "Discreet by Design.",

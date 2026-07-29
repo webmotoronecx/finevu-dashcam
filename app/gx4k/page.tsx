@@ -605,7 +605,7 @@ export default function GX4KPage() {
                     <Head pre="Memory Allocation" className="!text-[30px] md:!text-[38px]" />
                     <p className={`mx-auto mt-5 max-w-[660px] ${BODY} text-center mb-6`}>
                         Split storage to match how you drive, with Driving, Event, Parking or Driving-Only priority, so the card fills with the footage you
-                        actually need.
+                        actually need. 
                     </p>
                     <small className="text-white/30">
                         <div>{`* The MicroSD card is formatted when changing the memory allocation.`}</div>

@@ -7,6 +7,8 @@ export type SubmitResult = { ok: true } | { ok: false; error: string };
 type SubmitOptions = {
   subject: string;
   replyTo?: string;
+  /** Optional single file attachment (e.g. a receipt), base64-encoded. */
+  attachment?: { filename: string; contentBase64: string };
 };
 
 export async function submitForm(
@@ -17,7 +19,7 @@ export async function submitForm(
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject: opts.subject, replyTo: opts.replyTo, fields }),
+      body: JSON.stringify({ subject: opts.subject, replyTo: opts.replyTo, fields, attachment: opts.attachment }),
     });
     const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
     if (res.ok && data?.ok) return { ok: true };

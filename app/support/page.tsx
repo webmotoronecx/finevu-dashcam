@@ -125,6 +125,7 @@ const regPanels = [
             "Keep your proof of purchase safely on record",
         ],
         cta: "Register Now",
+        href: "/register",
         primary: true,
     },
     {
@@ -136,6 +137,7 @@ const regPanels = [
             "Return shipping included on approved claims",
         ],
         cta: "Start a Warranty Claim",
+        href: "/contact",
         primary: false,
     },
 ];
@@ -428,7 +430,7 @@ export default function Page() {
                                     ))}
                                 </ul>
                                 <Link
-                                    href="/contact"
+                                    href={p.href}
                                     className={`mt-auto inline-flex w-fit items-center justify-center rounded-full px-[26px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] ${p.primary ? "cta-hover bg-[var(--finevu-orange)] text-white" : "border-[1.5px] border-[#e7e7ea] text-[#17181a] transition-colors hover:border-[var(--finevu-orange)] hover:text-[var(--finevu-orange)]"}`}
                                 >
                                     {p.cta}

@@ -13,7 +13,11 @@ type Payload = {
   replyTo?: string;
   botcheck?: string;
   fields?: Record<string, unknown>;
+  attachment?: { filename?: string; contentBase64?: string };
 };
+
+// Guard against Vercel's ~4.5 MB request-body limit (base64 inflates ~1/3).
+const MAX_ATTACHMENT_BASE64 = 4 * 1024 * 1024;
 
 const isEmail = (v: unknown): v is string =>
   typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
@@ -69,6 +73,12 @@ export async function POST(req: Request) {
     </table>
   </div>`;
 
+  const att = payload.attachment;
+  const attachments =
+    att?.filename && att?.contentBase64 && att.contentBase64.length <= MAX_ATTACHMENT_BASE64
+      ? [{ filename: att.filename, content: Buffer.from(att.contentBase64, "base64") }]
+      : undefined;
+
   const resend = new Resend(apiKey);
   try {
     const { error } = await resend.emails.send({
@@ -78,6 +88,7 @@ export async function POST(req: Request) {
       replyTo: isEmail(payload.replyTo) ? payload.replyTo.trim() : undefined,
       text,
       html,
+      attachments,
     });
     if (error) {
       return NextResponse.json(

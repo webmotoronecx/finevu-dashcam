@@ -54,9 +54,9 @@ const HERO_BEATS: HeroBeat[] = [
 
 // "Every detail" bento; the field-of-view tile stays a placeholder until the client supplies that shot
 const featureTiles = [
-  { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", video: "/gx35/detail-front-camera.mp4" },
+  { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", video: "/gx35/detail-front-camera.mp4", img: "/gx35/detail-front-camera-poster.webp" },
   { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.webp" },
-  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx35/detail-night.mp4" },
+  { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx35/detail-night.mp4", img: "/gx35/detail-night-poster.webp" },
   { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.webp" },
   { title: "147° / 143° Field of View", caption: "Front & Rear", img: "/gx35/detail-field.webp" },
 ];
@@ -88,6 +88,7 @@ const cSeeDetail: Card[] = [
     title: "True 2K Quad HD",
     body: "Front records in 2560×1440 QHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
     video: "/gx35/day-true-2k.mp4",
+    img: "/gx35/day-true-2k-poster.webp",
   },
   {
     title: "Sony STARVIS 2 Sensor",
@@ -98,6 +99,7 @@ const cSeeDetail: Card[] = [
     title: "AI Auto Night Vision",
     body: "Smart AI reads the light around you and adjusts brightness and contrast on its own — clear night footage with nothing to switch on.",
     video: "/gx35/day-ai-auto.mp4",
+    img: "/gx35/day-ai-auto-poster.webp",
   },
 ];
 
@@ -153,6 +155,7 @@ const cConnected: Card[] = [
     title: "5GHz Wi-Fi",
     body: "Fast dual-band Wi-Fi streams live footage to your phone and pulls clips straight off the camera. No removing the SD card.",
     video: "/gx35/connected-5g.mp4",
+    img: "/gx35/connected-5g-poster.webp",
   },
   {
     title: "GPS Included",
@@ -265,6 +268,7 @@ const mInYourHand: MediaSectionData = {
 const mDiscreet: MediaSectionData = {
   video: "/gx35/discreet_scrub.mp4",
   mobileVideo: "/gx35/discreet_mobile.mp4",
+  poster: "/gx35/discreet_scrub-poster.webp",
   pinOnMobile: false,
   background: "#fff",
   title: "Discreet by Design.",
@@ -299,6 +303,7 @@ const memoryAllocationTabs = [
   {
     title: "Driving Priority",
     video: "/gx35/alloc-driving.mp4",
+    poster: "/gx35/alloc-driving-poster.webp",
     componentStatic: true,
     componentOverlay: true,
     component: (
@@ -317,7 +322,8 @@ const memoryAllocationTabs = [
   },
   {
     title: "Event Priority",
-    video: "/gx35/alloc-event.mp4", 
+    video: "/gx35/alloc-event.mp4",
+    poster: "/gx35/alloc-event-poster.webp",
     componentStatic: true,
     componentOverlay: true,
     component: (
@@ -355,7 +361,8 @@ const memoryAllocationTabs = [
   },
   {
     title: "Driving Only",
-    video: "/gx35/alloc-only.mp4", 
+    video: "/gx35/alloc-only.mp4",
+    poster: "/gx35/alloc-only-poster.webp",
     componentStatic: true,
     componentOverlay: true,
     component: (

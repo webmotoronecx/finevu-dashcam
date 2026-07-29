@@ -66,9 +66,9 @@ function TwoTone({ text, className = "" }: { text: string; className?: string })
 /* Data */
 
 const detailCards = [
-    { title: "3840 × 2160 UHD Front Camera", caption: "Every pixel captured", video: "/gx4k/captured-front-cam.mp4" },
+    { title: "3840 × 2160 UHD Front Camera", caption: "Every pixel captured", video: "/gx4k/captured-front-cam.mp4", img: "/gx4k/captured-front-cam-poster.webp" },
     { title: "Sony STARVIS IMX515", caption: "8.5MP · F/1.8 · crystal-clear detail", img: "/gx4k/captured-starvis.webp" },
-    { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx4k/captured-night.mp4" },
+    { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx4k/captured-night.mp4", img: "/gx4k/captured-night-poster.webp" },
     { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/captured-ai-heat.webp" },
     { title: "136°/143° Field of View", caption: "Front & Rear", img: "/gx4k/captured-front-rear.webp" },
 ];
@@ -78,6 +78,7 @@ const cSeeDetail: Card[] = [
         title: "True 4K Ultra HD",
         body: "Front records in 3840×2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
         video: "/gx4k/detail-true-4k.mp4",
+        img: "/gx4k/detail-true-4k-poster.webp",
     },
     {
         title: "Sony STARVIS Sensor",
@@ -88,6 +89,7 @@ const cSeeDetail: Card[] = [
         title: "AI Auto Night Vision",
         body: "Smart AI reads the light around you and adjusts brightness and contrast on its own, for clear night footage with nothing to switch on.",
         video: "/gx4k/detail-auto-night.mp4",
+        img: "/gx4k/detail-auto-night-poster.webp",
     },
 ];
 
@@ -167,6 +169,7 @@ const cConnected: Card[] = [
         title: "5GHz Wi-Fi",
         body: "Fast dual-band Wi-Fi streams live footage to your phone and pulls clips straight off the camera. No removing the SD card.",
         video: "/gx4k/connected-5g.mp4",
+        img: "/gx4k/connected-5g-poster.webp",
     },
     {
         title: "Built-in GPS",
@@ -373,6 +376,7 @@ const memoryAllocationTabs = [
     {
         title: "Driving Priority",
         video: "/gx4k/alloc-driving.mp4",
+        poster: "/gx4k/alloc-driving-poster.webp",
         componentStatic: true,
         componentOverlay: true,
         component: (
@@ -393,6 +397,7 @@ const memoryAllocationTabs = [
     {
         title: "Event Priority",
         video: "/gx4k/alloc-event.mp4",
+        poster: "/gx4k/alloc-event-poster.webp",
         componentStatic: true,
         componentOverlay: true,
         component: (
@@ -433,6 +438,7 @@ const memoryAllocationTabs = [
     {
         title: "Driving Only",
         video: "/gx4k/alloc-only.mp4",
+        poster: "/gx4k/alloc-only-poster.webp",
         componentStatic: true,
         componentOverlay: true,
         component: (

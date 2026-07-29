@@ -163,6 +163,7 @@ const baseConfig: SiteConfig = {
     "/learn",
     "/retailers",
     "/services",
+    "/register"
 
   ],
 

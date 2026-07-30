@@ -521,6 +521,9 @@ export default function GX35Page() {
         theme="light"
         image="/gx35/optics_2.webp"
         fit="contain"
+        // optics_2.webp's own pixel width (same as stageViewBox below). Past this the still would
+        // upscale and grow into the head copy and callouts on ultrawide displays.
+        maxMediaWidth="2160px"
         // Below lg there are no callouts to reveal and nothing to scrub, so the pin would just
         // hold a still image for ~3 screens. Off, the mobile section shows the frame in flow.
         pinOnMobile={false}

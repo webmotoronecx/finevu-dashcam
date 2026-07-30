@@ -215,8 +215,18 @@ const STAGE_H = "100dvh";
 //   `--ssv-nudge` (`nudgeY`)   slides everything down at full size; the overflow is clipped.
 // Both resolve percentages against the same containing block (the sticky stage), so a `%` nudge
 // means the same thing to each.
+//
+// `--ssv-maxw` (`maxMediaWidth`) is the third shared value: a ceiling on the box width, defaulting
+// to `100%` so it's a no-op unless the prop is set. `inset-x-0` + `mx-auto` centres the box once
+// the cap bites — auto inline margins resolve against left:0/right:0, so no extra transform.
+//
+// ⚠️ The cap itself is applied *inline* via `mediaStyle`, NOT as a `max-w-[…]` class here.
+// `app/globals.css` carries an **unlayered** `img, video, svg { max-width: 100% }` (the iOS
+// horizontal-overflow guard), and unlayered declarations outrank everything in `@layer utilities`
+// — so a Tailwind `max-w-*` on a media element is silently dead no matter how specific it looks.
+// The class generates fine and computes to 100%; only an inline style wins. Don't "tidy" it back.
 const MEDIA_CLASS =
-  "absolute top-50 md:top-[calc(var(--ssv-head)+var(--ssv-nudge))] inset-0 w-full object-cover [object-position:var(--ssv-pos)] [transform:scale(var(--ssv-scale))] md:[object-position:center] md:[transform:none] h-[60dvh] md:h-[calc(100%-var(--ssv-head))]";
+  "absolute top-50 md:top-[calc(var(--ssv-head)+var(--ssv-nudge))] inset-0 mx-auto w-full object-cover [object-position:var(--ssv-pos)] [transform:scale(var(--ssv-scale))] md:[object-position:center] md:[transform:none] h-[60dvh] md:h-[calc(100%-var(--ssv-head))]";
 
 // `fit="contain"`: the box is sized by *width* and carries the media's own aspect ratio, so the
 // media fills it exactly — no crop, and therefore no exposed top edge. It overflows the stage on
@@ -225,7 +235,7 @@ const MEDIA_CLASS =
 //
 // `headroom` doesn't apply here (there's no box height to give up); `nudgeY` does all the work.
 const MEDIA_CLASS_CONTAIN =
-  "absolute inset-x-0 w-full top-[calc(50%+var(--ssv-nudge,0px))] -translate-y-1/2 object-cover";
+  "absolute inset-x-0 mx-auto w-full top-[calc(50%+var(--ssv-nudge,0px))] -translate-y-1/2 object-cover";
 
 /** One annotation block — shared by the pinned overlay and the mobile stack.
  *
@@ -289,6 +299,7 @@ export function ScrollScrubVideo({
   nudgeY = "0px",
   scrollHint = true,
   fit = "cover",
+  maxMediaWidth,
   pinOnMobile = true,
   mobileVideo,
   mobileMediaClass = "",
@@ -398,6 +409,23 @@ export function ScrollScrubVideo({
    *  and below, so set `stageBg` to the media's own edge colour. `headroom` is ignored; use
    *  `nudgeY`. `mobileObjectPosition`/`mobileScale` are no-ops, there being no crop to position. */
   fit?: "cover" | "contain";
+  /** Ceiling on the backdrop's width — any CSS length (e.g. `"2160px"`). Unset = uncapped.
+   *
+   *  This is the ultrawide knob. The media box is width-driven (`contain` literally, `cover` via
+   *  the `max()` below), so without a cap the artwork keeps growing with the viewport: past ~2560px
+   *  it upscales beyond its own resolution and climbs into the pinned `head` copy and the callouts.
+   *  Cap it at the media's native pixel width and it stops at 1:1, leaving that clearance intact.
+   *
+   *  Two things make this safe. It's a *maximum*, so anything narrower is unaffected — pages that
+   *  don't set it behave exactly as before. And it caps **the media and the callout stage together**
+   *  (one `--ssv-maxw` read by both, like `--ssv-head`/`--ssv-nudge`): capping only the media would
+   *  leave the stage tracking full width and detach every leader line from the artwork.
+   *
+   *  Trade-off on `fit="cover"`: a capped box no longer full-bleeds, so `stageBg` shows at the left
+   *  and right edges on wide viewports. Fine on artwork that already sits on the stage colour;
+   *  otherwise it wants an edge gradient. `fit="contain"` already bands on narrow viewports, so
+   *  this changes nothing there. */
+  maxMediaWidth?: string;
   /** Keep the pinned, full-height treatment below `lg` (default true).
    *
    *  Set false for a still backdrop. The callout overlay is `lg+` only and a still has nothing to
@@ -457,17 +485,26 @@ export function ScrollScrubVideo({
   // *after* `headroom` is taken off the top, matching MEDIA_CLASS's `md:h-[calc(100%-…)]`.
   // `contain` makes the stage the width-driven box the media itself occupies, so the two are the
   // same rectangle by construction rather than by a formula that has to replicate object-cover.
+  //
+  // `--ssv-maxw` (`maxMediaWidth`) caps the **box** term only, never the content term: under cover
+  // the content rect is legitimately *wider* than its box on tall viewports (that's the horizontal
+  // crop), and the stage has to be that wider rect. So the cap goes inside the `max()`, on the same
+  // `boxWidth` the media's own `maxWidth` gets — and both expressions collapse to their old form at
+  // the `100%` default.
   const contain = fit === "contain";
+  const boxWidth = "min(100%, var(--ssv-maxw, 100%))";
   const stageWidth = contain
-    ? "100%"
+    ? boxWidth
     : vbW && vbH
-      ? `max(100%, calc((${STAGE_H} - var(--ssv-head, 0px)) * ${vbW} / ${vbH}))`
-      : "100%";
+      ? `max(${boxWidth}, calc((${STAGE_H} - var(--ssv-head, 0px)) * ${vbW} / ${vbH}))`
+      : boxWidth;
   // Media class + the extra style the contain box needs (its height comes from the aspect ratio).
+  // `maxWidth` has to live here rather than as a `max-w-[…]` class — see MEDIA_CLASS's note on the
+  // unlayered `img, video, svg { max-width: 100% }` in globals.css, which outranks any utility.
   const mediaClass = contain ? MEDIA_CLASS_CONTAIN : MEDIA_CLASS;
   const mediaStyle: CSSProperties = contain
-    ? { aspectRatio: stageAspect }
-    : { ["--ssv-pos" as string]: mobileObjectPosition, ["--ssv-scale" as string]: mobileScale };
+    ? { aspectRatio: stageAspect, maxWidth: boxWidth }
+    : { ["--ssv-pos" as string]: mobileObjectPosition, ["--ssv-scale" as string]: mobileScale, maxWidth: boxWidth };
 
   // How much viewport height is scrolled *before* the section pins, in vh. `startVisible: 1`
   // gives 0 (progress starts at the pin, as before); 0.5 gives 50 — half a viewport of
@@ -825,7 +862,11 @@ export function ScrollScrubVideo({
           className={`${t.stageBg} sticky top-0  h-[80dvh] md:h-[100dvh] w-full overflow-hidden flex  items-center `}
           // Declared once here so the media and the callout stage below read the same values —
           // they must move together or every leader detaches from the artwork.
-          style={{ ["--ssv-head" as string]: contain ? "0px" : `${headroom}px`, ["--ssv-nudge" as string]: nudgeY }}
+          style={{
+            ["--ssv-head" as string]: contain ? "0px" : `${headroom}px`,
+            ["--ssv-nudge" as string]: nudgeY,
+            ["--ssv-maxw" as string]: maxMediaWidth ?? "100%",
+          }}
         >
           {/* Both branches carry identical framing classes so the callout stage — which is sized to
               the same object-cover box — lines up whichever backdrop is in use. */}

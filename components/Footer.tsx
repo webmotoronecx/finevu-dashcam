@@ -73,7 +73,7 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
             <div className={`grid grid-cols-1 ${grid.wrapper} gap-10 lg:gap-14 mb-10`}>
               {/* Brand */}
               <div className={`space-y-5 ${grid.brand}`}>
-                <Logo className="h-8" />
+                <Logo variant="dark" className="h-8" />
                 <p className="text-zinc-400 leading-relaxed text-sm max-w-xs">
                   Premium 4K &amp; 2K front and rear dash cams with SONY STARVIS image
                   sensors. {contact.origin}, trusted by drivers worldwide.

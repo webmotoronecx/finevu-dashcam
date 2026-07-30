@@ -269,9 +269,11 @@ export function Navigation() {
             }`}
             style={subNav ? undefined : pillStyle}
           >
-            {/* Logo — orange/grey wordmark */}
+            {/* Logo — follows the same data-nav-theme sampler as the links and glass.
+                On light sections the "Vu" must use the darkened `contrast` variant; the
+                stock brand grey sits at ~2.3:1 over the white glass and vanishes. */}
             <Link href="/" aria-label="FineVu home" className="flex min-h-[44px] items-center shrink-0">
-              <Logo variant="primary" className="w-[136px] h-[33px] sm:w-[150px] sm:h-[36px] object-contain transition-transform duration-300 hover:scale-105" />
+              <Logo variant={isDarkBackground ? "dark" : "contrast"} className="w-[136px] h-[33px] sm:w-[150px] sm:h-[36px] object-contain transition-transform duration-300 hover:scale-105" />
             </Link>
 
             {/* Desktop links — Products ⌄ / Installation / Retailers / Support */}

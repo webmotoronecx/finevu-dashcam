@@ -283,7 +283,7 @@ export default function Page() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section id="top" className="relative text-white" data-nav-theme="dark">
-        <Image src="/retailers/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
+        <Image src="/retailer/hero.png" alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,rgba(8,8,9,.55) 0%,rgba(8,8,9,.35) 45%,rgba(8,8,9,.62) 100%)" }} />
         <div className="relative z-10 mx-auto max-w-[760px] px-6 pt-36 pb-16 text-center md:pt-44 md:pb-20">
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.8px] md:text-[64px] md:leading-[76px]">

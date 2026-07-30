@@ -170,9 +170,9 @@ export default function Page() {
         // video="/home/GX4K_Hero_Video_V2_desktop.mp4"
         // mobileVideo="/home/GX4K_Hero_Video_V2_mobile.mp4"
 
-        video="/gx4k/hero_v2.mp4"
-        mobileVideo="/gx4k/hero_v2_mobile.mp4"
-        image="/gx4k/gx4k-hero-poster.webp"
+        video="/gx4k/hero_2.mp4"
+        mobileVideo="/gx4k/hero_2_mobile.mp4"
+        image="/gx4k/hero_2-poster.webp"
 
 
         eyebrow="FineVu GX4K · 2-Channel UHD"

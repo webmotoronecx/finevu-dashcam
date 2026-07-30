@@ -228,7 +228,7 @@ const mDualVision: MediaSectionData = {
   mobileImage: "/gx35/dual-vision-mobile.webp",
   mobileAspectRatio: "420/593",
 
-  heightVh: 100,
+  heightVh: 120,
   heightVhMobile: false,
 
   background: "#fff",
@@ -519,7 +519,7 @@ export default function GX35Page() {
       <ScrollScrubVideo
         scrollHint={false}
         theme="light"
-        image="/gx35/optics.webp"
+        image="/gx35/optics_2.webp"
         fit="contain"
         // Below lg there are no callouts to reveal and nothing to scrub, so the pin would just
         // hold a still image for ~3 screens. Off, the mobile section shows the frame in flow.
@@ -529,10 +529,10 @@ export default function GX35Page() {
         // Must match optics.webp's real pixel size — the callout layer is sized to the same box,
         // so `at` values below are literal image pixels. Note this crop is 1.582 wide, NOT the
         // 1.456 of the image OpticsSection used; anchors from that era do not carry over.
-        stageViewBox="0 0 2160 1365"
+        stageViewBox="0 0 2160 1300"
 
         
-        nudgeY="7%"
+        // nudgeY="7%"
         head={{
           title: "The Optics Behind the Image.",
           subtitle:
@@ -546,7 +546,7 @@ export default function GX35Page() {
             ...opticsCallouts[0],
             start: 0.2,
             end: 0.3,
-            at: [1100, 570],
+            at: [1100, 670],
             direction: "top-right",
             leader: { angle: 25, diag: 220, run: 60, radius: 6 },
             from: "left",
@@ -555,7 +555,7 @@ export default function GX35Page() {
             ...opticsCallouts[1],
             start: 0.3,
             end: 0.4,
-            at: [904, 707],
+            at: [904, 807],
             direction: "bottom-left",
             leader: { angle: 25, diag: 180, run: 60, radius: 6 },
             from: "right",
@@ -564,7 +564,7 @@ export default function GX35Page() {
             ...opticsCallouts[2],
             start: 0.4,
             end: 0.6,
-            at: [1160, 860],
+            at: [1160, 990],
             direction: "bottom-left",
             leader: { angle: 45, diag: 50, run: 70, radius: 6 },
             from: "right",

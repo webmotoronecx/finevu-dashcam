@@ -8,7 +8,8 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useState } from "react";
-import { Phone, Mail, Smartphone, ChevronDown, ChevronRight } from "lucide-react";
+import { Phone, Mail, ChevronDown, ChevronRight } from "lucide-react";
+import { AppSupport } from "@/components/AppSupport";
 
 // Support page — dark hero, phone/email cards, per-model download/guide hubs, troubleshooting accordion, registration and warranty panels, and fine print.
 
@@ -355,28 +356,8 @@ export default function Page() {
                     </motion.div>
                     <ModelHubs />
 
-                    {/* App strip */}
-                    <motion.div
-                        {...fadeUp}
-                        className="mx-auto mt-5 flex max-w-[1020px] flex-wrap items-center gap-5 rounded-[16px] border border-[#e7e7ea] bg-white px-[26px] py-[22px]"
-                    >
-                        <span className="flex h-[46px] w-[46px] items-center justify-center rounded-[12px] bg-[#fef2e5] text-[var(--finevu-orange)]">
-                            <Smartphone className="h-[22px] w-[22px]" strokeWidth={1.8} />
-                        </span>
-                        <div className="min-w-[220px] flex-1">
-                            <h3 className="text-[18px] font-semibold text-[#17181a]">FineVu app support</h3>
-                            <p className="text-[14px] text-[#6b6b72]">
-                                Change settings, view live footage and download clips over Wi-Fi. Works with both GX4K and GX35.
-                            </p>
-                        </div>
-                      
-                        <Link
-                            href="#"
-                            className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white  w-full md:w-auto"
-                        >
-                            Get the App
-                        </Link>
-                    </motion.div>
+                    {/* FineVu Wi-Fi app support card with expandable downloads */}
+                    <AppSupport />
                 </div>
             </section>
 

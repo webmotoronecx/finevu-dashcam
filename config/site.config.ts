@@ -23,6 +23,11 @@ export type Disclaimer = {
   body: string;
 };
 
+export type FooterColumn = {
+  heading: string;
+  links: NavLink[];
+};
+
 export type SiteConfig = {
   /** Site metadata */
   name: string;
@@ -68,6 +73,26 @@ export type SiteConfig = {
   brandMarquee: {
     eyebrow: string;
     brands: BrandLogo[];
+  };
+
+  /**
+   * Footer link columns and the social row in the bottom bar.
+   *
+   * Production ships a deliberately trimmed set, because most of the fuller footer's
+   * links point at routes in `comingSoon`. Staging restores the full version via
+   * `site.config.staging.ts` — see the note there.
+   *
+   * The two sets are INDEPENDENT, not subset/superset: production keeps /contact (which
+   * IS gated) and omits "Features & App", so this can't be derived by filtering against
+   * `comingSoon`. Promoting a route out of `comingSoon` does NOT move its footer link
+   * here automatically; that's a manual edit, by design.
+   *
+   * `Footer` reads `columns.length` to pick its grid (2 or 3 columns only — see the GRID
+   * lookup in components/Footer.tsx). An empty `social` omits the row and its separator.
+   */
+  footer: {
+    columns: FooterColumn[];
+    social: NavLink[];
   };
 
   /** Routes that render the Coming Soon placeholder instead of their content */
@@ -151,8 +176,40 @@ const baseConfig: SiteConfig = {
     ],
   },
 
+  // PRODUCTION footer — two columns, no social row. The fuller three-column version
+  // lives in site.config.staging.ts.
+  //
+  // NOTE: /contact is still in `comingSoon` below, so that link renders the Coming Soon
+  // placeholder in production. It's retained deliberately (it was in the trimmed footer
+  // as shipped) and is part of the CA-38 gated-CTA decision, not an oversight.
+  footer: {
+    columns: [
+      {
+        heading: "Dash Cams",
+        links: [
+          { href: "/gx4k", label: "GX4K - 4K 2CH" },
+          { href: "/gx35", label: "GX35 - 2K 2CH" },
+          { href: "/installation", label: "Installation" },
+        ],
+      },
+      {
+        heading: "Company",
+        links: [
+          { href: "/about", label: "About FineVu" },
+          { href: "/installation", label: "Book Installation" },
+          { href: "/contact", label: "Contact" },
+          { href: "/support", label: "Help & Support" },
+          // Kept in sync with contact.warranty above by hand — a config object can't
+          // reference its own fields while being defined.
+          { href: "/warranty", label: "3-Year Australian Warranty" },
+        ],
+      },
+    ],
+    social: [],
+  },
+
   // Routes here render the Coming Soon placeholder instead of their page content.
-  // e.g. ["/services", "/about"]
+  // e.g. ["/how-it-works", "/about"]
   // This list is the PRODUCTION gate. Staging ungates everything via site.config.staging.ts.
   comingSoon: [
 
@@ -162,7 +219,6 @@ const baseConfig: SiteConfig = {
     "/how-it-works",
     "/learn",
     "/retailers",
-    "/services",
     "/register",
     "/warranty-claim",
     "/thank-you"

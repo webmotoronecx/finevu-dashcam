@@ -5,8 +5,25 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { siteConfig } from "@/config/site.config";
 
+/**
+ * Grid geometry per column count. Keyed off `footer.columns.length` so the two config
+ * variants each render the layout they were designed at: production's 2 columns on a
+ * 12-grid, staging's 3 on a 5-grid (brand ~40% wide).
+ *
+ * These MUST stay literal strings — Tailwind v4 scans source text, so a computed class
+ * name like `md:col-span-${n}` would never be generated.
+ */
+const GRID = {
+  2: { wrapper: "md:grid-cols-12", brand: "md:col-span-6", col: "md:col-span-3" },
+  3: { wrapper: "md:grid-cols-5", brand: "md:col-span-2", col: "md:col-span-1" },
+} as const;
+
+const LINK_CLASS =
+  "text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm";
+
 export function Footer({ cta = true }: { cta?: boolean } = {}) {
-  const { contact } = siteConfig;
+  const { contact, footer } = siteConfig;
+  const grid = GRID[footer.columns.length as keyof typeof GRID] ?? GRID[2];
 
   return (
     <div className="relative overflow-hidden bg-black" data-nav-theme="dark">
@@ -53,9 +70,9 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
         {/* Footer panel, set over the product image */}
         <div className={`pb-28 ${cta ? "" : "pt-24 md:pt-32"}`}>
           <footer className="rounded-[2rem] border border-white/10 px-8 md:px-12 lg:px-16 py-14 lg:py-16">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 mb-10">
+            <div className={`grid grid-cols-1 ${grid.wrapper} gap-10 lg:gap-14 mb-10`}>
               {/* Brand */}
-              <div className="space-y-5 md:col-span-6">
+              <div className={`space-y-5 ${grid.brand}`}>
                 <Logo className="h-8" />
                 <p className="text-zinc-400 leading-relaxed text-sm max-w-xs">
                   Premium 4K &amp; 2K front and rear dash cams with SONY STARVIS image
@@ -82,34 +99,42 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
                 </div>
               </div>
 
-              {/* Products */}
-              <div className="md:col-span-3">
-                <h4 className="text-white mb-5 font-semibold text-sm">Dash Cams</h4>
-                <ul className="space-y-3">
-                  <li><Link href="/gx4k" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX4K - 4K 2CH</Link></li>
-                  <li><Link href="/gx35" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">GX35 - 2K 2CH</Link></li>
-                  <li><Link href="/services" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Installation</Link></li>
-                </ul>
-              </div>
-
-              {/* Company */}
-              <div className="md:col-span-3">
-                <h4 className="text-white mb-5 font-semibold text-sm">Company</h4>
-                <ul className="space-y-3">
-                  <li><Link href="/about" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">About FineVu</Link></li>
-                  <li><Link href="/installation" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Book Installation</Link></li>
-                  <li><Link href="/contact" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Contact</Link></li>
-                  <li><Link href="/support" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">Help &amp; Support</Link></li>
-                  <li><Link href="/warranty" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)] text-sm">{contact.warranty}</Link></li>
-                </ul>
-              </div>
+              {/* Link columns — see `footer` in config/site.config.ts */}
+              {footer.columns.map((column) => (
+                <div key={column.heading} className={grid.col}>
+                  <h4 className="text-white mb-5 font-semibold text-sm">{column.heading}</h4>
+                  <ul className="space-y-3">
+                    {column.links.map((link) => (
+                      <li key={`${column.heading}-${link.href}-${link.label}`}>
+                        <Link href={link.href} className={LINK_CLASS}>
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
 
             {/* Bottom Bar */}
             <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-xs text-zinc-500 font-mono">© 2026 FINEVU. ALL RIGHTS RESERVED.</p>
               <div className="flex flex-wrap justify-center gap-8 text-xs font-mono uppercase tracking-wider">
-                <span className="text-zinc-700 hidden md:inline">|</span>
+                {footer.social.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+                {/* Separator only makes sense with something to its left. */}
+                {footer.social.length > 0 && (
+                  <span className="text-zinc-700 hidden md:inline">|</span>
+                )}
                 <a href="https://motoronegroup.com/privacy-policy/" target="_blank" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Privacy Policy</a>
                 <a href="/terms-of-service" className="text-zinc-400 smooth-transition hover:text-[var(--finevu-orange)]">Terms of Service</a>
               </div>

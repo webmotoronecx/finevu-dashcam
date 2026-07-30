@@ -52,10 +52,10 @@ export default function Page() {
         "Hardwire kit for rear and parking mode",
         "Professional mobile install available",
       ],
-      links: [
-        { label: "Installation options", href: "/services" },
-        { label: "Book an installer", href: "/installation" },
-      ],
+      // /services was folded into /installation, which "Book an installer" already
+      // points at — so the old "Installation options" link is dropped rather than
+      // repointed, to avoid two identical hrefs side by side.
+      links: [{ label: "Book an installer", href: "/installation" }],
     },
     {
       number: "03",
@@ -304,7 +304,7 @@ export default function Page() {
           >
             ADAS Plus and 24/7 parking mode require hardwiring. A professional install
             unlocks every feature — see your{" "}
-            <Link href="/services" className="text-[var(--finevu-orange)] font-medium underline">
+            <Link href="/installation" className="text-[var(--finevu-orange)] font-medium underline">
               installation options
             </Link>
             .

@@ -5,8 +5,10 @@ import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitForm } from "@/lib/submitForm";
+import { thankYouUrl } from "@/lib/data/thank-you";
 import {
   Star,
   BarChart3,
@@ -154,9 +156,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 function RetailerForm() {
+  const router = useRouter();
   const [f, setF] = useState({ biz: "", abn: "", btype: "", cname: "", email: "", phone: "", state: "", web: "", msg: "" });
   const [err, setErr] = useState("");
-  const [done, setDone] = useState(false);
   const [sending, setSending] = useState(false);
   const [botcheck, setBotcheck] = useState("");
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
@@ -164,7 +166,7 @@ function RetailerForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (botcheck) {
-      setDone(true);
+      router.push(thankYouUrl("become-a-retailer"));
       return;
     }
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim());
@@ -192,24 +194,13 @@ function RetailerForm() {
       },
       { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email },
     );
-    setSending(false);
+    // Leave `sending` on through the navigation so the button can't be re-submitted.
     if (res.ok) {
-      setDone(true);
+      router.push(thankYouUrl("become-a-retailer"));
     } else {
+      setSending(false);
       setErr(res.error);
     }
-  }
-
-  if (done) {
-    return (
-      <div className="rounded-[20px] border border-[#e7e7e3] bg-white p-[34px] text-center shadow-[0_10px_17px_rgba(20,21,25,0.06)]">
-        <div className="mx-auto mb-[18px] flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white">
-          <Check className="h-6 w-6" strokeWidth={2.4} />
-        </div>
-        <h3 className="mb-2 text-[22px] font-semibold text-[#17181a]">Application received</h3>
-        <p className="text-[16px] text-[#6b6b72]">Thanks — the AutoXtreme trade team will review your details and be in touch within 1–2 business days.</p>
-      </div>
-    );
   }
 
   return (

@@ -5,9 +5,11 @@ import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Phone, Mail, Check } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { thankYouUrl } from "@/lib/data/thank-you";
 
 // Contact page: dark hero, support cards, message form section and learn more strip
 
@@ -63,8 +65,9 @@ const INPUT =
   "w-full rounded-[10px] border border-[#e8e5e0] bg-white px-4 py-[13px] text-[15px] text-[#1d1d1f] placeholder:text-[#a8adb7] outline-none transition-colors focus:border-[var(--finevu-orange)]";
 
 function ContactForm() {
+  const router = useRouter();
   const [form, setForm] = useState({ name: "", phone: "", email: "", subject: "", message: "" });
-  const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
+  const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
   const [botcheck, setBotcheck] = useState("");
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -72,7 +75,7 @@ function ContactForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (botcheck) {
-      setStatus("done");
+      router.push(thankYouUrl("contact"));
       return;
     }
     setStatus("sending");
@@ -85,28 +88,12 @@ function ContactForm() {
       },
     );
     if (res.ok) {
-      setStatus("done");
+      // Stay in "sending" through the navigation so the button can't be re-submitted.
+      router.push(thankYouUrl("contact"));
     } else {
       setStatus("idle");
       setError(res.error);
     }
-  }
-
-  if (status === "done") {
-    return (
-      <motion.div
-        {...fadeUp}
-        className="rounded-[16px] border border-[#e7e7ea] bg-white p-10 text-center"
-      >
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white">
-          <Check className="h-6 w-6" strokeWidth={2.4} />
-        </div>
-        <h3 className="mb-2 text-[22px] font-semibold text-[#17181a]">Message sent</h3>
-        <p className="text-[16px] text-[#6b6b72]">
-          Thanks — our support team will get back to you shortly, usually within one business day.
-        </p>
-      </motion.div>
-    );
   }
 
   return (

@@ -4,9 +4,11 @@ import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Check, UploadCloud } from "lucide-react";
+import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { thankYouUrl } from "@/lib/data/thank-you";
 
 // Warranty claim page: light page-head, claim form (emailed to support via Resend)
 // with a required proof-of-purchase attachment and optional issue evidence, plus a
@@ -131,6 +133,7 @@ function UploadZone({
 }
 
 function ClaimForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -147,7 +150,7 @@ function ClaimForm() {
   const [receiptError, setReceiptError] = useState("");
   const [evidence, setEvidence] = useState<File[]>([]);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
-  const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
+  const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
   const [botcheck, setBotcheck] = useState("");
 
@@ -173,7 +176,7 @@ function ClaimForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (botcheck) {
-      setStatus("done");
+      router.push(thankYouUrl("warranty-claim"));
       return;
     }
     const inv: Record<string, boolean> = {};
@@ -220,26 +223,12 @@ function ClaimForm() {
       },
       { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment },
     );
-    if (res.ok) setStatus("done");
+    // Stay in "sending" through the navigation so the button can't be re-submitted.
+    if (res.ok) router.push(thankYouUrl("warranty-claim"));
     else {
       setStatus("idle");
       setError(res.error);
     }
-  }
-
-  if (status === "done") {
-    return (
-      <motion.div {...fadeUp} className="rounded-[16px] border border-[#e8e8ec] bg-white p-10 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fdf1e6]">
-          <Check className="h-6 w-6 text-[var(--finevu-orange)]" strokeWidth={2.5} />
-        </div>
-        <h3 className="mb-2 text-[20px] font-bold text-[#111114]">Claim submitted</h3>
-        <p className="mx-auto max-w-[400px] text-[14.5px] leading-[1.6] text-[#55555c]">
-          We&apos;ve emailed you a confirmation with your claim reference. Our technicians will review your claim
-          and be in touch within 2 business days with next steps.
-        </p>
-      </motion.div>
-    );
   }
 
   return (

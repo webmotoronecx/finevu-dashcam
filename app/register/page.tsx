@@ -4,9 +4,11 @@ import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Check, UploadCloud } from "lucide-react";
+import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { thankYouUrl } from "@/lib/data/thank-you";
 
 // Product registration page: dark hero, registration form (emailed to support via
 // Resend) with optional receipt attachment, and a "why register" aside.
@@ -47,6 +49,7 @@ function readFileAsBase64(file: File): Promise<string> {
 }
 
 function RegisterForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -61,7 +64,7 @@ function RegisterForm() {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
-  const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
+  const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
   const [botcheck, setBotcheck] = useState("");
   const [dragging, setDragging] = useState(false);
@@ -92,7 +95,7 @@ function RegisterForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (botcheck) {
-      setStatus("done");
+      router.push(thankYouUrl("register"));
       return;
     }
     const inv: Record<string, boolean> = {};
@@ -131,26 +134,12 @@ function RegisterForm() {
       },
       { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment },
     );
-    if (res.ok) setStatus("done");
+    // Stay in "sending" through the navigation so the button can't be re-submitted.
+    if (res.ok) router.push(thankYouUrl("register"));
     else {
       setStatus("idle");
       setError(res.error);
     }
-  }
-
-  if (status === "done") {
-    return (
-      <motion.div {...fadeUp} className="rounded-[16px] border border-[#e8e8ec] bg-white p-10 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fdf1e6]">
-          <Check className="h-6 w-6 text-[var(--finevu-orange)]" strokeWidth={2.5} />
-        </div>
-        <h3 className="mb-2 text-[20px] font-bold text-[#111114]">You&apos;re registered</h3>
-        <p className="mx-auto max-w-[380px] text-[14.5px] leading-[1.6] text-[#55555c]">
-          We&apos;ve saved your details. If you ever need to make a warranty claim, we&apos;ll already have
-          everything on file.
-        </p>
-      </motion.div>
-    );
   }
 
   return (

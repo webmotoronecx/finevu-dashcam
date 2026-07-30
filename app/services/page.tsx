@@ -3,15 +3,16 @@
 import { Footer } from "@/components/Footer";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitForm } from "@/lib/submitForm";
+import { thankYouUrl } from "@/lib/data/thank-you";
 import {
   CalendarDays,
   Cable,
   PlugZap,
   SlidersHorizontal,
   Check,
-  CheckCircle2,
   ArrowRight,
   ArrowUpRight,
   MapPin,
@@ -86,7 +87,7 @@ const inputClass =
 const labelClass = "block text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5";
 
 function BookingForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
   const [installType, setInstallType] = useState<"front" | "rear">("front");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -95,7 +96,7 @@ function BookingForm() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     if (fd.get("botcheck")) {
-      setSubmitted(true);
+      router.push(thankYouUrl("services"));
       return;
     }
     setSending(true);
@@ -115,9 +116,12 @@ function BookingForm() {
       },
       { subject: "FineVu installation booking request", replyTo: email },
     );
-    setSending(false);
-    if (res.ok) setSubmitted(true);
-    else setError(res.error);
+    // Leave `sending` on through the navigation so the button can't be re-submitted.
+    if (res.ok) router.push(thankYouUrl("services"));
+    else {
+      setSending(false);
+      setError(res.error);
+    }
   }
 
   return (
@@ -130,100 +134,90 @@ function BookingForm() {
         <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Request a Booking</h3>
       </div>
 
-      {submitted ? (
-        <div className="flex flex-col items-center text-center py-10">
-          <CheckCircle2 className="w-12 h-12 text-[var(--finevu-orange)] mb-4" />
-          <h4 className="text-xl font-bold text-zinc-900 mb-2">Booking request sent</h4>
-          <p className="text-sm text-zinc-600 max-w-sm">
-            Thanks — we&apos;ll be in touch by email or phone to confirm your appointment.
-          </p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input type="text" name="botcheck" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass} htmlFor="firstName">First Name</label>
+            <input id="firstName" name="firstName" className={inputClass} placeholder="Jane" required />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="lastName">Last Name</label>
+            <input id="lastName" name="lastName" className={inputClass} placeholder="Smith" required />
+          </div>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="text" name="botcheck" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass} htmlFor="firstName">First Name</label>
-              <input id="firstName" name="firstName" className={inputClass} placeholder="Jane" required />
-            </div>
-            <div>
-              <label className={labelClass} htmlFor="lastName">Last Name</label>
-              <input id="lastName" name="lastName" className={inputClass} placeholder="Smith" required />
-            </div>
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="email">Email Address</label>
-            <input id="email" name="email" type="email" className={inputClass} placeholder="jane@example.com" required />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="mobile">Mobile</label>
-            <input id="mobile" name="mobile" type="tel" className={inputClass} placeholder="04xx xxx xxx" />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="model">Dash Cam Model</label>
-            <input id="model" name="model" className={inputClass} placeholder="FineVu GX4K" />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="vehicle">Vehicle Make / Model / Year</label>
-            <input id="vehicle" name="vehicle" className={inputClass} placeholder="e.g. Toyota RAV4 2023" />
-          </div>
+        <div>
+          <label className={labelClass} htmlFor="email">Email Address</label>
+          <input id="email" name="email" type="email" className={inputClass} placeholder="jane@example.com" required />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="mobile">Mobile</label>
+          <input id="mobile" name="mobile" type="tel" className={inputClass} placeholder="04xx xxx xxx" />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="model">Dash Cam Model</label>
+          <input id="model" name="model" className={inputClass} placeholder="FineVu GX4K" />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="vehicle">Vehicle Make / Model / Year</label>
+          <input id="vehicle" name="vehicle" className={inputClass} placeholder="e.g. Toyota RAV4 2023" />
+        </div>
 
-          <div>
-            <span className={labelClass}>Install Type</span>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setInstallType("front")}
-                className={`min-h-[44px] rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
-                  installType === "front"
-                    ? "bg-[var(--finevu-orange)] text-white"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                }`}
-              >
-                Front Only
-              </button>
-              <button
-                type="button"
-                onClick={() => setInstallType("rear")}
-                className={`min-h-[44px] rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
-                  installType === "rear"
-                    ? "bg-[var(--finevu-orange)] text-white"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                }`}
-              >
-                Front + Rear
-              </button>
-            </div>
+        <div>
+          <span className={labelClass}>Install Type</span>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setInstallType("front")}
+              className={`min-h-[44px] rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+                installType === "front"
+                  ? "bg-[var(--finevu-orange)] text-white"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              }`}
+            >
+              Front Only
+            </button>
+            <button
+              type="button"
+              onClick={() => setInstallType("rear")}
+              className={`min-h-[44px] rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+                installType === "rear"
+                  ? "bg-[var(--finevu-orange)] text-white"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              }`}
+            >
+              Front + Rear
+            </button>
           </div>
+        </div>
 
-          <div>
-            <label className={labelClass} htmlFor="datetime">Preferred Date &amp; Time</label>
-            <input id="datetime" name="datetime" type="datetime-local" className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="notes">Notes</label>
-            <textarea
-              id="notes"
-              name="notes"
-              rows={3}
-              className={`${inputClass} resize-none`}
-              placeholder="Anything else we should know?"
-            />
-          </div>
+        <div>
+          <label className={labelClass} htmlFor="datetime">Preferred Date &amp; Time</label>
+          <input id="datetime" name="datetime" type="datetime-local" className={inputClass} />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="notes">Notes</label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={3}
+            className={`${inputClass} resize-none`}
+            placeholder="Anything else we should know?"
+          />
+        </div>
 
-          <button
-            type="submit"
-            disabled={sending}
-            className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-semibold uppercase leading-[20px] text-white disabled:opacity-70"
-          >
-            {sending ? "Sending…" : (<>Request Booking <ArrowUpRight className="w-4 h-4" /></>)}
-          </button>
-          {error && <p className="text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
-          <p className="text-center text-[11px] text-zinc-400 pt-1">
-            By appointment only · Clayton South VIC · We&apos;ll confirm by email or phone
-          </p>
-        </form>
-      )}
+        <button
+          type="submit"
+          disabled={sending}
+          className="cta-hover w-full flex items-center justify-center gap-2 rounded-full bg-[var(--finevu-orange)] px-6 py-3.5 text-sm font-semibold uppercase leading-[20px] text-white disabled:opacity-70"
+        >
+          {sending ? "Sending…" : (<>Request Booking <ArrowUpRight className="w-4 h-4" /></>)}
+        </button>
+        {error && <p className="text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
+        <p className="text-center text-[11px] text-zinc-400 pt-1">
+          By appointment only · Clayton South VIC · We&apos;ll confirm by email or phone
+        </p>
+      </form>
     </div>
   );
 }

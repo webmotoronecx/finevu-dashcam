@@ -5,9 +5,11 @@ import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { submitForm } from "@/lib/submitForm";
+import { thankYouUrl } from "@/lib/data/thank-you";
 import { Carousel } from "@/components/sections/Carousel";
 import { motion } from "motion/react";
 import { useMemo, useRef, useState, Fragment } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   ShieldCheck,
@@ -125,6 +127,7 @@ const FLABEL = "mb-2.5 mt-[22px] block text-[12px] font-semibold uppercase track
 const FIELD_LABEL = "mb-1.5 block text-[13px] font-semibold leading-[19.5px] text-[#1d1d1f]";
 
 function BookingWizard() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY);
   const [hint, setHint] = useState<Coverage>({ msg: "", cls: "" });
@@ -170,7 +173,11 @@ function BookingWizard() {
     if (step < TOTAL) { setHint({ msg: "", cls: "" }); setStep(step + 1); scrollTop(); }
     else {
     setProcessing(true);
-      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); setProcessing(false); setStep(6); scrollTop(); }, 900);
+      // Wizard logic is unchanged pending ops sign-off on CA-36 — this still submits
+      // nothing and takes no payment; only the destination moved to the shared
+      // thank-you page. The step-6 block below is now unreachable; it is kept, not
+      // deleted, so the original confirmation can be restored if ops wants it back.
+      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); setProcessing(false); router.push(thankYouUrl("installation")); }, 900);
     }
   }
   function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setStep(step - 1); scrollTop(); } }

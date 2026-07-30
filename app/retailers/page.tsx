@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { PageHero } from "@/components/sections/PageHero";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
@@ -353,25 +354,31 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative flex w-full aspect-[2160/960]  items-center justify-center text-center text-white" data-nav-theme="dark">
-        <Image src="/retailers/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" objectPosition="top" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(rgba(12,12,14,.35),rgba(12,12,14,.5))" }} />
-        <div className="relative z-10 mx-auto max-w-[660px] px-6 pt-36 pb-24">
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.015em] md:text-[64px] md:leading-[76px]">
+      <PageHero
+        id="top"
+        image="/retailers/hero.webp"
+        imagePosition="top"
+        maxWidth="max-w-[760px]"
+        title={
+          <>
             Find your nearest
             <br />
             FineVu retailer
-          </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.12 }} className="mx-auto mt-[22px] max-w-[540px] text-[16px] leading-[1.6] text-white/90 md:text-[18px]">
-            FineVu dash cams are sold through our authorised Australian retailers — so you get genuine stock,
-            local support and a full 3-year warranty. Shop online, or find a store near you.
-          </motion.p>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.24 }} className="mt-9 flex flex-wrap justify-center gap-3.5">
+          </>
+        }
+        subtitle={
+          <>
+            FineVu dash cams are sold through our authorised Australian retailers — so you get genuine
+            stock, local support and a full 3-year warranty. Shop online, or find a store near you.
+          </>
+        }
+        actions={
+          <>
             <a href="#where" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Where to Buy</a>
             <a href="#why" className="cta-hover rounded-full border border-white/25 bg-white/15 px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white backdrop-blur transition-colors hover:bg-white/25">Why Buy Authorised</a>
-          </motion.div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* Where to buy */}
       <section id="where" className="scroll-mt-24 bg-white py-24 md:py-[96px]" data-nav-theme="light">
@@ -428,10 +435,15 @@ export default function Page() {
 
       {/* Install CTA */}
       <section className="bg-white py-24 text-center md:py-[96px]" data-nav-theme="light">
-        <div className="mx-auto max-w-[1200px] px-6">
+        <div className="mx-auto w-full max-w-[1180px] px-6 lg:px-8 text-center">
           <motion.h2 {...fadeUp} className="mb-11 text-[32px] font-semibold leading-[40px] tracking-[-0.015em] text-[#17181b] md:text-[48px] md:leading-[60px]">Got your FineVu?<br />Leave the wiring to us.</motion.h2>
-          <motion.div {...fadeUp} className="mx-auto aspect-[12/5] max-w-[860px] overflow-hidden rounded-[18px] shadow-[0_18px_44px_rgba(20,21,25,0.12)]">
-            <Image src="/retailers/wiring.webp" alt="FineVu certified installer arriving on-site" width={860} height={358} className="h-full w-full object-cover" />
+          <motion.div {...fadeUp} className="mx-auto overflow-hidden rounded-[28px] shadow-[0_18px_44px_rgba(20,21,25,0.12)]">
+            {/* <Image src="/retailers/wiring.webp" alt="FineVu certified installer arriving on-site" width={860} height={358} className="h-full w-full object-cover" /> */}
+            <img
+              src="/gx4k/wiring-experts.webp"
+              alt="FineVu certified installer arriving on-site"
+              className="h-[280px] w-full object-cover md:h-[520px]"
+            />
           </motion.div>
           <motion.p {...fadeUp} className="mx-auto mb-9 mt-9 max-w-[600px] text-[16px] leading-[1.6] text-[#5b5e66] md:text-[18px]">The GX4K records straight out of the box, but full-time parking protection means hardwiring it properly into your fuse box. Our certified installers fit it cleanly, hide every cable and set it up right the first time.</motion.p>
           <motion.div {...fadeUp}>

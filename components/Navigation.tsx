@@ -54,9 +54,27 @@ export function Navigation() {
   // Past 100px from the top the main row swipes up and the sub-nav docks at the top.
   // The 90px undock point is hysteresis — it keeps a scroll position sitting exactly on
   // the boundary from flickering between the two states.
+  //
+  // Below that, direction decides: scrolling up brings the main row back, scrolling down
+  // sends it away again (the Apple pattern), so it's reachable anywhere on the page
+  // without scrolling to the top. `docked` only gates whether hiding is allowed at all.
+  const [scrolledUp, setScrolledUp] = useState(false);
+  const lastScrollY = useRef(0);
+
+  // Direction only flips once the pointer has actually travelled — a trackpad or a
+  // rubber-band bounce emits a stream of sub-pixel deltas that would otherwise strobe the
+  // row. `lastScrollY` deliberately updates only when a move clears the threshold, so slow
+  // scrolling accumulates toward it instead of being discarded.
+  const DIRECTION_THRESHOLD_PX = 8;
+
   useMotionValueEvent(scrollY, "change", (y) => {
     if (!subNav) return;
     setDocked((prev) => (prev ? y > 90 : y > 100));
+
+    const delta = y - lastScrollY.current;
+    if (Math.abs(delta) < DIRECTION_THRESHOLD_PX) return;
+    lastScrollY.current = y;
+    setScrolledUp(delta < 0);
   });
 
   // Measure the main row so the stack can slide up by exactly its height, landing the
@@ -71,17 +89,24 @@ export function Navigation() {
     return () => observer.disconnect();
   }, [subNav]);
 
-  // Both menus hang off the main row — pointless once that row is off-screen.
+  const revealed = !docked || scrolledUp;
+
+  // Both menus hang off the main row — pointless once that row is off-screen. Reopening
+  // is allowed once a scroll-up brings it back, so this keys off `revealed`, not `docked`.
   useEffect(() => {
-    if (!docked) return;
+    if (revealed) return;
     setProductsOpen(false);
     setIsMobileMenuOpen(false);
-  }, [docked]);
+  }, [revealed]);
 
   // Sync on mount / route change: a reload or an anchor deep-link can land well past
-  // 100px without ever firing a scroll event, and 100px is easy to exceed.
+  // 100px without ever firing a scroll event, and 100px is easy to exceed. The direction
+  // baseline has to be re-seeded here too, or the first scroll on the new page is measured
+  // against the old one's offset and reads as a huge jump in whichever direction.
   useEffect(() => {
     setDocked(!!subNav && window.scrollY > 100);
+    setScrolledUp(false);
+    lastScrollY.current = window.scrollY;
   }, [pathname, subNav]);
 
   const focusFirstItem = () => {
@@ -237,14 +262,14 @@ export function Navigation() {
         {/* Product pages slide the whole stack up by the main row's height, which docks
             the sub-nav flush at top: 0. One transform, no second sticky element. */}
         <motion.div
-          animate={{ y: subNav && docked ? -mainRowHeight : 0 }}
+          animate={{ y: subNav && !revealed ? -mainRowHeight : 0 }}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
         {/* On product pages the pill becomes a full-bleed glass block; the surface spans
             the viewport while the content below stays capped at 1400px. */}
         <div
           ref={mainRowRef}
-          {...(subNav && docked ? { inert: true, "aria-hidden": true as const } : {})}
+          {...(subNav && !revealed ? { inert: true, "aria-hidden": true as const } : {})}
           // `navigation-main` is an unstyled hook for finding this row in devtools.
           className={`navigation-main ${subNav ? `w-full border-b ${glassBorderClass(isDarkBackground)} py-3` : ""}`}
           style={subNav ? pillStyle : undefined}

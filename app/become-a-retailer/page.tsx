@@ -63,7 +63,7 @@ const chips = [
 const range = [
   {
     flagship: true,
-    img: "/products/gx4k-card.jpg",
+    img: "/retailer/gx4k-small.png",
     model: "FineVu GX4K",
     tagline: "True 4K front & Full HD rear — the sharpest FineVu made.",
     specs: [
@@ -75,7 +75,7 @@ const range = [
   },
   {
     flagship: false,
-    img: "/products/gx35-card.jpg",
+    img: "/retailer/gx35-small.png",
     model: "FineVu GX35",
     tagline: "2K QHD clarity and the latest sensor, at an accessible price.",
     specs: [
@@ -350,7 +350,7 @@ export default function Page() {
             {range.map((r) => (
               <motion.article key={r.model} {...fadeUp} className={`flex flex-col rounded-[20px] border bg-white p-[34px] ${r.flagship ? "border-[#f3d3bc] shadow-[0_10px_15px_rgba(255,106,30,0.1)]" : "border-[#e7e7e3] shadow-[0_2px_5px_rgba(20,21,25,0.04)]"}`}>
                 <div className="relative mb-6 h-[190px]">
-                  <Image src={r.img} alt={r.model} fill sizes="500px" className="object-contain" />
+                  <Image src={r.img} alt={r.model} fill sizes="500px" className="object-contain object-left" />
                 </div>
                 <div className="text-[25.6px] font-bold tracking-[-0.02em] text-[#1d1d1f]">{r.model}</div>
                 <p className="mb-[18px] mt-1.5 text-[15.7px] text-[#5b5e66]">{r.tagline}</p>

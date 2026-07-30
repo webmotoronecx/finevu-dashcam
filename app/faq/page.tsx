@@ -2,13 +2,12 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
-import { motion } from "motion/react";
+import { PageHero } from "@/components/sections/PageHero";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
-// FAQ page — photo hero with brand scrim, category-grouped question accordions, important-information note, and a Learn More strip.
+// FAQ page — gradient hero, category-grouped question accordions, important-information note, and a Learn More strip.
 
 const groups: { title: string; items: { q: string; a: string[] }[] }[] = [
   {
@@ -147,42 +146,21 @@ function FaqRow({ q, a }: { q: string; a: string[] }) {
 export default function Page() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero: dash cam lineup photo */}
-      <section className="relative overflow-hidden text-white" data-nav-theme="dark">
-        {/* Product-lineup photography */}
-        <Image
-          src="/products/faq-hero.webp"
-          alt="The FineVu dash cam range"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        {/* Darkening scrim for legibility — matches the support/retailers heroes */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,rgba(8,8,9,.5) 0%,rgba(8,8,9,.28) 45%,rgba(8,8,9,.55) 100%)" }} />
-        <div className="relative z-10 mx-auto max-w-[760px] px-6 pt-36 pb-24 text-center md:pt-48 md:pb-36">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-[40px] font-semibold leading-[48px] tracking-[-0.02em] md:text-[64px] md:leading-[76px]"
-          >
-            Frequently asked questions
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-[640px] text-[16px] leading-[1.6] text-white/85 md:text-[18px]"
-          >
+      {/* Hero: black → FineVu orange brand gradient */}
+      <PageHero
+        background="linear-gradient(155deg, #000 0%, #F68428 100%)"
+        maxWidth="max-w-[760px]"
+        title="Frequently asked questions"
+        subtitle={
+          <>
             Everything you need to know about your FineVu dash cam. Can&apos;t find your answer?{" "}
             <Link href="/contact" className="font-semibold text-white underline decoration-white/40 underline-offset-4">
               Contact us
             </Link>{" "}
             and we&apos;ll help.
-          </motion.p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* FAQ groups */}
       <main className="mx-auto max-w-[880px] px-6 pt-10 pb-5" data-nav-theme="light">

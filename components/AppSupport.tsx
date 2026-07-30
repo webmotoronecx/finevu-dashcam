@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Smartphone, ChevronDown, Info, Download } from "lucide-react";
+import IconFinevuApp from "@/public/support/icon-finevu-app.svg"
 
 // FineVu Wi-Fi app support card for the Support page: a summary strip whose
 // "Get the app" button expands a collapsible downloads panel (iOS / Android store
@@ -59,6 +60,7 @@ export function AppSupport() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Platform["id"]>("ios");
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const Icon = IconFinevuApp
 
   const active = platforms.find((p) => p.id === tab) ?? platforms[0];
 
@@ -78,7 +80,8 @@ export function AppSupport() {
       {/* Summary strip */}
       <div className="flex flex-wrap items-center gap-5 px-[26px] py-[22px]">
         <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[12px] bg-[#fef2e5] text-[var(--finevu-orange)]">
-          <Smartphone className="h-[24px] w-[24px]" strokeWidth={1.8} />
+          {/* <Smartphone className="h-[24px] w-[24px]" strokeWidth={1.8} /> */}
+          <Icon className="h-[60px] w-[60px]" />
         </span>
         <div className="min-w-[240px] flex-1">
           <h3 className="text-[18px] font-bold tracking-[-0.01em] text-[#17181a]">FineVu app support</h3>
@@ -87,12 +90,7 @@ export function AppSupport() {
           </p>
         </div>
         <div className="flex w-full gap-3 sm:w-auto">
-          <Link
-            href="/how-it-works"
-            className="inline-flex flex-1 items-center justify-center rounded-full border border-[#d9d9df] bg-white px-[26px] py-3.5 text-[13px] font-bold uppercase leading-[20px] tracking-[0.06em] text-[#17181a] transition-colors hover:border-[#17181a] sm:flex-none"
-          >
-            App setup guide
-          </Link>
+       
           <button
             type="button"
             onClick={openAndScroll}
@@ -168,7 +166,7 @@ export function AppSupport() {
               className="rounded-[12px] bg-[#f7f7f9] px-7 py-6"
             >
               <div className="mb-3.5 flex flex-wrap items-center justify-between gap-4">
-                <h4 className="text-[17px] font-bold text-[#17181a]">{active.version}</h4>
+                <h4 className="text-[17px] font-bold text-[#17181a] w-full md:w-auto">{active.version}</h4>
                 <a
                   href={active.href}
                   target="_blank"
@@ -183,7 +181,7 @@ export function AppSupport() {
               <p className="text-[13.5px] leading-[1.6] text-[#8a8a92]">{active.fine}</p>
             </div>
 
-            <div className="mt-8">
+            {/* <div className="mt-8">
               <h4 className="mb-3.5 text-[19px] font-bold text-[#17181a]">Supported products</h4>
               <div className="flex flex-wrap gap-2.5">
                 {supported.map((s) => (
@@ -199,7 +197,7 @@ export function AppSupport() {
                   </span>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

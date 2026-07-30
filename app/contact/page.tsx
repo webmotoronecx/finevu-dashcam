@@ -2,8 +2,8 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { PageHero } from "@/components/sections/PageHero";
 import { motion } from "motion/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Phone, Mail } from "lucide-react";
@@ -189,35 +189,17 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative text-white" data-nav-theme="dark">
-        <Image src="/contact/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg,rgba(8,8,9,.5) 0%,rgba(8,8,9,.3) 45%,rgba(8,8,9,.55) 100%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[760px] px-6 pt-36 pb-28 text-center md:pt-48 md:pb-36">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-[40px] font-semibold leading-[48px] tracking-[-0.02em] md:text-[64px] md:leading-[76px]"
-          >
-            Get in touch
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-[640px] text-[16px] leading-[1.6] text-white/85 md:text-[18px]"
-          >
+      <PageHero
+        image="/contact/hero.webp"
+        maxWidth="max-w-[760px]"
+        title="Get in touch"
+        subtitle={
+          <>
             Questions about your dash cam, an order from one of our retailers, or a warranty claim — our
             Australian support team is here to help.
-          </motion.p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* How can we help */}
       <section className="bg-white py-24 md:py-[96px]" data-nav-theme="light">

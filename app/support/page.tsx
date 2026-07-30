@@ -369,11 +369,11 @@ export default function Page() {
                             Troubleshooting common fixes
                         </h2>
                         <p className="mt-4 text-[18px] leading-[1.6] text-[#6b6b72]">
-                            Most issues are solved in a few minutes with the steps below. <div>Can&apos;t find yours?{" "}
+                            Most issues are solved in a few minutes with the steps below.<br />Can&apos;t find yours?{" "}
                             <Link href="/contact" className="font-semibold text-[var(--finevu-orange)]">
                                 Contact us
                             </Link>{" "}
-                            and we&apos;ll help.</div>
+                            and we&apos;ll help.
                         </p>
                     </motion.div>
                     <div className="border-t border-[#e7e7ea]">

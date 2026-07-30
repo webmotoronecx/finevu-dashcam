@@ -670,14 +670,7 @@ export default function GX4KPage() {
                             ))}
                         </div>
                         
-                        {/* <motion.div
-                            {...fadeUp}
-                            className="tile-hover-purple overflow-hidden rounded-[22px] border border-white/[0.06]"
-                            style={{ aspectRatio: "1297 / 427" }}
-                        >
-                          
-                            <img src="/gx4k/detail-angle.webp" alt="GX4K angled macro" className="h-full w-full object-cover" />
-                        </motion.div> */}
+                   
                     </div>
                 </section>
             </div>
@@ -738,7 +731,7 @@ export default function GX4KPage() {
                 </section>
 
                 {/* Full specifications */}
-                <section data-nav-theme="dark" className="py-16 md:py-24">
+                <section id="specs" data-nav-theme="dark" className="scroll-mt-24 py-16 md:py-24">
                     <div className={SHELL}>
                         <motion.div {...fadeUp} className="mb-10 text-center">
                             <Head pre="Full Specifications" className="!text-[28px] md:!text-[40px]" />
@@ -790,7 +783,7 @@ export default function GX4KPage() {
                 </section>
 
                 {/* FineVu series comparison */}
-                <section data-nav-theme="dark" className="py-16 md:py-24">
+                <section id="compare" data-nav-theme="dark" className="scroll-mt-24 py-16 md:py-24">
                     <div className={SHELL}>
                         <motion.div
                             {...fadeUp}

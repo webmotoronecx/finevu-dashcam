@@ -23,6 +23,19 @@ export type Disclaimer = {
   body: string;
 };
 
+/**
+ * Product-page sub-navigation: the second full-width row under the main nav on the
+ * product pages. Presence of an entry for the current pathname is what switches
+ * `Navigation` from the floating pill to the full-width block variant.
+ */
+export type ProductSubNav = {
+  /** Left-hand label, e.g. "GX4K" */
+  label: string;
+  /** In-page links. `href: "#top"` is special-cased to scroll back to the page top. */
+  links: NavLink[];
+  cta: NavLink;
+};
+
 export type FooterColumn = {
   heading: string;
   links: NavLink[];
@@ -58,6 +71,12 @@ export type SiteConfig = {
 
   /** Secondary CTA (hero) */
   secondaryCta: NavLink;
+
+  /**
+   * Sub-nav rows keyed by pathname. A route with no entry keeps the default floating
+   * pill navbar, so this map is also the switch for the full-width nav variant.
+   */
+  productSubNav: Record<string, ProductSubNav>;
 
   /** Hero section content */
   hero: {
@@ -154,6 +173,29 @@ const baseConfig: SiteConfig = {
 
   primaryCta: { href: "/retailers", label: "Find Retailer" },
   secondaryCta: { href: "/gx4k", label: "Explore the Range" },
+
+  // The anchors here must exist on the page: `#specs` and `#compare` are on the
+  // Full Specifications / FineVu Series Comparison sections of both product pages.
+  productSubNav: {
+    "/gx4k": {
+      label: "GX4K",
+      links: [
+        { href: "#top", label: "Overview" },
+        { href: "#specs", label: "Tech Specs" },
+        { href: "#compare", label: "Compare" },
+      ],
+      cta: { href: "/retailers", label: "Find Retailer" },
+    },
+    "/gx35": {
+      label: "GX35",
+      links: [
+        { href: "#top", label: "Overview" },
+        { href: "#specs", label: "Tech Specs" },
+        { href: "#compare", label: "Compare" },
+      ],
+      cta: { href: "/retailers", label: "Find Retailer" },
+    },
+  },
 
   hero: {
     headline: "Global leader in dash cam technology.",

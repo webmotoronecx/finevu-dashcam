@@ -2,11 +2,13 @@
 
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site.config";
 import { Logo } from "@/components/Logo";
+import { ProductSubNav } from "@/components/ProductSubNav";
+import { glassBorderClass, glassStyle } from "@/components/navGlass";
 
 // Featured products shown in the Products mega-menu panel (per Figma 17:7267).
 const dropdownProducts = [
@@ -39,6 +41,48 @@ export function Navigation() {
   const productsBtnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const focusFirstOnOpen = useRef(false);
+
+  // Product-page variant: full-width nav block + sticky sub-nav row. Driven purely by
+  // whether the current route has a sub-nav entry in the config.
+  const subNav = siteConfig.productSubNav[pathname] ?? null;
+  const [docked, setDocked] = useState(false);
+  const [mainRowHeight, setMainRowHeight] = useState(0);
+  const mainRowRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollY } = useScroll();
+
+  // Past 100px from the top the main row swipes up and the sub-nav docks at the top.
+  // The 90px undock point is hysteresis — it keeps a scroll position sitting exactly on
+  // the boundary from flickering between the two states.
+  useMotionValueEvent(scrollY, "change", (y) => {
+    if (!subNav) return;
+    setDocked((prev) => (prev ? y > 90 : y > 100));
+  });
+
+  // Measure the main row so the stack can slide up by exactly its height, landing the
+  // sub-nav flush at top: 0. Re-measures on breakpoint changes / logo reflow.
+  useEffect(() => {
+    const el = mainRowRef.current;
+    if (!subNav || !el) return;
+    const measure = () => setMainRowHeight(el.offsetHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [subNav]);
+
+  // Both menus hang off the main row — pointless once that row is off-screen.
+  useEffect(() => {
+    if (!docked) return;
+    setProductsOpen(false);
+    setIsMobileMenuOpen(false);
+  }, [docked]);
+
+  // Sync on mount / route change: a reload or an anchor deep-link can land well past
+  // 100px without ever firing a scroll event, and 100px is easy to exceed.
+  useEffect(() => {
+    setDocked(!!subNav && window.scrollY > 100);
+  }, [pathname, subNav]);
 
   const focusFirstItem = () => {
     panelRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
@@ -157,22 +201,9 @@ export function Navigation() {
   const productsItem = nav.find((n) => n.children);
   const flatLinks = nav.filter((n) => !n.children);
 
-  // Translucent glass pill, themed to the section under the navbar.
-  const glassStyle = isDarkBackground
-    ? {
-        background: "rgba(255, 255, 255, 0.05)",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
-      }
-    : {
-        background: "rgba(255, 255, 255, 0.72)",
-        border: "1px solid rgba(0, 0, 0, 0.06)",
-      };
-  const pillStyle = {
-    ...glassStyle,
-    backdropFilter: "blur(20px) saturate(160%)",
-    WebkitBackdropFilter: "blur(20px) saturate(160%)",
-    transition: "background 250ms ease, border-color 250ms ease",
-  };
+  // Translucent glass surface, themed to the section under the navbar (shared with
+  // <ProductSubNav> via components/navGlass.ts).
+  const pillStyle = glassStyle(isDarkBackground);
 
   const lBase = isDarkBackground
     ? "text-white/85 hover:text-white"
@@ -198,21 +229,45 @@ export function Navigation() {
       </AnimatePresence>
 
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8"
+        className={`fixed top-0 left-0 right-0 z-50 ${subNav ? "" : "px-4 md:px-8"}`}
         initial={{ y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
+        {/* Product pages slide the whole stack up by the main row's height, which docks
+            the sub-nav flush at top: 0. One transform, no second sticky element. */}
+        <motion.div
+          animate={{ y: subNav && docked ? -mainRowHeight : 0 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        >
+        {/* On product pages the pill becomes a full-bleed glass block; the surface spans
+            the viewport while the content below stays capped at 1400px. */}
+        <div
+          ref={mainRowRef}
+          {...(subNav && docked ? { inert: true, "aria-hidden": true as const } : {})}
+          // `navigation-main` is an unstyled hook for finding this row in devtools.
+          className={`navigation-main ${subNav ? `w-full border-b ${glassBorderClass(isDarkBackground)} py-3` : ""}`}
+          style={subNav ? pillStyle : undefined}
+        >
         {/* Row: centered glass pill (logo + links) with the Find Retailer button
             floating to the right — per Figma v4 (pill 113:3561, button 113:3356). */}
         {/* xl:pr reserves a gutter on the right so the centered pill can never
             slide under the absolutely-positioned Find Retailer button. */}
          {/* ZEUS remove the padding right coz we already have a mobile view for navigation    */}
-        <div className="relative z-50 mx-auto mt-4 md:mt-6 max-w-[1400px] flex items-center justify-center">
-          {/* Centered pill */}
+        <div
+          className={`relative z-50 mx-auto max-w-[1400px] flex items-center ${
+            subNav ? "gap-6 px-4 md:px-8" : "mt-4 md:mt-6 justify-center"
+          }`}
+        >
+          {/* Centered pill (product pages: the row itself, unstyled and full width) */}
           <div
-            className="relative z-10 flex w-full xl:w-auto items-center justify-between xl:justify-center gap-4 xl:gap-24 rounded-full px-5 py-2 xl:px-10 xl:py-3"
-            style={pillStyle}
+            className={`relative z-10 flex w-full items-center justify-between gap-4 ${
+              subNav
+                ? "min-w-0 xl:flex-1"
+                : "xl:w-auto xl:justify-center xl:gap-24 rounded-full border px-5 py-2 xl:px-10 xl:py-3 " +
+                  glassBorderClass(isDarkBackground)
+            }`}
+            style={subNav ? undefined : pillStyle}
           >
             {/* Logo — orange/grey wordmark */}
             <Link href="/" aria-label="FineVu home" className="flex min-h-[44px] items-center shrink-0">
@@ -279,10 +334,13 @@ export function Navigation() {
             </button>
           </div>
 
-          {/* Find Retailer — solid orange, floating to the right of the pill */}
+          {/* Find Retailer — solid orange. Floats to the right of the pill normally; on
+              product pages it sits inline as the last item in the full-width row. */}
           <Link
             href={primaryCta.href}
-            className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2"
+            className={`hidden xl:block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${
+              subNav ? "shrink-0" : "absolute right-0 top-1/2 -translate-y-1/2"
+            }`}
           >
             <motion.button
               className="cta-hover text-white font-semibold text-[14px] uppercase leading-[20px] px-9 py-4 rounded-full"
@@ -292,6 +350,11 @@ export function Navigation() {
             </motion.button>
           </Link>
         </div>
+        </div>
+
+        {/* Product-page sub-nav — the row that stays behind once the main row swipes up */}
+        {subNav && <ProductSubNav entry={subNav} isDark={isDarkBackground} />}
+        </motion.div>
 
         {/* Products mega-menu — floating white panel centered below the pill */}
         <AnimatePresence>
@@ -351,7 +414,9 @@ export function Navigation() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              className="xl:hidden max-w-[1400px] mx-auto mt-2 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden"
+              className={`xl:hidden max-w-[1400px] mt-2 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden ${
+                subNav ? "mx-4 md:mx-8" : "mx-auto"
+              }`}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

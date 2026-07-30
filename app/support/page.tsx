@@ -371,7 +371,7 @@ export default function Page() {
                         </div>
                       
                         <Link
-                            href="/how-it-works"
+                            href="#"
                             className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[26px] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white  w-full md:w-auto"
                         >
                             Get the App

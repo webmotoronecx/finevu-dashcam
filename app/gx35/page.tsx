@@ -768,7 +768,7 @@ export default function GX35Page() {
       </section>
 
       {/* Full Specifications */}
-      <section data-nav-theme="light" className="py-16 md:py-24">
+      <section id="specs" data-nav-theme="light" className="scroll-mt-24 py-16 md:py-24">
         <div className={SHELL}>
           <motion.div {...fadeUp} className="mb-10 text-center">
             <Head theme="light" pre="Full Specifications" className="!text-[28px] md:!text-[40px]" />
@@ -814,7 +814,7 @@ export default function GX35Page() {
       </section>
 
       {/* FineVu Series Comparison */}
-      <section data-nav-theme="light" className="py-16 md:py-24" >
+      <section id="compare" data-nav-theme="light" className="scroll-mt-24 py-16 md:py-24" >
         <div className={SHELL}>
           <motion.div
             {...fadeUp}

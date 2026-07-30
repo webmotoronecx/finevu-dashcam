@@ -21,6 +21,10 @@
   /* Brand gradient — used as the hero design layer across the site */
   --brand-gradient: linear-gradient(65deg, #000000 6%, #4F2D74 34%, #0C4D97 60%, #234088 84%);
   --brand-gradient-soft: linear-gradient(65deg, #4F2D74 0%, #0C4D97 52%, #234088 100%);
+  /* Figma "FineVu-Gradient-v2" — brighter, indigo-leaning. Distinct from the two above
+     (different angle AND stops), so it is not interchangeable with them. Currently the
+     Find Retailer CTA in the product-page sub-nav. */
+  --brand-gradient-v2: linear-gradient(135deg, #603DB0 0%, #4F47FF 44.23%, #6284D8 100%);
 
   /* Orange gradient (Figma "Orange-Gradient"). NOTE: its stops use #F68428, which is NOT
      --finevu-orange (#F47920, PANTONE 165C). Both oranges ship today — see the raw #F68428

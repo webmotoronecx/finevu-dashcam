@@ -519,11 +519,11 @@ export default function GX35Page() {
       <ScrollScrubVideo
         scrollHint={false}
         theme="light"
-        image="/gx35/optics_2.webp"
+        image="/gx35/optics.png"
         fit="contain"
-        // optics_2.webp's own pixel width (same as stageViewBox below). Past this the still would
-        // upscale and grow into the head copy and callouts on ultrawide displays.
-        maxMediaWidth="2160px"
+        // Percentage, not a pixel stop: the still tracks the viewport at every size and always
+        // keeps a 5% gutter each side, which is the clearance the head copy and callouts need.
+        maxMediaWidth="90%"
         // Below lg there are no callouts to reveal and nothing to scrub, so the pin would just
         // hold a still image for ~3 screens. Off, the mobile section shows the frame in flow.
         pinOnMobile={false}
@@ -532,7 +532,7 @@ export default function GX35Page() {
         // Must match optics.webp's real pixel size — the callout layer is sized to the same box,
         // so `at` values below are literal image pixels. Note this crop is 1.582 wide, NOT the
         // 1.456 of the image OpticsSection used; anchors from that era do not carry over.
-        stageViewBox="0 0 2160 1300"
+        stageViewBox="0 0 2160 1400"
 
         
         // nudgeY="7%"
@@ -549,7 +549,7 @@ export default function GX35Page() {
             ...opticsCallouts[0],
             start: 0.2,
             end: 0.3,
-            at: [1100, 670],
+            at: [1100, 740],
             direction: "top-right",
             leader: { angle: 25, diag: 220, run: 60, radius: 6 },
             from: "left",
@@ -558,7 +558,7 @@ export default function GX35Page() {
             ...opticsCallouts[1],
             start: 0.3,
             end: 0.4,
-            at: [904, 807],
+            at: [904, 860],
             direction: "bottom-left",
             leader: { angle: 25, diag: 180, run: 60, radius: 6 },
             from: "right",
@@ -567,7 +567,7 @@ export default function GX35Page() {
             ...opticsCallouts[2],
             start: 0.4,
             end: 0.6,
-            at: [1160, 990],
+            at: [1170, 1050],
             direction: "bottom-left",
             leader: { angle: 45, diag: 50, run: 70, radius: 6 },
             from: "right",

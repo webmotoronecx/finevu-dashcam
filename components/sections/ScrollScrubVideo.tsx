@@ -267,7 +267,7 @@ function CalloutBlock({ data, t, measureDivider }: { data: ScrubCallout; t: Scru
       />
       <ul className="mt-3.5 space-y-1.5">
         {data.items.map((it) => (
-          <li key={it} className={`text-[13px] font-medium xl:text-[14.4px] ${t.calloutItem}`} style={{ textShadow: t.textShadow }}>
+          <li key={it} className={`text-[13px] font-medium xl:text-[14.4px]  ${t.calloutItem}`} style={{ textShadow: t.textShadow }}>
             {it}
           </li>
         ))}
@@ -409,12 +409,21 @@ export function ScrollScrubVideo({
    *  and below, so set `stageBg` to the media's own edge colour. `headroom` is ignored; use
    *  `nudgeY`. `mobileObjectPosition`/`mobileScale` are no-ops, there being no crop to position. */
   fit?: "cover" | "contain";
-  /** Ceiling on the backdrop's width — any CSS length (e.g. `"2160px"`). Unset = uncapped.
+  /** Ceiling on the backdrop's width. Unset = uncapped.
    *
    *  This is the ultrawide knob. The media box is width-driven (`contain` literally, `cover` via
    *  the `max()` below), so without a cap the artwork keeps growing with the viewport: past ~2560px
    *  it upscales beyond its own resolution and climbs into the pinned `head` copy and the callouts.
-   *  Cap it at the media's native pixel width and it stops at 1:1, leaving that clearance intact.
+   *
+   *  Takes **any CSS width value**, because it is interpolated raw into a `min(100%, …)`:
+   *   - `"2160px"`             — hard stop at the media's native size; beyond that the artwork is a
+   *                              fixed island that reads smaller and smaller as the display grows.
+   *   - `"85%"`                — scales with the viewport, always leaving a 7.5% gutter each side.
+   *                              No ceiling, so on a 4K display it upscales past 1:1 and softens.
+   *   - `"min(90%, 2160px)"`   — both: proportional while it can be, then pinned at native size.
+   *                              Usually what you want, and what GX35 ships.
+   *  Percentages resolve against the sticky stage (i.e. viewport width) for the media *and* the
+   *  callout stage alike — same containing block — so any of these keeps the two in lockstep.
    *
    *  Two things make this safe. It's a *maximum*, so anything narrower is unaffected — pages that
    *  don't set it behave exactly as before. And it caps **the media and the callout stage together**

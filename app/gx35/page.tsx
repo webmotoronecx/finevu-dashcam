@@ -519,7 +519,7 @@ export default function GX35Page() {
       <ScrollScrubVideo
         scrollHint={false}
         theme="light"
-        image="/gx35/optics.png"
+        image="/gx35/optics.webp"
         fit="contain"
         // Percentage, not a pixel stop: the still tracks the viewport at every size and always
         // keeps a 5% gutter each side, which is the clearance the head copy and callouts need.

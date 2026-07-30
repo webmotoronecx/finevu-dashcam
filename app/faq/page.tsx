@@ -17,7 +17,7 @@ const groups: { title: string; items: { q: string; a: string[] }[] }[] = [
       {
         q: "What's the difference between the GX4K and the GX35?",
         a: [
-          "The GX4K is our flagship. It records in 4K UHD at the front and Full HD at the rear, so it picks up more detail and makes number plates easier to read at a distance. The GX35 records Full HD front and rear in a smaller, cheaper package that handles everyday driving well. Both have parking mode, Wi-Fi app connectivity and low-voltage battery protection.",
+          "The GX4K is our flagship. It records in 4K UHD at the front and Full HD at the rear, so it picks up more detail and makes number plates easier to read at a distance. The GX35 records 2K QHD (2560 × 1440) at the front and Full HD at the rear, in a smaller, cheaper package that handles everyday driving well. Both have parking mode, Wi-Fi app connectivity and low-voltage battery protection.",
         ],
       },
       {
@@ -82,14 +82,14 @@ const groups: { title: string; items: { q: string; a: string[] }[] }[] = [
       {
         q: "What warranty comes with my FineVu dash cam?",
         a: [
-          "FineVu dash cams purchased from an authorised Australian retailer are covered by a manufacturer's warranty against defects, in addition to your rights under the Australian Consumer Law.",
+          "FineVu dash cams purchased from an authorised Australian retailer are covered by a voluntary warranty against defects, provided in Australia by Motor One Group Pty Ltd, in addition to your rights under the Australian Consumer Law.",
           "Our goods come with guarantees that cannot be excluded under the Australian Consumer Law. You are entitled to a replacement or refund for a major failure and compensation for any other reasonably foreseeable loss or damage. You are also entitled to have the goods repaired or replaced if the goods fail to be of acceptable quality and the failure does not amount to a major failure.",
         ],
       },
       {
         q: "What isn't covered by the warranty?",
         a: [
-          "The manufacturer's warranty doesn't cover damage caused by accident, misuse, unauthorised modification or repair, incorrect installation, water ingress from improper fitting, or normal wear and tear. Consumable items such as memory cards and adhesive mounts have a shorter expected life and are covered against manufacturing defects only. These exclusions don't limit your statutory rights under the Australian Consumer Law.",
+          "The voluntary warranty doesn't cover damage caused by accident, misuse, unauthorised modification or repair, incorrect installation, water ingress from improper fitting, or normal wear and tear. Consumable items such as memory cards and adhesive mounts have a shorter expected life and are covered against manufacturing defects only. These exclusions don't limit your statutory rights under the Australian Consumer Law.",
         ],
       },
       {

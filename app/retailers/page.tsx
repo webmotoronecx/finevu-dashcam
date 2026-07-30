@@ -142,7 +142,6 @@ function StoreLocator() {
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#5b5e66]">
           {rows.length ? <><b className="text-[var(--finevu-orange)]">{rows.length}</b> {rows.length === 1 ? "store found" : "stores found"}</> : "No stores found"}
         </span>
-        <span className="text-[12.5px] text-[#9a9da5]">Sample stockist list shown for layout — connect your live retailer feed.</span>
       </div>
 
       <div className="max-h-[560px] overflow-y-auto rounded-[16px] border border-[#e8e7e2] bg-white">
@@ -368,7 +367,7 @@ export default function Page() {
             local support and a full 3-year warranty. Shop online, or find a store near you.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.24 }} className="mt-9 flex flex-wrap justify-center gap-3.5">
-            <a href="#where" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Book Retailers</a>
+            <a href="#where" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white">Where to Buy</a>
             <a href="#why" className="cta-hover rounded-full border border-white/25 bg-white/15 px-7 py-3.5 text-[14px] font-semibold uppercase leading-[20px] text-white backdrop-blur transition-colors hover:bg-white/25">Why Buy Authorised</a>
           </motion.div>
         </div>

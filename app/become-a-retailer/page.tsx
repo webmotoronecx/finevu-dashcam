@@ -81,7 +81,7 @@ const range = [
     specs: [
       ["Sony STARVIS 2 IMX675", " — 5.12MP, 2560×1440 2K QHD front"],
       ["External GPS included", ", Wi-Fi, 64GB card included"],
-      ["Up to 13,950 hrs", " parking standby with power saving"],
+      ["13,950 more hours", " of parking recording than standard parking mode"],
     ],
     href: "/gx35",
   },
@@ -264,7 +264,15 @@ function RetailerForm() {
       {err && <p className="mt-3.5 text-[13px] font-medium text-[#D93816]">{err}</p>}
       <p className="mt-3.5 text-center text-[13.6px] text-[#9a9da5]">
         By submitting, you agree to be contacted about a FineVu wholesale account. See our{" "}
-        <Link href="/support" className="font-semibold text-[var(--finevu-orange)]">privacy policy</Link>.
+        <a
+          href="https://motoronegroup.com/privacy-policy/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-[var(--finevu-orange)]"
+        >
+          privacy policy
+        </a>
+        .
       </p>
     </form>
   );

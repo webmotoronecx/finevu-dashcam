@@ -43,7 +43,7 @@ const issueTypes = [
 const steps = [
   { title: "Submit your claim", body: "Send us your model, serial number and receipt using this form." },
   { title: "We assess it", body: "Our technicians review the issue and confirm your warranty coverage." },
-  { title: "Repair or replace", body: "We repair or replace your camera. Return shipping is included on approved claims." },
+  { title: "Repair or replace", body: "At our option we repair, replace or otherwise remedy your camera. Return shipping is included on approved claims." },
 ];
 
 const LABEL = "mb-1.5 block text-[13.5px] font-semibold text-[#17181a]";
@@ -395,8 +395,12 @@ export default function Page() {
             transition={{ duration: 0.7, delay: 0.12 }}
             className="mx-auto mt-3.5 max-w-[620px] text-[16.5px] leading-[1.6] text-[#55555c]"
           >
-            Every FineVu dash cam is covered by a manufacturer&apos;s warranty, no matter which authorised retailer
-            you purchased from. Tell us what&apos;s wrong and we&apos;ll take it from there.
+            Every FineVu dash cam is covered by a{" "}
+            <Link href="/warranty" className="font-semibold text-[var(--finevu-orange)]">
+              voluntary warranty against defects
+            </Link>
+            , no matter which authorised retailer you purchased from. Tell us what&apos;s wrong and we&apos;ll take it
+            from there.
           </motion.p>
         </div>
       </section>
@@ -426,7 +430,8 @@ export default function Page() {
                 Many common issues — memory card errors, Wi-Fi drop-outs, footage not saving — can be fixed in a few
                 minutes. Check our{" "}
                 <Link href="/support" className="font-semibold text-[var(--finevu-orange)]">troubleshooting guide</Link>{" "}
-                first; it might save you the wait.
+                first; it might save you the wait. For what&apos;s covered and for how long, see the{" "}
+                <Link href="/warranty" className="font-semibold text-[var(--finevu-orange)]">warranty terms</Link>.
               </p>
             </div>
           </motion.aside>

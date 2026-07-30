@@ -44,12 +44,14 @@ const whyReasons = [
   },
 ];
 
-const pricing = [
-  { tier: "Hatchback / Sedan", price: "$200" },
-  { tier: "SUV / Hatchback", price: "$250" },
-  { tier: "Prestige", price: "$300" },
+// One flat rate for every vehicle — see docs/content-sources/general.txt § INSTALLATION SERVICE.
+const PRICE = "$250";
+const priceFeatures = [
+  "Front or front + rear install",
+  "Mobile — we come to your home or workplace",
+  "Concealed cable routing",
+  "Full system test & setup",
 ];
-const priceFeatures = ["Front or front + rear install", "Concealed cable routing", "Full system test & setup"];
 
 const steps = [
   {
@@ -64,8 +66,8 @@ const steps = [
   },
   {
     n: "03",
-    title: "Get confirmed",
-    desc: "Once confirmed, bring your dash cam, cables and memory card to our Clayton South workshop at your appointment time.",
+    title: "Confirm and pay",
+    desc: "Payment is required at the time of booking. Once you've paid we send your booking confirmation, and the installer comes to you at the agreed time.",
   },
 ];
 
@@ -215,7 +217,7 @@ function BookingForm() {
         </button>
         {error && <p className="text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
         <p className="text-center text-[11px] text-zinc-400 pt-1">
-          By appointment only · Clayton South VIC · We&apos;ll confirm by email or phone
+          By appointment only · We come to you · Payment is due at the time of booking
         </p>
       </form>
     </div>
@@ -244,8 +246,8 @@ export default function Page() {
             </h1>
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">
               Buying your FineVu dash cam is the easy part. Having it fitted cleanly and correctly — wiring concealed,
-              parking mode configured, camera dialled in — that&apos;s what a professional install is for. Book yours
-              at our Clayton South workshop.
+              parking mode configured, camera dialled in — that&apos;s what a professional install is for. Our
+              installer comes to your home or workplace.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a href="#book" className="w-full sm:w-auto">
@@ -295,13 +297,13 @@ export default function Page() {
                   Already have your FineVu?
                 </p>
                 <p className="text-sm text-zinc-600 leading-relaxed mb-3">
-                  Great — just bring the unit, cables and memory card and we&apos;ll handle the rest.
+                  Great — just have the unit, cables and memory card ready on the day and we&apos;ll handle the rest.
                 </p>
                 <a
                   href="#included"
                   className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-[var(--finevu-orange)]"
                 >
-                  See what to bring <ArrowRight className="w-4 h-4" />
+                  See what to have ready <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </motion.div>
@@ -320,43 +322,41 @@ export default function Page() {
           <motion.div className="text-center max-w-2xl mx-auto mb-12" {...fadeUp}>
             <span className="finevu-capsule uppercase mb-5">Proven Performance</span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-4">
-              Simple, per-vehicle pricing
+              One price, every vehicle
             </h2>
-            <p className="text-zinc-600 text-lg">One flat rate, everything included. No hidden charges.</p>
+            <p className="text-zinc-600 text-lg">
+              The same flat rate whatever you drive — GST and every unavoidable fee included.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            {pricing.map((p, i) => (
-              <motion.div
-                key={p.tier}
-                className="tile-hover rounded-[1.75rem] border border-zinc-100 bg-white p-8 text-center shadow-[0_18px_50px_-20px_rgba(0,0,0,0.18)]"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-              >
-                <h3 className="text-xl font-bold text-zinc-900">{p.tier}</h3>
-                <div className="text-5xl md:text-6xl font-bold text-[var(--finevu-orange)] mt-4">{p.price}</div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mt-1">
-                  Per vehicle/inc. setup
-                </p>
-                <hr className="my-6 border-zinc-100" />
-                <ul className="space-y-3 text-left">
-                  {priceFeatures.map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-zinc-600">
-                      <Check className="w-4 h-4 text-[var(--finevu-orange)] shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div
+            className="tile-hover mx-auto max-w-md rounded-[1.75rem] border border-zinc-100 bg-white p-8 text-center shadow-[0_18px_50px_-20px_rgba(0,0,0,0.18)]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <h3 className="text-xl font-bold text-zinc-900">Mobile installation</h3>
+            <div className="text-5xl md:text-6xl font-bold text-[var(--finevu-orange)] mt-4">{PRICE}</div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mt-1">
+              Per vehicle, GST included
+            </p>
+            <hr className="my-6 border-zinc-100" />
+            <ul className="space-y-3 text-left">
+              {priceFeatures.map((f) => (
+                <li key={f} className="flex items-center gap-2.5 text-sm text-zinc-600">
+                  <Check className="w-4 h-4 text-[var(--finevu-orange)] shrink-0" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
           <p className="flex items-start justify-center gap-2 text-center text-xs text-zinc-400 mt-8 max-w-3xl mx-auto px-4">
             <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <span>
-              Pricing covers the installation service only. Dash cam hardware sold separately. OBD/hardwire components
-              may incur a small additional cost depending on vehicle.
+              Pricing covers the installation service only. Dash cam hardware sold separately. If your vehicle needs
+              work that wasn&apos;t part of the booking, we&apos;ll explain it and get your approval on the price
+              before we start.
             </span>
           </p>
         </div>
@@ -400,7 +400,7 @@ export default function Page() {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-4">
               Everything in the service
             </h2>
-            <p className="text-zinc-600 text-lg">Here&apos;s exactly what we do — and what to bring with you.</p>
+            <p className="text-zinc-600 text-lg">Here&apos;s exactly what we do — and what to have ready.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 max-w-4xl mx-auto">
@@ -418,7 +418,7 @@ export default function Page() {
               </ul>
             </motion.div>
             <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.1 }}>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 mb-5">Bring with you</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 mb-5">Have ready on the day</h3>
               <ul className="space-y-4">
                 {bringWithYou.map((item) => (
                   <li key={item} className="flex items-start gap-3">
@@ -435,7 +435,7 @@ export default function Page() {
           <div className="mt-10 max-w-4xl mx-auto rounded-xl border-l-4 border-[var(--finevu-orange)] bg-zinc-50 p-5">
             <p className="text-sm text-zinc-600 leading-relaxed">
               <span className="font-bold text-zinc-900">Note:</span> The installation service covers fitting only —
-              hardware is not supplied as part of this service. Please bring all items listed above to your
+              hardware is not supplied as part of this service. Please have all items listed above ready for your
               appointment. If you&apos;re unsure what cables came with your unit, check the FineVu box contents or{" "}
               <Link href="/contact" className="text-[var(--finevu-orange)] underline">
                 contact us before booking
@@ -446,20 +446,21 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Workshop location */}
+      {/* Where we install */}
       <section className="py-16 md:py-24 bg-zinc-50" data-nav-theme="light">
         <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             <motion.div {...fadeUp}>
-              <span className="finevu-capsule uppercase mb-5">Where to Find Us</span>
+              <span className="finevu-capsule uppercase mb-5">Where We Install</span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight uppercase mb-6">
-                Workshop location
+                We come to you
               </h2>
-              <p className="font-bold text-zinc-900">FineVu Dashcam Australia</p>
-              <p className="text-zinc-600">Unit 28 / 266 Osborne Ave</p>
-              <p className="text-zinc-600 mb-6">Clayton South VIC 3169</p>
+              <p className="text-zinc-600 mb-6 max-w-md">
+                There&apos;s no workshop to drive to. Book a time and your installer arrives at your home or
+                workplace with everything needed to fit the camera on the spot.
+              </p>
               <div className="flex flex-wrap gap-3 mb-8">
-                {["Victoria only", "By appointment", "(03) 9099 0983"].map((b) => (
+                {["Mobile install", "By appointment", "1800 818 288"].map((b) => (
                   <span
                     key={b}
                     className="rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-zinc-700"
@@ -486,16 +487,16 @@ export default function Page() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="absolute h-40 w-40 rounded-full bg-[var(--finevu-orange)]/25 blur-2xl" />
                   <span className="absolute -rotate-[30deg] translate-y-7 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--finevu-orange)]/70 whitespace-nowrap">
-                    FineVu · Clayton South
+                    FineVu · We come to you
                   </span>
                   <MapPin className="relative w-10 h-10 -translate-y-2 text-[var(--finevu-orange)]" />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
                 {[
-                  { t: "Independent installers", d: "Work is carried out by our team at the Clayton South workshop." },
+                  { t: "Our own installers", d: "Every install is carried out by the AutoXtreme team, not a subcontractor." },
                   { t: "Direct confirmation", d: "We'll call or email to confirm your appointment time." },
-                  { t: "Outside Victoria?", d: "Currently workshop-only. Contact us to discuss options." },
+                  { t: "Not sure we reach you?", d: "Send your postcode with the form and we'll confirm before you pay." },
                 ].map((c) => (
                   <div key={c.t}>
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--finevu-orange)] mb-2">{c.t}</p>

@@ -314,7 +314,7 @@ export default function Page() {
 
                   <h3 className="text-2xl font-bold mb-4 relative z-10">Choosing your FineVu?</h3>
                   <p className="text-zinc-400 mb-8 relative z-10 text-sm leading-relaxed">
-                    Explore the GX4K and GX35. True 4K and 2K, both with SONY STARVIS, front &amp; rear and a 3-Year Australian Warranty.
+                    Explore the GX4K and GX35. True 4K and 2K, both with a SONY STARVIS front sensor, front &amp; rear recording and a 3-Year Australian Warranty.
                   </p>
 
                   <Link href="/gx4k" className="block relative z-10">

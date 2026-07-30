@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Phone, Mail } from "lucide-react";
@@ -172,9 +171,14 @@ function ContactForm() {
       {error && <p className="col-span-full text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
       <p className="col-span-full text-center text-[12.5px] text-[#707784]">
         By submitting this form, you agree to our{" "}
-        <Link href="/support" className="font-semibold text-[var(--finevu-orange)]">
+        <a
+          href="https://motoronegroup.com/privacy-policy/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-[var(--finevu-orange)]"
+        >
           privacy policy
-        </Link>
+        </a>
         .
       </p>
     </motion.form>

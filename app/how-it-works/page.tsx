@@ -30,9 +30,9 @@ export default function Page() {
         "Pick the FineVu that fits how you drive. GX4K for true 4K front clarity, or GX35 for a sharp, value-packed 2K setup — both front + rear.",
       icon: Camera,
       details: [
-        "GX4K — 4K front + 2K rear",
+        "GX4K — 4K front + Full HD rear",
         "GX35 — 2K front + Full HD rear",
-        "SONY STARVIS sensors on both",
+        "SONY STARVIS front sensors on both",
         "Made in Korea, 3-year Australian warranty",
       ],
       links: [
@@ -65,7 +65,7 @@ export default function Page() {
       icon: Smartphone,
       details: [
         "Connect over built-in Wi-Fi",
-        "Enable built-in GPS tracking",
+        "GPS tracking — built in on the GX4K, external antenna included with the GX35",
         "Live view and quick settings",
         "Firmware updates on tap",
       ],
@@ -95,7 +95,7 @@ export default function Page() {
     {
       icon: ShieldCheck,
       title: "ADAS Plus",
-      desc: "Lane departure and forward collision warnings help you stay alert on every drive. Requires hardwiring to unlock.",
+      desc: "Lane Departure Warning (LDWS) and Front Vehicle Motion Alert (FVMA) help you stay alert on every drive. Requires hardwiring to unlock.",
     },
     {
       icon: Car,
@@ -105,12 +105,12 @@ export default function Page() {
     {
       icon: Moon,
       title: "Auto Night Vision",
-      desc: "SONY STARVIS sensors pull detail out of the dark so number plates stay readable after sunset.",
+      desc: "SONY STARVIS front sensors pull detail out of the dark so number plates stay readable after sunset.",
     },
     {
       icon: Satellite,
-      title: "Built-in GPS & Wi-Fi",
-      desc: "Stamp every clip with speed and location, and connect instantly to the FineVu app.",
+      title: "GPS & built-in Wi-Fi",
+      desc: "Stamp every clip with speed and location, and connect instantly to the FineVu app. GPS is built into the GX4K; the GX35 ships with an external GPS antenna.",
     },
     {
       icon: Gauge,

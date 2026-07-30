@@ -164,7 +164,8 @@ const baseConfig: SiteConfig = {
     "/retailers",
     "/services",
     "/register",
-    "/warranty-claim"
+    "/warranty-claim",
+    "/thank-you"
 
   ],
 

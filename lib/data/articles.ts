@@ -31,7 +31,7 @@ export const articles: Article[] = [
       </div>
 
       <h3>The SONY STARVIS difference</h3>
-      <p>Resolution is only half the story. Both cameras use SONY STARVIS image sensors, which are built for low light. That is why FineVu footage stays clean at dusk, in tunnels, and on poorly lit suburban streets, where lesser cameras turn to noise and smear. A true 4K sensor with STARVIS gives you both the detail and the light sensitivity to actually use that detail at night.</p>
+      <p>Resolution is only half the story. Both cameras use a SONY STARVIS image sensor up front, built for low light. That is why FineVu footage stays clean at dusk, in tunnels, and on poorly lit suburban streets, where lesser cameras turn to noise and smear. A true 4K sensor with STARVIS gives you both the detail and the light sensitivity to actually use that detail at night.</p>
 
       <h3>GX4K vs GX35 at a glance</h3>
       <div class="overflow-x-auto my-8">
@@ -50,9 +50,9 @@ export const articles: Article[] = [
               <td class="p-4">2K (2560 x 1440)</td>
             </tr>
             <tr class="border-b border-zinc-100 bg-zinc-50/50">
-              <td class="p-4 font-medium">Sensor</td>
-              <td class="p-4">SONY STARVIS</td>
-              <td class="p-4">SONY STARVIS</td>
+              <td class="p-4 font-medium">Front sensor</td>
+              <td class="p-4">SONY STARVIS (IMX515)</td>
+              <td class="p-4">SONY STARVIS 2 (IMX675)</td>
             </tr>
             <tr class="border-b border-zinc-100">
               <td class="p-4 font-medium">Included storage</td>
@@ -66,8 +66,8 @@ export const articles: Article[] = [
             </tr>
             <tr class="border-b border-zinc-100">
               <td class="p-4 font-medium">Wi-Fi &amp; GPS app</td>
-              <td class="p-4">Yes</td>
-              <td class="p-4">Yes</td>
+              <td class="p-4">Yes — built-in GPS</td>
+              <td class="p-4">Yes — external GPS antenna included</td>
             </tr>
             <tr class="border-b border-zinc-100 bg-zinc-50/50">
               <td class="p-4 font-medium">Best for</td>
@@ -102,7 +102,7 @@ export const articles: Article[] = [
     slug: "how-adas-keeps-you-safer",
     image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     title: "How ADAS keeps you safer",
-    description: "Lane departure warnings, forward collision alerts and more. Here is what ADAS does in a FineVu dash cam, and why hardwiring matters.",
+    description: "Lane departure warnings and front vehicle motion alerts. Here is what ADAS does in a FineVu dash cam, and why hardwiring matters.",
     category: "Safety",
     date: "May 14, 2026",
     author: "FineVu Team",
@@ -120,8 +120,7 @@ export const articles: Article[] = [
       <h3>The key warnings</h3>
       <ul class="list-disc pl-5 space-y-2">
         <li><strong>Lane Departure Warning (LDWS):</strong> alerts you if you drift out of your lane without indicating, the classic sign of fatigue or distraction.</li>
-        <li><strong>Forward Collision Warning (FCWS):</strong> warns you when you are closing on the vehicle ahead too quickly.</li>
-        <li><strong>Front Vehicle Start Alarm (FVSA):</strong> a gentle nudge when traffic ahead moves off and you have not, handy at lights.</li>
+        <li><strong>Front Vehicle Motion Alert (FVMA):</strong> a gentle nudge when traffic ahead moves off and you have not, handy at lights.</li>
       </ul>
 
       <h3>Why hardwiring matters for ADAS</h3>
@@ -211,7 +210,7 @@ export const articles: Article[] = [
       </ul>
 
       <h3>Both ends, both clear</h3>
-      <p>Because FineVu uses SONY STARVIS sensors front and rear, the rear footage is genuinely usable, not a grainy afterthought. On the GX4K you get true 4K up front with a sharp rear channel, and on the GX35 you get crisp 2K both ways. Either way, a number plate behind you stands a real chance of being readable.</p>
+      <p>Both models pair a SONY STARVIS front sensor with a Full HD rear camera, so the rear footage is genuinely usable, not a grainy afterthought. On the GX4K you get true 4K up front with a Full HD rear channel, and on the GX35, 2K up front with the same Full HD rear. Either way, a number plate behind you stands a real chance of being readable.</p>
 
       <h3>Share it in seconds</h3>
       <p>When something happens, open the FineVu app over Wi-Fi, pull both the front and rear clips with their GPS data, and send them to your insurer. No need to hand over your whole memory card or describe what happened, the footage speaks for itself.</p>
@@ -261,6 +260,12 @@ export const articles: Article[] = [
 
       <h3>The bottom line</h3>
       <p>Dash cams are legal, mounting is straightforward, and the footage is genuinely useful when a claim goes sideways. Fit a FineVu properly, keep the microphone setting sensible, and you have an impartial witness on every drive.</p>
+
+      <div class="my-10 rounded-2xl border border-zinc-200 bg-zinc-50 px-7 py-6">
+        <h4 class="mb-2 font-semibold text-zinc-900">Important information</h4>
+        <p class="mb-2 text-sm leading-relaxed text-zinc-600">The information on this page is general in nature and provided as a guide only. It does not constitute legal advice. Road rules, surveillance and recording laws differ between Australian states and territories and may change, so please check the requirements that apply in your location.</p>
+        <p class="text-sm leading-relaxed text-zinc-600">Nothing on this page excludes, restricts or modifies any consumer guarantee, right or remedy conferred by the Australian Consumer Law (Schedule 2 of the Competition and Consumer Act 2010 (Cth)) or any other applicable law that cannot lawfully be excluded.</p>
+      </div>
     `
   }
 ];

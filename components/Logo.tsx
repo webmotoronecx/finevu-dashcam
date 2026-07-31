@@ -13,10 +13,10 @@ interface LogoProps {
 
 // FineVu wordmark from the official brand asset in public/brand/
 const SOURCES: Record<NonNullable<LogoProps["variant"]>, string> = {
-  primary: "/brand/finevu-logo.svg",
-  contrast: "/brand/finevu-logo-contrast.svg",
-  dark: "/brand/finevu-logo-dark.svg",
-  white: "/brand/finevu-logo-white.svg",
+  primary: "/brand/finevu-logo.png",
+  contrast: "/brand/finevu-logo-contrast.png",
+  dark: "/brand/finevu-logo-dark.png",
+  white: "/brand/finevu-logo-white.png",
 };
 
 export function Logo({ className = "h-7", variant = "primary" }: LogoProps) {

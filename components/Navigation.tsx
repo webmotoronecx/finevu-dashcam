@@ -115,6 +115,28 @@ export function Navigation() {
   // page, and below the hero while scrolling up.
   const revealed = !subNav || atTop || (docked && scrolledUp);
 
+  // Shape of the main row — the full-bleed glass block vs. the centered pill. Product
+  // pages resting at the very top wear the pill (it's just the site nav over the hero);
+  // the block is for the docked/scrolled-up state, where the row is page chrome. Purely
+  // cosmetic: everything structural (the sub-nav anchor, the hide transform, `inert`)
+  // still keys off `subNav`, which is per-route and never changes mid-scroll.
+  //
+  // The two boundaries are deliberately different, and the gap between them is what keeps
+  // the swap invisible. Re-shaping on a single threshold flashes the wrong layout, because
+  // that threshold is also where the row starts its 0.35s slide-out — you see it become a
+  // block and *then* leave. So: it widens only once `docked` (0.8vh, deep inside the band
+  // where the row is already hidden) and narrows only back at `atTop`. In between it holds
+  // whatever it was, so it always exits and re-enters in the shape it will be seen in.
+  //
+  // Derived during render rather than in an effect: an effect lands a frame late, and one
+  // frame of full-bleed glass at the top of the hero is the exact artefact this avoids.
+  // Idempotent — same `atTop`/`docked` in, same value out — so a StrictMode double render
+  // is a no-op.
+  const wideRef = useRef(false);
+  if (!subNav || atTop) wideRef.current = false;
+  else if (docked) wideRef.current = true;
+  const wide = wideRef.current;
+
   // Both menus hang off the main row — pointless once that row is off-screen. Reopening
   // is allowed once a scroll-up brings it back, so this keys off `revealed`, not `docked`.
   useEffect(() => {
@@ -289,7 +311,7 @@ export function Navigation() {
       </AnimatePresence>
 
       <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 ${subNav ? "" : "px-4 md:px-8"}`}
+        className={`fixed top-0 left-0 right-0 z-50 ${wide ? "" : "px-4 md:px-8"}`}
         initial={{ y: -24, opacity: 0 }}
         // Product pages fade the whole nav out while it's parked over the hero. Belt and
         // braces with the transform — and it hides the one frame before the rows have been
@@ -305,14 +327,14 @@ export function Navigation() {
           animate={{ y: subNav && !revealed ? -mainRowHeight : 0 }}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-        {/* On product pages the pill becomes a full-bleed glass block; the surface spans
-            the viewport while the content below stays capped at 1400px. */}
+        {/* Once a product page leaves the top the pill becomes a full-bleed glass block;
+            the surface spans the viewport while the content below stays capped at 1400px. */}
         <div
           ref={mainRowRef}
           {...(subNav && !revealed ? { inert: true, "aria-hidden": true as const } : {})}
           // `navigation-main` is an unstyled hook for finding this row in devtools.
-          className={`navigation-main ${subNav ? `w-full border-b ${glassBorderClass(isDarkBackground)} py-3` : ""}`}
-          style={subNav ? pillStyle : undefined}
+          className={`navigation-main ${wide ? `w-full border-b ${glassBorderClass(isDarkBackground)} py-3` : ""}`}
+          style={wide ? pillStyle : undefined}
         >
         {/* Row: centered glass pill (logo + links) with the Find Retailer button
             floating to the right — per Figma v4 (pill 113:3561, button 113:3356). */}
@@ -321,18 +343,18 @@ export function Navigation() {
          {/* ZEUS remove the padding right coz we already have a mobile view for navigation    */}
         <div
           className={`relative z-50 mx-auto max-w-[1400px] flex items-center ${
-            subNav ? "gap-6 px-4 md:px-8" : "mt-4 md:mt-6 justify-center"
+            wide ? "gap-6 px-4 md:px-8" : "mt-4 md:mt-6 justify-center"
           }`}
         >
-          {/* Centered pill (product pages: the row itself, unstyled and full width) */}
+          {/* Centered pill (wide mode: the row itself, unstyled and full width) */}
           <div
             className={`relative z-10 flex w-full items-center justify-between gap-4 ${
-              subNav
+              wide
                 ? "min-w-0 xl:flex-1"
                 : "xl:w-auto xl:justify-center xl:gap-24 rounded-full border px-5 py-2 xl:px-10 xl:py-3 " +
                   glassBorderClass(isDarkBackground)
             }`}
-            style={subNav ? undefined : pillStyle}
+            style={wide ? undefined : pillStyle}
           >
             {/* Logo — follows the same data-nav-theme sampler as the links and glass.
                 On light sections the "Vu" must use the darkened `contrast` variant; the
@@ -401,12 +423,12 @@ export function Navigation() {
             </button>
           </div>
 
-          {/* Find Retailer — solid orange. Floats to the right of the pill normally; on
-              product pages it sits inline as the last item in the full-width row. */}
+          {/* Find Retailer — solid orange. Floats to the right of the pill normally; in
+              wide mode it sits inline as the last item in the full-width row. */}
           <Link
             href={primaryCta.href}
             className={`hidden xl:block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${
-              subNav ? "shrink-0" : "absolute right-0 top-1/2 -translate-y-1/2"
+              wide ? "shrink-0" : "absolute right-0 top-1/2 -translate-y-1/2"
             }`}
           >
             <motion.button
@@ -496,7 +518,7 @@ export function Navigation() {
           {isMobileMenuOpen && (
             <motion.div
               className={`xl:hidden max-w-[1400px] mt-2 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/15 overflow-hidden ${
-                subNav ? "mx-4 md:mx-8" : "mx-auto"
+                wide ? "mx-4 md:mx-8" : "mx-auto"
               }`}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}

@@ -17,8 +17,15 @@ type Platform = {
   href: string;
   requirement: string;
   fine: string;
+  supported: { name: string; featured?: boolean }[] 
 };
 
+// Both models are listed on both platforms, matching /gx35 and /faq and en.finevu.com.
+// ⚠️ GX35-on-iOS still NEEDS APPROVAL: the Apple App Store listing for FineVu Wi-Fi
+// (id1514069940) does not name the GX35. We follow en.finevu.com on the assumption the
+// store listing is stale, but Fine Digital has not confirmed it. If that flips, three
+// other surfaces flip with it — see docs/content-sources/general.txt § FINEVU WI-FI APP
+// and gx35.txt:45 {!needs approval}, CA-76.
 const platforms: Platform[] = [
   {
     id: "ios",
@@ -27,6 +34,10 @@ const platforms: Platform[] = [
     href: "https://apps.apple.com/au/app/finevu-wi-fi/id1514069940",
     requirement: "Requires iOS 13.0 or later. Designed for iPhone.",
     fine: "Download size is approximately 117 MB. Some phones may behave differently depending on OS version and supported resolution. If you run into trouble, our support team can help — or contact FineVu directly at finevu-cs@finedigital.com.",
+    supported: [
+      { name: "GX4K", featured: true },
+      { name: "GX35", featured: true },
+    ]
   },
   {
     id: "android",
@@ -35,19 +46,14 @@ const platforms: Platform[] = [
     href: "https://play.google.com/store/apps/details?id=com.finedigital.finevu3&hl=en_AU",
     requirement: "Requires Android 10.0 or higher.",
     fine: "Some phones may behave differently depending on OS version and supported resolution. If Android Auto is connected, disconnect it before pairing with your camera. If you run into trouble, our support team can help — or contact FineVu directly at finevu-cs@finedigital.com.",
+    supported: [
+      { name: "GX4K", featured: true },
+      { name: "GX35", featured: true },
+    ]
   },
 ];
 
-const supported: { name: string; featured?: boolean }[] = [
-  { name: "GX4K", featured: true },
-  { name: "GX35", featured: true },
-  { name: "GX400" },
-  { name: "GX7000" },
-  { name: "GX1000" },
-  { name: "GX33" },
-  { name: "GX300" },
-  { name: "GX30" },
-];
+
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -181,10 +187,10 @@ export function AppSupport() {
               <p className="text-[13.5px] leading-[1.6] text-[#8a8a92]">{active.fine}</p>
             </div>
 
-            {/* <div className="mt-8">
+            <div className="mt-8">
               <h4 className="mb-3.5 text-[19px] font-bold text-[#17181a]">Supported products</h4>
               <div className="flex flex-wrap gap-2.5">
-                {supported.map((s) => (
+                {active.supported.map((s) => (
                   <span
                     key={s.name}
                     className={`rounded-[8px] border px-3.5 py-[7px] text-[13.5px] ${
@@ -197,7 +203,7 @@ export function AppSupport() {
                   </span>
                 ))}
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

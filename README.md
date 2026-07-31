@@ -37,6 +37,20 @@ npm run dev                  # http://localhost:3000
 page in a browser. The `docs/responsiveness-audit-*.md` files are manual QA
 reports, not automated checks.
 
+### Slash commands (Claude Code)
+
+| Command | What it does |
+| --- | --- |
+| `/content-audit [scope]` | Audits page claims against `docs/content-sources/`; updates the narrative doc **and** `docs/content-accuracy-changes.csv` in the same pass |
+| `/link-check [all\|mvp\|<path>] [--no-external]` | Sweeps links and asset refs for missing routes, gated pages, 404 assets, placeholder `href`s and dead anchors |
+
+Definitions live in `.claude/commands/`. Both are **hard gate #2** work (see
+"Before you deploy"), and they cover different halves of it — `/content-audit`
+verifies *claims*, `/link-check` verifies *targets*. Neither `npm run build` nor
+`tsc` catches what `/link-check` finds: those paths are string literals, so a
+renamed image or a route that never existed typechecks perfectly and 404s in the
+browser.
+
 ---
 
 ## Environment variables

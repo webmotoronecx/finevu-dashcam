@@ -173,10 +173,17 @@ a gate, not a formality.
   `docs/content-accuracy-changes.csv`, and settle the Open items listed above first.
 - Remember AU-market figures may legitimately differ from the Korean spec sheet (e.g.
   the GX35 ships a **64GB** card here vs 128GB officially — that's correct, not a bug).
+- **Links and asset refs are the other half of this gate**, and `/content-audit` does not
+  cover them — it checks *claims*, not *targets*. Run **`/link-check`**
+  (`.claude/commands/link-check.md`) for missing routes, gated CTAs, 404 assets and dead
+  anchors. Neither `npm run build` nor `tsc` catches any of it: those paths are string
+  literals, so a pruned PNG or a route that never existed typechecks perfectly.
 
 **Audit change log — keep it current.** Every time you run or update a content-accuracy
 audit, you MUST also update the single canonical change log `docs/content-accuracy-changes.csv`
-in the same pass — it's part of the audit, not a separate request.
+in the same pass — it's part of the audit, not a separate request. **`/content-audit`
+(`.claude/commands/content-audit.md`) does both halves in one pass — use it rather than
+hand-rolling an audit.**
 
 It is a **living tracker**, not an append-only ledger: **one row per issue**, keyed by a
 stable `ID` (`CA-01`, `CA-02`, …). Per-cell rules:

@@ -62,4 +62,57 @@ Approved wording: "leading authorised retailers"
 
   Confirmed AU retail partners: (none) {!needs approval}
 
+== SOCIAL MEDIA ==
+
+No FineVu Australia social account has been confirmed. The footer social row is EMPTY in
+production (`social: []` in config/site.config.ts) and must stay that way until real
+handles are supplied here.
+
+Staging (config/site.config.staging.ts) currently shows three FINEVU GLOBAL / KOREA HQ
+accounts so the footer's social row is reviewable:
+
+  Instagram   https://www.instagram.com/finevu_global
+  Facebook    https://www.facebook.com/FineVuDASHCAM
+  YouTube     https://www.youtube.com/channel/UCcjdOYjx1kDfcYbgVz9JuCQ
+
+These are NOT AutoXtreme/FineVu Australia properties. Pointing an Australian customer at
+the Korean HQ's channels sends them to KR-market pricing, model line-ups and support
+contacts we do not control, so this is a business decision, not a content fix. Nobody has
+verified the three URLs above are the official HQ accounts either.
+
+  Approved social accounts for the AU site: (none) {!needs approval}
+
+To approve: replace the line above with the confirmed handles (AU accounts, or an explicit
+decision to link HQ), drop the {!needs approval} tag, and only then add them to
+config/site.config.ts. Until then they stay staging-only. Tracked as CA-75.
+
+== FINEVU WI-FI APP — PLATFORM AVAILABILITY ==
+
+THE SITE'S POSITION: both the GX4K and the GX35 are supported on iOS AND Android.
+Decided 2026-07-31. The site states this without a platform caveat anywhere.
+
+  GX4K   iOS + Android   — confirmed (gx4k.txt, en.finevu.com, App Store listing)
+  GX35   iOS + Android   — Android confirmed; iOS {!needs approval}
+
+The GX35-on-iOS half rests on ONE source and is contradicted by another:
+
+  en.finevu.com                                         — GX35 IS listed as supported
+  Apple App Store listing (FineVu Wi-Fi, id1514069940)  — GX35 NOT listed as supported
+
+We follow en.finevu.com because it is FineVu's own current product site and the App Store
+listing is more likely to be stale — and because the previous split (iOS: GX4K only on
+/support, unqualified app support on /gx35 and /faq) had the site contradicting itself.
+That reasoning is a judgement call, NOT verification. Fine Digital must confirm before
+launch: if iOS support is genuinely GX4K-only, an iPhone owner who chose a GX35 for the
+app has a warranty-adjacent complaint, and four surfaces are wrong rather than one.
+
+Surfaces asserting it (keep these consistent — change all four or none):
+
+  components/AppSupport.tsx (/support)  — per-platform "Supported products" chips
+  app/gx35/page.tsx:392                 — spec row "... · FineVu Wi-Fi App"
+  app/faq/page.tsx:19                   — "Both have ... Wi-Fi app connectivity ..."
+  docs/content-sources/gx35.txt:45      — "Mobile App: FineVu Wi-Fi App (Android, iOS)"
+
+Tracked as CA-76.
+
 == NOTES ==

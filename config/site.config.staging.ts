@@ -32,7 +32,6 @@ export const stagingOverrides: Partial<SiteConfig> = {
         links: [
           { href: "/gx4k", label: "GX4K - 4K 2CH" },
           { href: "/gx35", label: "GX35 - 2K 2CH" },
-          { href: "/how-it-works", label: "Features & App" },
           { href: "/installation", label: "Installation" },
         ],
       },
@@ -56,13 +55,16 @@ export const stagingOverrides: Partial<SiteConfig> = {
         ],
       },
     ],
-    // ⚠️ PLACEHOLDERS — bare domains, not FineVu accounts. Harmless here because this
-    // file only ever applies to staging, which is noindex and internal. Real profile
-    // URLs are a launch to-do; NEVER promote these to baseConfig as-is.
+    // ⚠️ NEEDS APPROVAL — these are FineVu GLOBAL / Korea HQ accounts, not FineVu
+    // Australia (AutoXtreme) properties, and nobody has verified they are the official
+    // HQ channels. Linking AU customers to KR-market content is a business decision, so
+    // they are staging-only (noindex, internal) and production keeps `social: []`.
+    // See docs/content-sources/general.txt § SOCIAL MEDIA — {!needs approval}, CA-75.
+    // NEVER promote these to site.config.ts until that tag is cleared.
     social: [
-      { href: "https://instagram.com", label: "Instagram" },
-      { href: "https://facebook.com", label: "Facebook" },
-      { href: "https://youtube.com", label: "YouTube" },
+      { href: "https://www.instagram.com/finevu_global", label: "Instagram" },
+      { href: "https://www.facebook.com/FineVuDASHCAM", label: "Facebook" },
+      { href: "https://www.youtube.com/channel/UCcjdOYjx1kDfcYbgVz9JuCQ", label: "YouTube" },
     ],
   },
 };

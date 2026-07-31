@@ -6,10 +6,11 @@ import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { submitForm } from "@/lib/submitForm";
 import { thankYouUrl } from "@/lib/data/thank-you";
+import { COVERAGE_MESSAGES, isExcluded, loadPostcodeRows, resolveCoverage, type Coverage, type PostcodeRow } from "@/lib/data/installation-coverage";
 import { Carousel } from "@/components/sections/Carousel";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { motion } from "motion/react";
-import { useMemo, useRef, useState, Fragment } from "react";
+import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -62,14 +63,14 @@ const INCLUDED = [
   { icon: Camera, title: "Precision camera placement", sub: "Mounted in the optimal position for full road coverage with minimal interior obstruction, clear of wiper sweep and your line of sight." },
   { icon: Cable, title: "Fully concealed cabling", sub: "Every cable routed through trim panels and A-pillars for a factory-fitted appearance, with the rear camera cable run the length of the vehicle." },
   { icon: Plug, title: "Safe fuse-box connection", sub: "Hardwired to a switched fuse with the correct amperage using fuse-tap connections — no bare wires, no cutting or splicing of factory wiring." },
-  { icon: BatteryCharging, title: "Parking mode & battery protection setup", sub: "Voltage cutoff configured to protect your battery, parking mode enabled and tested so your camera keeps watch without draining the car." },
+  { icon: BatteryCharging, title: "Parking mode & battery protection setup", sub: "Voltage cut-off configured to protect your battery, parking mode enabled and tested so your camera keeps watch without draining the car." },
   { icon: Smartphone, title: "App connection & settings configuration", sub: "Wi-Fi pairing, ADAS settings and recording preferences set before handover — resolution, sensitivity, time and speed display." },
   { icon: CheckCircle2, title: "Full system test & handover", sub: "Live recording verified, all modes confirmed, and a brief walkthrough for the owner before your installer signs off." },
 ];
 
 const WHY = [
   { icon: ShieldCheck, title: "Your vehicle, protected", body: "A professional hardwire uses a fused tap at the correct amperage. No risk of electrical faults, melted connectors, or void warranties from a botched DIY job." },
-  { icon: Clock, title: "Parking mode, done properly", body: "Parking mode only works reliably with a hardwire. Our installers configure the voltage cutoff for your specific vehicle to protect your battery." },
+  { icon: Clock, title: "Parking mode, done properly", body: "Parking mode only works reliably with a hardwire. Our installers configure the voltage cut-off for your specific vehicle to protect your battery." },
   { icon: Sparkles, title: "A finish that matches the camera", body: "The GX4K is a premium piece of hardware. It deserves a premium install — cables fully hidden, no dangling wires, no tape, nothing visible." },
 ];
 
@@ -85,20 +86,6 @@ const FAQS = [
   { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we'll move it to a time that suits. There's no fee to reschedule with notice." },
 ];
 
-type Coverage ={ msg: string; cls: "ok" | "warn" | "err" | "" };
-function coverageMessage(pc: string): Coverage {
-  const n = parseInt(pc, 10);
-  if (isNaN(n)) return { msg: "", cls: "" };
-  if (pc.length === 4 && /^0[89]/.test(pc)) return { msg: "Installation isn’t currently available in the Northern Territory.", cls: "err" };
-  const metro: [number, number, string][] = [
-    [2000, 2249, "Sydney"], [2555, 2574, "Greater Sydney"], [2740, 2786, "Greater Sydney"], [2500, 2530, "Wollongong"], [2250, 2330, "Newcastle & Central Coast"],
-    [2600, 2620, "Canberra"], [2900, 2920, "Canberra"], [3000, 3220, "Melbourne"], [3214, 3227, "Geelong"], [3335, 3338, "Melbourne West"], [3750, 3810, "Melbourne outer"],
-    [4000, 4209, "Brisbane"], [4210, 4230, "the Gold Coast"], [4300, 4306, "Ipswich"], [4500, 4521, "Moreton Bay"], [4550, 4580, "the Sunshine Coast"],
-    [5000, 5199, "Adelaide"], [6000, 6210, "Perth"], [7000, 7099, "Hobart"],
-  ];
-  for (const [lo, hi, name] of metro) if (n >= lo && n <= hi) return { msg: `Great news — certified installers service ${name}. Mobile installation is available in your area.`, cls: "ok" };
-  return { msg: "You may be within our regional coverage. Submit your booking and we’ll confirm availability within one business day.", cls: "warn" };
-}
 const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#C77700]", err: "text-[#D93816]", "": "text-[#6e6e73]" };
 
 type Form = {
@@ -138,6 +125,10 @@ function BookingWizard() {
   const [ref, setRef] = useState("");
   const days = useCalendar();
   const bookRef = useRef<HTMLDivElement>(null);
+  // Prefetched so step-2 validation stays synchronous. Null until it lands (or if it
+  // fails), in which case resolveCoverage falls back to the coarse range table.
+  const [pcRows, setPcRows] = useState<PostcodeRow[] | null>(null);
+  useEffect(() => { loadPostcodeRows().then(setPcRows); }, []);
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
   const scrollTop = () => bookRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -147,8 +138,8 @@ function BookingWizard() {
     if (s === 2) {
       if (!form.place) return fail("Please choose home or workplace.");
       if (!form.street || !form.suburb || !form.stateAu || !/^\d{4}$/.test(form.postcode)) return fail("Please complete your address, including a 4-digit postcode.");
-      if (form.stateAu === "NT" || /^0[89]\d\d$/.test(form.postcode)) return fail("Sorry — installation isn’t currently available in the Northern Territory.");
-      setHint(coverageMessage(form.postcode)); return true;
+      if (isExcluded(form.stateAu, form.postcode)) return fail(COVERAGE_MESSAGES.excludedBooking);
+      setHint(resolveCoverage(form.postcode, pcRows, true)); return true;
     }
     if (s === 3) { if (!date) return fail("Please select a date."); if (!form.slot) return fail("Please select a start time."); }
     if (s === 4) {
@@ -165,32 +156,43 @@ function BookingWizard() {
       if (!em) return fail("Please enter your card expiry as MM/YY.");
       const now = new Date(); const yy = 2000 + parseInt(em[2], 10); const mm = parseInt(em[1], 10);
       if (yy < now.getFullYear() || (yy === now.getFullYear() && mm < now.getMonth() + 1)) return fail("Your card expiry date has passed.");
-      if (!/^\d{3,4}$/.test(form.ccCvc)) return fail("Please enter your card’s 3–4 digit CVC.");
+      if (!/^\d{3,4}$/.test(form.ccCvc)) return fail("Please enter your card’s 3- or 4-digit CVC.");
     }
     setHint({ msg: "", cls: "" }); return true;
   }
   function next() {
+    if (processing) return;
     if (!validate(step)) return;
-    if (step < TOTAL) { setHint({ msg: "", cls: "" }); setStep(step + 1); scrollTop(); }
+    // Note: no setHint() here. validate() has already either cleared the hint or, on
+    // step 2, set the coverage message — which is meant to carry over onto step 3.
+    if (step < TOTAL) { setStep(step + 1); scrollTop(); }
     else {
-    setProcessing(true);
+      setProcessing(true);
       // Wizard logic is unchanged pending ops sign-off on CA-36 — this still submits
       // nothing and takes no payment; only the destination moved to the shared
       // thank-you page. The step-6 block below is now unreachable; it is kept, not
       // deleted, so the original confirmation can be restored if ops wants it back.
-      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); setProcessing(false); router.push(thankYouUrl("installation")); }, 900);
+      // processing stays true through the redirect so the pay button can't fire twice.
+      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); router.push(thankYouUrl("installation")); }, 900);
     }
   }
   function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setStep(step - 1); scrollTop(); } }
 
-  const summaryRows = (): [string, string][] => [
+  const summaryRows = (): [string, string][] => {
+    const rows: [string, string][] = [
       ["Dash cam", `${form.model || "—"} · Front + rear (2CH)`],
       ["Install", "Professional hardwire install"],
       ["Location", (form.place ? form.place + " — " : "") + [form.street, form.suburb, form.stateAu, form.postcode].filter(Boolean).join(", ")],
       ["Date", dateLabel || "—"],
       ["Time", form.slot || "—"],
-    ["Total", "$250.00 AUD — paid today"],
     ];
+    // Optional step-4 fields. Shown only when filled, so the user can see they weren't
+    // dropped — they have no other destination until the wizard actually submits (CA-36).
+    if (form.retailer) rows.push(["Purchased from", form.retailer]);
+    if (form.notes) rows.push(["Notes", form.notes]);
+    rows.push(["Total", "$250.00 AUD — paid today"]);
+    return rows;
+  };
   const confirmRows = (): [string, string][] => {
     const rows = summaryRows();
     rows.push(["Payment", `Card ending ${form.ccNum.replace(/\s+/g, "").slice(-4)} · Paid`], ["Name", form.name], ["Contact", `${form.phone} · ${form.email}`]);
@@ -202,6 +204,9 @@ function BookingWizard() {
   return (
     <div ref={bookRef} className="scroll-mt-24">
       <div className="mx-auto w-full overflow-hidden rounded-[18px] border border-[#e8e7e2] bg-white shadow-[0_4px_40px_rgba(0,0,0,0.08)]">
+        {/* A real <form> so Enter advances the step from any text input. Validation is
+            entirely ours, hence noValidate — no browser bubbles. */}
+        <form onSubmit={(e) => { e.preventDefault(); next(); }} noValidate>
         {/* head — step indicator + price badge */}
         <div className="flex flex-col gap-5 border-b border-[#e8e7e2] bg-[#f7f6f3] px-6 pb-[25px] pt-6 md:flex-row md:items-center md:justify-between md:px-9">
           <div className="flex flex-1 items-start">
@@ -229,10 +234,10 @@ function BookingWizard() {
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Which FineVu are we fitting?</h3>
               <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Both models are front-and-rear systems with the hardwire kit and power cable included in the box — so everything your installer needs arrives with your camera.</p>
-              <span className={FLABEL}>Your model</span>
-              <div className="grid gap-3.5 sm:grid-cols-2">
+              <span className={FLABEL} id="wiz-model-label">Your model</span>
+              <div className="grid gap-3.5 sm:grid-cols-2" role="group" aria-labelledby="wiz-model-label">
                 {[{ v: "GX4K", d: "4K UHD front + Full HD rear · Sony STARVIS · 128GB card & hardwire kit included" }, { v: "GX35", d: "2K QHD front + Full HD rear · Sony STARVIS 2 · 64GB card & hardwire kit included" }].map((m) => (
-                  <button key={m.v} type="button" onClick={() => { set("model", m.v); setHint({ msg: "", cls: "" }); }} className={`relative rounded-[12px] border-[1.5px] px-5 py-[18px] text-left transition-colors ${form.model === m.v ? "border-[var(--finevu-orange)] bg-[#fef2e5]" : "border-[#e7e7ea] hover:border-[#9c9ca3]"}`}>
+                  <button key={m.v} type="button" aria-pressed={form.model === m.v} onClick={() => { set("model", m.v); setHint({ msg: "", cls: "" }); }} className={`relative rounded-[12px] border-[1.5px] px-5 py-[18px] text-left transition-colors ${form.model === m.v ? "border-[var(--finevu-orange)] bg-[#fef2e5]" : "border-[#e7e7ea] hover:border-[#9c9ca3]"}`}>
                     <span className="block text-[.95rem] font-semibold text-[#1d1d1f]">{m.v}</span>
                     <small className="mt-1.5 block text-[.8rem] leading-[1.5] text-[#6e6e73]">{m.d}</small>
                     {form.model === m.v && <span className="absolute right-4 top-4 h-2.5 w-2.5 rounded-full bg-[var(--finevu-orange)]" />}
@@ -248,11 +253,11 @@ function BookingWizard() {
           {step === 2 && (
             <div>
               <h3 className="text-[22px] font-semibold leading-[33px] text-[#1d1d1f]">Where should we come to you?</h3>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="mt-6 grid gap-4 sm:grid-cols-2" role="group" aria-label="Installation location">
                 {[{ v: "Home", t: "At home", icon: Home }, { v: "Workplace", t: "At my workplace", icon: Briefcase }].map((p) => {
                   const sel = form.place === p.v; const Ico = p.icon;
                   return (
-                    <button key={p.v} type="button" onClick={() => { set("place", p.v); setHint({ msg: "", cls: "" }); }} className={`flex flex-col items-center gap-3 rounded-[14px] border-2 px-[26px] py-[30px] transition-colors ${sel ? "border-[var(--finevu-orange)] bg-[#fff1e8]" : "border-[#e8e7e2] bg-white hover:border-[#9c9ca3]"}`}>
+                    <button key={p.v} type="button" aria-pressed={sel} onClick={() => { set("place", p.v); setHint({ msg: "", cls: "" }); }} className={`flex flex-col items-center gap-3 rounded-[14px] border-2 px-[26px] py-[30px] transition-colors ${sel ? "border-[var(--finevu-orange)] bg-[#fff1e8]" : "border-[#e8e7e2] bg-white hover:border-[#9c9ca3]"}`}>
                       <Ico className={`h-7 w-7 ${sel ? "text-[var(--finevu-orange)]" : "text-[#9a9da5]"}`} strokeWidth={1.75} />
                       <span className="text-[16px] font-semibold leading-[24px] text-[#1d1d1f]">{p.t}</span>
                       <span className={`flex size-[22px] items-center justify-center rounded-[11px] border-2 ${sel ? "border-[var(--finevu-orange)] bg-[var(--finevu-orange)]" : "border-[#e8e7e2]"}`}>
@@ -293,24 +298,25 @@ function BookingWizard() {
           {step === 3 && (
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Choose a date and time</h3>
-              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a weekday that suits you, then a start time. Installers are available hourly from 9am to 5pm, Monday to Friday. Most installations take 60–90 minutes.</p>
-              <span className={FLABEL}>Date</span>
-              <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-                {DOWS.map((d) => <div key={d} className="pb-1 text-center text-[11px] font-semibold uppercase text-[#9c9ca3]">{d}</div>)}
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a weekday that suits you, then a start time. Installers are available hourly from 9:00 AM to 5:00 PM, Monday to Friday. Most installations take 60–90 minutes.</p>
+              <span className={FLABEL} id="wiz-date-label">Date</span>
+              <div className="grid grid-cols-7 gap-1.5 sm:gap-2" role="group" aria-labelledby="wiz-date-label">
+                {DOWS.map((d) => <div key={d} aria-hidden="true" className="pb-1 text-center text-[11px] font-semibold uppercase text-[#9c9ca3]">{d}</div>)}
                 {days.map((d, i) => {
                   const selected = date?.getTime() === d.date.getTime();
+                  const full = d.date.toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
                   return (
-                    <button key={i} type="button" disabled={d.disabled} onClick={() => { setDate(d.date); setDateLabel(d.date.toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })); setHint({ msg: "", cls: "" }); }}
+                    <button key={i} type="button" disabled={d.disabled} aria-pressed={selected} aria-label={full} onClick={() => { setDate(d.date); setDateLabel(full); setHint({ msg: "", cls: "" }); }}
                       className={`flex flex-col items-center rounded-[10px] border-[1.5px] py-2 text-[.88rem] transition-colors ${d.disabled ? "cursor-not-allowed border-transparent text-[#d4d4d8]" : selected ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>
                       <span className="text-[.6rem] uppercase text-[#9c9ca3]">{d.month}</span>{d.day}
                     </button>
                   );
                 })}
               </div>
-              <span className={FLABEL}>Start time</span>
-              <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
+              <span className={FLABEL} id="wiz-slot-label">Start time</span>
+              <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5" role="group" aria-labelledby="wiz-slot-label">
                 {SLOTS.map((s) => (
-                  <button key={s} type="button" onClick={() => { set("slot", s); setHint({ msg: "", cls: "" }); }} className={`rounded-full border-[1.5px] px-3 py-2.5 text-[.85rem] font-medium transition-colors ${form.slot === s ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>{s}</button>
+                  <button key={s} type="button" aria-pressed={form.slot === s} onClick={() => { set("slot", s); setHint({ msg: "", cls: "" }); }} className={`rounded-full border-[1.5px] px-3 py-2.5 text-[.85rem] font-medium transition-colors ${form.slot === s ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>{s}</button>
                 ))}
               </div>
             </div>
@@ -378,52 +384,35 @@ function BookingWizard() {
           <div className="flex items-center justify-between gap-4 border-t border-[#e8e7e2] px-6 py-5 md:px-9">
             <button type="button" onClick={back} disabled={step === 1} className="rounded-full border border-[#1d1d1f] px-[19px] py-[9px] text-[12px] font-semibold uppercase leading-[18px] tracking-[0.96px] text-[#1d1d1f] transition-colors disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
             <span className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">Step {step} of {TOTAL}</span>
-            <button type="button" onClick={next} disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $250 AUD" : "Continue →"}</button>
+            <button type="submit" disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $250 AUD" : "Continue →"}</button>
           </div>
         )}
+        </form>
       </div>
 
       {/* We Accept — payment logos */}
       <div className="mt-14 flex justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/installation/we-accept.svg" alt="We accept AMEX, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
+        <img src="/installation/we-accept.svg" alt="We accept American Express, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
       </div>
     </div>
   );
 }
-
-// Postcode row: [postcode, suburb, state, supported flag]; exact 4-digit lookup against a precomputed coverage dataset.
-type PostcodeRow = [string, string, string, number];
-let postcodeCache: PostcodeRow[] | null = null;
 
 function PostcodeCheck() {
   const [pc, setPc] = useState("");
   const [result, setResult] = useState<Coverage>({ msg: "", cls: "" });
   const [checking, setChecking] = useState(false);
 
-  async function loadRows(): Promise<PostcodeRow[] | null> {
-    if (postcodeCache) return postcodeCache;
-    try {
-      const res = await fetch("/installation/au-postcodes.json");
-      if (!res.ok) return null;
-      const data = (await res.json()) as { rows: PostcodeRow[] };
-      postcodeCache = data.rows;
-      return postcodeCache;
-    } catch {
-      return null;
-    }
-  }
-
   async function run() {
-    if (!/^\d{4}$/.test(pc)) { setResult({ msg: "Please enter a valid 4-digit Australian postcode.", cls: "err" }); return; }
+    if (!/^\d{4}$/.test(pc)) { setResult({ msg: COVERAGE_MESSAGES.invalid, cls: "err" }); return; }
     setChecking(true);
-    const rows = await loadRows();
+    const rows = await loadPostcodeRows();
     setChecking(false);
-    if (!rows) { setResult({ msg: "Sorry, we couldn’t check availability just now — please try again.", cls: "err" }); return; }
-    const match = rows.find((r) => r[0] === pc);
-    if (match && match[3]) setResult({ msg: `Great — installation is available in ${match[1]}, ${match[2]}.`, cls: "ok" });
-    else if (match) setResult({ msg: `Sorry, we don’t service ${match[1]}, ${match[2]} yet.`, cls: "err" });
-    else setResult({ msg: "Sorry, we don’t currently service that postcode. Submit a booking and we’ll confirm within one business day.", cls: "warn" });
+    // Unlike the wizard, the checker reports the outage rather than silently falling back
+    // to the coarse range table — it exists to give a precise answer or none at all.
+    if (!rows) { setResult({ msg: COVERAGE_MESSAGES.unavailable, cls: "err" }); return; }
+    setResult(resolveCoverage(pc, rows));
   }
 
   return (
@@ -521,7 +510,7 @@ export default function Page() {
               <p className="mt-3.5 text-[18px] leading-[27px] tracking-[-0.4395px] text-[#5b5e66]">FineVu certified installers operate across major metropolitan areas with regional coverage expanding monthly. Enter your postcode to check availability in your area.</p>
               <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-[12px] leading-[18px] text-[#5b5e66]">
                 <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[var(--finevu-orange)]" />Metro coverage now</span>
-                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[#9a9da5]" />Regional - confirmed at booking</span>
+                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[#9a9da5]" />Regional — confirmed at booking</span>
               </div>
               <PostcodeCheck />
               <p className="mt-5 text-[12px] leading-[18px] text-[#9a9da5]">Installation is not currently available in the Northern Territory.</p>

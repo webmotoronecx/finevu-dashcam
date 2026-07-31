@@ -3,6 +3,15 @@
 **Date:** 2026-07-31 · **Scope:** all ten user-input surfaces, incl. the four gated in
 production and the two dead components · **Deliverable:** report only, no code changed.
 
+> **Second pass, same day — booking wizard only** (§6 below). `app/installation/page.tsx`
+> was re-read end to end at the user's request. FA-01, FA-06, FA-08, FA-16, FA-17, FA-20,
+> FA-21 and FA-22 all still reproduce at the cited lines. Nine further findings —
+> **FA-23 … FA-31** — are new. Nothing else was re-read in that pass.
+>
+> **FA-24, FA-25, FA-27, FA-29 and FA-31 were then applied** (same day, at the user's
+> request) and are marked `Applied` in the CSV; the §6 table below still describes them as
+> found. FA-23, FA-26 and FA-28 are untouched — all three need a decision, not an edit.
+
 Flat tracker: `docs/forms-audit-changes.csv` (one row per finding, same `FA-nn` IDs).
 Every `file:line` below was read and verified.
 
@@ -138,16 +147,127 @@ from the unlabelled payment fields uses `aria-label` correctly (`installation:43
 
 ---
 
-## 6. Summary
+## 6. Booking wizard — deep pass (`app/installation/page.tsx`, read in full)
+
+The wizard is the **only form live in production** and the only one that asks for money.
+Below is what the first pass didn't reach. Everything is verified by reading the file;
+`au-postcodes.json` figures come from counting the dataset against the wizard's own table.
+
+### FA-23 · Two coverage answers on the same page, and the paying one is the wrong one
+`installation/page.tsx:145-151` and `:89-101` vs `:417-427`
+
+The postcode checker (§ *Installers near you*) answers from
+`public/installation/au-postcodes.json` — 2,765 rows, each with a supported flag. The
+**wizard never loads that file.** `validate(2)` hard-blocks only NT (`:150`) and otherwise
+accepts any 4-digit postcode, falling back to a hardcoded 19-range metro table at `:93-98`.
+
+Counting one against the other:
+
+| | Count | Example |
+|---|---|---|
+| Non-NT postcodes the checker calls unserviced that the wizard will still take payment for | **1,297** | 4870 Cairns |
+| …of those, ones the wizard's own table calls metro | **106** | 2010 Surry Hills, 2011 Kings Cross |
+| Postcodes the wizard calls "regional, we'll confirm" that the checker calls serviced | **437** | 3350 Redan |
+
+So a Surry Hills customer is told *"Sorry, we don't service Surry Hills yet"* by the
+checker and *"Great news — certified installers service Sydney"* by the booking flow, then
+pays. Which dataset is right is an ops question; that they disagree is not.
+
+**Resolved 2026-07-31.** Both surfaces now answer through a single `resolveCoverage()` in
+`lib/data/installation-coverage.ts`, which reads the JSON dataset. The wizard prefetches
+the rows on mount so step-2 validation stays synchronous, and the 19-range table survives
+only as a fallback for when that fetch fails. Surry Hills now reads *"We don't have a
+certified installer in Surry Hills, NSW yet"* in the wizard.
+
+**The JSON is now the single source of truth** — `METRO_COVERAGE` is commented out (kept in
+the file as the restore path). With no fallback left, a failed fetch resolves to a
+non-committal *"we'll confirm within one business day"*, never a refusal.
+
+Cross-checking the two before disabling the ranges: they agreed on **79.9%** of the 2,700
+non-NT postcodes — 106 the ranges called metro the dataset calls unserviced, 436 the ranges
+called merely regional the dataset calls serviced. Per-range agreement ran from 100%
+(Melbourne, Adelaide, Canberra, Ipswich) down to **44% Wollongong** and **59% Sunshine Coast**.
+
+⚠️ **Correction to an earlier draft of this section, which said the JSON "was the side that
+turned out to be right".** That is not supportable. Its metro flags are demonstrably broken:
+
+```
+2000 Sydney    SERVICED     2010 Surry Hills  not serviced
+2007 Ultimo    not serviced 2016 Redfern      not serviced
+2009 Pyrmont   SERVICED     2017 Zetland      SERVICED
+```
+
+Ultimo sits physically between Sydney and Pyrmont; Redfern is ringed by serviced postcodes.
+No radius or polygon produces that, so generation failed per-postcode and wrote the failures
+as `0`. An unknown number of *"not serviced"* answers are **false negatives** — customers
+turned away from areas we probably do service. Also flagged serviced: `7151 Casey` (an
+Antarctic base) and `9999 North Pole`.
+
+So FA-23's defect — *two answers* — is fixed. The remaining problem is that the surviving
+answer is unreliable, which is CA-78's territory, not this row's. Three things block it, and
+none are ours:
+
+- **Non-blocking was a deliberate choice.** An unserviced postcode warns and lets the
+  customer continue, so no revenue path closed. Hard-blocking is the stricter option and an
+  ops call — and given the false negatives above, blocking today would be actively wrong.
+- **Provenance.** The flags came from `installations.dashcamsrus.com.au` polygons; AutoXtreme
+  must confirm those describe their installer network.
+- **The file cannot be regenerated.** `scripts/build-au-postcodes.py`, named in its own
+  `note`, does not exist in this repo.
+
+### FA-26 · A paid checkout with nothing agreed to
+`:342-358`
+
+Five steps collect name, address, phone, email and full card details and charge $250 —
+with **no consent checkbox, no terms link and no privacy notice anywhere in the flow.**
+`lib/data/installation-terms.ts` §5 makes payment-at-booking a contractual term, but
+`installationTerms` is imported by exactly one file, `app/terms-of-service/page.tsx`, and
+nothing on `/installation` links to it. Legal call, not ours.
+
+### FA-28 · The thank-you page contradicts the button that got you there
+`:181` → `lib/data/thank-you.ts:32,67`
+
+The button reads **"Pay $250 AUD"**; the destination reads *"We've received your submission
+and sent a confirmation to your email"*, with no reference, no amount and no receipt. This
+is not the same defect as FA-07 — for the other four forms support does receive an email,
+so only the *confirmation-to-submitter* half is false. Here the submission itself is
+phantom, immediately after the user was told their card was charged. The step-6 block
+(`:361-371`, now unreachable by design, see the comment at `:177-180`) at least showed the
+reference and the paid summary; the redirect shows less.
+
+### The rest
+
+| ID | Finding | Where | Impact |
+|----|---------|-------|--------|
+| **FA-24** | The step-2 coverage message is dead code — `validate(2)` sets the hint, `next()` clears it on the same tick | `:151` vs `:174` | The `ok`/`warn` strings at `:99-100` can never render in the wizard; only error branches display |
+| **FA-25** | Not a `<form>` — no form element, no `onSubmit`, so Enter does nothing in any of 12 text inputs | `:202-384` | Type a card number, press Enter, nothing happens. The postcode checker 50 lines below handles Enter correctly (`:432`) |
+| **FA-27** | `retailer` and `notes` have no destination in **any** code path — absent from `summaryRows()` and `confirmRows()` too | `:329,338` vs `:186-199` | "Apartment parking access" is dropped even by the on-page summary, independently of FA-01 |
+| **FA-29** | The four button-grid selectors convey selection visually only — no `role="radio"`/`aria-checked`, no `aria-pressed`, no group label | `:235`, `:255`, `:303`, `:313` | Screen reader hears "GX4K button" with no selected state. Distinct from FA-16, which covers the text fields |
+| **FA-30** | No availability model: nine slots offered on every weekday, fixed 28-day window with no navigation, `today` memoised at mount | `:111-124`, `:311-315` | Every slot always looks free; nothing bookable past four weeks; a page left open overnight offers a stale day split |
+| **FA-31** | `setProcessing(false)` runs before `router.push`, re-enabling the pay button mid-navigation | `:181` | Harmless now; a double-charge path the moment a provider is wired |
+
+**Verified still correct in the wizard, for the record:** Back preserves all state
+(`:184`); step 2's Street field is the one properly labelled input on the page (`:266-268`)
+and `AddressAutocomplete` is a correctly built combobox; postcode and year inputs strip
+non-digits and cap length (`:288,335`); card expiry is checked against the current month
+(`:164-167`); disabled calendar days are genuinely `disabled`, so they're skipped by Tab.
+
+---
+
+## 7. Summary
 
 **Blocks launch** — FA-01 (wizard/card), FA-02 (evidence lost), FA-03 (attachments
 dropped), FA-04 (honeypot dead), FA-05 (no rate limiting), FA-07 (phantom email),
-FA-12 (wrong recipient domain).
+FA-12 (wrong recipient domain), **FA-23** (contradictory coverage), **FA-26** (no terms
+acceptance at checkout), **FA-28** (thank-you copy contradicts the pay button).
 
-**Should fix, not blocking** — FA-08, FA-09, FA-11, FA-13, FA-14, and the a11y set, of
-which **FA-15** and **FA-16** are the two that actually block users.
+**Should fix, not blocking** — FA-08, FA-09, FA-11, FA-13, FA-14, FA-24, FA-25, FA-27,
+FA-30, FA-31, and the a11y set, of which **FA-15**, **FA-16** and **FA-29** are the ones
+that actually block users.
 
 **Not ours to settle** — whether `/installation` gets a real payment + booking backend or
 is visibly marked a demo (**CA-36**, everything else about that wizard is downstream);
-whether submitters get an auto-reply or the copy is reworded (**FA-07**); whether warranty
-evidence is attached properly or the UI redirects people to email (**FA-02**).
+which coverage dataset is authoritative (**FA-23**); whether a terms checkbox is required
+before payment (**FA-26**, legal); whether submitters get an auto-reply or the copy is
+reworded (**FA-07** / **FA-28**); whether warranty evidence is attached properly or the UI
+redirects people to email (**FA-02**).

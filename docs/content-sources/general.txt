@@ -25,6 +25,60 @@ Service model:    Mobile — installer comes to the customer's home or workplace
 Typical duration: 60–90 minutes
 Reschedule:       Free with >24 hours notice (see anchor §14 for the binding wording)
 
+Coverage area:    ANCHORED IN CODE — lib/data/installation-coverage.ts is the single entry
+                  point (resolveCoverage) for both the postcode checker and the booking
+                  wizard. Same arrangement as warranty.ts and installation-terms.ts: the .ts
+                  file is the anchor, do not restate coverage here or on a page. Unified
+                  2026-07-31; the two surfaces previously disagreed (forms audit FA-23).
+
+  THE DATA:       public/installation/au-postcodes.json — 2,765 suburb-level rows, each
+                  [postcode, suburb, state, supported]. As of 2026-07-31 this is the SINGLE
+                  source for every installer/coverage answer on the site. The 19 metro
+                  ranges that used to back it up are commented out in the .ts file (kept as
+                  the restore path — do not delete them).
+
+                  Postcodes are Matthew Proctor's CC-BY list. The SUPPORTED FLAGS are ours,
+                  and are the part that needs approval: they were computed offline by
+                  point-in-polygon against service-area polygons from a third party,
+                  installations.dashcamsrus.com.au, which nobody has confirmed describe
+                  AutoXtreme's installer network.
+
+  KNOWN DEFECTS:  Recorded so nobody mistakes this file for verified data.
+
+                  1. The supported flags are NOT reliable point-in-polygon output, whatever
+                     the file's own `note` claims. Inner Sydney is a checkerboard: 2000
+                     Sydney and 2009 Pyrmont are serviced while 2007 Ultimo — physically
+                     between them — is not, as are 2010 Surry Hills, 2011 Kings Cross and
+                     2016 Redfern, each ringed by serviced postcodes. No radius or polygon
+                     produces that. Generation failed per-postcode and wrote the failures as
+                     0, so an unknown number of "not serviced" answers are FALSE NEGATIVES —
+                     real customers being turned away from areas we probably do service.
+                  2. 52 flagged-serviced postcodes are non-geographic — PO boxes and mail
+                     centres (1314 Eastern Suburbs Mc, 1481 Hurstville Bc, 0200 Anu).
+                     Harmless; nobody types them.
+                  3. 7151 Casey (an Antarctic base) and 9999 North Pole are flagged serviced.
+                  4. 16 postcodes appear twice. Their flags agree, so it is cosmetic.
+
+                  Defect 1 is the one that matters. It cannot be fixed by editing the file —
+                  it needs regenerating from service areas AutoXtreme confirms, which is
+                  also what clears the approval tag below.
+
+  REGENERATING:   The file's `note` says to re-run scripts/build-au-postcodes.py. THAT SCRIPT
+                  DOES NOT EXIST in this repo, so the file currently cannot be reproduced or
+                  audited. Rebuilding the generator is a prerequisite for fixing defect 1.
+
+  For context when approving: Adelaide, Hobart and Canberra are all marked serviced, while
+  the FineVu dealer feed under RETAIL DISTRIBUTION lists NO presence in SA, TAS or ACT — only
+  VIC, QLD, NSW and WA. Not proof of an error, since the service model above is MOBILE and a
+  mobile installer need not be a listed stockist, but it is the only independent evidence and
+  it points the other way.
+
+  Narrowing coverage is the safe direction; do not widen it without a source. Tracked as
+  CA-78 (data) and FA-23 (wiring). NT exclusion is separate and confirmed — it stays
+  regardless, and is the ONLY hard block in the booking flow.
+
+  Confirmed installer service areas: (none) {!needs approval}
+
 == WORDING CONVENTIONS (site-wide — the audit enforces these) ==
 
 Size comparison — always a CREDIT CARD, never a business card.
@@ -61,6 +115,45 @@ Approved wording: "leading authorised retailers"
   operational data, not marketing copy, and it must come from the retailers themselves.
 
   Confirmed AU retail partners: (none) {!needs approval}
+
+Candidate source (NOT approved) — found 2026-07-31:
+
+  FineVu's own global site publishes an Australian dealer list through a public JSON
+  endpoint. It is the first concrete candidate for the "NONE APPROVED" line above:
+
+    GET https://en.finevu.com/api/controller/user/store/getWheretoBuy.php
+        ?page=1&size=100&countryId=6&where=W&retail=R&installer=I
+
+  Returns 20 Australian listings — 5 online sellers and 15 physical retailers
+  (7 VIC, 6 QLD, 2 NSW, 1 WA), each with street address and phone, about a third with
+  email. All 15 physical retailers also advertise installation.
+
+  The records are deliberately NOT reproduced here. Per the paragraph above, store-locator
+  data belongs in its own file and must come from the retailers themselves — a pull from
+  the Korean parent's site is not that. This is a pointer so the list can be re-pulled or
+  re-requested once someone approves it, nothing more.
+
+  Three data-quality problems for whoever reviews it:
+    - `countryName` reads "Argentina" on every row. Their bug — the countryId=6 filter is
+      correct and the rows match their rendered page — but it means the feed cannot be
+      trusted field-for-field.
+    - Retail / On-line / Installation is not a field. It is baked into the store NAME
+      string and inconsistently punctuated ("Retail. On-line, Installation").
+    - `installerCnt` reports 0 while 15 rows advertise installation; their taxonomy only
+      has Online/Retailers.
+
+  Approval here means AutoXtreme confirming the list is current and may be published as
+  the AU dealer network — not merely that the endpoint returned data. Tracked as CA-33.
+
+Store-locator map:
+
+  /retailers today links out to google.com/maps/search URLs (app/retailers/page.tsx:96),
+  which need no key and cost nothing. Nothing is broken. A key is required only if an
+  EMBEDDED map is wanted, and it would sit on AutoXtreme's own Google Cloud billing as a
+  metered service. Do not reuse the key on en.finevu.com — that is Fine Digital's,
+  referrer-restricted, and on their billing. Tracked as CA-77.
+
+  Approved Google Maps API key for the store locator: (none) {!needs approval}
 
 == SOCIAL MEDIA ==
 

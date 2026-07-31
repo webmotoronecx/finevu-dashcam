@@ -37,15 +37,15 @@ const fadeUp = {
 };
 
 const HERO_STATS = [
-  { value: "No.1", label: "Dash cam brand in Korea" },
-  { value: "3 Year", label: "Australian warranty" },
+  { value: "No. 1", label: "Dash cam brand in Korea" },
+  { value: "3-Year", label: "Australian warranty" },
   { value: "<0.2%", label: "In-house defect rate" },
   { value: "2 models", label: "GX4K flagship & GX35" },
 ];
 
 const whyPartner = [
   { icon: Star, title: "Premium brand, premium margins", body: "A recognised, award-winning product positioned above the supermarket shelf — so you sell on quality, not just price." },
-  { icon: BarChart3, title: "No.1 dash cam in Korea", body: "The best-selling dash cam brand in its home market, made in-house by FineDigital with a defect rate held below 0.2%." },
+  { icon: BarChart3, title: "No. 1 dash cam in Korea", body: "The best-selling dash cam brand in its home market, made in-house by FineDigital with a defect rate held below 0.2%." },
   { icon: Aperture, title: "Sony STARVIS technology", body: "Genuine Sony STARVIS and STARVIS 2 sensors with true 4K and 2K clarity — features customers actively search for and ask about." },
   { icon: ShieldCheck, title: "Backed by a local distributor", body: "AutoXtreme handles importing, the 3-year Australian warranty, firmware and support — so your customers are looked after long after the sale." },
   { icon: Megaphone, title: "Marketing & POS support", body: "Display units, point-of-sale material and product assets to help FineVu look the part in-store and online." },
@@ -68,7 +68,7 @@ const range = [
     model: "FineVu GX4K",
     tagline: "True 4K front & Full HD rear — the sharpest FineVu made.",
     specs: [
-      ["Sony STARVIS IMX515", " — 8.5MP, 3840×2160 4K UHD front"],
+      ["Sony STARVIS IMX515", " — 8.5MP, 3840 × 2160 4K UHD front"],
       ["Built-in GPS & 5GHz Wi-Fi", ", 128GB card included"],
       ["ADAS Plus, HDR night vision", " & parking mode"],
     ],
@@ -80,9 +80,9 @@ const range = [
     model: "FineVu GX35",
     tagline: "2K QHD clarity and the latest sensor, at an accessible price.",
     specs: [
-      ["Sony STARVIS 2 IMX675", " — 5.12MP, 2560×1440 2K QHD front"],
+      ["Sony STARVIS 2 IMX675", " — 5.12MP, 2560 × 1440 2K QHD front"],
       ["External GPS included", ", Wi-Fi, 64GB card included"],
-      ["13,950 more hours", " of parking recording than standard parking mode"],
+      ["13,950 more hours", " of parking recording than it would in standard parking mode"],
     ],
     href: "/gx35",
   },
@@ -289,7 +289,7 @@ export default function Page() {
         maxWidth="max-w-[760px]"
         overlay="gradient"
         stats={HERO_STATS}
-        title={<>Stock Korea&apos;s<br />No.1 dash cam.</>}
+        title={<>Stock Korea&apos;s<br />No. 1 dash cam.</>}
         subtitle="Add FineVu to your range. Premium 4K and 2K dash cams with Sony STARVIS sensors, healthy margins and a 3-year Australian warranty, backed by a distributor that supports every sale."
         actions={
           <>
@@ -361,7 +361,7 @@ export default function Page() {
       {/* How it works */}
       <section className="bg-[#f7f7f7] py-24 md:py-[96px]" data-nav-theme="light">
         <div className="mx-auto max-w-[1160px] px-6">
-          <SectionHead title="From application to shelf." sub="Becoming a FineVu stockist is quick. Most accounts are approved within one to two business days." />
+          <SectionHead title="From application to shelf." sub="Becoming a FineVu stockist is quick. Most accounts are approved within 1–2 business days." />
           <div className="relative mx-auto max-w-[1112px]">
             <div className="absolute left-[12.5%] right-[12.5%] top-[31px] hidden border-t-2 border-dashed border-[var(--finevu-orange)] lg:block" />
             <div className="grid gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">

@@ -23,11 +23,11 @@ export const articles: Article[] = [
       <p class="lead">Both the FineVu GX4K and GX35 give you clear, court-ready footage. The real question is how much detail you need, and how often you need to read a number plate from a moving car. Here is how to choose without the marketing fluff.</p>
 
       <h3>What 4K and 2K actually mean</h3>
-      <p>Resolution is just the number of pixels in each frame. 2K (also called Quad HD, 2560 x 1440) is sharper than the 1080p most cheap dash cams record. True 4K (3840 x 2160) packs in roughly four times the pixels of 1080p, which means far more usable detail when you crop in on a plate, a face, or a street sign.</p>
+      <p>Resolution is just the number of pixels in each frame. 2K (also called Quad HD, 2560 × 1440) is sharper than the 1080p most cheap dash cams record. True 4K (3840 × 2160) packs in roughly four times the pixels of 1080p, which means far more usable detail when you crop in on a plate, a face, or a street sign.</p>
 
       <div class="my-10">
         <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Highway driving at dusk seen through a windscreen" class="rounded-2xl w-full object-cover h-[400px] shadow-lg" />
-        <p class="text-sm text-zinc-500 mt-2 text-center">More pixels means a plate stays readable even when the car is moving and you crop in.</p>
+        <p class="text-sm text-zinc-500 mt-2 text-center">More pixels mean a plate stays readable even when the car is moving and you crop in.</p>
       </div>
 
       <h3>The SONY STARVIS difference</h3>
@@ -46,8 +46,8 @@ export const articles: Article[] = [
           <tbody>
             <tr class="border-b border-zinc-100">
               <td class="p-4 font-medium">Front resolution</td>
-              <td class="p-4">True 4K (3840 x 2160)</td>
-              <td class="p-4">2K (2560 x 1440)</td>
+              <td class="p-4">True 4K (3840 × 2160)</td>
+              <td class="p-4">2K (2560 × 1440)</td>
             </tr>
             <tr class="border-b border-zinc-100 bg-zinc-50/50">
               <td class="p-4 font-medium">Front sensor</td>
@@ -128,7 +128,7 @@ export const articles: Article[] = [
 
       <div class="bg-zinc-50 p-6 rounded-xl border-l-4 border-[var(--finevu-orange)] my-8">
         <h4 class="font-bold text-zinc-900 mb-2">Get it installed properly</h4>
-        <p class="text-sm text-zinc-600">A clean hardwire install protects your warranty, keeps wiring out of sight, and makes sure ADAS and parking mode work as intended. AutoXtreme can point you to a fitter, call 1800 818 288.</p>
+        <p class="text-sm text-zinc-600">A clean hardwire install protects your warranty, keeps wiring out of sight, and makes sure ADAS and parking mode work as intended. AutoXtreme can point you to a fitter — call 1800 818 288.</p>
       </div>
 
       <h3>ADAS plus a recording you can trust</h3>
@@ -161,7 +161,7 @@ export const articles: Article[] = [
       <ul class="list-disc pl-5 space-y-2">
         <li><strong>Impact (G-sensor):</strong> a bump or knock triggers an instant recording, ideal for trolley dents and door dings.</li>
         <li><strong>Motion detection:</strong> the camera records when someone or something moves into frame near the car.</li>
-        <li><strong>Time-lapse:</strong> a continuous low-frame recording of the whole time you were parked, so nothing is missed.</li>
+        <li><strong>Time-lapse:</strong> a continuous low-frame-rate recording of the whole time you were parked, so nothing is missed.</li>
       </ul>
 
       <h3>Why hardwiring is essential here</h3>
@@ -213,7 +213,7 @@ export const articles: Article[] = [
       <p>Both models pair a SONY STARVIS front sensor with a Full HD rear camera, so the rear footage is genuinely usable, not a grainy afterthought. On the GX4K you get true 4K up front with a Full HD rear channel, and on the GX35, 2K up front with the same Full HD rear. Either way, a number plate behind you stands a real chance of being readable.</p>
 
       <h3>Share it in seconds</h3>
-      <p>When something happens, open the FineVu app over Wi-Fi, pull both the front and rear clips with their GPS data, and send them to your insurer. No need to hand over your whole memory card or describe what happened, the footage speaks for itself.</p>
+      <p>When something happens, open the FineVu app over Wi-Fi, pull both the front and rear clips with their GPS data, and send them to your insurer. No need to hand over your whole memory card or describe what happened — the footage speaks for itself.</p>
 
       <h3>The bottom line</h3>
       <p>Front-only protects you from what you can already see. A 2CH FineVu protects you from everything else. For the small extra outlay, full front and rear cover is the obvious choice.</p>

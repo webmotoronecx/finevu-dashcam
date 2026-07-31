@@ -32,7 +32,7 @@ const channels = [
   {
     icon: Mail,
     title: "Email Support",
-    desc: "Send us a detailed inquiry",
+    desc: "Send us a detailed enquiry",
     big: "support@finevuaustralia.com.au",
     small: "Response within 24 hours",
     cta: "Send Email",
@@ -155,7 +155,7 @@ function ContactForm() {
         <textarea
           id="f-msg"
           className={`${INPUT} min-h-[130px] resize-y`}
-          placeholder="Tell us about your dash cam and what you need help with..."
+          placeholder="Tell us about your dash cam and what you need help with…"
           required
           value={form.message}
           onChange={(e) => set("message", e.target.value)}
@@ -209,8 +209,8 @@ export default function Page() {
               How can we help?
             </h2>
             <p className="mt-4 text-[18px] leading-[1.6] text-[#6b6b72]">
-              Get in touch with our team, or find manuals, firmware and troubleshooting for your FineVu
-              dash cam below.
+              Call or email our Australian support team, or send us a message below and we’ll
+              get back to you.
             </p>
           </motion.div>
 

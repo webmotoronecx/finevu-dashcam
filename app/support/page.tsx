@@ -33,7 +33,7 @@ const channels = [
     {
         icon: Mail,
         title: "Email Support",
-        desc: "Send us a detailed inquiry",
+        desc: "Send us a detailed enquiry",
         big: "support@finevuaustralia.com.au",
         small: "Response within 24 hours",
         cta: "Send Email",
@@ -54,7 +54,7 @@ const models: ModelHub[] = [
     {
         id: "gx4k",
         name: "FineVu GX4K",
-        line: "4K UHD front & FHD rear dash cam",
+        line: "4K UHD front & Full HD rear dash cam",
         img: "/products/gx4k-card-transparent.webp",
         downloads: [
             ["Firmware", "v2.03 · ZIP"],
@@ -64,7 +64,7 @@ const models: ModelHub[] = [
         ],
         guides: [
             ["Firmware update steps", "GUIDE"],
-            ["MicroSD card formatting", "GUIDE"],
+            ["microSD card formatting", "GUIDE"],
             ["Parking mode & battery protection", "GUIDE"],
             ["Installation video", "VIDEO"],
         ],
@@ -82,7 +82,7 @@ const models: ModelHub[] = [
         ],
         guides: [
             ["Firmware update steps", "GUIDE"],
-            ["MicroSD card formatting", "GUIDE"],
+            ["microSD card formatting", "GUIDE"],
             ["Parking mode & battery protection", "GUIDE"],
             ["Installation video", "VIDEO"],
         ],
@@ -100,7 +100,7 @@ const troubleshooting = [
     },
     {
         q: "Camera turns off in parking mode",
-        a: "This is usually the low-voltage cutoff protecting your car battery. Check the cutoff voltage setting in the camera menu — 12.0V is typical for daily drivers. If your battery is older, it may be dropping below the cutoff sooner than expected.",
+        a: "This is usually the low-voltage cut-off protecting your car battery. Check the cut-off voltage setting in the camera menu — 12.0V is typical for daily drivers. If your battery is older, it may be dropping below the cut-off sooner than expected.",
     },
     {
         q: "GPS not connecting or speed shows zero",
@@ -108,7 +108,7 @@ const troubleshooting = [
     },
     {
         q: "How do I update the firmware?",
-        a: "Download the firmware for your model from the Download Centre above, copy it to a freshly formatted SD card, insert it into the camera and power on. The camera updates automatically — don’t disconnect power until it finishes.",
+        a: "Download the firmware for your model from its support hub above, copy it to a freshly formatted SD card, insert it into the camera and power on. The camera updates automatically — don’t disconnect power until it finishes.",
     },
     {
         q: "Time or date is wrong on my footage",
@@ -343,12 +343,12 @@ export default function Page() {
                 </div>
             </section>
 
-            {/* Select your dash camera */}
+            {/* Select your dash cam */}
             <section id="downloads" className="bg-[#f4f4f5] py-24 md:py-[96px]" data-nav-theme="light">
                 <div className="mx-auto max-w-[1160px] px-6">
                     <motion.div {...fadeUp} className="mx-auto mb-11 max-w-[720px] text-center">
                         <h2 className="text-[32px] font-semibold leading-[40px] tracking-[-0.015em] text-[#0a0a0a] md:text-[48px] md:leading-[60px]">
-                            Select your dash camera
+                            Select your dash cam
                         </h2>
                         <p className="mt-4 text-[18px] leading-[1.6] text-[#6b6b72]">
                             Tap your model to open its support hub. Manuals, firmware, quick start guides and model FAQs, all in one place.
@@ -389,7 +389,7 @@ export default function Page() {
                 <div className="mx-auto max-w-[1160px] px-6">
                     <motion.div {...fadeUp} className="mx-auto mb-11 max-w-[720px] text-center">
                         <h2 className="text-[32px] font-semibold leading-[40px] tracking-[-0.015em] text-[#17181a] md:text-[48px] md:leading-[60px]">
-                            Product Registration &amp; Warranty Claims
+                            Product registration and warranty claims
                         </h2>
                     </motion.div>
                     <div className="mx-auto grid max-w-[900px] gap-[22px] md:grid-cols-2">

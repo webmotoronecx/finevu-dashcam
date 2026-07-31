@@ -22,10 +22,10 @@ const fadeUp = {
 };
 
 const stats = [
-  { img: "/about/trust-no1.webp", cap: ["No.1 Dash cam brand", "by sales in Korea"] },
-  { img: "/about/trust-warranty.webp", cap: ["3 Year Warranty", "[1]"] },
+  { img: "/about/trust-no1.webp", cap: ["No. 1 dash cam brand", "by sales in Korea"] },
+  { img: "/about/trust-warranty.webp", cap: ["3-Year Warranty", "[1]"] },
   { img: "/about/trust-founded.webp", cap: ["Founded in", "Gyeonggi-do, Korea"] },
-  { img: "/about/trust-defect.webp", cap: ["<0.2% Defect rate across", "in-house production"] },
+  { img: "/about/trust-defect.webp", cap: ["<0.2% defect rate across", "in-house production"] },
 ];
 
 const whatWeBuild = [
@@ -156,7 +156,7 @@ export default function Page() {
             heading="Over 30 years of automotive electronics, built in-house."
             paras={[
               "FineVu is the dash cam brand of Fine Digital Inc., a South Korean electronics company that's been designing car technology since 1992, long before dash cams were mainstream.",
-              "That history matters. It's why FineVu builds its cameras in its own factories rather than outsourcing to generic manufacturers, keeping defect rates below 0.2% and making FineVu the No.1 selling dash cam brand in Korea.",
+              "That history matters. It's why FineVu builds its cameras in its own factories rather than outsourcing to generic manufacturers, keeping defect rates below 0.2% and making FineVu the No. 1 selling dash cam brand in Korea.",
             ]}
           />
         </div>

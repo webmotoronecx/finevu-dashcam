@@ -466,7 +466,7 @@ export function Navigation() {
               key="products-panel"
               id="products-menu"
               role="menu"
-              aria-label="Dash cameras"
+              aria-label="Dash cams"
               ref={panelRef}
               onKeyDown={handlePanelKeyDown}
               className="hidden xl:block absolute left-1/2 -translate-x-1/2 top-full mt-3 z-50 rounded-[28px] bg-white border border-black/[0.06] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.35)]"
@@ -477,7 +477,7 @@ export function Navigation() {
             >
               <div className="flex items-start gap-[55px] px-12 py-10">
                 <span className="text-[16px] font-semibold text-[#0b0b0c] whitespace-nowrap tracking-[-0.3px] pt-1">
-                  Dash Cameras
+                  Dash Cams
                 </span>
                 <div className="flex gap-[21px]">
                   {dropdownProducts.map((p) => (
@@ -527,7 +527,7 @@ export function Navigation() {
             >
               <div className="px-6 py-6 space-y-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
-                  Dash Cameras
+                  Dash Cams
                 </p>
                 {productsItem?.children?.map((c) => (
                   <Link key={c.href} href={c.href} className="block pl-3 text-white/80 hover:text-white transition-colors">

@@ -47,7 +47,9 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.15 }}
           >
-            {contact.origin}. Backed by a {contact.warranty.toLowerCase()}.
+            {/* warrantyInline, not warranty.toLowerCase() — the latter also lowercased
+                "Australian". See the note on `contact` in config/site.config.ts. CP-11. */}
+            {contact.origin}. Backed by a {contact.warrantyInline}.
           </motion.p>
           <motion.div
             className="flex justify-center"

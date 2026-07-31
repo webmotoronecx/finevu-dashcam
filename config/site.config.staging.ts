@@ -30,8 +30,8 @@ export const stagingOverrides: Partial<SiteConfig> = {
       {
         heading: "Dash Cams",
         links: [
-          { href: "/gx4k", label: "GX4K - 4K 2CH" },
-          { href: "/gx35", label: "GX35 - 2K 2CH" },
+          { href: "/gx4k", label: "GX4K — 4K 2CH" },
+          { href: "/gx35", label: "GX35 — 2K 2CH" },
           { href: "/installation", label: "Installation" },
         ],
       },

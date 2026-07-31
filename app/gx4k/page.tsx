@@ -69,14 +69,14 @@ const detailCards = [
     { title: "3840 × 2160 UHD Front Camera", caption: "Every pixel captured", video: "/gx4k/captured-front-cam.mp4", img: "/gx4k/captured-front-cam-poster.webp" },
     { title: "Sony STARVIS IMX515", caption: "8.5MP · F/1.8 · crystal-clear detail", img: "/gx4k/captured-starvis.webp" },
     { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx4k/captured-night.mp4", img: "/gx4k/captured-night-poster.webp" },
-    { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/captured-ai-heat.webp" },
+    { title: "AI Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx4k/captured-ai-heat.webp" },
     { title: "136°/143° Field of View", caption: "Front & Rear", img: "/gx4k/captured-front-rear.webp" },
 ];
 
 const cSeeDetail: Card[] = [
     {
         title: "True 4K Ultra HD",
-        body: "Front records in 3840×2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
+        body: "Front records in 3840 × 2160 UHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
         video: "/gx4k/detail-true-4k.mp4",
         img: "/gx4k/detail-true-4k-poster.webp",
     },
@@ -96,7 +96,7 @@ const cSeeDetail: Card[] = [
 const cParked: Card[] = [
     {
         title: "Power Saving Parking Mode",
-        body: "Prolonged recording time. Consuming 98% less power, GX4K records 2,325 more hours than standard parking mode.",
+        body: "Prolonged recording time. Consuming 98% less power, GX4K records 2,325 more hours than it would in standard parking mode.",
         img: "/gx4k/protected-parking.webp",
     },
     {
@@ -143,7 +143,7 @@ const cBuilt: Card[] = [
     {
         title: "Battery Protection Integrated",
         body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
-        note: "* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system.",
+        note: "* FineVu recommends changing the low-voltage settings to “Hybrid” when using the ISG system.",
         img: "/gx4k/built-battery.webp",
     },
 ];
@@ -181,7 +181,7 @@ const cConnected: Card[] = [
 /* Full-bleed MediaSection dividers (title + description over image/color). */
 const mDualVision: MediaSectionData = {
     title: `Dual Vision`,
-    description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
+    description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer colour, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
     image: "/gx4k/graphic-dual-vision.webp",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
@@ -230,7 +230,7 @@ const mSecondEyes: MediaSectionData = {
 };
 
 const mInYourHand: MediaSectionData = {
-    title: "Your Dashcam. In Your Hand.",
+    title: "Your Dash Cam. In Your Hand.",
     description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
     
     image: "/gx4k/your-dashcam.webp",
@@ -279,7 +279,7 @@ const disappearTabs = [
     },
     {
         title: "Disappears Behind the Mirror",
-        body: "At 96.5mm wide and just 123g, the wedge-shaped front unit tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 18g. Always present, never in sight.",
+        body: "At 96.5 mm wide and just 123 g, the wedge-shaped front unit tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 18 g. Always present, never in sight.",
         image: "/gx4k/disappear-behind.webp",
     },
     {
@@ -311,7 +311,7 @@ const specRows: [string, string][] = [
     ["Driver assistance", "ADAS Plus — FVMA (front vehicle motion alert) · LDWS (lane departure)"],
     ["Connectivity", "Built-in dual-band Wi-Fi (2.4 / 5 GHz) · Built-in GPS"],
     ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
-    ["Protection", "Low voltage cut-off · G-sensor · AI heat monitoring"],
+    ["Protection", "Low-voltage cut-off · G-sensor · AI heat monitoring"],
     ["Safety database", "Speed camera alerts, updated quarterly"],
 ];
 
@@ -320,8 +320,8 @@ const boxItems = ["Front Camera", "Rear Camera", "MicroSD Card & Adapter", "Powe
 
 const compareRows: [string, string, string][] = [
     ["Front Sensor", "Sony STARVIS IMX515 8.5MP", "Sony STARVIS 2 IMX675 5.12MP"],
-    ["Front Resolution", "4K UHD 3840×2160", "2K QHD 2560×1440"],
-    ["Rear Resolution", "Full HD 1920×1080", "Full HD 1920×1080"],
+    ["Front Resolution", "4K UHD 3840 × 2160", "2K QHD 2560 × 1440"],
+    ["Rear Resolution", "Full HD 1920 × 1080", "Full HD 1920 × 1080"],
     ["Max Video", "4K 30fps", "2K 30fps"],
     ["Field of View", "136°F · 143°R", "147°F · 143°R"],
     ["GPS", "Built-in", "External antenna (included)"],
@@ -332,20 +332,20 @@ const compareRows: [string, string, string][] = [
 
 const firmwareSteps = [
     "Download the latest firmware.",
-    "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
-    "When the reader is connected to the PC, a USB drive or new disk drive will be created. (It's recommended to format the Micro SD card used for another device before you upgrade the firmware.)",
-    "Copy the downloaded firmware on the top-level root of the memory card.",
-    "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
+    "Remove the microSD card from your dash cam. Insert it into a microSD card reader and connect the reader to the PC.",
+    "When the reader is connected to the PC, a USB drive or new disk drive will be created. (We recommend formatting a card previously used in another device before you upgrade the firmware.)",
+    "Copy the downloaded firmware to the top-level root of the memory card.",
+    "Insert the microSD card into the device. Turn on the vehicle or start the engine to turn on the device.",
     "The firmware update starts automatically.",
     "The system will automatically restart once the firmware update is completed.",
 ];
 
 const speedCamSteps = [
     "Download the latest Speed Cam data file.",
-    "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
+    "Remove the microSD card from your dash cam. Insert it into a microSD card reader and connect the reader to the PC.",
     "When the reader is connected to the PC, a USB drive or new disk drive will be created.",
-    "Copy the downloaded Speed Cam data file on the top-level root of the memory card.",
-    "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
+    "Copy the downloaded Speed Cam data file to the top-level root of the memory card.",
+    "Insert the microSD card into the device. Turn on the vehicle or start the engine to turn on the device.",
     "The Speed Cam data file update starts automatically.",
     "The system will automatically restart once the Speed Cam data file update is completed.",
 ];
@@ -356,7 +356,7 @@ const downloadTabs: FirmwareTab[] = [
         heading: "Instructions",
         steps: firmwareSteps,
         warning:
-            "Do not power off your dashcam until it begins continuous recording, as it may cause permanent damage to the dashcam.",
+            "Do not power off your dash cam until it begins continuous recording, as it may cause permanent damage to the dash cam.",
        // downloadLabel: "Download Firmware",
     },
     {
@@ -615,8 +615,8 @@ export default function GX4KPage() {
                         actually need. 
                     </p>
                     <small className="text-white/30">
-                        <div>{`* The MicroSD card is formatted when changing the memory allocation.`}</div>
-                        <div>{`* The memory format type is FAT32, and if the format type is different, the dashcam proceeds with formatting automatically.`}</div>
+                        <div>{`* The microSD card is formatted when changing the memory allocation.`}</div>
+                        <div>{`* The memory format type is FAT32, and if the format type is different, the dash cam proceeds with formatting automatically.`}</div>
                         <div>{`(After formatting, once you insert it into the device and supply it with power, the formatting will be in progress to set the memory.)`}</div>
                     </small>
                 </motion.div>
@@ -686,11 +686,11 @@ export default function GX4KPage() {
                     {/* Figma 133:58 bento — taller top row, two equal tiles below. */}
                     <div className={`${SHELL} space-y-4 sm:space-y-5`}>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
-                            <BentoCard variant="overlayLabel" img="/gx4k/no1.webp" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
+                            <BentoCard variant="overlayLabel" img="/gx4k/no1.webp" title="No. 1 Dash Cam in Korea" className="aspect-[730/600]" />
                             <BentoCard
                                 variant="overlayLabel"
                                 img="/gx4k/warranty3.webp"
-                                title="3 Year Warranty"
+                                title="3-Year Warranty"
                                 sup="1"
                                 imgClass="object-[50%_42%]"
                                 className="aspect-[550/600] sm:aspect-auto sm:h-full"
@@ -756,7 +756,7 @@ export default function GX4KPage() {
                 <section data-nav-theme="dark" className="py-16 md:py-24">
                     <div className={`${SHELL} text-center`}>
                         <motion.div {...fadeUp}>
-                            <Head pre="What’s in The Box?" className="!text-[28px] md:!text-[40px]" />
+                            <Head pre="What’s in the Box?" className="!text-[28px] md:!text-[40px]" />
                         </motion.div>
                         {/* Box contents — 3-col × 2-row grid, each label gradient-filled (Figma 110:2810) */}
                         <div className="mx-auto mt-10 grid max-w-[760px] grid-cols-2 gap-x-10 gap-y-5 sm:grid-cols-3 md:mt-12">

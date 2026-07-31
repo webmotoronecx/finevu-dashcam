@@ -22,7 +22,7 @@ const groups: { title: string; items: { q: string; a: string[] }[] }[] = [
       {
         q: "Does my dash cam record while my car is parked?",
         a: [
-          "Yes, as long as a hardwire kit is installed. Parking mode keeps watch while the ignition is off and saves a clip whenever it detects motion or an impact. A built-in low-voltage cutoff stops recording before your car battery runs down, and you can adjust the cutoff level in the settings.",
+          "Yes, as long as a hardwire kit is installed. Parking mode keeps watch while the ignition is off and saves a clip whenever it detects motion or an impact. A built-in low-voltage cut-off stops recording before your car battery runs down, and you can adjust the cut-off level in the settings.",
         ],
       },
       {
@@ -106,7 +106,7 @@ const groups: { title: string; items: { q: string; a: string[] }[] }[] = [
       {
         q: "How do I keep my dash cam up to date?",
         a: [
-          "Download the latest firmware for your model from the Download Centre and copy it onto a freshly formatted memory card. Put the card in, power the camera on, and the update installs itself. Leave the camera powered the whole time. It's also worth reformatting your memory card every one to two months to keep recording reliable.",
+          "Download the latest firmware for your model from the support hub on our Support page and copy it onto a freshly formatted memory card. Put the card in, power the camera on, and the update installs itself. Leave the camera powered the whole time. It's also worth reformatting your memory card every one to two months to keep recording reliable.",
         ],
       },
     ],

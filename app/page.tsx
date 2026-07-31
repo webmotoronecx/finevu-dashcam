@@ -118,8 +118,8 @@ function Hero({
 
 /* More reasons bento */
 const reasons = [
-  { img: '/home/No.1_Banner.webp', label: 'No.1 Dash Cam in Korea' },
-  { img: '/home/3YearWarranty_Tile.webp', label: '3 Year Warranty', sup: '1' },
+  { img: '/home/No.1_Banner.webp', label: 'No. 1 Dash Cam in Korea' },
+  { img: '/home/3YearWarranty_Tile.webp', label: '3-Year Warranty', sup: '1' },
   { img: '/home/reason-microsd.webp', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
   { img: '/home/reason-hardwire.webp', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
 ];
@@ -177,7 +177,7 @@ export default function Page() {
 
         eyebrow="FineVu GX4K · 2-Channel UHD"
         title="GX4K"
-        sub="The clearest view of the road you've ever recorded - front and rear."
+        sub="The clearest view of the road you've ever recorded — front and rear."
         href="/gx4k"
       />
 
@@ -191,7 +191,7 @@ export default function Page() {
         mobileVideo="/gx35/hero_mobile.mp4"
         eyebrow="FineVu GX35 · 2-Channel QHD"
         title="GX35"
-        sub="QHD 2K clarity in a camera smaller than a credit card - with in-app live view straight from your phone."
+        sub="QHD 2K clarity in a camera smaller than a credit card — with in-app live view straight from your phone."
         href="/gx35"
       />
 
@@ -242,7 +242,7 @@ export default function Page() {
       <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1340px] mx-auto px-6">
           <motion.div className="text-center max-w-[760px] mx-auto mb-10 md:mb-14" {...fadeUp}>
-            <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dashcams.</h2>
+            <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dash cams.</h2>
             <p className={`${SUB} mt-5`}>
               Built by FINEDIGITAL, an automotive-IT specialist since 1992, held to a standard the numbers prove.
             </p>

@@ -30,7 +30,7 @@ const platforms: Platform[] = [
   {
     id: "ios",
     label: "iOS",
-    version: "V 1.1.77",
+    version: "Version 1.1.77",
     href: "https://apps.apple.com/au/app/finevu-wi-fi/id1514069940",
     requirement: "Requires iOS 13.0 or later. Designed for iPhone.",
     fine: "Download size is approximately 117 MB. Some phones may behave differently depending on OS version and supported resolution. If you run into trouble, our support team can help — or contact FineVu directly at finevu-cs@finedigital.com.",
@@ -182,8 +182,12 @@ export function AppSupport() {
                   Download <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
                 </a>
               </div>
-              <p className="mb-3.5 text-[14.5px] leading-[1.55] text-[#55555c]">{active.requirement}</p>
+              {/* The heading labels the line BELOW it. It used to sit between the two,
+                  so "Requirements" titled the fine print while the actual requirement
+                  sat above it, unlabelled. CP-33. */}
               <h5 className="mb-1.5 text-[14.5px] font-bold text-[#17181a]">Requirements</h5>
+              <p className="mb-3.5 text-[14.5px] leading-[1.55] text-[#55555c]">{active.requirement}</p>
+              <h5 className="mb-1.5 text-[14.5px] font-bold text-[#17181a]">Before you download</h5>
               <p className="text-[13.5px] leading-[1.6] text-[#8a8a92]">{active.fine}</p>
             </div>
 

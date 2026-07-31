@@ -58,7 +58,16 @@ export type SiteConfig = {
     phone: string;
     distributor: string;
     distributorUrl: string;
+    /** Title-case form, for link labels and headings: "3-Year Australian Warranty". */
     warranty: string;
+    /**
+     * Mid-sentence form of `warranty`, for running prose ("Backed by a …").
+     *
+     * It exists because `warranty.toLowerCase()` — what the footer used to do — also
+     * lowercases "Australian", which is a proper noun and must keep its capital. Keep the
+     * two in sync by hand when either changes. CP-11.
+     */
+    warrantyInline: string;
     origin: string;
   };
 
@@ -154,6 +163,7 @@ const baseConfig: SiteConfig = {
     distributor: "AutoXtreme",
     distributorUrl: "https://autoxtreme.com.au",
     warranty: "3-Year Australian Warranty",
+    warrantyInline: "3-year Australian warranty",
     origin: "Made in Korea",
   },
 
@@ -237,8 +247,8 @@ const baseConfig: SiteConfig = {
       {
         heading: "Dash Cams",
         links: [
-          { href: "/gx4k", label: "GX4K - 4K 2CH" },
-          { href: "/gx35", label: "GX35 - 2K 2CH" },
+          { href: "/gx4k", label: "GX4K — 4K 2CH" },
+          { href: "/gx35", label: "GX35 — 2K 2CH" },
           { href: "/installation", label: "Installation" },
         ],
       },

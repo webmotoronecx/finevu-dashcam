@@ -281,9 +281,11 @@ export function AddressAutocomplete({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
-    } else if (e.key === "Enter" && activeIndex >= 0) {
+    } else if (e.key === "Enter") {
+      // Always swallow Enter while the dropdown is showing — otherwise it submits the
+      // surrounding form (the booking wizard) mid-suggestion.
       e.preventDefault();
-      handleSelect(suggestions[activeIndex]);
+      if (activeIndex >= 0) handleSelect(suggestions[activeIndex]);
     } else if (e.key === "Escape") {
       setOpen(false);
       setActiveIndex(-1);

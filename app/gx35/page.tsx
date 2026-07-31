@@ -57,7 +57,7 @@ const featureTiles = [
   { title: "2560 × 1440 QHD Front Camera", caption: "Every pixel captured", video: "/gx35/detail-front-camera.mp4", img: "/gx35/detail-front-camera-poster.webp" },
   { title: "Sony STARVIS 2 IMX675", caption: "5.12MP F/1.8", img: "/gx35/detail-starvis.webp" },
   { title: "Auto Night Vision", caption: "AI-controlled, always-on HDR mode", video: "/gx35/detail-night.mp4", img: "/gx35/detail-night-poster.webp" },
-  { title: "Ai Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.webp" },
+  { title: "AI Heat Monitoring", caption: "Auto power-save if temps spike", img: "/gx35/detail-heat.webp" },
   { title: "147° / 143° Field of View", caption: "Front & Rear", img: "/gx35/detail-field.webp" },
 ];
 
@@ -86,7 +86,7 @@ const opticsCallouts = [
 const cSeeDetail: Card[] = [
   {
     title: "True 2K Quad HD",
-    body: "Front records in 2560×1440 QHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
+    body: "Front records in 2560 × 1440 QHD, rear in Full HD 1080p. Number plates, road signs and faces stay sharp enough to actually hold up as evidence.",
     video: "/gx35/day-true-2k.mp4",
     img: "/gx35/day-true-2k-poster.webp",
   },
@@ -106,7 +106,7 @@ const cSeeDetail: Card[] = [
 const cParked: Card[] = [
   {
     title: "Power Saving Parking Mode",
-    body: "Prolonged recording time. Consuming 98% less power, GX35 records 13,950 more hours than standard parking mode.",
+    body: "Prolonged recording time. Consuming 98% less power, GX35 records 13,950 more hours than it would in standard parking mode.",
     img: "/gx35/protected-power.webp",
   },
   {
@@ -179,7 +179,7 @@ const cBuilt: Card[] = [
   {
     title: "Battery Protection Integrated",
     body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
-    note: "* FineVu recommends changing the low voltage settings to ‘hybrid’ when using the ISG system.",
+    note: "* FineVu recommends changing the low-voltage settings to “Hybrid” when using the ISG system.",
     img: "/gx35/built-battery.webp",
   },
 ];
@@ -199,8 +199,8 @@ const disappearTabs = [
     image: "/gx35/disappear-screen.webp", 
   },
   {
-    title: "Smaller Than a Business Card",
-    body: "At just 74mm wide and 57g, the front unit is smaller than a credit card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23g.",
+    title: "Smaller Than a Credit Card",
+    body: "At just 74 mm wide and 57 g, the front unit is smaller than a credit card and tucks neatly behind your rear-view mirror. The rear camera is smaller still at only 23 g.",
     image: "/gx35/disappear-smaller.webp", 
   },
   {
@@ -222,7 +222,7 @@ const disappearTabs = [
 const mDualVision: MediaSectionData = {
   title: "Dual vision. Zero compromise.",
   description:
-    "GX35 is equipped with the SONY STARVIS 2 IMX675, a 5.12MP flagship image sensor up front, paired with a 2.13MP CMOS sensor at the rear. The IMX675 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer color, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.",
+    "GX35 is equipped with the SONY STARVIS 2 IMX675, a 5.12MP flagship image sensor up front, paired with a 2.13MP CMOS sensor at the rear. The IMX675 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer colour, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.",
 
   image: "/gx35/dual-vision.webp",
   mobileImage: "/gx35/dual-vision-mobile.webp",
@@ -253,7 +253,7 @@ const mSecondEyes: MediaSectionData = {
 };
 
 const mInYourHand: MediaSectionData = {
-  title: "Your Dashcam. In Your Hand.",
+  title: "Your Dash Cam. In Your Hand.",
   description: "Live view, instant downloads and settings, all from your phone. No cables, no card removal.",
   image: "/gx35/your-dashcam.webp", 
   mobileImage:"/gx35/your-dashcam-mobile.webp",
@@ -391,7 +391,7 @@ const specRows: [string, string][] = [
   ["Driver assistance", "ADAS Plus — FVMA (front vehicle motion alert) · LDWS (lane departure)"],
   ["Connectivity", "Built-in Wi-Fi · External GPS antenna (included) · FineVu Wi-Fi App"],
   ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
-  ["Protection", "Low voltage cut-off · G-sensor · AI heat monitoring · Supercapacitor"],
+  ["Protection", "Low-voltage cut-off · G-sensor · AI heat monitoring · Supercapacitor"],
   ["Safety database", "Speed camera alerts, GPS-supported"],
 ];
 
@@ -408,8 +408,8 @@ const boxItems = [
 
 const compareRows: [string, string, string][] = [
   ["Front Sensor", "Sony STARVIS IMX515 8.5MP", "Sony STARVIS 2 IMX675 5.12MP"],
-  ["Front Resolution", "4K UHD 3840×2160", "2K QHD 2560×1440"],
-  ["Rear Resolution", "Full HD 1920×1080", "Full HD 1920×1080"],
+  ["Front Resolution", "4K UHD 3840 × 2160", "2K QHD 2560 × 1440"],
+  ["Rear Resolution", "Full HD 1920 × 1080", "Full HD 1920 × 1080"],
   ["Max Video", "4K 30fps", "2K 30fps"],
   ["Field of View", "136°F · 143°R", "147°F · 143°R"],
   ["GPS", "Built-in", "External antenna (included)"],
@@ -420,20 +420,20 @@ const compareRows: [string, string, string][] = [
 
 const firmwareSteps = [
   "Download the latest firmware.",
-  "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
-  "When the reader is connected to the PC, a USB drive or new disk drive will be created. (It's recommended to format the Micro SD card used for another device before you upgrade the firmware.)",
-  "Copy the downloaded firmware on the top-level root of the memory card.",
-  "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
+  "Remove the microSD card from your dash cam. Insert it into a microSD card reader and connect the reader to the PC.",
+  "When the reader is connected to the PC, a USB drive or new disk drive will be created. (We recommend formatting a card previously used in another device before you upgrade the firmware.)",
+  "Copy the downloaded firmware to the top-level root of the memory card.",
+  "Insert the microSD card into the device. Turn on the vehicle or start the engine to turn on the device.",
   "The firmware update starts automatically.",
   "The system will automatically restart once the firmware update is completed.",
 ];
 
 const speedCamSteps = [
   "Download the latest Speed Cam data file.",
-  "Remove the Micro SD card from your dashcam. Insert it into Micro SD card reader and connect the reader to the PC.",
+  "Remove the microSD card from your dash cam. Insert it into a microSD card reader and connect the reader to the PC.",
   "When the reader is connected to the PC, a USB drive or new disk drive will be created.",
-  "Copy the downloaded Speed Cam data file on the top-level root of the memory card.",
-  "Insert the Micro SD card into on the device. Turn on the vehicle or start the engine to turn on the device.",
+  "Copy the downloaded Speed Cam data file to the top-level root of the memory card.",
+  "Insert the microSD card into the device. Turn on the vehicle or start the engine to turn on the device.",
   "The Speed Cam data file update starts automatically.",
   "The system will automatically restart once the Speed Cam data file update is completed.",
 ];
@@ -444,7 +444,7 @@ const downloadTabs: FirmwareTab[] = [
     heading: "Instructions",
     steps: firmwareSteps,
     warning:
-      "Do not power off your dashcam until it begins continuous recording, as it may cause permanent damage to the dashcam.",
+      "Do not power off your dash cam until it begins continuous recording, as it may cause permanent damage to the dash cam.",
     // downloadLabel: "Download Firmware",
   },
   {
@@ -643,8 +643,8 @@ export default function GX35Page() {
           Split storage to match how you drive, with Driving, Event, Parking or Driving-Only priority, so the card fills with the footage you actually need.
           </p>
           <small className="text-[#9aa0ad]">
-            <div>{`* The MicroSD card is formatted when changing the memory allocation.`}</div>
-            <div>{`* The memory format type is FAT32, and if the format type is different, the dashcam proceeds with formatting automatically.`}</div>
+            <div>{`* The microSD card is formatted when changing the memory allocation.`}</div>
+            <div>{`* The memory format type is FAT32, and if the format type is different, the dash cam proceeds with formatting automatically.`}</div>
             <div>{`(After formatting, once you insert it into the device and supply it with power, the formatting will be in progress to set the memory.)`}</div>
           </small>
         </motion.div>
@@ -721,12 +721,12 @@ export default function GX35Page() {
         </motion.div>
         <div className={`${SHELL} space-y-4 sm:space-y-5`}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[730fr_550fr] sm:gap-5">
-            <BentoCard theme="light" variant="overlayLabel" img="/gx35/no1.webp" title="No.1 Dash Cam in Korea" className="aspect-[730/600]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/no1.webp" title="No. 1 Dash Cam in Korea" className="aspect-[730/600]" />
             <BentoCard
               theme="light"
               variant="overlayLabel"
               img="/gx35/warranty3.webp"
-              title="3 Year Warranty"
+              title="3-Year Warranty"
               sup="1"
               imgClass="object-[50%_42%]"
               className="aspect-[550/600] sm:aspect-auto sm:h-full"
@@ -793,7 +793,7 @@ export default function GX35Page() {
       <section data-nav-theme="light" className=" py-16 md:py-24">
         <div className={`${SHELL} text-center`}>
           <motion.div {...fadeUp}>
-            <Head theme="light" pre="What’s in The Box?" className="!text-[28px] md:!text-[40px]" />
+            <Head theme="light" pre="What’s in the Box?" className="!text-[28px] md:!text-[40px]" />
           </motion.div>
           <div className="mx-auto mt-10 grid max-w-[760px] grid-cols-2 gap-x-10 gap-y-5 sm:grid-cols-3 md:mt-12">
             {boxItems.map((it) => (

@@ -178,6 +178,14 @@ a gate, not a formality.
   (`.claude/commands/link-check.md`) for missing routes, gated CTAs, 404 assets and dead
   anchors. Neither `npm run build` nor `tsc` catches any of it: those paths are string
   literals, so a pruned PNG or a route that never existed typechecks perfectly.
+- **Spelling, grammar and house style are a THIRD axis, and not part of this gate.** Run
+  **`/copy-sweep`** (`.claude/commands/copy-sweep.md`) — `full`/`semi` mode, `all` or a
+  single route — tracked separately in `docs/copy-sweep-changes.csv` (`CP-nn`) and
+  `docs/copy-sweep-*.md`. It checks language, never facts: a string that disagrees with
+  `content-sources/*.txt` is a `CA-nn` row even when the only difference is casing
+  (precedent: **CA-79**, "Ai" → "AI"), while a typo or an inconsistent heading style is
+  `CP-nn`. Keep the three ID spaces separate — never mix `CP` rows into
+  `content-accuracy-changes.csv`.
 
 **Audit change log — keep it current.** Every time you run or update a content-accuracy
 audit, you MUST also update the single canonical change log `docs/content-accuracy-changes.csv`

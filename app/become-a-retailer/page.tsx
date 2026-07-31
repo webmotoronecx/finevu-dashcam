@@ -1,6 +1,7 @@
 "use client";
 
 import { Footer } from "@/components/Footer";
+import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -36,10 +37,10 @@ const fadeUp = {
 };
 
 const HERO_STATS = [
-  { b: "No.1", s: "Dash cam brand in Korea" },
-  { b: "3 Year", s: "Australian warranty" },
-  { b: "<0.2%", s: "In-house defect rate" },
-  { b: "2 models", s: "GX4K flagship & GX35" },
+  { value: "No.1", label: "Dash cam brand in Korea" },
+  { value: "3 Year", label: "Australian warranty" },
+  { value: "<0.2%", label: "In-house defect rate" },
+  { value: "2 models", label: "GX4K flagship & GX35" },
 ];
 
 const whyPartner = [
@@ -282,35 +283,21 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative text-white" data-nav-theme="dark">
-        <Image src="/retailer/hero.png" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,rgba(8,8,9,.55) 0%,rgba(8,8,9,.35) 45%,rgba(8,8,9,.62) 100%)" }} />
-        <div className="relative z-10 mx-auto max-w-[760px] px-6 pt-36 pb-16 text-center md:pt-44 md:pb-20">
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.8px] md:text-[64px] md:leading-[76px]">
-            Stock Korea&apos;s
-            <br />
-            No.1 dash cam.
-          </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.12 }} className="mx-auto mt-[22px] max-w-[640px] text-[16px] leading-[1.6] text-white/85 md:text-[18px]">
-            Add FineVu to your range. Premium 4K and 2K dash cams with Sony STARVIS sensors, healthy margins
-            and a 3-year Australian warranty, backed by a distributor that supports every sale.
-          </motion.p>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.24 }} className="mt-8 flex flex-wrap justify-center gap-3.5">
+      <FullscreenHero
+        id="top"
+        image="/retailer/hero.png"
+        maxWidth="max-w-[760px]"
+        overlay="gradient"
+        stats={HERO_STATS}
+        title={<>Stock Korea&apos;s<br />No.1 dash cam.</>}
+        subtitle="Add FineVu to your range. Premium 4K and 2K dash cams with Sony STARVIS sensors, healthy margins and a 3-year Australian warranty, backed by a distributor that supports every sale."
+        actions={
+          <>
             <a href="#apply" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[30px] py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white">Apply to Become a Retailer</a>
             <a href="#why" className="cta-hover rounded-full border border-white/40 px-[30px] py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white transition-colors hover:bg-white/10">Why Partner</a>
-          </motion.div>
-        </div>
-        <div className="relative z-10">
-          <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-y-8 px-6 pb-9 pt-10 md:grid-cols-4 md:items-start md:gap-y-0 border-t border-white/10">
-            {HERO_STATS.map((s) => (
-              <div key={s.b}>
-                <b className={`block leading-[27px] ${s.b === "<0.2%" ? "text-[21.6px] font-semibold tracking-[-0.216px]" : "text-[18px] font-bold"}`}>{s.b}</b>
-                <span className="mt-1 block text-[13px] leading-[19.5px] text-white/70">{s.s}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* Why partner */}
       <section id="why" className="scroll-mt-24 bg-white py-24 md:py-[96px]" data-nav-theme="light">

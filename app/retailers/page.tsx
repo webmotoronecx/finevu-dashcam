@@ -2,7 +2,7 @@
 
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
-import { PageHero } from "@/components/sections/PageHero";
+import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
@@ -354,11 +354,12 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <PageHero
+      <FullscreenHero
         id="top"
         image="/retailers/hero.webp"
         imagePosition="top"
         maxWidth="max-w-[760px]"
+        overlay="gradient"
         title={
           <>
             Find your nearest

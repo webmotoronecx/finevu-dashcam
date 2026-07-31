@@ -7,6 +7,7 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { submitForm } from "@/lib/submitForm";
 import { thankYouUrl } from "@/lib/data/thank-you";
 import { Carousel } from "@/components/sections/Carousel";
+import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { motion } from "motion/react";
 import { useMemo, useRef, useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
@@ -452,35 +453,19 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section id="top" className="relative flex w-full aspect-[2160/960] min-h-screen items-center justify-center overflow-hidden text-center text-white" data-nav-theme="dark">
-        <Image src="/installation/hero.webp" alt="" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 mx-auto max-w-[820px] px-6">
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-[40px] font-semibold leading-[48px] tracking-[-0.8px] md:text-[64px] md:leading-[76px]">Leave the wiring to<br />the experts</motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.12 }} className="mx-auto mt-[26px] max-w-[774px] text-[16px] leading-[27px] tracking-[-0.44px] text-white md:text-[18px]">Your FineVu records straight out of the box, but full-time parking protection means hardwiring it properly into your fuse box. Our certified installers come to you, fit it cleanly, hide every cable and set it up right the first time.</motion.p>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.24 }} className="mt-9 flex flex-wrap justify-center gap-3.5">
+      <FullscreenHero
+        id="top"
+        image="/installation/hero.webp"
+        stats={HERO_STATS}
+        title={<>Leave the wiring to<br />the experts</>}
+        subtitle="Your FineVu records straight out of the box, but full-time parking protection means hardwiring it properly into your fuse box. Our certified installers come to you, fit it cleanly, hide every cable and set it up right the first time."
+        actions={
+          <>
             <a href="#book" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[29px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] text-white">Book Installation</a>
             <a href="#how" className="cta-hover rounded-full border border-white/60 bg-white/5 px-[29px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] text-white transition-colors hover:bg-white/10">See How It Works</a>
-          </motion.div>
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.36 }}
-          className="absolute inset-x-0 bottom-0 z-10"
-        >
-          <div className="mx-auto max-w-[1160px] px-6 pb-8 md:pb-12">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-6 border-t border-white/15 pt-6 text-left sm:grid-cols-4">
-              {HERO_STATS.map((stat) => (
-                <div key={stat.value}>
-                  <div className="text-[20px] font-semibold leading-tight text-white md:text-[22px]">{stat.value}</div>
-                  <div className="mt-1 text-[13px] leading-snug text-white/70">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      </section>
+          </>
+        }
+      />
 
       {/* Wizard */}
       <section id="book" className="scroll-mt-24 bg-white py-24 md:py-[96px]" data-nav-theme="light">

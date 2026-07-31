@@ -34,6 +34,12 @@ export type ProductSubNav = {
   /** In-page links. `href: "#top"` is special-cased to scroll back to the page top. */
   links: NavLink[];
   cta: NavLink;
+  /**
+   * How far down the page the sub-nav docks, in viewport heights — i.e. how tall the hero
+   * is. Tune it by eye per page: a pinned/scroll-scrubbed hero consumes several screens of
+   * scroll before it releases, so this is not necessarily < 1. Defaults to 0.8.
+   */
+  dockAfterVh?: number;
 };
 
 export type FooterColumn = {
@@ -185,6 +191,7 @@ const baseConfig: SiteConfig = {
         { href: "#compare", label: "Compare" },
       ],
       cta: { href: "/retailers", label: "Find Retailer" },
+      dockAfterVh: 1.9,
     },
     "/gx35": {
       label: "GX35",
@@ -194,6 +201,7 @@ const baseConfig: SiteConfig = {
         { href: "#compare", label: "Compare" },
       ],
       cta: { href: "/retailers", label: "Find Retailer" },
+      dockAfterVh: 1.9,
     },
   },
 

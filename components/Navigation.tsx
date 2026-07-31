@@ -33,6 +33,21 @@ const dropdownProducts = [
 // Find Retailer pill — solid brand orange per Figma v4 (node 113:3356).
 const CTA_ORANGE = "#F68428";
 
+// Fallback dock point when a route's config omits `dockAfterVh`, as a fraction of the
+// viewport height. Per-page values live in siteConfig.productSubNav — a pinned or
+// scroll-scrubbed hero eats several viewport heights, so the right number is eyeballed.
+const DEFAULT_DOCK_AFTER_VH = 0.8;
+
+// The sub-nav undocks 0.05vh earlier than it docks, so a scroll position parked exactly on
+// the boundary can't strobe between the two states.
+const DOCK_HYSTERESIS_VH = 0.05;
+const dockThreshold = (vh: number) => window.innerHeight * vh;
+
+// Resting at the very top of a product page shows the full stack; the first nudge of a
+// scroll sends it away. The two values are hysteresis around the same boundary.
+const TOP_LEAVE_PX = 24;
+const TOP_ENTER_PX = 8;
+
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -51,14 +66,19 @@ export function Navigation() {
   const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
 
-  // Past 100px from the top the main row swipes up and the sub-nav docks at the top.
-  // The 90px undock point is hysteresis — it keeps a scroll position sitting exactly on
-  // the boundary from flickering between the two states.
+  const dockAfterVh = subNav?.dockAfterVh ?? DEFAULT_DOCK_AFTER_VH;
+
+  // Product pages open with the main row on screen and shed it as soon as the page moves,
+  // so the hero is uncovered while it owns the viewport. The sub-nav is a separate track:
+  // it belongs to the page *after* the hero and never shows above `dockAfterVh`, so
+  // scrolling back up to the top returns the main row alone.
   //
-  // Below that, direction decides: scrolling up brings the main row back, scrolling down
-  // sends it away again (the Apple pattern), so it's reachable anywhere on the page
-  // without scrolling to the top. `docked` only gates whether hiding is allowed at all.
+  // Once docked, direction decides the main row: scrolling up brings it back down,
+  // scrolling down sends it away again (the Apple pattern), so the site nav is reachable
+  // anywhere below the hero without scrolling all the way to the top. Over the hero the
+  // direction is ignored — `docked` gates the reveal entirely.
   const [scrolledUp, setScrolledUp] = useState(false);
+  const [atTop, setAtTop] = useState(true);
   const lastScrollY = useRef(0);
 
   // Direction only flips once the pointer has actually travelled — a trackpad or a
@@ -69,7 +89,8 @@ export function Navigation() {
 
   useMotionValueEvent(scrollY, "change", (y) => {
     if (!subNav) return;
-    setDocked((prev) => (prev ? y > 90 : y > 100));
+    setDocked((prev) => y > dockThreshold(prev ? dockAfterVh - DOCK_HYSTERESIS_VH : dockAfterVh));
+    setAtTop((prev) => y < (prev ? TOP_LEAVE_PX : TOP_ENTER_PX));
 
     const delta = y - lastScrollY.current;
     if (Math.abs(delta) < DIRECTION_THRESHOLD_PX) return;
@@ -77,8 +98,9 @@ export function Navigation() {
     setScrolledUp(delta < 0);
   });
 
-  // Measure the main row so the stack can slide up by exactly its height, landing the
-  // sub-nav flush at top: 0. Re-measures on breakpoint changes / logo reflow.
+  // Measure the main row: it slides up by exactly its own height, which lands the
+  // absolutely-positioned sub-nav flush at top: 0. Re-measures on breakpoint changes /
+  // logo reflow.
   useEffect(() => {
     const el = mainRowRef.current;
     if (!subNav || !el) return;
@@ -89,7 +111,9 @@ export function Navigation() {
     return () => observer.disconnect();
   }, [subNav]);
 
-  const revealed = !docked || scrolledUp;
+  // Main row: always visible off the product pages; on them, at rest at the top of the
+  // page, and below the hero while scrolling up.
+  const revealed = !subNav || atTop || (docked && scrolledUp);
 
   // Both menus hang off the main row — pointless once that row is off-screen. Reopening
   // is allowed once a scroll-up brings it back, so this keys off `revealed`, not `docked`.
@@ -99,15 +123,26 @@ export function Navigation() {
     setIsMobileMenuOpen(false);
   }, [revealed]);
 
-  // Sync on mount / route change: a reload or an anchor deep-link can land well past
-  // 100px without ever firing a scroll event, and 100px is easy to exceed. The direction
-  // baseline has to be re-seeded here too, or the first scroll on the new page is measured
-  // against the old one's offset and reads as a huge jump in whichever direction.
+  // Sync on mount / route change: a reload or an anchor deep-link can land well past the
+  // hero without ever firing a scroll event. The direction baseline has to be re-seeded
+  // here too, or the first scroll on the new page is measured against the old one's offset
+  // and reads as a huge jump in whichever direction.
   useEffect(() => {
-    setDocked(!!subNav && window.scrollY > 100);
+    setDocked(!!subNav && window.scrollY > dockThreshold(dockAfterVh));
+    setAtTop(window.scrollY < TOP_LEAVE_PX);
     setScrolledUp(false);
     lastScrollY.current = window.scrollY;
-  }, [pathname, subNav]);
+
+    // The threshold is a fraction of the viewport, so a rotate / window resize can move it
+    // past the current scroll position without any scrolling happening.
+    if (!subNav) return;
+    const onResize = () =>
+      setDocked((prev) =>
+        window.scrollY > dockThreshold(prev ? dockAfterVh - DOCK_HYSTERESIS_VH : dockAfterVh)
+      );
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [pathname, subNav, dockAfterVh]);
 
   const focusFirstItem = () => {
     panelRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
@@ -256,12 +291,17 @@ export function Navigation() {
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 ${subNav ? "" : "px-4 md:px-8"}`}
         initial={{ y: -24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        // Product pages fade the whole nav out while it's parked over the hero. Belt and
+        // braces with the transform — and it hides the one frame before the rows have been
+        // measured, when the stack still renders at y: 0.
+        animate={{ y: 0, opacity: !subNav || docked || revealed ? 1 : 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {/* Product pages slide the whole stack up by the main row's height, which docks
-            the sub-nav flush at top: 0. One transform, no second sticky element. */}
+        {/* Product pages move the main row with one transform — no second sticky element.
+            `relative` anchors the sub-nav, which hangs off the row's bottom edge, so the
+            same -mainRowHeight that hides the row docks the sub-nav flush at top: 0. */}
         <motion.div
+          className={subNav ? "relative" : undefined}
           animate={{ y: subNav && !revealed ? -mainRowHeight : 0 }}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -379,8 +419,22 @@ export function Navigation() {
         </div>
         </div>
 
-        {/* Product-page sub-nav — the row that stays behind once the main row swipes up */}
-        {subNav && <ProductSubNav entry={subNav} isDark={isDarkBackground} />}
+        {/* Product-page sub-nav — the row that stays behind once the main row swipes up.
+            Absolute so it can be hidden independently of the main row: it belongs to the
+            page below the hero, so scrolling back to the top returns the main row alone.
+            Its position needs no animating — the main row's transform carries it. */}
+        {subNav && (
+          <motion.div
+            className="absolute inset-x-0 top-full"
+            initial={false}
+            animate={{ opacity: docked ? 1 : 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.25, ease: "easeOut" }}
+            style={{ pointerEvents: docked ? "auto" : "none" }}
+            {...(docked ? {} : { inert: true, "aria-hidden": true as const })}
+          >
+            <ProductSubNav entry={subNav} isDark={isDarkBackground} />
+          </motion.div>
+        )}
         </motion.div>
 
         {/* Products mega-menu — floating white panel centered below the pill */}

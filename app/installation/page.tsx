@@ -8,6 +8,7 @@ import { submitForm } from "@/lib/submitForm";
 import { thankYouUrl } from "@/lib/data/thank-you";
 import { COVERAGE_MESSAGES, isExcluded, loadPostcodeRows, resolveCoverage, type Coverage, type PostcodeRow } from "@/lib/data/installation-coverage";
 import { Carousel } from "@/components/sections/Carousel";
+import { Accordion } from "@/components/Accordion";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState, Fragment } from "react";
@@ -24,7 +25,6 @@ import {
   Smartphone,
   CheckCircle2,
   Check,
-  ChevronDown,
   Home,
   Briefcase,
   Lock,
@@ -426,18 +426,6 @@ function PostcodeCheck() {
   );
 }
 
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-[#e8e7e2]">
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`flex w-full items-center justify-between gap-5 py-[20px] text-left text-[15px] font-semibold leading-[22.5px] transition-colors ${open ? "text-[var(--finevu-orange)]" : "text-[#17181b]"}`}>
-        {q}<ChevronDown className={`h-[18px] w-[18px] shrink-0 transition-transform duration-300 ${open ? "rotate-180 text-[var(--finevu-orange)]" : "text-[#9c9ca3]"}`} />
-      </button>
-      <div className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}><div className="overflow-hidden"><p className="max-w-[700px] pb-6 text-[15px] leading-[23px] text-[#5b5e66]">{a}</p></div></div>
-    </div>
-  );
-}
-
 export default function Page() {
   return (
     <div className="min-h-screen bg-white">
@@ -539,7 +527,7 @@ export default function Page() {
       <section className="bg-white py-24 md:py-[96px]" data-nav-theme="light">
         <div className="mx-auto max-w-[800px] px-6">
           <h2 className="mb-12 text-center text-[32px] font-semibold leading-[40px] tracking-[-0.88px] text-[#1d1d1f] md:text-[44px] md:leading-[66px]">Installation questions.</h2>
-          <div className="border-t border-[#e8e7e2]">{FAQS.map((f) => <FaqItem key={f.q} q={f.q} a={f.a} />)}</div>
+          <Accordion items={FAQS} />
         </div>
       </section>
 

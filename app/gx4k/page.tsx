@@ -11,6 +11,7 @@ import { MediaSection, type MediaSectionData } from "@/components/sections/Media
 import { Head } from "@/components/sections/Head";
 import { Carousel, type Card } from "@/components/sections/Carousel";
 import { FeatureTabs } from "@/components/sections/FeatureTabs";
+import { CoverTransition } from "@/components/sections/CoverTransition";
 import { BarGraph } from "@/components/sections/BarGraph";
 import { ScrollScrubVideo } from "@/components/sections/ScrollScrubVideo";
 import { ScrollHero, type HeroBeat } from "@/components/sections/ScrollHero";
@@ -246,6 +247,12 @@ const mInYourHand: MediaSectionData = {
 
 };
 
+/* Shared by `mDiscreet.pinHeightVh` and the `<CoverTransition>` below it, which needs
+   the same number to turn its `start` fraction into a distance. The pin window — the
+   scroll every 0–1 fraction in this transition maps over — is `PIN_VH - 100`, because
+   the sticky frame is one viewport tall inside the track. */
+const PIN_VH = 350;
+
 const mDiscreet: MediaSectionData = {
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/discreet_scrub.mp4",
@@ -262,13 +269,32 @@ const mDiscreet: MediaSectionData = {
     textReplay: true,
 
     pin: true,
-    pinHeightVh: 250, 
+    // 350 rather than 250 to buy a cover window for the band below; see the geometry
+    // block above. The scrub fractions are re-derived so the video's timing in *scroll
+    // distance* is unchanged — see the note on videoScrubStart/End.
+    pinHeightVh: PIN_VH,
     videoScrub: true,
     // Mobile releases the scrub, so this takes over there: one play-through on entry
     // rather than a loop. Inert on desktop, where the scrub still owns playback.
     videoPlayOnce: true,
-    videoScrubStart: 0.2,
-    videoScrubEnd: 0.9,
+    // The pinned window is `pinHeightVh - 100` = 250vh of scroll, and the scrub maps
+    // over it (`["start start", "end end"]`). These fractions preserve the original
+    // feel from the 250vh track: a 30vh lead-in (0.12 x 250) and a 105vh scrub
+    // (0.42 x 250), which is what 0.2/0.9 bought across the old 150vh window. The
+    // 115vh left after 0.54 is the cover window. Recompute all three together if
+    // `pinHeightVh` changes.
+    videoScrubStart: 0.12,
+    videoScrubEnd: 0.42,
+
+    // Exit: dissolve + push back as "Designed to Disappear" covers this frame.
+    // `start` matches videoScrubEnd exactly — the cover window opens the instant the
+    // video finishes, so those numbers move together.
+    exitFade: {
+        start: 0.42, 
+        end: 0.7,
+        color: "#000",
+        scale: 0.7,
+    },
 };
 
 const disappearTabs = [
@@ -633,7 +659,18 @@ export default function GX4KPage() {
 
             {/* Designed to disappear band — temporarily disabled */}
           
-            <div data-nav-theme="dark" style={{ background: "linear-gradient(180deg, #241C38 0%, #130F1E 7.2%, #08080C 59.6%)" }}>
+            {/* Slides up over the still-pinned "Discreet by Design" frame while its
+                `exitFade` dissolves underneath. `start` is on the same 0–1 pin scale as
+                that section's `exitFade.start`/`end` (0.42 → 0.8), so a value between
+                them means the band covers mid-dissolve. Tune it right here. */}
+            <CoverTransition
+                pinHeightVh={PIN_VH}
+                start={0.4}
+                theme="dark"
+                style={{
+                    //  background: "linear-gradient(180deg, #241C38 0%, #130F1E 7.2%, #08080C 59.6%)"
+                }}
+            >
                 {/* Designed to disappear tabs */}
                  <FeatureTabs sectionClass={`py-20 md:py-28`} title="Designed to Disappear" tabs={disappearTabs} /> 
 
@@ -673,8 +710,8 @@ export default function GX4KPage() {
                    
                     </div>
                 </section>
-            </div>
-          
+            </CoverTransition>
+
 
             {/* More reasons and wiring band */}
             <div data-nav-theme="dark" style={{ background: "#0B0B0B" }}>

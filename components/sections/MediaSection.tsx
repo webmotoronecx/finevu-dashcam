@@ -326,6 +326,51 @@ export type MediaSectionData = {
    * `fadeColor` and only then reveals. 0 = start fading immediately.
    */
   fadeHold?: number;
+  /**
+   * Exit transition for a **pinned** section: as the next section slides up over
+   * this frame, the frame dissolves and pushes back, so the outgoing panel recedes
+   * rather than simply being wiped.
+   *
+   * **Presence enables it** — pass the object to turn it on, omit it for none.
+   *
+   * Unlike `fade` (symmetric — `fadeHold`/`fadeRange` apply to both ends), this
+   * only touches the exit, so it can be aligned to a cover without the entry
+   * ramp blacking out the start of a video scrub.
+   *
+   * Ignored when the section is not pinned. See `docs/stacked-panels-2026-07-30.md`.
+   */
+  exitFade?: {
+    /**
+     * Where the exit starts, as a fraction of the **pin window** (0 = the frame
+     * locks to the top, 1 = it releases). Match this to the point the covering
+     * section's leading edge reaches the viewport bottom. Default 0.5.
+     */
+    start?: number;
+    /**
+     * Where the exit *finishes*, same scale as `start`. Default 1 (the pin release).
+     * Pull it in to land the frame fully faded before something else happens — e.g.
+     * `end` = the point a covering section starts to slide over, so the section is
+     * already gone by the time it is covered rather than fading behind it.
+     * Clamped to at least `start + 0.01`.
+     */
+    end?: number;
+    /**
+     * Colour the frame dissolves to, and the colour revealed around it as it
+     * scales back — one knob, both jobs. Default `#000`.
+     */
+    color?: string;
+    /**
+     * Opacity at full exit. Default 0 — the frame disappears completely, leaving
+     * only `color`, so `0` + `color: "#000"` is a full fade to black. Raise it to
+     * stop short (0.2 keeps a ghost of the section visible under whatever covers it).
+     */
+    opacity?: number;
+    /**
+     * Scale at full exit (1 = no movement). Default 0.94. Dropped to 1 under
+     * `prefers-reduced-motion`.
+     */
+    scale?: number;
+  };
   /** Drives text colour and the navbar contrast signal */
   theme?: "dark" | "light";
   /**
@@ -447,6 +492,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     fadeRange = 0.25,
     fadeColor = "#000",
     fadeHold = 0.15,
+    exitFade,
     theme = "dark",
     titleClass,
     descriptionClass,
@@ -556,6 +602,52 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     [0, hold, hold + edge, 1 - hold - edge, 1 - hold, 1],
     [1, 1, 0, 0, 1, 1],
   );
+
+  // Exit transition (`exitFade`). Deliberately its own `useScroll` rather than
+  // reusing `videoProgress`: that one's offset is overridable via
+  // `videoScrubOffset`, and this must stay locked to the pin window — 0 when the
+  // sticky frame locks, 1 when the track runs out and it releases — so it lines up
+  // with whatever is sliding over it.
+  const { scrollYProgress: exitProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"] as never,
+  });
+  const exiting = Boolean(exitFade) && pinned;
+  const exitFrom = Math.min(Math.max(exitFade?.start ?? 0.5, 0), 0.99);
+  // `end` defaults to the pin release. Floored just above `start` so the two can
+  // never meet and divide by zero — same guard as `fade`'s `hold`/`edge` pair.
+  const exitTo = Math.min(Math.max(exitFade?.end ?? 1, exitFrom + 0.01), 1);
+  const exitColor = exitFade?.color ?? "#000";
+  // Opacity *at full exit*, the sibling of `scale`. 0 = gone entirely, leaving only
+  // `color` behind — so 0 + `#000` is a full fade to black.
+  const exitOpacityTo = Math.min(Math.max(exitFade?.opacity ?? 0, 0), 1);
+  // The frame dissolves *out* rather than a scrim fading *in*: the track behind it
+  // is painted `exitFade.color` (see the pinned branch), so it lands on exactly the
+  // same colour with one less node.
+  //
+  // Opacity is written straight to the node instead of going through `style`. On
+  // this element motion reliably drives *transform* values (`exitScale` below) but
+  // not plain style properties — measured at several scroll positions, the scale
+  // landed on its expected value to six decimals while `opacity` stayed pinned at 1
+  // through three different bindings. Rather than fight that, do what the video
+  // scrub in this file already does and write the DOM directly; `exitProgress` is
+  // the same source either way. **Don't "tidy" this back into `style`.**
+  useMotionValueEvent(exitProgress, "change", (p) => {
+    const el = frameRef.current;
+    if (!el) return;
+    if (!exiting) {
+      if (el.style.opacity) el.style.opacity = "";
+      return;
+    }
+    const t = Math.min(Math.max((p - exitFrom) / (exitTo - exitFrom), 0), 1);
+    el.style.opacity = String(1 - t * (1 - exitOpacityTo));
+  });
+  // Reduced motion keeps the dissolve — a cross-fade isn't vestibular — but drops
+  // the scale, which is the part that reads as movement.
+  const exitScale = useTransform(exitProgress, [exitFrom, exitTo], [
+    1,
+    exiting && !reduce ? Math.min(Math.max(exitFade?.scale ?? 0.94, 0.5), 1) : 1,
+  ]);
 
   // Video scrub: scroll progress drives `currentTime`. We never write it from the
   // scroll event directly — a rAF loop lerps toward the target so seeks stay smooth
@@ -831,6 +923,7 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
           style={{ background: fadeColor, opacity: fadeOpacity }}
         />
       )}
+
     </>
   );
 
@@ -841,12 +934,23 @@ export function MediaSection({ data }: { data: MediaSectionData }) {
     <section
       ref={sectionRef}
       className={`relative w-full ${className}`}
-      style={{ height: `${pinHeightVh}vh` }}
+      // While exiting, the frame scales back off its own edges — paint the track
+      // in the same colour it's dimming to, so what's revealed is deliberate
+      // rather than whatever happens to be behind the page.
+      style={{ height: `${pinHeightVh}vh`, ...(exiting ? { background: exitColor } : {}) }}
       data-nav-theme={theme}
     >
-      <div ref={frameRef} className={frameClass}>
+      <motion.div
+        ref={frameRef}
+        className={frameClass}
+        // Bound on the *static* `exitFade`, not `exiting`: `pinned` is false on the
+        // first render (`useIsDesktop` resolves after mount), and handing motion a
+        // value that appears later is unreliable. Until the section is actually
+        // pinned `exitScale` just resolves to 1.
+        style={exitFade ? { scale: exitScale } : undefined}
+      >
         {body}
-      </div>
+      </motion.div>
     </section>
   ) : (
     <section ref={sectionRef} className={frameClass} style={frameStyle} data-nav-theme={theme}>

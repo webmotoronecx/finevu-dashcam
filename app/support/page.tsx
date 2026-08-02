@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Fragment, useState } from "react";
 import { Phone, Mail, ChevronDown, ChevronRight } from "lucide-react";
 import { AppSupport } from "@/components/AppSupport";
+import { Accordion } from "@/components/Accordion";
 
 // Support page — dark hero, phone/email cards, per-model download/guide hubs, troubleshooting accordion, registration and warranty panels, and fine print.
 
@@ -264,30 +265,6 @@ function ModelHubs() {
     );
 }
 
-function TroubleItem({ q, a }: { q: string; a: string }) {
-    const [open, setOpen] = useState(false);
-    return (
-        <div className="border-b border-[#e7e7ea]">
-            <button
-                type="button"
-                onClick={() => setOpen((o) => !o)}
-                aria-expanded={open}
-                className={`flex w-full items-center justify-between gap-5 py-[22px] text-left text-[18px] font-semibold transition-colors ${open ? "text-[var(--finevu-orange)]" : "text-[#17181a]"}`}
-            >
-                {q}
-                <ChevronDown
-                    className={`h-[18px] w-[18px] shrink-0 transition-transform duration-300 ${open ? "rotate-180 text-[var(--finevu-orange)]" : "text-[#9c9ca3]"}`}
-                />
-            </button>
-            <div className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-                <div className="overflow-hidden">
-                    <p className="max-w-[700px] pb-6 text-[18px] leading-[1.6] text-[#6b6b72]">{a}</p>
-                </div>
-            </div>
-        </div>
-    );
-}
-
 export default function Page() {
     return (
         <div className="min-h-screen bg-white">
@@ -376,11 +353,7 @@ export default function Page() {
                             and we&apos;ll help.
                         </p>
                     </motion.div>
-                    <div className="border-t border-[#e7e7ea]">
-                        {troubleshooting.map((t) => (
-                            <TroubleItem key={t.q} q={t.q} a={t.a} />
-                        ))}
-                    </div>
+                    <Accordion items={troubleshooting} />
                 </div>
             </section>
 

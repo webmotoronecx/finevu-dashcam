@@ -30,6 +30,15 @@ export function ComingSoonGate({ children }: { children: React.ReactNode }) {
     setBypass(params.get("showpage") === "true");
   }, [gated, pathname]);
 
+  // Gating swallows `children`, and `children` is Next's <LayoutRouter> for the
+  // page segment — the thing that carries ScrollAndFocusHandler. With it never
+  // mounted, nothing resets the scroll after a client navigation, so you land on
+  // the short Coming Soon page still scrolled to wherever you were. Do it here.
+  useEffect(() => {
+    if (!gated || bypass) return;
+    window.scrollTo(0, 0);
+  }, [gated, bypass, pathname]);
+
   if (gated && !bypass) {
     return <ComingSoon />;
   }

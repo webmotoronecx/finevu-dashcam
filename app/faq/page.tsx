@@ -3,8 +3,7 @@
 import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { PageHero } from "@/components/sections/PageHero";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { Accordion } from "@/components/Accordion";
 import Link from "next/link";
 
 // FAQ page — gradient hero, category-grouped question accordions, important-information note, and a Learn More strip.
@@ -113,36 +112,6 @@ const groups: { title: string; items: { q: string; a: string[] }[] }[] = [
   },
 ];
 
-function FaqRow({ q, a }: { q: string; a: string[] }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-[#e7e7ea]">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className={`flex w-full items-center justify-between gap-5 py-[22px] text-left text-[17px] font-semibold leading-snug tracking-[-0.005em] transition-colors md:text-[18px] ${open ? "text-[var(--finevu-orange)]" : "text-[#17181a]"}`}
-      >
-        {q}
-        <ChevronDown
-          className={`h-[18px] w-[18px] shrink-0 transition-transform duration-300 ${
-            open ? "rotate-180 text-[var(--finevu-orange)]" : "text-[#9c9ca3]"
-          }`}
-        />
-      </button>
-      <div className={`grid transition-all duration-300 ease-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-        <div className="overflow-hidden">
-          <div className="max-w-[700px] space-y-3 pb-6 text-[16px] leading-[1.6] text-[#6b6b72] md:text-[18px]">
-            {a.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Page() {
   return (
     <div className="min-h-screen bg-white">
@@ -153,7 +122,7 @@ export default function Page() {
         title="Frequently asked questions"
         subtitle={
           <>
-            Everything you need to know about your FineVu dash cam. Can&apos;t find your answer?{" "}
+            Everything you need to know about your FineVu dash cam.<br/>Can&apos;t find your answer?{" "}
             <Link href="/contact" className="font-semibold text-white underline decoration-white/40 underline-offset-4">
               Contact us
             </Link>{" "}
@@ -169,11 +138,7 @@ export default function Page() {
             <h2 className="pb-2 text-[15px] font-semibold uppercase leading-[1.4] tracking-[0.16em] text-[var(--finevu-orange)]">
               {g.title}
             </h2>
-            <div className="border-t border-[#e7e7ea]">
-              {g.items.map((it) => (
-                <FaqRow key={it.q} q={it.q} a={it.a} />
-              ))}
-            </div>
+            <Accordion items={g.items} />
           </div>
         ))}
 

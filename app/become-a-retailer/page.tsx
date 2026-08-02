@@ -3,6 +3,7 @@
 import { Footer } from "@/components/Footer";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
+import { Accordion } from "@/components/Accordion";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,7 +25,6 @@ import {
   Store,
   Globe,
   Check,
-  ChevronDown,
 } from "lucide-react";
 
 // Become a retailer page — dark hero + stat band, why-partner cards, partner chips, the range, how-it-works steps, apply form, and trade FAQs.
@@ -135,24 +135,6 @@ function SectionHead({ title, sub }: { title: string; sub: React.ReactNode }) {
       </h2>
       <p className="mx-auto mt-4 max-w-[720px] text-[18px] leading-[1.6] text-[#5b5e66]">{sub}</p>
     </motion.div>
-  );
-}
-
-// Trade FAQ accordion — same line-separated rows and rotating orange chevron as the FAQ page's FaqRow.
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-[#e7e7ea]">
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`flex w-full items-center justify-between gap-5 py-[22px] text-left text-[17px] font-semibold leading-snug tracking-[-0.005em] transition-colors md:text-[18px] ${open ? "text-[var(--finevu-orange)]" : "text-[#17181a]"}`}>
-        {q}
-        <ChevronDown className={`h-[18px] w-[18px] shrink-0 transition-transform duration-300 ${open ? "rotate-180 text-[var(--finevu-orange)]" : "text-[#9c9ca3]"}`} />
-      </button>
-      <div className={`grid transition-all duration-300 ease-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-        <div className="overflow-hidden">
-          <p className="max-w-[700px] pb-6 text-[16px] leading-[1.6] text-[#6b6b72] md:text-[18px]">{a}</p>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -406,9 +388,7 @@ export default function Page() {
       <section className="bg-[#f7f7f7] py-24 md:py-[96px]" data-nav-theme="light">
         <div className="mx-auto max-w-[860px] px-6">
           <SectionHead title="Retailer questions." sub={<>Most trade questions are answered below. Can&apos;t find yours? <Link href="/contact" className="font-semibold text-[var(--finevu-orange)]">Contact us</Link> and we&apos;ll help.</>} />
-          <div className="border-t border-[#e7e7ea]">
-            {faqs.map((f) => <FaqItem key={f.q} q={f.q} a={f.a} />)}
-          </div>
+          <Accordion items={faqs} />
         </div>
       </section>
 

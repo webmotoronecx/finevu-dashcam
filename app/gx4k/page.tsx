@@ -284,16 +284,16 @@ const mDiscreet: MediaSectionData = {
     // 115vh left after 0.54 is the cover window. Recompute all three together if
     // `pinHeightVh` changes.
     videoScrubStart: 0.12,
-    videoScrubEnd: 0.42,
+    videoScrubEnd: 0.52,
 
     // Exit: dissolve + push back as "Designed to Disappear" covers this frame.
     // `start` matches videoScrubEnd exactly — the cover window opens the instant the
     // video finishes, so those numbers move together.
     exitFade: {
-        start: 0.42, 
-        end: 0.7,
+        start: 0.48, 
+        end: 0.52,
         color: "#000",
-        scale: 0.7,
+         scale: 0.95,
     },
 };
 
@@ -675,7 +675,7 @@ export default function GX4KPage() {
                  <FeatureTabs sectionClass={`py-20 md:py-28`} title="Designed to Disappear" tabs={disappearTabs} /> 
 
                 {/* Small in size gallery */}
-                <section className="pb-16 md:py-24">
+                <section className="pb-16 md:py-24 bg-[#0B0B0B]">
                     <motion.div {...fadeUp} className={`${SHELL} mb-8 text-center md:mb-12`}>
                         <Head pre="Small in Size. " grad="Rich in Detail." className="!text-[26px] md:!text-[40px]" />
                     </motion.div>

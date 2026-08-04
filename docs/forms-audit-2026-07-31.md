@@ -86,6 +86,12 @@ All four forms render a hidden `botcheck` and check it client-side. `submitForm`
 `route.ts:51` can never fire. The only defence is the client check, bypassed completely by
 POSTing directly. It reads as protection in review and does nothing. **One-line fix.**
 
+**Applied 2026-08-04.** `submitForm` now forwards `botcheck` in the POST body and all four
+forms pass it, dropping their client-side short-circuit so `route.ts:51` is the single,
+reachable enforcement point. Verified end to end: a filled honeypot returns 200 with no
+send (a direct POST carrying `botcheck` is caught the same way); an empty one proceeds
+normally.
+
 ### FA-05 · `/api/contact` has no rate limiting or input bounds
 `route.ts:34-106`
 
@@ -257,7 +263,7 @@ non-digits and cap length (`:288,335`); card expiry is checked against the curre
 ## 7. Summary
 
 **Blocks launch** — FA-01 (wizard/card), FA-02 (evidence lost), FA-03 (attachments
-dropped), FA-04 (honeypot dead), FA-05 (no rate limiting), FA-07 (phantom email),
+dropped), ~~FA-04 (honeypot dead)~~ *(fixed 2026-08-04)*, FA-05 (no rate limiting), FA-07 (phantom email),
 FA-12 (wrong recipient domain), **FA-23** (contradictory coverage), **FA-26** (no terms
 acceptance at checkout), **FA-28** (thank-you copy contradicts the pay button).
 

@@ -175,10 +175,6 @@ function ClaimForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (botcheck) {
-      router.push(thankYouUrl("warranty-claim"));
-      return;
-    }
     const inv: Record<string, boolean> = {};
     if (!form.firstName.trim()) inv.firstName = true;
     if (!form.lastName.trim()) inv.lastName = true;
@@ -221,7 +217,7 @@ function ClaimForm() {
         receipt: receipt ? receipt.name : "Not provided",
         evidence: evidence.length ? evidence.map((f) => f.name).join(", ") : "Not provided",
       },
-      { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment },
+      { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment, botcheck },
     );
     // Stay in "sending" through the navigation so the button can't be re-submitted.
     if (res.ok) router.push(thankYouUrl("warranty-claim"));

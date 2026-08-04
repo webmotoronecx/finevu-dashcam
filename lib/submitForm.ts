@@ -9,6 +9,8 @@ type SubmitOptions = {
   replyTo?: string;
   /** Optional single file attachment (e.g. a receipt), base64-encoded. */
   attachment?: { filename: string; contentBase64: string };
+  /** Honeypot value, forwarded so the server-side check in route.ts can actually fire. */
+  botcheck?: string;
 };
 
 export async function submitForm(
@@ -19,7 +21,7 @@ export async function submitForm(
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject: opts.subject, replyTo: opts.replyTo, fields, attachment: opts.attachment }),
+      body: JSON.stringify({ subject: opts.subject, replyTo: opts.replyTo, fields, attachment: opts.attachment, botcheck: opts.botcheck }),
     });
     const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
     if (res.ok && data?.ok) return { ok: true };

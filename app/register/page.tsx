@@ -94,10 +94,6 @@ function RegisterForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (botcheck) {
-      router.push(thankYouUrl("register"));
-      return;
-    }
     const inv: Record<string, boolean> = {};
     if (!form.firstName.trim()) inv.firstName = true;
     if (!form.lastName.trim()) inv.lastName = true;
@@ -132,7 +128,7 @@ function RegisterForm() {
         firmware_updates: notify ? "Yes" : "No",
         receipt: file ? file.name : "Not provided",
       },
-      { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment },
+      { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment, botcheck },
     );
     // Stay in "sending" through the navigation so the button can't be re-submitted.
     if (res.ok) router.push(thankYouUrl("register"));

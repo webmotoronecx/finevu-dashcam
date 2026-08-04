@@ -148,10 +148,6 @@ function RetailerForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (botcheck) {
-      router.push(thankYouUrl("become-a-retailer"));
-      return;
-    }
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim());
     if (!f.biz.trim() || !f.btype || !f.cname.trim() || !f.email.trim() || !f.phone.trim() || !f.state) {
       setErr("Please complete the required fields marked with *.");
@@ -175,7 +171,7 @@ function RetailerForm() {
         website: f.web,
         message: f.msg,
       },
-      { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email },
+      { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email, botcheck },
     );
     // Leave `sending` on through the navigation so the button can't be re-submitted.
     if (res.ok) {

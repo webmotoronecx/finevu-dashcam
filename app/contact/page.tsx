@@ -73,10 +73,6 @@ function ContactForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (botcheck) {
-      router.push(thankYouUrl("contact"));
-      return;
-    }
     setStatus("sending");
     setError("");
     const res = await submitForm(
@@ -84,6 +80,7 @@ function ContactForm() {
       {
         subject: form.subject ? `FineVu enquiry — ${form.subject}` : "FineVu enquiry — Contact form",
         replyTo: form.email,
+        botcheck,
       },
     );
     if (res.ok) {

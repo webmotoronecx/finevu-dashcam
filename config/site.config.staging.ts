@@ -62,9 +62,10 @@ export const stagingOverrides: Partial<SiteConfig> = {
     // See docs/content-sources/general.txt § SOCIAL MEDIA — {!needs approval}, CA-75.
     // NEVER promote these to site.config.ts until that tag is cleared.
     social: [
-      { href: "https://www.instagram.com/finevu_global", label: "Instagram" },
-      { href: "https://www.facebook.com/FineVuDASHCAM", label: "Facebook" },
-      { href: "https://www.youtube.com/channel/UCcjdOYjx1kDfcYbgVz9JuCQ", label: "YouTube" },
+      { href: "https://www.tiktok.com/@finevu.australia?lang=en-GB", label: "TikTok" },
+      { href: "https://www.instagram.com/finevuaustralia/", label: "Instagram" },
+      { href: "https://www.facebook.com/profile.php?id=61593047544177", label: "Facebook" },
+      { href: "https://www.youtube.com/@FineVu-Australia", label: "YouTube" },
     ],
   },
 };

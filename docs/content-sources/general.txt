@@ -67,17 +67,21 @@ Coverage area:    ANCHORED IN CODE — lib/data/installation-coverage.ts is the 
                   DOES NOT EXIST in this repo, so the file currently cannot be reproduced or
                   audited. Rebuilding the generator is a prerequisite for fixing defect 1.
 
-  For context when approving: Adelaide, Hobart and Canberra are all marked serviced, while
-  the FineVu dealer feed under RETAIL DISTRIBUTION lists NO presence in SA, TAS or ACT — only
-  VIC, QLD, NSW and WA. Not proof of an error, since the service model above is MOBILE and a
-  mobile installer need not be a listed stockist, but it is the only independent evidence and
-  it points the other way.
+  For context when approving: Adelaide, Hobart and Canberra are all marked serviced with no
+  source behind it. (A cross-check against the FineVu global dealer feed was noted here on
+  2026-07-31; that feed is now DEFERRED per ops — see RETAIL DISTRIBUTION — so it is no
+  longer evidence either way. The IT list supersedes it.)
 
   Narrowing coverage is the safe direction; do not widen it without a source. Tracked as
   CA-78 (data) and FA-23 (wiring). NT exclusion is separate and confirmed — it stays
   regardless, and is the ONLY hard block in the booking flow.
 
-  Confirmed installer service areas: (none) {!needs approval}
+  STATUS 2026-08-05 (ops): PENDING IT. The real serviced-postcode list is coming from the
+  internal IT team; until it lands, au-postcodes.json stays provisional and defect 1 above
+  is not worth chasing — the file will be replaced, not patched. Do not regenerate, hand-
+  edit or widen the flags in the meantime.
+
+  Confirmed installer service areas: (none) {!needs approval — pending IT}
 
 == WORDING CONVENTIONS (site-wide — the audit enforces these) ==
 
@@ -99,51 +103,50 @@ Size comparison — always a CREDIT CARD, never a business card.
 Distributor:      AutoXtreme (Motor One Group Pty Ltd) — exclusive Australian distributor.
                   This is confirmed and may be named on the site.
 
-Named stockists:  NONE APPROVED. There is no confirmed list of Australian retail partners.
-                  Until a real one is supplied, NO retailer may be named anywhere on the
-                  site — not in body copy, not as a logo, not as a store locator entry,
-                  not as an outbound link.
+Named stockists:  NONE — AND NO RETAIL NETWORK EXISTS YET. Updated 2026-08-04: this is not
+                  merely "a list we haven't been given". AutoXtreme has no signed Australian
+                  retail partners at all; they still have to be found and onboarded. Treat
+                  the retail network as work not yet started, not as pending paperwork.
+
+                  Until real stockists exist and are approved here, NO retailer may be named
+                  anywhere on the site — not in body copy, not as a logo, not as a store
+                  locator entry, not as an outbound link.
 
 Approved wording: "leading authorised retailers"
                   Use this generic phrase wherever the site refers to where FineVu is
                   sold. Applied 2026-07-27 (CA-28). Note the AU spelling "authorised" —
                   the site uses it 31x and "authorized" 0x; keep it consistent.
 
-  To approve real stockists, replace the "NONE APPROVED" line above with the confirmed
-  list, one per line, and drop the {!needs approval} tag below. Only then may pages name
-  them. Add the store-locator data (addresses, phone numbers) as its own file — that is
-  operational data, not marketing copy, and it must come from the retailers themselves.
+                  ⚠️ 2026-08-04: with zero stockists, even this generic phrase implies a
+                  retail network that does not exist. Any page telling a visitor they can
+                  buy FineVu at a retailer is currently unsupportable. Whether to soften
+                  the wording site-wide (e.g. to direct-from-distributor / enquiry copy)
+                  or leave it as forward-looking is a business call — raise it before
+                  launch. Tracked as CA-33.
+
+  To approve real stockists, replace the "NONE" line above with the confirmed list, one per
+  line, and drop the {!needs approval} tag below. Only then may pages name them. Add the
+  store-locator data (addresses, phone numbers) as its own file — that is operational data,
+  not marketing copy, and it must come from the retailers themselves.
 
   Confirmed AU retail partners: (none) {!needs approval}
 
-Candidate source (NOT approved) — found 2026-07-31:
+FineVu global dealer list — DEFERRED, do not reference (ops, 2026-08-05):
 
-  FineVu's own global site publishes an Australian dealer list through a public JSON
-  endpoint. It is the first concrete candidate for the "NONE APPROVED" line above:
+  FineVu's global site publishes an Australian dealer list via a public JSON endpoint
+  (found 2026-07-31). Ops has deferred it: it is to be confirmed later and is NOT to be
+  used or referenced on the site, in copy, or as a prospect list, for now. It is not a
+  source of truth and carries no weight in an audit. Do not cite it as evidence for or
+  against any AU retail claim.
+
+  Kept only so it can be re-pulled if and when ops asks for it:
 
     GET https://en.finevu.com/api/controller/user/store/getWheretoBuy.php
         ?page=1&size=100&countryId=6&where=W&retail=R&installer=I
 
-  Returns 20 Australian listings — 5 online sellers and 15 physical retailers
-  (7 VIC, 6 QLD, 2 NSW, 1 WA), each with street address and phone, about a third with
-  email. All 15 physical retailers also advertise installation.
-
-  The records are deliberately NOT reproduced here. Per the paragraph above, store-locator
-  data belongs in its own file and must come from the retailers themselves — a pull from
-  the Korean parent's site is not that. This is a pointer so the list can be re-pulled or
-  re-requested once someone approves it, nothing more.
-
-  Three data-quality problems for whoever reviews it:
-    - `countryName` reads "Argentina" on every row. Their bug — the countryId=6 filter is
-      correct and the rows match their rendered page — but it means the feed cannot be
-      trusted field-for-field.
-    - Retail / On-line / Installation is not a field. It is baked into the store NAME
-      string and inconsistently punctuated ("Retail. On-line, Installation").
-    - `installerCnt` reports 0 while 15 rows advertise installation; their taxonomy only
-      has Online/Retailers.
-
-  Approval here means AutoXtreme confirming the list is current and may be published as
-  the AU dealer network — not merely that the endpoint returned data. Tracked as CA-33.
+  (Returned 20 AU listings on 2026-07-31 — 5 online, 15 physical. Records deliberately not
+  reproduced here; the feed also had three data-quality defects — see git history of this
+  file for the detail.) Tracked as CA-33.
 
 Store-locator map:
 
@@ -173,11 +176,18 @@ the Korean HQ's channels sends them to KR-market pricing, model line-ups and sup
 contacts we do not control, so this is a business decision, not a content fix. Nobody has
 verified the three URLs above are the official HQ accounts either.
 
-  Approved social accounts for the AU site: (none) {!needs approval}
+DECIDED 2026-08-05 (ops): FineVu Australia will get its OWN social accounts — they are
+being created, and the AU handles will be added here once they exist. So the question is
+settled in principle: the site links AU accounts, NOT the Korean HQ ones. The three staging
+URLs above are placeholder-only and must NOT be promoted to production config; they should
+be replaced by the AU handles rather than approved. Still blocked on the accounts existing.
 
-To approve: replace the line above with the confirmed handles (AU accounts, or an explicit
-decision to link HQ), drop the {!needs approval} tag, and only then add them to
-config/site.config.ts. Until then they stay staging-only. Tracked as CA-75.
+  Approved social accounts for the AU site: (none yet — AU accounts being created)
+                                            {!needs approval}
+
+To approve: replace the line above with the confirmed AU handles, drop the
+{!needs approval} tag, and only then add them to config/site.config.ts. Until then the
+production footer stays `social: []` and the HQ links stay staging-only. Tracked as CA-75.
 
 == FINEVU WI-FI APP — PLATFORM AVAILABILITY ==
 
@@ -185,7 +195,7 @@ THE SITE'S POSITION: both the GX4K and the GX35 are supported on iOS AND Android
 Decided 2026-07-31. The site states this without a platform caveat anywhere.
 
   GX4K   iOS + Android   — confirmed (gx4k.txt, en.finevu.com, App Store listing)
-  GX35   iOS + Android   — Android confirmed; iOS {!needs approval}
+  GX35   iOS + Android   — Android confirmed; iOS  confirmed
 
 The GX35-on-iOS half rests on ONE source and is contradicted by another:
 

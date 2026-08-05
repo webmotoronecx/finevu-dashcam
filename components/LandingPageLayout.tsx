@@ -24,7 +24,6 @@ interface LandingPageProps {
   secondaryCtaLink?: string;
   faq?: { q: string; a: string }[];
   content?: React.ReactNode;
-  form?: React.ReactNode;
 }
 
 export function LandingPageLayout({
@@ -38,8 +37,7 @@ export function LandingPageLayout({
   secondaryCtaText,
   secondaryCtaLink,
   faq,
-  content,
-  form
+  content
 }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-white">
@@ -69,26 +67,16 @@ export function LandingPageLayout({
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* If form is present, scroll to it. Else link to ctaLink */}
-                {form ? (
-                   <button 
-                    onClick={() => document.getElementById('enquire')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="px-8 py-4 rounded-full bg-[var(--brand-primary)] text-white font-medium hover:scale-105 transition-transform w-full sm:w-auto flex items-center justify-center gap-2 group cursor-pointer"
+                <Link href={ctaLink}>
+                  <motion.button
+                    className="px-8 py-4 rounded-full bg-[var(--brand-primary)] text-white font-medium hover:scale-105 transition-transform w-full sm:w-auto flex items-center justify-center gap-2 group"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {ctaText} <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                ) : (
-                  <Link href={ctaLink}>
-                    <motion.button 
-                      className="px-8 py-4 rounded-full bg-[var(--brand-primary)] text-white font-medium hover:scale-105 transition-transform w-full sm:w-auto flex items-center justify-center gap-2 group"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {ctaText} <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </motion.button>
-                  </Link>
-                )}
-                
+                  </motion.button>
+                </Link>
+
                 {secondaryCtaText && secondaryCtaLink && (
                   <Link href={secondaryCtaLink}>
                     <motion.button 
@@ -157,52 +145,44 @@ export function LandingPageLayout({
         </section>
       )}
 
-      {/* Form Section OR The Solution/Report Preview */}
-      {form ? (
-        <section className="py-24 bg-white" data-nav-theme="light">
-          <div className="max-w-[1000px] mx-auto px-8 lg:px-16">
-            {form}
-          </div>
-        </section>
-      ) : (
-        <section className="py-24 bg-zinc-900 overflow-hidden" data-nav-theme="dark">
-          <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">
-                  Your footage, anywhere.
-                </h2>
-                <p className="text-lg text-zinc-400 mb-8 leading-relaxed">
-                  The FineVu app puts every recording in your pocket. View, save and share footage over Wi-Fi and GPS — no need to remove the memory card.
-                </p>
-                <Link href={ctaLink}>
-                  <button className="px-8 py-3 rounded-full bg-white text-zinc-900 font-medium hover:bg-zinc-200 transition-colors">
-                    {ctaText}
-                  </button>
-                </Link>
-              </motion.div>
+      {/* The Solution / Report Preview */}
+      <section className="py-24 bg-zinc-900 overflow-hidden" data-nav-theme="dark">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">
+                Your footage, anywhere.
+              </h2>
+              <p className="text-lg text-zinc-400 mb-8 leading-relaxed">
+                The FineVu app puts every recording in your pocket. View, save and share footage over Wi-Fi and GPS — no need to remove the memory card.
+              </p>
+              <Link href={ctaLink}>
+                <button className="px-8 py-3 rounded-full bg-white text-zinc-900 font-medium hover:bg-zinc-200 transition-colors">
+                  {ctaText}
+                </button>
+              </Link>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--brand-primary)]/20 to-purple-500/10 rounded-full blur-[100px] -z-10" />
-                <TiltCard>
-                  <ReportPreview className="w-full max-w-md mx-auto shadow-2xl rotate-[2deg] hover:rotate-0 transition-transform duration-500" />
-                </TiltCard>
-              </motion.div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-[var(--brand-primary)]/20 to-purple-500/10 rounded-full blur-[100px] -z-10" />
+              <TiltCard>
+                <ReportPreview className="w-full max-w-md mx-auto shadow-2xl rotate-[2deg] hover:rotate-0 transition-transform duration-500" />
+              </TiltCard>
+            </motion.div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <Footer />
     </div>

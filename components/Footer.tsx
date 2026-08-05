@@ -77,8 +77,11 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
               <div className={`space-y-5 ${grid.brand}`}>
                 <Logo variant="dark" className="h-8" />
                 <p className="text-zinc-400 leading-relaxed text-sm max-w-xs">
-                  Premium 4K &amp; 2K front and rear dash cams with SONY STARVIS image
-                  sensors. {contact.origin}, trusted by drivers worldwide.
+                  {/* STARVIS is the FRONT sensor only — the rear is a 2MP CMOS on both
+                      models. Don't reintroduce "front and rear ... STARVIS image
+                      sensors"; it claims a sensor the rear channel doesn't have. CA-61. */}
+                  Premium 4K &amp; 2K dash cams with SONY STARVIS front sensors, front and
+                  rear recording. {contact.origin}, trusted by drivers worldwide.
                 </p>
                 <div className="space-y-1 text-sm">
                   <p className="text-zinc-300">

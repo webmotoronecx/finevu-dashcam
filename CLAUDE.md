@@ -272,7 +272,7 @@ There are **no tests**. Verification = `npm run build` + driving the page in the
 - **`app/`** — App Router pages. Product pages (`gx4k`, `gx35`), audience/landing pages (`services`, `retailers`, `support`, `about`, etc.), and blog at `learn/` + dynamic `learn/[slug]`.
 - **`lib/data/articles.ts`** — the entire "Learn" blog content lives here as an array of `Article` objects with **HTML strings** in `content`. `learn/[slug]/page.tsx` finds the article by slug, injects `id`s into `<h3>` tags to build a table of contents, and renders via `dangerouslySetInnerHTML` styled by `@tailwindcss/typography`.
 - **`components/`** — top-level components are bespoke site sections/animations (Hero, Navigation, Footer, TiltCard, MagneticButton, ParallaxImage, AnimatedCounter, etc.). `components/ui/` is the generated shadcn/Radix primitive set — treat as vendored; prefer composing over editing.
-- **`components/LandingPageLayout.tsx`** — reusable template driving most audience landing pages via props (title, benefits grid, optional `form`, optional `content`, FAQ).
+- **`components/LandingPageLayout.tsx`** — reusable template for audience landing pages, driven by props (title, benefits grid, optional `content`, FAQ). **Currently imported by no page** — it is kept as a template, not as shipping code. Its `form` prop was removed 2026-08-05 along with the dead `BusinessEnquiryForm` (FA-13 / FA-14); forms now live in their own route pages and post via `lib/submitForm.ts`.
 
 ### Two conventions that are easy to miss
 

@@ -163,7 +163,7 @@ const cStorage: Card[] = [
 const cConnected: Card[] = [
     {
         title: "FineVu App",
-        body: "View live video, download clips, change settings and update firmware right from your phone. Android and iOS, plus FineVu Player 2.0 on desktop.",
+        body: "View live video, download clips, change settings and update firmware right from your phone. Android and iOS, plus FineVu PC Player 2.0 on desktop.",
         img: "/gx4k/connected-app.webp",
     },
     {

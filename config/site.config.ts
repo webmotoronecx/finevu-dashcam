@@ -155,8 +155,11 @@ export type SiteConfig = {
 const baseConfig: SiteConfig = {
   name: "FineVu",
   tagline: "Global leader in dash cam technology",
+  // "SONY STARVIS front sensors", not "SONY STARVIS image sensors" — only the front
+  // sensor is a STARVIS; both spec sheets give the rear as CMOS 2MP. Beside "front and
+  // rear" the old wording read as both channels. CA-61.
   description:
-    "Premium 4K & 2K front and rear dash cams with SONY STARVIS image sensors. Engineered in Korea, backed by a 3-year Australian warranty.",
+    "Premium 4K & 2K dash cams with SONY STARVIS front sensors and Full HD rear cameras. Engineered in Korea, backed by a 3-year Australian warranty.",
 
   contact: {
     phone: "1800 818 288",

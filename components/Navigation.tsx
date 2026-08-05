@@ -424,20 +424,25 @@ export function Navigation() {
           </div>
 
           {/* Find Retailer — solid orange. Floats to the right of the pill normally; in
-              wide mode it sits inline as the last item in the full-width row. */}
-          <Link
-            href={primaryCta.href}
-            className={`hidden xl:block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${
-              wide ? "shrink-0" : "absolute right-0 top-1/2 -translate-y-1/2"
-            }`}
-          >
-            <motion.button
-              className="cta-hover text-white font-semibold text-[14px] uppercase leading-[20px] px-9 py-4 rounded-full"
-              style={{ backgroundColor: CTA_ORANGE }}
+              wide mode it sits inline as the last item in the full-width row.
+              Product pages carry the same CTA in <ProductSubNav>, so the main row drops it
+              rather than showing two identical orange pills once the sub-nav docks. The
+              sub-nav's copy is desktop-only, so the mobile menu below keeps its button. */}
+          {!subNav && (
+            <Link
+              href={primaryCta.href}
+              className={`hidden xl:block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--finevu-orange)] focus-visible:ring-offset-2 ${
+                wide ? "shrink-0" : "absolute right-0 top-1/2 -translate-y-1/2"
+              }`}
             >
-              {primaryCta.label}
-            </motion.button>
-          </Link>
+              <motion.button
+                className="cta-hover text-white font-semibold text-[14px] uppercase leading-[20px] px-9 py-4 rounded-full"
+                style={{ backgroundColor: CTA_ORANGE }}
+              >
+                {primaryCta.label}
+              </motion.button>
+            </Link>
+          )}
         </div>
         </div>
 

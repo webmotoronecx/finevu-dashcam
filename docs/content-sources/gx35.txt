@@ -42,7 +42,7 @@ Size / Weight:    Front 74.1×37.1×23.0mm / 57g  |  Rear 46.85×36.5×29.2mm / 
                     axes. Approved size comparison for the GX35 is "smaller than a
                     credit card" — never "business card". See general.txt
                     == WORDING CONVENTIONS ==.
-Mobile App:       FineVu Wi-Fi App (Android, iOS)  {!needs approval — iOS only}
+Mobile App:       FineVu Wi-Fi App (Android, iOS)
                   ^ Android is confirmed. iOS is the SITE'S POSITION, not a verified
                     fact: en.finevu.com lists the GX35 as iOS-supported, but the Apple
                     App Store listing for FineVu Wi-Fi (id1514069940) does not name it.

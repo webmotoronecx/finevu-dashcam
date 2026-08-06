@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
 
 // Product registration page: dark hero, registration form (emailed to support via
@@ -20,7 +21,10 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-const MAX_RECEIPT_BYTES = 10 * 1024 * 1024;
+// Must stay at or below what /api/contact accepts (MAX_ATTACHMENT_BASE64 there is 4 MB
+// of base64, and base64 inflates by ~1/3). Anything larger used to pass this check and
+// then be dropped server-side, so support received a registration with no receipt.
+const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
 
 const models = [
   { value: "GX4K", label: "FineVu GX4K" },
@@ -67,6 +71,8 @@ function RegisterForm() {
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
   const [botcheck, setBotcheck] = useState("");
+  const [captcha, setCaptcha] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -84,7 +90,7 @@ function RegisterForm() {
     if (f.size > MAX_RECEIPT_BYTES) {
       setFile(null);
       setFileError(
-        "That file is over 10 MB. Please choose a smaller file — or email your receipt to support@finevuaustralia.com.au after registering.",
+        "That file is over 3 MB. Please choose a smaller file — or email your receipt to support@finevuaustralia.com.au after registering.",
       );
       return;
     }
@@ -104,6 +110,10 @@ function RegisterForm() {
     if (!form.retailer.trim()) inv.retailer = true;
     setInvalid(inv);
     if (Object.keys(inv).length > 0 || fileError) return;
+    if (TURNSTILE_ENABLED && !captcha) {
+      setError("Please complete the verification below.");
+      return;
+    }
 
     setStatus("sending");
     setError("");
@@ -128,13 +138,16 @@ function RegisterForm() {
         firmware_updates: notify ? "Yes" : "No",
         receipt: file ? file.name : "Not provided",
       },
-      { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment, botcheck },
+      { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment, botcheck, turnstileToken: captcha },
     );
     // Stay in "sending" through the navigation so the button can't be re-submitted.
     if (res.ok) router.push(thankYouUrl("register"));
     else {
       setStatus("idle");
       setError(res.error);
+      // The token is single-use and may already be spent, so reissue one for the retry.
+      setCaptcha("");
+      setCaptchaReset((n) => n + 1);
     }
   }
 
@@ -248,7 +261,7 @@ function RegisterForm() {
               <><span className="text-[#de6f12]">Choose a file</span> or drag it here</>
             )}
           </p>
-          <p className="mt-1 text-[12.5px] text-[#8a8a92]">JPG, PNG, HEIC or PDF — up to 10 MB</p>
+          <p className="mt-1 text-[12.5px] text-[#8a8a92]">JPG, PNG, HEIC or PDF — up to 3 MB</p>
         </div>
         {fileError && <p className={ERR}>{fileError}</p>}
       </div>
@@ -258,6 +271,10 @@ function RegisterForm() {
         <label htmlFor="notify" className="text-[13.5px] leading-[1.55] text-[#55555c]">
           Email me firmware update notifications for my model. No marketing — just updates that keep your camera running its best.
         </label>
+      </div>
+
+      <div className="mb-5">
+        <Turnstile onToken={setCaptcha} resetKey={captchaReset} />
       </div>
 
       <button

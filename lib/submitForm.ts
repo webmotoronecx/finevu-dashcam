@@ -11,6 +11,8 @@ type SubmitOptions = {
   attachment?: { filename: string; contentBase64: string };
   /** Honeypot value, forwarded so the server-side check in route.ts can actually fire. */
   botcheck?: string;
+  /** Cloudflare Turnstile token, verified server-side against TURNSTILE_SECRET_KEY (FB-07). */
+  turnstileToken?: string;
 };
 
 export async function submitForm(
@@ -21,7 +23,14 @@ export async function submitForm(
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject: opts.subject, replyTo: opts.replyTo, fields, attachment: opts.attachment, botcheck: opts.botcheck }),
+      body: JSON.stringify({
+        subject: opts.subject,
+        replyTo: opts.replyTo,
+        fields,
+        attachment: opts.attachment,
+        botcheck: opts.botcheck,
+        turnstileToken: opts.turnstileToken,
+      }),
     });
     const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
     if (res.ok && data?.ok) return { ok: true };

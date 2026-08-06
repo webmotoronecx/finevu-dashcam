@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Phone, Mail } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
 
 // Contact page: dark hero, support cards, message form section and learn more strip
@@ -69,10 +70,16 @@ function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
   const [botcheck, setBotcheck] = useState("");
+  const [captcha, setCaptcha] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (TURNSTILE_ENABLED && !captcha) {
+      setError("Please complete the verification below.");
+      return;
+    }
     setStatus("sending");
     setError("");
     const res = await submitForm(
@@ -81,6 +88,7 @@ function ContactForm() {
         subject: form.subject ? `FineVu enquiry — ${form.subject}` : "FineVu enquiry — Contact form",
         replyTo: form.email,
         botcheck,
+        turnstileToken: captcha,
       },
     );
     if (res.ok) {
@@ -89,6 +97,9 @@ function ContactForm() {
     } else {
       setStatus("idle");
       setError(res.error);
+      // The token is single-use and may already be spent, so reissue one for the retry.
+      setCaptcha("");
+      setCaptchaReset((n) => n + 1);
     }
   }
 
@@ -157,6 +168,9 @@ function ContactForm() {
           value={form.message}
           onChange={(e) => set("message", e.target.value)}
         />
+      </div>
+      <div className="col-span-full">
+        <Turnstile onToken={setCaptcha} resetKey={captchaReset} />
       </div>
       <button
         type="submit"

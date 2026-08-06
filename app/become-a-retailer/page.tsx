@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitForm } from "@/lib/submitForm";
+import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
 import {
   Star,
@@ -144,6 +145,8 @@ function RetailerForm() {
   const [err, setErr] = useState("");
   const [sending, setSending] = useState(false);
   const [botcheck, setBotcheck] = useState("");
+  const [captcha, setCaptcha] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
 
   async function submit(e: React.FormEvent) {
@@ -155,6 +158,10 @@ function RetailerForm() {
     }
     if (!emailOk) {
       setErr("Please enter a valid email address.");
+      return;
+    }
+    if (TURNSTILE_ENABLED && !captcha) {
+      setErr("Please complete the verification below.");
       return;
     }
     setErr("");
@@ -171,7 +178,7 @@ function RetailerForm() {
         website: f.web,
         message: f.msg,
       },
-      { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email, botcheck },
+      { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email, botcheck, turnstileToken: captcha },
     );
     // Leave `sending` on through the navigation so the button can't be re-submitted.
     if (res.ok) {
@@ -179,6 +186,9 @@ function RetailerForm() {
     } else {
       setSending(false);
       setErr(res.error);
+      // The token is single-use and may already be spent, so reissue one for the retry.
+      setCaptcha("");
+      setCaptchaReset((n) => n + 1);
     }
   }
 
@@ -237,6 +247,7 @@ function RetailerForm() {
         <textarea className={`${INPUT} min-h-[110px] resize-y`} placeholder="Where you're based, what you sell, and roughly how many units you'd expect to move." value={f.msg} onChange={(e) => set("msg", e.target.value)} />
       </div>
 
+      <Turnstile onToken={setCaptcha} resetKey={captchaReset} />
       <button type="submit" disabled={sending} className="cta-hover mt-2 w-full rounded-full bg-[var(--finevu-orange)] px-7 py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70">
         {sending ? "Submitting…" : "Submit Application"}
       </button>

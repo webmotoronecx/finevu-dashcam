@@ -95,19 +95,86 @@ type Form = {
 };
 const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "", ccName: "", ccNum: "", ccExp: "", ccCvc: "" };
 
-function useCalendar() {
+// ── Availability ──────────────────────────────────────────────────────────────
+// Step 3 renders whatever the GHL calendar says is bookable, fetched via
+// /api/booking/slots (the token is secret, so the browser can't ask GHL directly).
+//
+// GHL enforces weekends, the minimum scheduling notice, the booking window and one-off
+// holiday blocks server-side — verified against the live calendar on 2026-08-06. So the
+// wizard deliberately does NOT re-implement any of those rules; a day is bookable if and
+// only if it came back with slots.
+
+const dateKey = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+// Slots arrive as ISO strings with a +10:00 offset. Formatting in the booking timezone
+// keeps the displayed time correct for a customer browsing from another state.
+const SLOT_FORMAT = new Intl.DateTimeFormat("en-AU", {
+  hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Australia/Melbourne",
+});
+const formatSlot = (iso: string) => SLOT_FORMAT.format(new Date(iso)).toUpperCase();
+
+type AvailabilityState = {
+  status: "loading" | "ready" | "unconfigured" | "error";
+  byDate: Record<string, string[]>;
+};
+
+function useAvailability(): AvailabilityState {
+  const [state, setState] = useState<AvailabilityState>({ status: "loading", byDate: {} });
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/booking/slots")
+      .then((r) => r.json())
+      .then((d: { ok?: boolean; reason?: string; days?: { date: string; slots: string[] }[] }) => {
+        if (cancelled) return;
+        if (d?.ok) {
+          const byDate: Record<string, string[]> = {};
+          for (const day of d.days ?? []) byDate[day.date] = day.slots ?? [];
+          setState({ status: "ready", byDate });
+        } else {
+          setState({ status: d?.reason === "not_configured" ? "unconfigured" : "error", byDate: {} });
+        }
+      })
+      .catch(() => { if (!cancelled) setState({ status: "error", byDate: {} }); });
+    return () => { cancelled = true; };
+  }, []);
+  return state;
+}
+
+/**
+ * Builds the month-grid of day buttons. Always starts on the Monday of the current week
+ * so the layout is stable, and runs far enough to cover the furthest bookable day.
+ *
+ * `fallback` is the local-dev path only: with no GHL keys configured there is no
+ * availability to render, so it falls back to the old client-side rule (future weekdays)
+ * purely so the wizard remains walkable. It must never be the production path — those
+ * days are guesses, not real availability.
+ */
+function useCalendarGrid(byDate: Record<string, string[]>, fallback: boolean) {
   return useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const start = new Date(today);
     start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
-    const days: { date: Date; day: number; month: string; disabled: boolean }[] = [];
-    for (let i = 0; i < 28; i++) {
+
+    const keys = Object.keys(byDate).sort();
+    const last = keys[keys.length - 1];
+    let weeks = 4;
+    if (last) {
+      const lastDate = new Date(`${last}T00:00:00`);
+      const span = Math.ceil(((lastDate.getTime() - start.getTime()) / 86_400_000 + 1) / 7);
+      weeks = Math.min(6, Math.max(4, span));
+    }
+
+    const days: { date: Date; key: string; day: number; month: string; disabled: boolean }[] = [];
+    for (let i = 0; i < weeks * 7; i++) {
       const d = new Date(start); d.setDate(start.getDate() + i);
+      const key = dateKey(d);
       const weekend = d.getDay() === 0 || d.getDay() === 6;
-      days.push({ date: d, day: d.getDate(), month: MONTHS[d.getMonth()], disabled: d <= today || weekend });
+      const available = fallback ? d > today && !weekend : Boolean(byDate[key]?.length);
+      days.push({ date: d, key, day: d.getDate(), month: MONTHS[d.getMonth()], disabled: !available });
     }
     return days;
-  }, []);
+  }, [byDate, fallback]);
 }
 
 const INPUT = "w-full rounded-[8px] border border-[#e8e7e2] bg-white px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors focus:border-[var(--finevu-orange)]";
@@ -121,9 +188,20 @@ function BookingWizard() {
   const [hint, setHint] = useState<Coverage>({ msg: "", cls: "" });
   const [date, setDate] = useState<Date | null>(null);
   const [dateLabel, setDateLabel] = useState("");
+  const [slotLabel, setSlotLabel] = useState("");
   const [processing, setProcessing] = useState(false);
   const [ref, setRef] = useState("");
-  const days = useCalendar();
+  const avail = useAvailability();
+  // Local dev only — see useCalendarGrid. Production always has the keys.
+  const fallbackAvailability = avail.status === "unconfigured";
+  const days = useCalendarGrid(avail.byDate, fallbackAvailability);
+  const selectedKey = date ? dateKey(date) : "";
+  // form.slot holds the ISO start time (what a booking will be created from); slotLabel
+  // holds what the customer sees. In fallback mode there are no ISO times, so the label
+  // doubles as the value.
+  const slotOptions: { value: string; label: string }[] = fallbackAvailability
+    ? SLOTS.map((s) => ({ value: s, label: s }))
+    : (avail.byDate[selectedKey] ?? []).map((iso) => ({ value: iso, label: formatSlot(iso) }));
   const bookRef = useRef<HTMLDivElement>(null);
   // Prefetched so step-2 validation stays synchronous. Null until it lands (or if it
   // fails), in which case resolveCoverage falls back to the coarse range table.
@@ -184,7 +262,7 @@ function BookingWizard() {
       ["Install", "Professional hardwire install"],
       ["Location", (form.place ? form.place + " — " : "") + [form.street, form.suburb, form.stateAu, form.postcode].filter(Boolean).join(", ")],
       ["Date", dateLabel || "—"],
-      ["Time", form.slot || "—"],
+      ["Time", slotLabel || "—"],
     ];
     // Optional step-4 fields. Shown only when filled, so the user can see they weren't
     // dropped — they have no other destination until the wizard actually submits (CA-36).
@@ -298,27 +376,55 @@ function BookingWizard() {
           {step === 3 && (
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Choose a date and time</h3>
-              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a weekday that suits you, then a start time. Installers are available hourly from 9:00 AM to 5:00 PM, Monday to Friday. Most installations take 60–90 minutes.</p>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a date that suits you, then a start time. Only dates and times our installers are actually free are shown. Most installations take 60–90 minutes.</p>
               <span className={FLABEL} id="wiz-date-label">Date</span>
-              <div className="grid grid-cols-7 gap-1.5 sm:gap-2" role="group" aria-labelledby="wiz-date-label">
-                {DOWS.map((d) => <div key={d} aria-hidden="true" className="pb-1 text-center text-[11px] font-semibold uppercase text-[#9c9ca3]">{d}</div>)}
-                {days.map((d, i) => {
-                  const selected = date?.getTime() === d.date.getTime();
-                  const full = d.date.toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-                  return (
-                    <button key={i} type="button" disabled={d.disabled} aria-pressed={selected} aria-label={full} onClick={() => { setDate(d.date); setDateLabel(full); setHint({ msg: "", cls: "" }); }}
-                      className={`flex flex-col items-center rounded-[10px] border-[1.5px] py-2 text-[.88rem] transition-colors ${d.disabled ? "cursor-not-allowed border-transparent text-[#d4d4d8]" : selected ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>
-                      <span className="text-[.6rem] uppercase text-[#9c9ca3]">{d.month}</span>{d.day}
-                    </button>
-                  );
-                })}
-              </div>
-              <span className={FLABEL} id="wiz-slot-label">Start time</span>
-              <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5" role="group" aria-labelledby="wiz-slot-label">
-                {SLOTS.map((s) => (
-                  <button key={s} type="button" aria-pressed={form.slot === s} onClick={() => { set("slot", s); setHint({ msg: "", cls: "" }); }} className={`rounded-full border-[1.5px] px-3 py-2.5 text-[.85rem] font-medium transition-colors ${form.slot === s ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>{s}</button>
-                ))}
-              </div>
+              {avail.status === "error" ? (
+                <p className="text-[15px] leading-[1.6] text-[#D93816]">
+                  We couldn&apos;t load available installation dates just now. Please try again in a moment, or call{" "}
+                  <a href="tel:1800818288" className="font-semibold underline">1800 818 288</a> and we&apos;ll book you in.
+                </p>
+              ) : (
+                <div className="grid grid-cols-7 gap-1.5 sm:gap-2" role="group" aria-labelledby="wiz-date-label" aria-busy={avail.status === "loading"}>
+                  {DOWS.map((d) => <div key={d} aria-hidden="true" className="pb-1 text-center text-[11px] font-semibold uppercase text-[#9c9ca3]">{d}</div>)}
+                  {days.map((d, i) => {
+                    const selected = date?.getTime() === d.date.getTime();
+                    const full = d.date.toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+                    return (
+                      <button key={i} type="button" disabled={d.disabled} aria-pressed={selected} aria-label={full}
+                        onClick={() => {
+                          setDate(d.date); setDateLabel(full);
+                          // Times belong to a date, so a new date invalidates the choice.
+                          set("slot", null); setSlotLabel("");
+                          setHint({ msg: "", cls: "" });
+                        }}
+                        className={`flex flex-col items-center rounded-[10px] border-[1.5px] py-2 text-[.88rem] transition-colors ${d.disabled ? "cursor-not-allowed border-transparent text-[#d4d4d8]" : selected ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>
+                        <span className="text-[.6rem] uppercase text-[#9c9ca3]">{d.month}</span>{d.day}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              {avail.status === "loading" && (
+                <p className="mt-3 text-[14px] text-[#6e6e73]">Loading available dates…</p>
+              )}
+              {avail.status !== "error" && (
+                <>
+                  <span className={FLABEL} id="wiz-slot-label">Start time</span>
+                  {!date ? (
+                    <p className="text-[14px] text-[#6e6e73]">Choose a date to see available start times.</p>
+                  ) : slotOptions.length === 0 ? (
+                    <p className="text-[14px] text-[#6e6e73]">No start times left on that date — please choose another.</p>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5" role="group" aria-labelledby="wiz-slot-label">
+                      {slotOptions.map((s) => (
+                        <button key={s.value} type="button" aria-pressed={form.slot === s.value}
+                          onClick={() => { set("slot", s.value); setSlotLabel(s.label); setHint({ msg: "", cls: "" }); }}
+                          className={`rounded-full border-[1.5px] px-3 py-2.5 text-[.85rem] font-medium transition-colors ${form.slot === s.value ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>{s.label}</button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 

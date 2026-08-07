@@ -74,6 +74,14 @@ Client accepts **10 MB** and says so. Server caps base64 at **4 MB** — and bas
 **without the attachment and returns `{ok:true}`**. A routine 4 MB phone photo of a
 receipt produces a claim with no proof of purchase and a success screen.
 
+**Applied 2026-08-07.** Both of the suggested fixes shipped. The client cap on
+`register` and `warranty-claim` is now **3 MB** (matching the 4 MB base64 server ceiling)
+and the UI advertises "up to 3 MB". And the server no longer drops silently:
+`buildAttachment` rejects oversize, empty, disallowed-extension and malformed attachments,
+and the handler returns a **400** (*"That file couldn't be attached… under 3 MB"*) instead
+of `{ok:true}`. Verified end to end — an oversize base64 and a `.exe` both return 400,
+while a valid image passes the gate.
+
 ---
 
 ## 3. High — security
@@ -262,8 +270,8 @@ non-digits and cap length (`:288,335`); card expiry is checked against the curre
 
 ## 7. Summary
 
-**Blocks launch** — FA-01 (wizard/card), FA-02 (evidence lost), FA-03 (attachments
-dropped), ~~FA-04 (honeypot dead)~~ *(fixed 2026-08-04)*, FA-05 (no rate limiting), FA-07 (phantom email),
+**Blocks launch** — FA-01 (wizard/card), FA-02 (evidence lost), ~~FA-03 (attachments
+dropped)~~ *(fixed 2026-08-07)*, ~~FA-04 (honeypot dead)~~ *(fixed 2026-08-04)*, FA-05 (no rate limiting), FA-07 (phantom email),
 FA-12 (wrong recipient domain), **FA-23** (contradictory coverage), **FA-26** (no terms
 acceptance at checkout), **FA-28** (thank-you copy contradicts the pay button).
 

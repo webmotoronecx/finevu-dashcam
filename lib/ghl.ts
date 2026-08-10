@@ -262,7 +262,7 @@ export async function createHeldAppointment(input: HoldInput): Promise<Appointme
       locationId,
       contactId: input.contactId,
       startTime: input.startTime,
-      title: `${input.customerName} — FineVu installation`,
+      title: holdTitle(input.customerName),
       address: input.address,
       appointmentStatus: "new",
       // Suppress GHL's own customer mail. Our confirmation goes out via Resend from the
@@ -278,9 +278,76 @@ export async function createHeldAppointment(input: HoldInput): Promise<Appointme
   return appt.startTime ? appt : { ...appt, startTime: input.startTime };
 }
 
+type EventsResponse = { events?: Record<string, unknown>[] };
+
+/**
+ * Finds an existing HELD appointment for this contact at this exact time.
+ *
+ * Exists because our own hold blocks the slot: a retried or double-fired create would
+ * see the slot as taken and tell the customer someone else booked it. Checking for our
+ * own hold first turns that into a reuse instead of a false 409.
+ *
+ * Matching on contactId + instant + status "new" is deliberately narrow — it can only
+ * ever return a hold belonging to the customer who is asking, and never a confirmed
+ * booking. Instants are compared numerically because GHL may echo a different but
+ * equivalent offset.
+ */
+export async function findHeldAppointment(contactId: string, startTime: string): Promise<Appointment | null> {
+  const { calendarId, locationId } = config();
+  const target = new Date(startTime).getTime();
+  if (Number.isNaN(target)) return null;
+
+  // A tight window around the slot keeps the response small; GHL wants epoch millis here.
+  const data = await ghlFetch<EventsResponse>(
+    `/calendars/events?locationId=${encodeURIComponent(locationId)}&calendarId=${encodeURIComponent(calendarId)}` +
+      `&startTime=${target - 60_000}&endTime=${target + 60_000}`,
+  );
+
+  const match = (data.events ?? []).find((e) => {
+    const status = typeof e.appointmentStatus === "string" ? e.appointmentStatus : e.appoinmentStatus;
+    const start = typeof e.startTime === "string" ? new Date(e.startTime).getTime() : NaN;
+    return e.contactId === contactId && status === "new" && start === target;
+  });
+
+  return match ? toAppointment(match as AppointmentResponse) : null;
+}
+
 export async function getAppointment(appointmentId: string): Promise<Appointment> {
   return toAppointment(
     await ghlFetch<AppointmentResponse>(`/calendars/events/appointments/${encodeURIComponent(appointmentId)}`),
+  );
+}
+
+// --- Hold ↔ Stripe session link ---------------------------------------------
+//
+// The appointment title is the only writable field on an appointment that actually
+// persists (`notes` is accepted and silently dropped), so it carries the Stripe session
+// id while the booking is held.
+//
+// This exists because the session id must be RECOVERABLE. Stripe's idempotency keys
+// cannot do the job: expires_at is derived from the current time, so a retry sends
+// different parameters under the same key and is rejected — and it cannot be made
+// deterministic either, because an expires_at anchored to when the hold was taken drops
+// below Stripe's "at least 30 minutes from now" floor within two minutes. Without a
+// recoverable id, every retry would mint a second payable session for one appointment.
+//
+// The tag is visible in the installers' calendar for at most the length of a hold:
+// confirmAppointment() strips it as it promotes the booking.
+
+const HOLD_TAG = /\s*\[hold (cs_[A-Za-z0-9_]+)\]$/;
+
+export const holdTitle = (customerName: string, sessionId?: string) =>
+  `${customerName} — FineVu installation${sessionId ? ` [hold ${sessionId}]` : ""}`;
+
+/** The Stripe session id parked on a held appointment, if it has one yet. */
+export const sessionIdFromTitle = (title: string): string | null => title.match(HOLD_TAG)?.[1] ?? null;
+
+export async function setAppointmentTitle(appointmentId: string, title: string): Promise<Appointment> {
+  return toAppointment(
+    await ghlFetch<AppointmentResponse>(`/calendars/events/appointments/${encodeURIComponent(appointmentId)}`, {
+      method: "PUT",
+      body: { title, toNotify: false },
+    }),
   );
 }
 
@@ -293,8 +360,17 @@ async function setStatus(appointmentId: string, status: AppointmentStatus): Prom
   );
 }
 
-/** Promotes a hold to a real booking. Called ONLY from the Stripe webhook. */
-export const confirmAppointment = (appointmentId: string) => setStatus(appointmentId, "confirmed");
+/**
+ * Promotes a hold to a real booking. Called ONLY from the Stripe webhook.
+ *
+ * Also strips the "[hold cs_…]" tag from the title, so a confirmed booking reads cleanly
+ * in the installers' calendar and the tag can never be mistaken for a live hold.
+ */
+export async function confirmAppointment(appointmentId: string): Promise<Appointment> {
+  const confirmed = await setStatus(appointmentId, "confirmed");
+  if (!sessionIdFromTitle(confirmed.title)) return confirmed;
+  return setAppointmentTitle(appointmentId, confirmed.title.replace(HOLD_TAG, ""));
+}
 
 /**
  * Cancels a booking the customer already paid for.

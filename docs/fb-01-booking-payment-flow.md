@@ -64,6 +64,23 @@ the address off the calendar), but **`notes` is accepted and silently dropped** 
 put anything load-bearing there. `createdBy.source` comes back as `"third_party"` for
 API-created appointments, a useful discriminator if a GHL-side audit is ever needed.
 
+### Why the session id is parked on the appointment title
+
+Discovered while building step 2, and it constrains anything that touches session
+creation. **Stripe idempotency keys cannot make `/api/booking/create` safe to retry.**
+`expires_at` is derived from the current time, so a retry sends different parameters
+under the same key and Stripe rejects it outright — *"keys for idempotent requests can
+only be used with the same parameters they were first used with"*. Anchoring `expires_at`
+to when the hold was taken does not rescue it either: Stripe requires at least 30 minutes
+from *now*, so an anchored value falls under the floor about two minutes after the hold
+is created.
+
+So the session id has to be recoverable from our own data. It goes in the appointment
+**title** — the only writable field that persists (`notes` is silently dropped) — as
+`Name — FineVu installation [hold cs_…]`. `confirmAppointment()` strips the tag as it
+promotes the booking, so the ugly form is visible for at most the length of a hold.
+Without this, every retry would mint a second payable session against one held slot.
+
 ### Implementation status
 
 **Step 1 of 5 complete** — `lib/ghl.ts` write path, 2026-08-10. Adds `upsertContact`,
@@ -74,6 +91,20 @@ live calendar (create → hold blocks slot → confirm → cancel → release �
 re-release), then cleaned up to zero events. Two API quirks handled: contacts need
 `Version: 2021-07-28` where calendars need `2021-04-15`, and GHL's create response omits
 `startTime`/`endTime` that its GET returns, so the created object is backfilled.
+
+**Step 2 of 5 complete** — `lib/stripe.ts` + `POST /api/booking/create`, 2026-08-10.
+Verified end-to-end against test-mode Stripe and the live calendar: a first call holds
+the slot and returns a client secret; two retries return the **same** appointment and the
+**same** session (`reused: true`); a different customer on the same slot gets `409
+slot_taken`; an NT postcode gets `422`; a missing field gets `400`; and a sixth request
+from one IP inside ten minutes gets `429`. The session reads back as `payment` /
+`embedded_page` / `25000 AUD` / `+32 min` / `redirect_on_completion: never` /
+`invoice_creation: true`, with the full booking payload in metadata. Calendar returned to
+zero events and all test contacts deleted afterwards.
+
+Two Stripe API details worth knowing: **`ui_mode: "embedded"` is rejected — the value is
+now `embedded_page`** (same in-page iframe, renamed), and `expires_at` computed as exactly
++30 minutes sits on the rejection boundary, so `HOLD_TTL_MINUTES` is 32 to carry margin.
 
 ---
 

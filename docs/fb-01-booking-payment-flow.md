@@ -130,8 +130,28 @@ Replaying the same event again changed nothing (idempotent, 200). Expiring a ses
 released its hold and returned the slot to availability. Unsigned and mis-signed payloads
 are both rejected 400.
 
-Still outstanding for FB-01: the confirmation email and tax invoice (step 5 of the plan),
-which is gated on the ABN and Resend domain verification.
+**Step 5 of 5 built** — `lib/email/bookingConfirmation.ts` + `lib/data/business.ts`,
+2026-08-10. The webhook sends the confirmation only after the appointment is actually
+promoted, so the email can never claim a booking that did not happen. A send failure is
+logged, never thrown: a Resend outage must not 500 the webhook and make Stripe replay the
+delivery.
+
+The email is **both** the confirmation and the tax invoice, deliberately. A default
+Stripe receipt carries no ABN and no GST line, so it is not a valid Australian tax
+invoice, and `/installation:84` promises the customer one. Stripe's own
+`invoice_creation` invoice is linked as a convenience when it exists, but the compliant
+document is ours.
+
+⚠️ **It ships with a PLACEHOLDER ABN (`00 000 000 000`) and cannot go live like that.**
+Set `BUSINESS_ABN`, and set the same value on the Stripe account. `sendBookingConfirmation`
+logs a warning on every send while the placeholder is in place. `BUSINESS_GST_REGISTERED`
+drives whether the GST line appears at all — registration is separate from holding an ABN,
+and showing GST when not registered would be worse than omitting it. Also unverified:
+`legalName` is assumed to be "AutoXtreme Pty Ltd" and needs checking against the ABR.
+
+The other launch blocker is unchanged: **Resend domain verification** (FB-08). Until
+`finevuaustralia.com.au` is verified, Resend's sandbox only delivers to the account
+owner's address, so a real customer receives nothing.
 
 Two Stripe API details worth knowing: **`ui_mode: "embedded"` is rejected — the value is
 now `embedded_page`** (same in-page iframe, renamed), and `expires_at` computed as exactly

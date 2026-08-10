@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { cancelAppointment, confirmAppointment, getAppointment, releaseHold } from "@/lib/ghl";
-import { stripe, stripeConfigured } from "@/lib/stripe";
+import { sendBookingConfirmation } from "@/lib/email/bookingConfirmation";
+import { invoiceUrl, stripe, stripeConfigured } from "@/lib/stripe";
 
 // The only thing that turns a held slot into a real booking (FB-01).
 //
@@ -62,6 +63,30 @@ export async function POST(req: Request) {
         }
         if (current.status === "confirmed") break; // already handled; a retry
         await confirmAppointment(appointmentId);
+
+        // Only after the booking is genuinely promoted — the email says "confirmed", so
+        // it must not go out before that is true. Deliberately not awaited into the
+        // failure path: a Resend outage must not 500 this handler and make Stripe replay
+        // the whole delivery. A missing email is fixable by hand; re-running the
+        // confirmation is noise.
+        const meta = session.metadata ?? {};
+        const sent = await sendBookingConfirmation({
+          reference: appointmentId,
+          email: meta.email ?? session.customer_details?.email ?? "",
+          name: meta.name ?? "",
+          phone: meta.phone ?? "",
+          model: meta.model ?? "",
+          slot: meta.slot ?? current.startTime,
+          address: meta.address ?? current.address,
+          vehicle: meta.vehicle ?? "",
+          amountCents: session.amount_total ?? 0,
+          invoiceUrl: await invoiceUrl(session.invoice),
+        });
+        if (!sent.ok) {
+          console.error("[stripe/webhook] booking confirmed but confirmation email failed", {
+            appointmentId, session: session.id, error: sent.error,
+          });
+        }
         break;
       }
 

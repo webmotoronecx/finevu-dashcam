@@ -117,6 +117,25 @@ export async function createBookingSession(meta: BookingMetadata): Promise<Booki
   return { sessionId: session.id, clientSecret: session.client_secret, expiresAt };
 }
 
+/**
+ * The hosted URL of the invoice Stripe generated for a paid session, if there is one.
+ *
+ * A webhook payload carries `invoice` as a bare id rather than an expanded object, so it
+ * has to be fetched. Returns undefined rather than throwing: the confirmation email
+ * contains the full tax-invoice detail itself, so this link is a convenience and must
+ * never be the reason a customer gets no email.
+ */
+export async function invoiceUrl(invoice: string | { id?: string } | null | undefined): Promise<string | undefined> {
+  const id = typeof invoice === "string" ? invoice : invoice?.id;
+  if (!id) return undefined;
+  try {
+    const inv = await stripe().invoices.retrieve(id);
+    return inv.hosted_invoice_url ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export const retrieveSession = (sessionId: string) => stripe().checkout.sessions.retrieve(sessionId);
 
 /**

@@ -120,7 +120,7 @@ moment FA-01 is resolved.
 | **FA-07** | Thank-you copy promises a confirmation email; the API sends one email, to support only | `lib/data/thank-you.ts:34-42` | Every submitter told to reply to an email that doesn't exist. Content accuracy is a hard gate |
 | **FA-08** | Three validation models: `/contact` browser-native (no `noValidate`), `/become-a-retailer` one combined message for 9 fields, wizard one hint line | `contact:99`, `retailer:175`, `installation:373` | `/contact` shows browser bubbles unlike any other form; retailer form won't say *which* field is empty |
 | **FA-09** | No required markers, while the intro implies unmarked = required | `register:154,170-218` | 7 fields required by `submit()`; user finds out by submitting |
-| **FA-12** | `.env.example` says `support@finevuaustralia.com`; code defaults to `...com.au` | `.env.example:11` vs `route.ts:8` | Deploy configured from the example sends customer mail nowhere |
+| ~~**FA-12**~~ *(fixed 2026-08-10)* | `.env.example` said `support@finevuaustralia.com`; corrected to `...com.au` to match `route.ts` and the verified Resend domain | `.env.example:10,15,18` vs `route.ts:8` | Deploy configured from the example sends customer mail nowhere |
 | **FA-10** | No timeout if the success redirect stalls | `contact:90` + 3 others | Button stuck disabled on "Sending…". Redirect-not-inline-success is a *confirmed deliberate pattern*, not a defect |
 | **FA-11** | Gate is an exact path match, so `/thank-you` is gated but `/thank-you/<slug>` isn't | `site.config.ts:275`, `ComingSoonGate.tsx:21` | Correct by accident. Prefix-matching the gate would send every success to Coming Soon |
 | **FA-13** | `BusinessEnquiryForm` fakes submit via `setTimeout`, has **no error state at all** | `BusinessEnquiryForm.tsx:33-41` | Imported by nothing, but reads as finished — drop it on a page and you ship a second silent-discard form |
@@ -272,7 +272,7 @@ non-digits and cap length (`:288,335`); card expiry is checked against the curre
 
 **Blocks launch** — FA-01 (wizard/card), FA-02 (evidence lost), ~~FA-03 (attachments
 dropped)~~ *(fixed 2026-08-07)*, ~~FA-04 (honeypot dead)~~ *(fixed 2026-08-04)*, FA-05 (no rate limiting), FA-07 (phantom email),
-FA-12 (wrong recipient domain), **FA-23** (contradictory coverage), **FA-26** (no terms
+~~FA-12 (wrong recipient domain)~~ *(fixed 2026-08-10)*, **FA-23** (contradictory coverage), **FA-26** (no terms
 acceptance at checkout), **FA-28** (thank-you copy contradicts the pay button).
 
 **Should fix, not blocking** — FA-08, FA-09, FA-11, FA-13, FA-14, FA-24, FA-25, FA-27,

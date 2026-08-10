@@ -4,15 +4,13 @@ import { Footer } from "@/components/Footer";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { submitForm } from "@/lib/submitForm";
-import { thankYouUrl } from "@/lib/data/thank-you";
+import { BookingCheckout } from "@/components/booking/BookingCheckout";
 import { COVERAGE_MESSAGES, isExcluded, loadPostcodeRows, resolveCoverage, type Coverage, type PostcodeRow } from "@/lib/data/installation-coverage";
 import { Carousel } from "@/components/sections/Carousel";
 import { Accordion } from "@/components/Accordion";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState, Fragment } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   ShieldCheck,
@@ -27,7 +25,6 @@ import {
   Check,
   Home,
   Briefcase,
-  Lock,
 } from "lucide-react";
 
 // Booking / installation page — hero, booking wizard, how-it-works, what's-included, service-area checker, why-experts, FAQs, fine print.
@@ -91,9 +88,8 @@ const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#
 type Form = {
   model: string | null; place: string | null; street: string; suburb: string; stateAu: string; postcode: string; slot: string | null;
   name: string; phone: string; email: string; retailer: string; make: string; vmodel: string; year: string; notes: string;
-  ccName: string; ccNum: string; ccExp: string; ccCvc: string;
 };
-const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "", ccName: "", ccNum: "", ccExp: "", ccCvc: "" };
+const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "" };
 
 // ── Availability ──────────────────────────────────────────────────────────────
 // Step 3 renders whatever the GHL calendar says is bookable, fetched via
@@ -182,14 +178,12 @@ const FLABEL = "mb-2.5 mt-[22px] block text-[12px] font-semibold uppercase track
 const FIELD_LABEL = "mb-1.5 block text-[13px] font-semibold leading-[19.5px] text-[#1d1d1f]";
 
 function BookingWizard() {
-  const router = useRouter();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY);
   const [hint, setHint] = useState<Coverage>({ msg: "", cls: "" });
   const [date, setDate] = useState<Date | null>(null);
   const [dateLabel, setDateLabel] = useState("");
   const [slotLabel, setSlotLabel] = useState("");
-  const [processing, setProcessing] = useState(false);
   const [ref, setRef] = useState("");
   const avail = useAvailability();
   // Local dev only — see useCalendarGrid. Production always has the keys.
@@ -226,33 +220,33 @@ function BookingWizard() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return fail("Please enter a valid email address.");
       if (!form.make || !form.vmodel) return fail("Please enter your vehicle make and model.");
     }
-    if (s === 5) {
-      const num = form.ccNum.replace(/\s+/g, "");
-      if (!form.ccName) return fail("Please enter the name on your card.");
-      if (!/^\d{15,16}$/.test(num)) return fail("Please enter a valid card number.");
-      const em = form.ccExp.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
-      if (!em) return fail("Please enter your card expiry as MM/YY.");
-      const now = new Date(); const yy = 2000 + parseInt(em[2], 10); const mm = parseInt(em[1], 10);
-      if (yy < now.getFullYear() || (yy === now.getFullYear() && mm < now.getMonth() + 1)) return fail("Your card expiry date has passed.");
-      if (!/^\d{3,4}$/.test(form.ccCvc)) return fail("Please enter your card’s 3- or 4-digit CVC.");
-    }
+    // No step 5 here on purpose. Card validation belongs to Stripe, inside its own
+    // iframe — the wizard never sees a card number to check.
     setHint({ msg: "", cls: "" }); return true;
   }
   function next() {
-    if (processing) return;
     if (!validate(step)) return;
     // Note: no setHint() here. validate() has already either cleared the hint or, on
     // step 2, set the coverage message — which is meant to carry over onto step 3.
+    // Step 5 never comes through here: it has no Continue button, because the pay
+    // button belongs to Stripe's iframe. Completion arrives via onPaid instead.
     if (step < TOTAL) { setStep(step + 1); scrollTop(); }
-    else {
-      setProcessing(true);
-      // Wizard logic is unchanged pending ops sign-off on CA-36 — this still submits
-      // nothing and takes no payment; only the destination moved to the shared
-      // thank-you page. The step-6 block below is now unreachable; it is kept, not
-      // deleted, so the original confirmation can be restored if ops wants it back.
-      // processing stays true through the redirect so the pay button can't fire twice.
-      window.setTimeout(() => { setRef("FV-" + Math.random().toString(36).slice(2, 8).toUpperCase()); router.push(thankYouUrl("installation")); }, 900);
-    }
+  }
+
+  /** Stripe reports the payment succeeded. Real reference, real money — no more fake delay. */
+  function paid(booking: { sessionId: string; appointmentId: string }) {
+    setRef(booking.appointmentId);
+    setStep(TOTAL + 1);
+    scrollTop();
+  }
+
+  /** Someone else took the slot between step 3 and step 5. Send them back to re-pick. */
+  function slotTaken(message: string) {
+    setForm((f) => ({ ...f, slot: null }));
+    setSlotLabel("");
+    setStep(3);
+    setHint({ msg: message, cls: "err" });
+    scrollTop();
   }
   function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setStep(step - 1); scrollTop(); } }
 
@@ -273,7 +267,10 @@ function BookingWizard() {
   };
   const confirmRows = (): [string, string][] => {
     const rows = summaryRows();
-    rows.push(["Payment", `Card ending ${form.ccNum.replace(/\s+/g, "").slice(-4)} · Paid`], ["Name", form.name], ["Contact", `${form.phone} · ${form.email}`]);
+    // No card details here any more — the wizard never receives them. The last four
+    // digits could be read back off the Checkout session once /api/booking/status
+    // exists; until then the payment line says only what we can actually vouch for.
+    rows.push(["Payment", "$250.00 AUD · Paid"], ["Name", form.name], ["Contact", `${form.phone} · ${form.email}`]);
     if (form.make) rows.push(["Vehicle", [form.make, form.vmodel, form.year].filter(Boolean).join(" ")]);
     return rows;
   };
@@ -454,28 +451,40 @@ function BookingWizard() {
           {step === 5 && (
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Checkout</h3>
-              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Pay the $250 flat rate now to lock in your appointment. Your card is charged today and your booking is confirmed instantly.</p>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Pay the $250 flat rate now to lock in your appointment. Your time slot is reserved while you complete payment.</p>
               <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-6 py-[22px]">
                 <span className="mb-3 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Order summary</span>
                 <dl className="space-y-2 text-[.88rem]">{summaryRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>
               <span className={FLABEL}>Payment details</span>
-              <input className={INPUT} placeholder="Name on card" autoComplete="cc-name" value={form.ccName} onChange={(e) => set("ccName", e.target.value)} />
-              <input className={`${INPUT} mt-4`} placeholder="Card number" inputMode="numeric" autoComplete="cc-number" maxLength={19} value={form.ccNum} onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 16); set("ccNum", d.replace(/(\d{4})(?=\d)/g, "$1 ")); }} />
-              <div className="mt-4 grid max-w-[420px] gap-4 sm:grid-cols-2">
-                <input className={INPUT} placeholder="Expiry (MM/YY)" inputMode="numeric" autoComplete="cc-exp" maxLength={5} value={form.ccExp} onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 4); set("ccExp", d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d); }} />
-                <input className={INPUT} placeholder="CVC" inputMode="numeric" autoComplete="cc-csc" maxLength={4} value={form.ccCvc} onChange={(e) => set("ccCvc", e.target.value.replace(/\D/g, "").slice(0, 4))} />
-              </div>
-              <p className="mt-[22px] flex items-start gap-2 text-[.78rem] text-[#9c9ca3]"><Lock className="mt-[3px] h-[13px] w-[13px] shrink-0 text-[var(--finevu-orange)]" /> Payments are encrypted and processed securely. A tax receipt is emailed to you as soon as payment clears.</p>
+              {/* Mounting this takes the hold and opens the Stripe session — see
+                  BookingCheckout. It supplies its own pay button, which is why the
+                  wizard's footer hides one on this step. */}
+              <BookingCheckout
+                payload={{
+                  model: form.model ?? "", street: form.street, suburb: form.suburb,
+                  stateAu: form.stateAu, postcode: form.postcode, slot: form.slot ?? "",
+                  name: form.name, phone: form.phone, email: form.email,
+                  make: form.make, vmodel: form.vmodel, year: form.year,
+                  retailer: form.retailer, notes: form.notes,
+                }}
+                onPaid={paid}
+                onSlotTaken={slotTaken}
+              />
             </div>
           )}
 
           {step === 6 && (
             <div className="py-[22px] text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white"><Check className="h-7 w-7" strokeWidth={2.4} /></div>
-              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Booking confirmed — payment received</h3>
+              {/* Reached only via Stripe's onComplete, so the payment genuinely cleared.
+                  The BOOKING, though, is confirmed by the checkout.session.completed
+                  webhook, which does not exist yet — so this deliberately claims a
+                  received payment and a confirmation to follow, not a locked-in booking.
+                  Tighten once /api/booking/status can report the real state. */}
+              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Payment received</h3>
               <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref} · Paid</div>
-              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $250.00 AUD has been received and your installation is locked in. Your confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
+              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $250.00 AUD has been received and your time slot is reserved. We’re confirming your appointment now; your booking confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
               <div className="mx-auto mt-8 max-w-[580px] rounded-[12px] bg-[#f7f7f7] px-6 py-[22px] text-left">
                 <dl className="space-y-2 text-[.88rem]">{confirmRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>
@@ -490,7 +499,12 @@ function BookingWizard() {
           <div className="flex items-center justify-between gap-4 border-t border-[#e8e7e2] px-6 py-5 md:px-9">
             <button type="button" onClick={back} disabled={step === 1} className="rounded-full border border-[#1d1d1f] px-[19px] py-[9px] text-[12px] font-semibold uppercase leading-[18px] tracking-[0.96px] text-[#1d1d1f] transition-colors disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
             <span className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">Step {step} of {TOTAL}</span>
-            <button type="submit" disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $250 AUD" : "Continue →"}</button>
+            {/* Step 5 has no Continue button: Stripe's iframe renders its own pay button,
+                and a second one outside it could only ever submit an empty form. The
+                spacer keeps "Step n of 5" centred. */}
+            {step === TOTAL
+              ? <span aria-hidden className="w-[112px]" />
+              : <button type="submit" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white">Continue →</button>}
           </div>
         )}
         </form>

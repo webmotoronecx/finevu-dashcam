@@ -1,8 +1,9 @@
 # FB-01 — Booking + payment flow (Option B)
 
-**Status:** design settled, not built. Written 2026-08-10.
-**Decision:** Stripe **Checkout**, **embedded** mode (`ui_mode: "embedded"`), confirmed by
-the user 2026-08-10 — plus booking **Option B**: hold the slot, pay, confirm on webhook.
+**Status:** built and verified in test mode except the confirmation email. Written and
+implemented 2026-08-10.
+**Decision:** Stripe **Checkout**, **embedded** mode (`ui_mode: "embedded_page"` — the
+value `"embedded"` is rejected), confirmed by the user 2026-08-10 — plus booking **Option B**: hold the slot, pay, confirm on webhook.
 
 Embedded was chosen over hosted because the redirect would discard every field the
 customer entered in steps 1–4, forcing server-side payload persistence and a
@@ -64,6 +65,20 @@ the address off the calendar), but **`notes` is accepted and silently dropped** 
 put anything load-bearing there. `createdBy.source` comes back as `"third_party"` for
 API-created appointments, a useful discriminator if a GHL-side audit is ever needed.
 
+### GHL soft-deletes — check `deleted`, not just "did it resolve"
+
+Found while testing the expiry path on 2026-08-10. `releaseHold()` does remove the
+appointment and the slot returns to `free-slots` immediately — but a deleted appointment
+**still answers `GET` with HTTP 200**, carrying its original `appointmentStatus` plus
+`deleted: true`. There is no 404.
+
+So any code that treats "the request resolved" as "the booking exists" is wrong. Two
+places would have been: the webhook's *paid but the hold is gone* branch would never have
+fired (it would have confirmed a deleted appointment and alerted nobody), and
+`/api/booking/status` would have told a customer they were confirmed while the slot was
+back on sale. `Appointment.deleted` now carries the flag and both check it, as does
+`findHeldAppointment`.
+
 ### Why the session id is parked on the appointment title
 
 Discovered while building step 2, and it constrains anything that touches session
@@ -101,6 +116,22 @@ from one IP inside ten minutes gets `429`. The session reads back as `payment` /
 `embedded_page` / `25000 AUD` / `+32 min` / `redirect_on_completion: never` /
 `invoice_creation: true`, with the full booking payload in metadata. Calendar returned to
 zero events and all test contacts deleted afterwards.
+
+**Steps 3 and 4 of 5 complete** — 2026-08-10. Step 5 of the wizard now mounts Stripe's
+embedded Checkout (`components/booking/BookingCheckout.tsx`) in place of the deleted card
+fields; `POST /api/stripe/webhook` promotes the hold on `checkout.session.completed`,
+releases it on `.expired`, and cancels on `charge.refunded`; `GET /api/booking/status`
+reports the real state and reconciles straight from Stripe when the webhook is late.
+
+Verified against a real test-mode booking: session `complete`/`paid` → status reported
+`paid: true, confirmed: false` → webhook replayed → appointment promoted `new` →
+`confirmed`, hold tag stripped from the title, status flipped to `confirmed: true`.
+Replaying the same event again changed nothing (idempotent, 200). Expiring a session
+released its hold and returned the slot to availability. Unsigned and mis-signed payloads
+are both rejected 400.
+
+Still outstanding for FB-01: the confirmation email and tax invoice (step 5 of the plan),
+which is gated on the ABN and Resend domain verification.
 
 Two Stripe API details worth knowing: **`ui_mode: "embedded"` is rejected — the value is
 now `embedded_page`** (same in-page iframe, renamed), and `expires_at` computed as exactly

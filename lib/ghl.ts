@@ -51,6 +51,12 @@ export type Appointment = {
   endTime: string;
   title: string;
   address: string;
+  /**
+   * GHL SOFT-deletes: a removed appointment still answers GET with 200 and its original
+   * status, carrying deleted: true. Callers that treat "it resolved" as "it exists" will
+   * happily act on a booking that is gone — always check this.
+   */
+  deleted: boolean;
 };
 
 export const ghlConfigured = () =>
@@ -226,6 +232,7 @@ function toAppointment(data: AppointmentResponse): Appointment {
     endTime: str("endTime"),
     title: str("title"),
     address: str("address"),
+    deleted: e.deleted === true,
   };
 }
 
@@ -306,7 +313,7 @@ export async function findHeldAppointment(contactId: string, startTime: string):
   const match = (data.events ?? []).find((e) => {
     const status = typeof e.appointmentStatus === "string" ? e.appointmentStatus : e.appoinmentStatus;
     const start = typeof e.startTime === "string" ? new Date(e.startTime).getTime() : NaN;
-    return e.contactId === contactId && status === "new" && start === target;
+    return e.contactId === contactId && status === "new" && start === target && e.deleted !== true;
   });
 
   return match ? toAppointment(match as AppointmentResponse) : null;

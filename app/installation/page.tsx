@@ -177,6 +177,36 @@ const INPUT = "w-full rounded-[8px] border border-[#e8e7e2] bg-white px-[15px] p
 const FLABEL = "mb-2.5 mt-[22px] block text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9c9ca3]";
 const FIELD_LABEL = "mb-1.5 block text-[13px] font-semibold leading-[19.5px] text-[#1d1d1f]";
 
+/**
+ * Polls /api/booking/status until the booking is confirmed, or gives up.
+ *
+ * Stripe's onComplete and the checkout.session.completed webhook race by a second or
+ * two, so step 6 is briefly "paid but not yet confirmed" on every successful booking.
+ * Rather than guess, the page asks the server and upgrades its wording when the answer
+ * actually changes. Giving up is not a failure state — the confirmation email still
+ * arrives, so the copy simply stays at "we're confirming".
+ */
+function useBookingConfirmation(sessionId: string) {
+  const [confirmed, setConfirmed] = useState(false);
+  useEffect(() => {
+    if (!sessionId) return;
+    let stopped = false;
+    let tries = 0;
+    const tick = async () => {
+      if (stopped || tries++ > 10) return;
+      try {
+        const res = await fetch(`/api/booking/status?session_id=${encodeURIComponent(sessionId)}`);
+        const data = (await res.json()) as { confirmed?: boolean };
+        if (data?.confirmed) { if (!stopped) setConfirmed(true); return; }
+      } catch { /* transient — the next tick retries */ }
+      if (!stopped) window.setTimeout(tick, 2000);
+    };
+    tick();
+    return () => { stopped = true; };
+  }, [sessionId]);
+  return confirmed;
+}
+
 function BookingWizard() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY);
@@ -185,6 +215,8 @@ function BookingWizard() {
   const [dateLabel, setDateLabel] = useState("");
   const [slotLabel, setSlotLabel] = useState("");
   const [ref, setRef] = useState("");
+  const [sessionId, setSessionId] = useState("");
+  const confirmed = useBookingConfirmation(sessionId);
   const avail = useAvailability();
   // Local dev only — see useCalendarGrid. Production always has the keys.
   const fallbackAvailability = avail.status === "unconfigured";
@@ -236,6 +268,8 @@ function BookingWizard() {
   /** Stripe reports the payment succeeded. Real reference, real money — no more fake delay. */
   function paid(booking: { sessionId: string; appointmentId: string }) {
     setRef(booking.appointmentId);
+    // Starts the confirmation poll — the webhook has probably not landed yet.
+    setSessionId(booking.sessionId);
     setStep(TOTAL + 1);
     scrollTop();
   }
@@ -477,14 +511,22 @@ function BookingWizard() {
           {step === 6 && (
             <div className="py-[22px] text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white"><Check className="h-7 w-7" strokeWidth={2.4} /></div>
-              {/* Reached only via Stripe's onComplete, so the payment genuinely cleared.
-                  The BOOKING, though, is confirmed by the checkout.session.completed
-                  webhook, which does not exist yet — so this deliberately claims a
-                  received payment and a confirmation to follow, not a locked-in booking.
-                  Tighten once /api/booking/status can report the real state. */}
-              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Payment received</h3>
-              <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref} · Paid</div>
-              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $250.00 AUD has been received and your time slot is reserved. We’re confirming your appointment now; your booking confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
+              {/* Two states, and the difference is real rather than cosmetic. Stripe's
+                  onComplete means the money cleared; it does NOT mean the appointment was
+                  promoted — checkout.session.completed does that, and it lands a beat
+                  later. useBookingConfirmation polls until it has, so the page only
+                  claims a confirmed booking once the server says so. */}
+              <h3 className="text-[22px] font-semibold text-[#1d1d1f]">{confirmed ? "Booking confirmed" : "Payment received"}</h3>
+              {/* normal-case on the reference is load-bearing: it is the GHL appointment
+                  id, which is case-sensitive. Letting the surrounding `uppercase` style
+                  it would print a string that matches nothing when a customer quotes it
+                  to support. */}
+              <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref <span className="normal-case tracking-normal">{ref}</span> · Paid</div>
+              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">
+                {confirmed
+                  ? "Thank you — your payment of $250.00 AUD has been received and your installation is locked in. Your confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle."
+                  : "Thank you — your payment of $250.00 AUD has been received and your time slot is reserved. We’re confirming your appointment now; your booking confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle."}
+              </p>
               <div className="mx-auto mt-8 max-w-[580px] rounded-[12px] bg-[#f7f7f7] px-6 py-[22px] text-left">
                 <dl className="space-y-2 text-[.88rem]">{confirmRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>

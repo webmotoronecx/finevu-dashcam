@@ -31,6 +31,24 @@ export type FirmwareTab = {
     downloadLabel?: string;
     /** Download CTA link. Defaults to /support. */
     downloadHref?: string;
+    /** Files backing this tab (e.g. a manual per language, or several firmware builds).
+        Rendered as a picker above the instructions: a <select> when there is more than
+        one, then the selected file's version/date and a download button. Order matters —
+        index 0 is treated as the latest.
+
+        An EMPTY array HIDES the whole tab — that is how a tab says "this download exists
+        but we don't have the file yet". Omit the prop entirely for a content-only tab,
+        which always shows. If every tab is hidden the section renders nothing. */
+    downloads?: DownloadFile[];
+};
+
+export type DownloadFile = {
+    /** Option text in the picker, e.g. "GX4K Firmware". */
+    label: string;
+    /** Version and/or date shown under the picker, e.g. "V1.00.001 (2025-08-20)".
+        Falls back to `label` when absent. */
+    version?: string;
+    href: string;
 };
 
 const TOKENS: Record<Theme, {
@@ -40,6 +58,7 @@ const TOKENS: Record<Theme, {
     heading: string;
     body: string;
     steps: string;
+    select: string;
 }> = {
     dark: {
         tabRow: "border border-white/10",
@@ -48,6 +67,7 @@ const TOKENS: Record<Theme, {
         heading: "text-white",
         body: "text-zinc-400",
         steps: "text-zinc-400",
+        select: "border-white/15 bg-white/[0.04] text-white",
     },
     light: {
         tabRow: "border border-[#e3e3e6] bg-[#eaeaea]",
@@ -56,8 +76,54 @@ const TOKENS: Record<Theme, {
         heading: "text-[#1D1D1F]",
         body: "text-[#6E6E73]",
         steps: "text-[#6E6E73]",
+        select: "border-[#d5d5d8] bg-white text-[#1D1D1F]",
     },
 };
+
+/* File picker: choose a build, see its version/date, download it. The <select> only
+   appears when there is a genuine choice — a single file renders just the version line
+   and the button. Mounted with a key per tab so the selection resets when tabs change. */
+function DownloadPicker({ files, theme }: { files: DownloadFile[]; theme: Theme }) {
+    const [i, setI] = useState(0);
+    const t = TOKENS[theme];
+    const file = files[i] ?? files[0];
+
+    // Empty lists are handled by the panel, which replaces the whole tab with "Coming soon".
+    if (!file) return null;
+
+    return (
+        <div className="mb-8 flex flex-col items-start gap-4">
+            {files.length > 1 && (
+                <select
+                    value={i}
+                    onChange={(e) => setI(Number(e.target.value))}
+                    aria-label="Select a file to download"
+                    className={`min-h-[44px] w-full max-w-[320px] rounded-xl border px-4 py-2.5 text-[14px] font-medium outline-none transition-colors focus:border-[#f68428] ${t.select}`}
+                >
+                    {files.map((f, idx) => (
+                        <option key={f.href} value={idx}>
+                            {f.label}
+                        </option>
+                    ))}
+                </select>
+            )}
+
+            <div>
+                {/* Index 0 is the latest build, so only that one claims to be. */}
+                <div className={`text-[14px] ${t.body}`}>{i === 0 ? "Latest Version/Date" : "Version/Date"}</div>
+                <div className={`mt-1 text-[22px] font-semibold ${t.heading}`}>{file.version ?? file.label}</div>
+                <a
+                    href={file.href}
+                    download
+                    className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#f68428] px-6 py-3 text-[14px] font-semibold uppercase tracking-wide text-[#f68428] transition-colors hover:bg-[#f68428] hover:text-white"
+                >
+                    <Download className="h-4 w-4" strokeWidth={2} />
+                    Download
+                </a>
+            </div>
+        </div>
+    );
+}
 
 export function FirmwareDownloads({
     tabs,
@@ -74,31 +140,63 @@ export function FirmwareDownloads({
 }) {
     const [active, setActive] = useState(0);
     const t = TOKENS[theme];
-    const current = tabs[active];
+
+    /* A tab that declares `downloads` but has no file yet is dropped from the switcher —
+       an empty tab is worse than no tab. Tabs that omit `downloads` entirely are
+       content-only and always show. */
+    const visible = tabs.filter((tab) => tab.downloads === undefined || tab.downloads.length > 0);
+
+    // Nothing downloadable at all — render no section rather than an empty shell.
+    if (visible.length === 0) return null;
+
+    // `active` can outrun the list if the data shrinks; clamp instead of crashing.
+    const current = visible[Math.min(active, visible.length - 1)];
 
     return (
         <section data-nav-theme={theme} className={`pb-16 md:pb-24 ${className}`}>
             <div className={`${SHELL} !max-w-[1050px] flex flex-col gap-10`}>
-                {/* Tab switcher */}
-                <div className={`flex w-full rounded-full p-1 ${t.tabRow}`} role="tablist" aria-label={ariaLabel}>
-                    {tabs.map((item, i) => (
-                        <button
-                            key={item.name}
-                            role="tab"
-                            aria-selected={active === i}
-                            onClick={() => setActive(i)}
-                            className={`flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors ${
-                                active === i ? "text-white" : t.tabIdle
-                            }`}
-                            style={active === i ? { backgroundColor: ORANGE } : undefined}
-                        >
-                            {item.name}
-                        </button>
-                    ))}
-                </div>
+                {/* One tab is not a choice — drop the pill bar and title the section instead.
+                    Two or more, and the switcher earns its place. */}
+                {visible.length === 1 ? (
+                    <div className="text-center">
+                    <h2 className={`text-[26px] font-semibold md:text-[32px] ${t.heading}`}>{current.name}</h2>
+                    </div>
+                ) : (
+                    <div className={`flex w-full rounded-full p-1 ${t.tabRow}`} role="tablist" aria-label={ariaLabel}>
+                        {visible.map((item, i) => (
+                            <button
+                                key={item.name}
+                                role="tab"
+                                aria-selected={active === i}
+                                onClick={() => setActive(i)}
+                                className={`flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors ${
+                                    active === i ? "text-white" : t.tabIdle
+                                }`}
+                                style={active === i ? { backgroundColor: ORANGE } : undefined}
+                            >
+                                {item.name}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
 
                 {/* Panel */}
-                <div className={`w-full rounded-[32px] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16 ${t.panel}`} role="tabpanel">
+                {/* Only a real switcher makes this a tabpanel; with a plain title it is just
+                    a region, and claiming tabpanel without a tablist misleads screen readers. */}
+                <div
+                    className={`w-full rounded-[32px] px-5 py-10 sm:px-10 md:rounded-[46px] md:px-14 md:py-16 ${t.panel}`}
+                    role={visible.length === 1 ? "region" : "tabpanel"}
+                    aria-label={visible.length === 1 ? ariaLabel : undefined}
+                >
+                    {/* Picker sits above the instructions — pick the build first, read how to
+                        install it second. Keyed by tab so switching tabs resets the selection. */}
+                    {current.downloads && (
+                        <div className="pb-6">
+                            <DownloadPicker key={current.name} files={current.downloads} theme={theme} />
+                        </div>
+                    )}
+
                     {current.heading && (
                         <h3 className={`text-lg font-semibold ${t.heading}`}>{current.heading}</h3>
                     )}
@@ -123,6 +221,8 @@ export function FirmwareDownloads({
                         <div className={`mt-4 text-[14px] leading-relaxed ${t.body}`}>{current.body}</div>
                     )}
 
+                    {/* Legacy single CTA — `downloads` above supersedes it, but tabs that set
+                        only downloadLabel still render their one button here. */}
                     {current.downloadLabel && (
                         <a
                             href={current.downloadHref ?? "/support"}

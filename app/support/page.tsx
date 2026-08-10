@@ -11,6 +11,7 @@ import { Fragment, useState } from "react";
 import { Phone, Mail, ChevronDown, ChevronRight } from "lucide-react";
 import { AppSupport } from "@/components/AppSupport";
 import { Accordion } from "@/components/Accordion";
+import { downloadsFor, supportGuides, type DownloadItem, type ModelKey } from "@/lib/data/firmware";
 
 // Support page — dark hero, phone/email cards, per-model download/guide hubs, troubleshooting accordion, registration and warranty panels, and fine print.
 
@@ -43,50 +44,32 @@ const channels = [
 ];
 
 type ModelHub = {
-    id: string;
+    id: ModelKey;
     name: string;
     line: string;
     img: string;
-    downloads: [string, string, string?][];
-    guides: [string, string][];
+    downloads: DownloadItem[];
+    guides: DownloadItem[];
 };
 
+// Download/guide rows and the release metadata behind them are shared with the two product
+// pages — edit lib/data/firmware.ts, not here.
 const models: ModelHub[] = [
     {
         id: "gx4k",
         name: "FineVu GX4K",
         line: "4K UHD front & Full HD rear dash cam",
         img: "/products/gx4k-card-transparent.webp",
-        downloads: [
-            ["Firmware", "v2.03 · ZIP"],
-            ["User manual", "PDF · EN"],
-            ["Quick start guide", "PDF"],
-            ["Spec sheet", "PDF"],
-        ],
-        guides: [
-            ["Firmware update steps", "GUIDE"],
-            ["microSD card formatting", "GUIDE"],
-            ["Parking mode & battery protection", "GUIDE"],
-            ["Installation video", "VIDEO"],
-        ],
+        downloads: downloadsFor("gx4k"),
+        guides: supportGuides,
     },
     {
         id: "gx35",
         name: "FineVu GX35",
         line: "Compact 2K QHD front & Full HD rear dash cam",
         img: "/products/gx35-card-transparent.webp",
-        downloads: [
-            ["Firmware", "v1.14 · ZIP"],
-            ["User manual", "PDF · EN"],
-            ["Quick start guide", "PDF"],
-            ["Spec sheet", "PDF"],
-        ],
-        guides: [
-            ["Firmware update steps", "GUIDE"],
-            ["microSD card formatting", "GUIDE"],
-            ["Parking mode & battery protection", "GUIDE"],
-            ["Installation video", "VIDEO"],
-        ],
+        downloads: downloadsFor("gx35"),
+        guides: supportGuides,
     },
 ];
 
@@ -144,13 +127,15 @@ const regPanels = [
     },
 ];
 
-function DownloadList({ heading, items }: { heading: string; items: [string, string, string?][] }) {
+function DownloadList({ heading, items }: { heading: string; items: DownloadItem[] }) {
     return (
         <div>
             <h4 className="mb-2 text-[20px] font-semibold text-[#1d1d1f]">{heading}</h4>
             <ul>
+                {/* Several files can share a label (e.g. two firmware builds), so the url
+                    is part of the key. */}
                 {items.map(([label, meta, url]) => (
-                    <li key={label}>
+                    <li key={`${label}-${url ?? ""}`}>
                         <a
                             href={url ? url : "#"}
                             className={`group flex items-center justify-between gap-3 py-[7px] text-[15px] ${url ? "cursor-pointer" : "cursor-not-allowed"}`}

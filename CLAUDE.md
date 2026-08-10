@@ -91,21 +91,58 @@ They are unresolved decisions, not tasks that can just be done.
    user (billing owner) to choose. Related: `components/sections/Carousel.tsx` renders a
    plain `<img>`, so every carousel image on `/gx4k`, `/gx35` and `/installation` — incl.
    the 16 MB `detail-starvis.png` — currently ships unoptimized either way.
-6. **Firmware sections are HIDDEN on both product pages — restore before launch.** The user
-   deliberately commented them out on 2026-07-27 because the download files were not the
-   correct ones. **They must go back once the real files are in hand** — a dash-cam product
-   page without firmware downloads is a support gap, not a design choice.
-   - `app/gx35/page.tsx:883` — `{/* <FirmwareDownloads tabs={downloadTabs} theme="light" … /> */}`
-   - `app/gx4k/page.tsx:839` — `{/* <FirmwareDownloads tabs={downloadTabs} theme="dark" … /> */}`
+6. **Firmware sections are HIDDEN on both product pages — blocked on Cloudflare R2 setup.**
+   First commented out on 2026-07-27 (wrong download files); re-hidden on 2026-08-10
+   because **the R2 bucket serving the firmware is not reachable**. They must go back once
+   the hosting works — a dash-cam product page without firmware downloads is a support gap,
+   not a design choice.
+   - `app/gx35/page.tsx:861` — `{/* <FirmwareDownloads tabs={downloadTabs} theme="light" … /> */}`
+   - `app/gx4k/page.tsx:868` — `{/* <FirmwareDownloads tabs={downloadTabs} theme="dark" … /> */}`
 
-   The `downloadTabs` arrays (`gx35:432`, `gx4k:339`) and the `FirmwareDownloads` import are
+   The `downloadTabs` consts (`gx35:424`, `gx4k:362`) and the `FirmwareDownloads` import are
    **still in place**, so restoring is just uncommenting — but that also means TypeScript
-   reports `downloadTabs` as unused in both files. **Do not "clean up" those arrays**; that
+   reports `downloadTabs` as unused in both files. **Do not "clean up" those consts**; that
    would delete the restore path. Ask before touching them.
 
+   **What still has to happen (the actual blocker):**
+   - The GX4K and GX35 `.bin` files (~73 MB each) were uploaded to an R2 bucket, but
+     `pub-5f24122eb7464fec8edf4af659a6237c.r2.dev` returns **NXDOMAIN** — the host does not
+     exist. Either the bucket's **Public Development URL was never enabled** (R2 → bucket →
+     Settings → Public access), or that hash is not the one Cloudflare assigned. The `pub-`
+     hash is issued when public access is turned on; it is **not** derived from the account
+     ID or bucket name, so it cannot be assembled by hand — copy it verbatim from that page.
+   - A **custom domain is not currently possible.** R2 custom domains require the zone to be
+     in the same Cloudflare account, and `finevuaustralia.com.au` is on **BrandShelter**
+     nameservers (apex A → `216.198.79.1`, Vercel). Moving it means changing nameservers at a
+     corporate registrar. Low-risk if it happens — the zone is only three records and has
+     **no MX** — but it is an ops decision. `r2.dev` is acceptable for staging meanwhile.
+   - **Verify the URLs actually serve** (`curl -I`) before un-hiding. Right now the button
+     renders and 404s.
+   - **Security, if `r2.dev` ships:** enabling the dev URL makes the **entire bucket**
+     publicly readable, so that bucket must hold firmware and nothing else. No WAF,
+     rate-limit rules or request logs are available on `r2.dev`. Firmware is executable code
+     for a device, so **integrity is the real risk**: keep R2 API tokens narrowly scoped and
+     out of the repo, publish a **SHA-256 checksum** beside each download, and confirm with
+     FineVu whether the camera verifies a firmware signature before flashing. No credential
+     is needed in the app itself — public reads are just a URL.
+   - `<a download>` is ignored cross-origin, so the browser decides from response headers.
+     Set `Content-Disposition: attachment` on the R2 objects if the file ever renders
+     inline instead of downloading.
+
+   **Where the data lives now (changed 2026-08-10):** all firmware content was consolidated
+   into **`lib/data/firmware.ts`** — update steps, the power-off warning, per-model release
+   files, and the `/support` download/guide rows. `app/gx4k`, `app/gx35` and `app/support`
+   are thin consumers (`downloadTabsFor`, `downloadsFor`, `supportGuides`); the duplicated
+   copies in the two product pages are gone. **When the files are ready, `modelReleases` is
+   the only thing to edit** — one `parentUrl` const plus a `ReleaseFile` per build. Empty
+   arrays hide a tab entirely, and if every tab is hidden `FirmwareDownloads` renders
+   nothing, so partial data is always safe to ship.
+
    Related: **CA-13** in `docs/content-accuracy-changes.csv` — firmware versions on
-   `/support` are unsourced and its download links are dead. Same root cause (no correct
-   files yet), so settle both together when the files arrive.
+   `/support` are unsourced and its download links are dead. Same root cause, so settle both
+   together. The unsourced `v2.03` / `v1.14` strings were removed from the code in that
+   consolidation; the versions currently in `modelReleases` (`V1.00.005`, `V1.00.001`) came
+   with the R2 uploads and still need a FineVu source.
 
 ### ✅ Settled — do not re-open
 

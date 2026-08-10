@@ -13,6 +13,7 @@ import { FeatureTabs } from "@/components/sections/FeatureTabs";
 import { BarGraph } from "@/components/sections/BarGraph";
 import { ScrollHero, type HeroBeat } from "@/components/sections/ScrollHero";
 import { FirmwareDownloads, type FirmwareTab } from "@/components/sections/FirmwareDownloads";
+import { downloadTabsFor } from "@/lib/data/firmware";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Eye } from "lucide-react";
@@ -418,48 +419,9 @@ const compareRows: [string, string, string][] = [
   ["Warranty", "3 Years", "3 Years"],
 ];
 
-const firmwareSteps = [
-  "Download the latest firmware.",
-  "Remove the microSD card from your dash cam. Insert it into a microSD card reader and connect the reader to the PC.",
-  "When the reader is connected to the PC, a USB drive or new disk drive will be created. (We recommend formatting a card previously used in another device before you upgrade the firmware.)",
-  "Copy the downloaded firmware to the top-level root of the memory card.",
-  "Insert the microSD card into the device. Turn on the vehicle or start the engine to turn on the device.",
-  "The firmware update starts automatically.",
-  "The system will automatically restart once the firmware update is completed.",
-];
-
-const speedCamSteps = [
-  "Download the latest Speed Cam data file.",
-  "Remove the microSD card from your dash cam. Insert it into a microSD card reader and connect the reader to the PC.",
-  "When the reader is connected to the PC, a USB drive or new disk drive will be created.",
-  "Copy the downloaded Speed Cam data file to the top-level root of the memory card.",
-  "Insert the microSD card into the device. Turn on the vehicle or start the engine to turn on the device.",
-  "The Speed Cam data file update starts automatically.",
-  "The system will automatically restart once the Speed Cam data file update is completed.",
-];
-
-const downloadTabs: FirmwareTab[] = [
-  {
-    name: "Firmware",
-    heading: "Instructions",
-    steps: firmwareSteps,
-    warning:
-      "Do not power off your dash cam until it begins continuous recording, as it may cause permanent damage to the dash cam.",
-    // downloadLabel: "Download Firmware",
-  },
-  {
-    name: "User Manual",
-    // heading: "User Manual",
-    intro: "Coming soon",
-    // downloadLabel: "Download User Manual (PDF)",
-  },
-  {
-    name: "Speed Cam Data",
-    heading: "Instructions",
-    steps: speedCamSteps,
-    // downloadLabel: "Download Speed Cam Data",
-  },
-];
+// Firmware steps, the warning and the (currently empty) release metadata are shared with
+// /gx4k and /support — edit lib/data/firmware.ts, not here.
+const downloadTabs: FirmwareTab[] = downloadTabsFor("gx35");
 
 // Component
 

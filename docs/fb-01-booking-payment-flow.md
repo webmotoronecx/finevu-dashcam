@@ -161,19 +161,94 @@ now `embedded_page`** (same in-page iframe, renamed), and `expires_at` computed 
 
 ## Booking states
 
-```
-HELD ──────► CONFIRMED        payment succeeded (webhook)
-  │
-  ├────────► EXPIRED          session expired / customer abandoned
-  └────────► RELEASED         customer went back and changed the slot
+```mermaid
+stateDiagram-v2
+    [*] --> HELD: step 5 renders — createHeldAppointment
+    HELD --> CONFIRMED: checkout.session.completed
+    HELD --> RELEASED: checkout.session.expired<br/>or the customer re-picks
+    CONFIRMED --> CANCELLED: charge.refunded
+    RELEASED --> [*]
+    CANCELLED --> [*]
+
+    note left of HELD
+        GHL status "new"
+        Occupies the slot.
+        NOT a real booking.
+    end note
+    note right of CONFIRMED
+        GHL status "confirmed"
+        Hold tag stripped
+        from the title.
+    end note
+    note right of RELEASED
+        DELETE — soft-deleted,
+        slot returns to
+        free-slots.
+    end note
+    note right of CANCELLED
+        GHL status "cancelled"
+        Record kept for the
+        refund audit trail.
+    end note
 ```
 
 A **HELD** appointment occupies the slot but is not a real booking. Only the Stripe
-webhook promotes it to **CONFIRMED**.
+webhook promotes it to **CONFIRMED**. Note the two different exits: an unpaid hold is
+**deleted** so it leaves no trace, while a paid booking is **cancelled** so the record
+survives — the terms promise refunds, and a refund needs something to point at.
 
 ---
 
 ## Happy path
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Browser (wizard)
+    participant API as Our API
+    participant G as GHL
+    participant S as Stripe
+    participant R as Resend
+
+    Note over B: Steps 1-4 are client-only. Nothing is created,<br/>so an abandoned visit leaves no trace.
+
+    rect rgb(245, 243, 238)
+    Note over B,S: Step 5 renders — this is where the slot gets held
+    B->>API: POST /api/booking/create
+    API->>G: upsertContact — one record per customer
+    API->>G: free-slots — is the slot STILL free?
+    API->>G: create appointment, status "new"
+    Note right of G: Slot is now blocked<br/>appointmentPerSlot = 1
+    API->>S: create Checkout session<br/>embedded, $250 AUD, expires in 32 min
+    API->>G: park the session id in the title<br/>hold cs_... — makes retries safe
+    API-->>B: clientSecret
+    end
+
+    B->>S: customer pays inside Stripe's iframe
+    S-->>B: onComplete
+    Note over B: Step 6 says "Payment received"<br/>and nothing stronger — the booking<br/>is not promoted yet.
+
+    rect rgb(238, 244, 240)
+    Note over API,R: The webhook is what actually books it
+    S->>API: POST /api/stripe/webhook<br/>checkout.session.completed
+    API->>G: getAppointment — exists, and not soft-deleted?
+    API->>G: confirmAppointment + strip the hold tag
+    API->>R: confirmation email + tax invoice
+    end
+
+    loop until confirmed, then stop (~20s cap)
+        B->>API: GET /api/booking/status
+        API->>S: retrieve session — did the money clear?
+        API->>G: getAppointment — was it promoted?
+        API-->>B: paid + confirmed flags
+    end
+    Note over B: Now, and only now, "Booking confirmed"
+```
+
+The two shaded bands are the parts that matter. The first is why a customer's slot cannot
+be taken while they are typing their card details. The second is why the browser is never
+trusted to declare a booking — `onComplete` fires in a tab that can be closed, so it earns
+only "Payment received", and the webhook is what earns "Booking confirmed".
 
 ### Steps 1–4 — unchanged
 

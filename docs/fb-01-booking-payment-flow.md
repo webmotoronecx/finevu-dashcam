@@ -399,3 +399,24 @@ FB-08 is done.
 - [ ] Decide surcharge vs absorb (recommend absorb — every page promises a flat $250)
 - [ ] `npm run test:booking` against staging
 - [ ] One real card payment end to end, then refund it
+
+### ⚠️ Never delete a test contact that had an appointment
+
+GHL only ever **soft-deletes** an appointment — it stays queryable with `deleted: true`.
+Delete the contact it points at and the appointment becomes **orphaned**: GHL's
+Appointments list shows it with status **"Invalid"**, and from that point it can be
+removed neither through the UI nor through the API, which answers
+`400 — "The event id is invalid or it has already been deleted."`
+
+The result is a permanent ghost row on a production calendar. It is cosmetic — the
+appointment is gone as far as `free-slots` and the events API are concerned, so it blocks
+no availability and no customer is affected — but it cannot be cleared.
+
+`scripts/e2e-booking.mjs` therefore deletes appointments and **leaves test contacts in
+place**, printing them instead. Delete a contact by hand only if no appointment ever
+referenced it.
+
+Related gotcha found the same day: **GHL caps a `free-slots` date range at 31 days.** A
+wider window returns `400` rather than a partial result, and code that reads the response
+for date-shaped keys sees an error body as "no availability". `BOOKING_WINDOW_DAYS` is 28,
+safely inside; do not raise it past 31.

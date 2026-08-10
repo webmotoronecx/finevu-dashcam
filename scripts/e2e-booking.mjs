@@ -329,15 +329,24 @@ async function cleanup() {
   for (const id of created.sessions) {
     if (id) await stripeApi(`/checkout/sessions/${id}/expire`, { method: "POST" });
   }
-  const deletedContacts = new Set();
+  // Test CONTACTS are deliberately left in place.
+  //
+  // GHL only ever soft-deletes an appointment — it stays queryable with deleted: true.
+  // Delete the contact it points at and the appointment is orphaned: GHL's Appointments
+  // list surfaces it as status "Invalid", and it can no longer be removed through the UI
+  // or the API ("the event id is invalid or it has already been deleted"). The result is
+  // a permanent ghost row on a production calendar.
+  //
+  // So the order that seems tidy is the one that causes damage. Contacts are harmless
+  // CRM records; delete them by hand in GHL only if no appointment ever referenced them.
+  const seen = new Set();
   for (const q of [TAG, `${TAG}2`, `${TAG}3`]) {
     const { data } = await ghl(`/contacts/?locationId=${GHL_LOCATION_ID}&query=${q}&limit=20`, { version: "2021-07-28" });
-    for (const c of data?.contacts ?? []) {
-      if (deletedContacts.has(c.id)) continue;
-      deletedContacts.add(c.id);
-      await ghl(`/contacts/${c.id}`, { method: "DELETE", version: "2021-07-28" });
-      console.log(`  contact ${c.id} deleted`);
-    }
+    for (const c of data?.contacts ?? []) seen.add(`${c.id}  ${c.firstName ?? ""} ${c.lastName ?? ""}`.trim());
+  }
+  if (seen.size) {
+    console.log(`  ${seen.size} test contact(s) left in place (deleting them would orphan their appointments):`);
+    for (const c of seen) console.log(`     ${c}`);
   }
   const strays = (await listEvents()).filter((e) => !preexisting.has(e.id));
   if (strays.length === 0) {

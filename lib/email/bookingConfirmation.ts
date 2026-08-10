@@ -136,11 +136,33 @@ export async function sendBookingConfirmation(input: ConfirmationInput): Promise
     console.warn("[booking-confirmation] SENDING WITH PLACEHOLDER ABN — not a valid tax invoice");
   }
 
-  const { subject, text, html } = renderBookingConfirmation(input);
+  let { subject, text, html } = renderBookingConfirmation(input);
+
+  // Test-inbox redirect. Set BOOKING_EMAIL_REDIRECT_TO in .env.local to read the real
+  // rendered email without it ever reaching a customer; unset it to go live. The
+  // intended recipient is carried in the subject and a banner so a redirected message is
+  // never ambiguous about who it was actually for.
+  //
+  // Note this changes who WE ask Resend to mail, not what Resend permits: while no domain
+  // is verified, Resend's sandbox still only delivers to the account owner's address, so
+  // any other value here comes back as an error rather than an inbox.
+  const redirectTo = process.env.BOOKING_EMAIL_REDIRECT_TO?.trim();
+  const to = redirectTo || input.email;
+  if (redirectTo) {
+    console.warn(`[booking-confirmation] REDIRECTED to ${redirectTo} — real recipient was ${input.email}`);
+    subject = `[TEST → ${input.email}] ${subject}`;
+    text = `*** TEST SEND — this email was addressed to ${input.email} and redirected here. ***\n\n${text}`;
+    html =
+      `<div style="font-family:-apple-system,sans-serif;max-width:600px;margin:0 auto 16px;padding:10px 14px;` +
+      `background:#FFF4E5;border:1px solid #F26522;border-radius:8px;font-size:13px;color:#8a4b00">` +
+      `<strong>Test send.</strong> Addressed to ${escapeHtml(input.email)} and redirected here.` +
+      `</div>${html}`;
+  }
+
   try {
     const { error } = await new Resend(apiKey).emails.send({
       from: FROM_EMAIL,
-      to: input.email,
+      to,
       replyTo: BUSINESS.supportEmail,
       subject,
       text,

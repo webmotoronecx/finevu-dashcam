@@ -315,3 +315,87 @@ import at `app/installation/page.tsx:7` finally goes.
   Every page currently promises a flat $250 — recommend absorbing the ~$4.55.
 - **Refunds** — the terms promise them in four scenarios. Recommend manual via the Stripe
   dashboard for launch, not a built flow.
+
+---
+
+## Testing
+
+### Automated — `npm run test:booking`
+
+`scripts/e2e-booking.mjs`, plain `node`, no test framework and no new dependencies. Needs
+the dev server running. **Refuses to start unless `STRIPE_SECRET_KEY` is a `sk_test_`
+key**, since it creates and expires real sessions.
+
+It writes to the live GHL calendar because there is nothing else to write to — the site
+has no database. It snapshots the calendar first, deletes everything it created in a
+`finally` block even on failure, and reports any residue against that snapshot, so real
+bookings sitting on the calendar are left alone and never counted as litter.
+
+34 checks: availability, hold creation and slot occupancy, retry reuse (same appointment
+*and* session), slot contention, NT exclusion, field validation, rate limiting, status
+before payment, signature rejection (unsigned and mis-signed), completion → promotion +
+tag stripping, event replay, the soft-delete guard, and expiry → hold release.
+
+**How the webhook is tested without a browser:** a Checkout Session cannot be paid through
+the API, so card entry genuinely needs one. But the webhook payload is just signed JSON,
+so the script builds the event and signs it exactly as Stripe does —
+`t=<unix>,v1=HMAC_SHA256(secret, "<unix>.<body>")` via `node:crypto`. That exercises real
+signature verification, the real handler, real GHL promotion and the real email send.
+
+**What it deliberately cannot cover:** `/api/booking/status` retrieves the *real* session
+from Stripe, so after a synthetic event it still reports `paid: false` — the session was
+never actually paid. The script asserts that truthfully rather than faking it, and says so
+in its output.
+
+Two traps this suite hit while being written, both worth remembering:
+
+- **`/api/booking/slots` caches for 30 seconds**, so it still advertises a slot that was
+  just taken. Assertions about availability must query GHL's `free-slots` directly.
+- **GHL's contact upsert matches on phone as well as email.** Two "different" test
+  customers sharing a phone number merge into one contact, which silently turns the
+  slot-contention test into a reuse test that always passes.
+
+### Manual — the parts only a browser can do
+
+Requires `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
+
+| Case | Card | Expected |
+|---|---|---|
+| Happy path | `4242 4242 4242 4242` | Step 6 shows "Payment received", upgrades to "Booking confirmed" in a few seconds; GHL flips to `confirmed`, tag stripped |
+| 3D Secure | `4000 0027 6000 3184` | Authentication completes **inside** the iframe with no navigation away — the entire reason embedded was chosen over hosted |
+| Declined | `4000 0000 0000 0002` | Hold survives, customer retries in place |
+| Abandon at step 5 | — | Expire the session in the Stripe dashboard → slot returns to availability |
+| Back from step 5, then forward | — | Same hold reused, no duplicate appointment |
+| Mobile viewport | — | The Stripe iframe is a third-party embed inside a `max-w` card |
+
+Then open the redirected email and check the tax-invoice block: ABN line, GST $22.73 of
+$250, the appointment reference — and that the reference is **not** uppercased, since it
+is a case-sensitive GHL id.
+
+### Reading the confirmation email before the domain is verified
+
+Set `BOOKING_EMAIL_REDIRECT_TO` in `.env.local`. Every booking confirmation then goes to
+that address instead of the customer, with the real recipient in the subject
+(`[TEST → sam@example.com] …`) and a banner in the body.
+
+⚠️ **This changes who we ask Resend to mail, not what Resend permits.** With no verified
+domain, the sandbox delivers **only to the Resend account owner's address** — anything
+else comes back as an error and still never arrives. Use the account address until
+FB-08 is done.
+
+---
+
+## Go-live checklist
+
+- [ ] Unset `BOOKING_EMAIL_REDIRECT_TO` — leaving it set diverts every customer's
+      confirmation and tax invoice to one inbox
+- [ ] Set `BUSINESS_ABN`; confirm `legalName` against the ABR (currently the assumed
+      "AutoXtreme Pty Ltd"); confirm `BUSINESS_GST_REGISTERED`
+- [ ] Set the same ABN on the Stripe account so its invoice matches ours
+- [ ] Verify `finevuaustralia.com.au` (or a `send.` subdomain) in Resend and move
+      `CONTACT_FROM_EMAIL` off `onboarding@resend.dev` — **FB-08**
+- [ ] Live Stripe keys, and create the production webhook endpoint with **its own**
+      `whsec_` (a test-mode secret rejects live events)
+- [ ] Decide surcharge vs absorb (recommend absorb — every page promises a flat $250)
+- [ ] `npm run test:booking` against staging
+- [ ] One real card payment end to end, then refund it

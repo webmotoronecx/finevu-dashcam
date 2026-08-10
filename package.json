@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:booking": "node scripts/e2e-booking.mjs"
+    "test:booking": "node scripts/e2e-booking.mjs",
+    "dev:booking": "bash scripts/dev-booking.sh",
+    "booking:clean": "node scripts/booking-clean.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

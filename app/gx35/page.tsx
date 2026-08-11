@@ -858,7 +858,7 @@ export default function GX35Page() {
       </section>
 
       {/* Firmware / Downloads */}
-      {/* <FirmwareDownloads tabs={downloadTabs} theme="light" ariaLabel="GX35 downloads" /> */}
+      <FirmwareDownloads tabs={downloadTabs} theme="light" ariaLabel="GX35 downloads" />
 
       {/* Help / quick links — Where to buy, Install, Support */}
       <LearnMoreLinks  />

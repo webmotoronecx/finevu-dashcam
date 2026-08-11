@@ -49,6 +49,9 @@ export type DownloadFile = {
         Falls back to `label` when absent. */
     version?: string;
     href: string;
+    /** Lowercase hex SHA-256 of the file, shown so a customer can verify the download.
+        Omit to hide the checksum line entirely. */
+    sha256?: string;
 };
 
 const TOKENS: Record<Theme, {
@@ -120,6 +123,17 @@ function DownloadPicker({ files, theme }: { files: DownloadFile[]; theme: Theme 
                     <Download className="h-4 w-4" strokeWidth={2} />
                     Download
                 </a>
+
+                {/* Integrity check. Firmware is executable code for a device, so a corrupted
+                    or substituted file can brick a camera — this lets a customer confirm the
+                    bytes before flashing. `break-all` because a 64-char hex string has no
+                    break opportunities and would otherwise overflow on mobile. */}
+                {file.sha256 && (
+                    <div className={`mt-4 max-w-[420px] text-[12px] leading-relaxed ${t.body}`}>
+                        <span className="font-semibold uppercase tracking-wide">SHA-256</span>
+                        <code className="mt-1 block break-all font-mono text-[11px]">{file.sha256}</code>
+                    </div>
+                )}
             </div>
         </div>
     );

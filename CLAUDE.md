@@ -104,39 +104,52 @@ They are unresolved decisions, not tasks that can just be done.
    reports `downloadTabs` as unused in both files. **Do not "clean up" those consts**; that
    would delete the restore path. Ask before touching them.
 
-   **What still has to happen (the actual blocker):**
-   - The GX4K and GX35 `.bin` files (~73 MB each) were uploaded to an R2 bucket, but
-     `pub-5f24122eb7464fec8edf4af659a6237c.r2.dev` returns **NXDOMAIN** — the host does not
-     exist. Either the bucket's **Public Development URL was never enabled** (R2 → bucket →
-     Settings → Public access), or that hash is not the one Cloudflare assigned. The `pub-`
-     hash is issued when public access is turned on; it is **not** derived from the account
-     ID or bucket name, so it cannot be assembled by hand — copy it verbatim from that page.
-   - A **custom domain is not currently possible.** R2 custom domains require the zone to be
-     in the same Cloudflare account, and `finevuaustralia.com.au` is on **BrandShelter**
-     nameservers (apex A → `216.198.79.1`, Vercel). Moving it means changing nameservers at a
-     corporate registrar. Low-risk if it happens — the zone is only three records and has
-     **no MX** — but it is an ops decision. `r2.dev` is acceptable for staging meanwhile.
-   - **Verify the URLs actually serve** (`curl -I`) before un-hiding. Right now the button
-     renders and 404s.
-   - **Security, if `r2.dev` ships:** enabling the dev URL makes the **entire bucket**
-     publicly readable, so that bucket must hold firmware and nothing else. No WAF,
-     rate-limit rules or request logs are available on `r2.dev`. Firmware is executable code
-     for a device, so **integrity is the real risk**: keep R2 API tokens narrowly scoped and
-     out of the repo, publish a **SHA-256 checksum** beside each download, and confirm with
-     FineVu whether the camera verifies a firmware signature before flashing. No credential
-     is needed in the app itself — public reads are just a URL.
-   - `<a download>` is ignored cross-origin, so the browser decides from response headers.
-     Set `Content-Disposition: attachment` on the R2 objects if the file ever renders
-     inline instead of downloading.
+   **How hosting works now — private bucket + presigned redirect (built 2026-08-11).** The
+   public-bucket approach was abandoned: the `r2.dev` development URL NXDOMAINed, and public
+   access was then switched off deliberately. The replacement is better on every axis and
+   **removes the custom-domain blocker entirely**:
 
-   **Where the data lives now (changed 2026-08-10):** all firmware content was consolidated
-   into **`lib/data/firmware.ts`** — update steps, the power-off warning, per-model release
-   files, and the `/support` download/guide rows. `app/gx4k`, `app/gx35` and `app/support`
-   are thin consumers (`downloadTabsFor`, `downloadsFor`, `supportGuides`); the duplicated
-   copies in the two product pages are gone. **When the files are ready, `modelReleases` is
-   the only thing to edit** — one `parentUrl` const plus a `ReleaseFile` per build. Empty
-   arrays hide a tab entirely, and if every tab is hidden `FirmwareDownloads` renders
-   nothing, so partial data is always safe to ship.
+   - **`app/api/firmware/[id]`** resolves the id against an allowlist, mints a presigned R2
+     URL (`lib/r2.ts`, 5-minute TTL) and **302s** to it. Downloads are therefore served from
+     `finevuaustralia.com.au/api/firmware/…` — a same-origin, branded, rate-limitable,
+     loggable URL — while the bucket stays private.
+   - **It must stay a redirect, never a proxy.** The files are ~73 MB; streaming them through
+     the function would bill Vercel bandwidth per download and exceed the response-size and
+     duration limits. Redirecting costs one small invocation and R2 egress is free.
+   - **`fileById()` is the security boundary.** The object key comes only from
+     `modelReleases`; a client-supplied key would turn the route into a read oracle for the
+     whole private bucket. Never "simplify" this to `/api/firmware/[...key]`.
+   - **`Cache-Control: no-store` on the redirect is load-bearing** — a cached 302 would keep
+     serving an expired signed URL, failing in a way that looks nothing like a caching bug.
+   - `Content-Disposition: attachment` is signed into each URL via
+     `ResponseContentDisposition`, so it needs no object metadata. This matters because
+     `<a download>` is ignored cross-origin and the redirect target is another origin.
+   - A **custom domain remains impossible** (zone on **BrandShelter** nameservers, apex A →
+     `216.198.79.1` Vercel; moving it is a registrar-level ops decision). It is no longer
+     needed for the downloads — only if you later want R2 cache rules.
+   - **SHA-256 checksums ship beside each download** (added 2026-08-11) — `ReleaseFile.sha256`,
+     rendered by the picker. Firmware is executable code for a device, so a corrupted or
+     substituted file can brick a camera. **Compute the digest from the OBJECT IN R2, not a
+     local copy**, or it certifies bytes nobody will download. Omitting the field just hides
+     the line, so a new file without one is safe but unverifiable.
+   - **Still outstanding:** confirm with FineVu whether the camera verifies a firmware
+     signature before flashing — that, not the checksum, is the real defence. Keep the R2
+     token **Object Read only and scoped to the one bucket**.
+
+   **Env vars (see `.env.example`):** four server-side `R2_*` secrets, plus the public
+   **`NEXT_PUBLIC_FIRMWARE_DOWNLOADS`** flag that draws the UI. **They must be set together** —
+   the flag renders the buttons, the credentials make them work. Unset flag = fail-safe *and*
+   kill switch: `hosted()` returns nothing, every tab hides, the section renders nothing. It
+   must be `NEXT_PUBLIC_` because all three consumers are client components, so **it is inlined
+   at build time and a change needs a redeploy, not just a saved env var.**
+
+   **Where the data lives (changed 2026-08-10):** all firmware content is consolidated into
+   **`lib/data/firmware.ts`** — update steps, the power-off warning, per-model release files,
+   and the `/support` download/guide rows. `app/gx4k`, `app/gx35` and `app/support` are thin
+   consumers (`downloadTabsFor`, `downloadsFor`, `supportGuides`). **Adding a file is a
+   `modelReleases` edit and nothing else:** an `id` (stable — it is the public URL), the R2
+   `key`, `label`, `meta`. Never write a URL there. Duplicate ids throw at build time.
+   Empty arrays hide a tab; all tabs hidden renders nothing — partial data is always safe.
 
    Related: **CA-13** in `docs/content-accuracy-changes.csv` — firmware versions on
    `/support` are unsourced and its download links are dead. Same root cause, so settle both

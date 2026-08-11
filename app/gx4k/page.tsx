@@ -865,7 +865,7 @@ export default function GX4KPage() {
                     </div>
                 </section>
                 {/* Firmware and downloads */}
-                {/* <FirmwareDownloads tabs={downloadTabs} theme="dark" ariaLabel="GX4K downloads" /> */}
+                <FirmwareDownloads tabs={downloadTabs} theme="dark" ariaLabel="GX4K downloads" />
             </div>
 
             {/* Help and quick links */}

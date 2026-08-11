@@ -446,7 +446,7 @@ function BookingWizard() {
                   ) : slotOptions.length === 0 ? (
                     <p className="text-[14px] text-[#6e6e73]">No start times left on that date — please choose another.</p>
                   ) : (
-                    <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5" role="group" aria-labelledby="wiz-slot-label">
+                    <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5" role="group" aria-labelledby="wiz-slot-label ">
                       {slotOptions.map((s) => (
                         <button key={s.value} type="button" aria-pressed={form.slot === s.value}
                           onClick={() => { set("slot", s.value); setSlotLabel(s.label); setHint({ msg: "", cls: "" }); }}

@@ -37,8 +37,9 @@ const ALLOWED_ATTACHMENT_EXTS = new Set(["jpg", "jpeg", "png", "webp", "heic", "
 
 // In-memory rate limit. Best-effort by design: serverless instances don't share
 // memory, so the real ceiling is per-instance rather than global, and a cold start
-// resets it. It stops the trivial "loop curl in a shell" case; the durable fix is
-// Cloudflare WAF + Turnstile (FB-07).
+// resets it. It stops the trivial "loop curl in a shell" case and is the fallback
+// when no shared store is configured; the durable, cross-instance ceiling is the
+// Upstash-backed limiter below (FB-07).
 const RATE_LIMIT_MAX = 8;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const hits = new Map<string, number[]>();
@@ -65,6 +66,56 @@ function rateLimited(ip: string): boolean {
   times.push(now);
   hits.set(ip, times);
   return false;
+}
+
+// Durable, cross-instance rate limit backed by an Upstash Redis REST store (FB-07).
+// The in-memory limiter above only bounds one warm instance, so a flood spread across
+// instances — or one that keeps hitting cold starts — walks past it. A shared store is
+// the only way to enforce a global ceiling on stateless serverless. This talks to the
+// REST API directly (no SDK dependency), the same shape as verifyTurnstile below.
+//
+// Accepts the Upstash-native names OR Vercel KV's, so it works however the store gets
+// provisioned. Unset ⇒ durableRateLimited returns null and we fall back to the
+// in-memory limiter, so local dev and any unprovisioned environment keep working.
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+// One INCR that arms the window's expiry only on the first hit, as a single atomic
+// script — so two concurrent first requests can't both skip PEXPIRE and leak a key
+// that never dies. Returns the current count for the window.
+const RATE_LIMIT_LUA =
+  "local c = redis.call('INCR', KEYS[1]) " +
+  "if c == 1 then redis.call('PEXPIRE', KEYS[1], ARGV[1]) end " +
+  "return c";
+
+// true = limited, false = allowed, null = store not configured or unreachable. Fails
+// OPEN (returns null → caller uses the in-memory limiter): a limiter outage must never
+// take the contact form down. This is the opposite trade to Turnstile, which fails
+// closed because it is the gate itself, not a throttle.
+async function durableRateLimited(ip: string): Promise<boolean | null> {
+  if (!REDIS_URL || !REDIS_TOKEN) return null;
+  try {
+    // Upstash REST: POST the command as a JSON array [cmd, ...args] to the base URL.
+    const res = await fetch(REDIS_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${REDIS_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify(["EVAL", RATE_LIMIT_LUA, "1", `rl:contact:${ip}`, String(RATE_LIMIT_WINDOW_MS)]),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { result?: unknown; error?: string };
+    if (typeof data.result !== "number") return null;
+    return data.result > RATE_LIMIT_MAX;
+  } catch {
+    return null;
+  }
+}
+
+// Prefer the durable store; fall back to the per-instance limiter when it isn't
+// configured or is unreachable.
+async function isRateLimited(ip: string): Promise<boolean> {
+  const durable = await durableRateLimited(ip);
+  if (durable !== null) return durable;
+  return rateLimited(ip);
 }
 
 // Cloudflare Turnstile (FB-07) — the durable fix for the bypassable honeypot.
@@ -145,7 +196,7 @@ export async function POST(req: Request) {
     );
   }
 
-  if (rateLimited(ip)) {
+  if (await isRateLimited(ip)) {
     return NextResponse.json(
       { ok: false, error: "Too many submissions from this connection. Please try again shortly, or email support@finevuaustralia.com.au." },
       { status: 429 },

@@ -3,8 +3,17 @@ import { Resend } from "resend";
 
 // Server-side handler for website form submissions. Sends via Resend using the
 // secret RESEND_API_KEY (never exposed to the browser). Recipient and sender are
-// overridable via env; the sender must be on a domain verified in Resend once
-// finevuaustralia.com.au is set up (until then Resend only allows onboarding@resend.dev).
+// overridable via env.
+//
+// finevuaustralia.com.au IS verified in Resend as of 2026-08-13, so the sandbox
+// restriction is gone — but CONTACT_FROM_EMAIL is still unset, which means the
+// onboarding@resend.dev fallback below is what actually sends. Set it to the verified
+// domain in Vercel; the fallback stays as a fail-safe, not as the intended sender.
+//
+// ⚠️ Accepting this message is NOT delivering it. A 200 from this route means Resend
+// accepted the send — nobody currently has access to the CONTACT_TO_EMAIL mailbox, so no
+// submission has ever been confirmed to arrive. See FB-08 before treating the forms as
+// working end to end.
 const TO_EMAIL = process.env.CONTACT_TO_EMAIL || "support@finevuaustralia.com.au";
 const FROM_EMAIL = process.env.CONTACT_FROM_EMAIL || "FineVu Website <onboarding@resend.dev>";
 

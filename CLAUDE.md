@@ -271,6 +271,21 @@ One row per concrete old→new change (same edit across several lines = one row 
 The narrative still goes in `docs/content-accuracy-audit-*.md`; the CSV is the flat diff
 view. Keep the two consistent.
 
+**The other two trackers follow the same `Status` contract** — `Applied` / `Pending` /
+`Needs approval`, on the same *decision authority* axis, plus frozen `First found` and a
+bumped `Last updated`. Never mix IDs between the three spaces.
+
+- `docs/forms-audit-changes.csv` (**`FA-nn`**) — what a form is *missing*: unwired submits,
+  dropped data, absent states, a11y gaps. Frozen: `ID`, `Form`, `What's missing`,
+  `First found`. Narrative: `docs/forms-audit-*.md`. Driven by `/forms-audit`.
+- `docs/forms-backend-requirements.csv` (**`FB-nn`**) — the *backend* each form still needs.
+  Aligned to this contract on 2026-08-13; before that it had no `Status` column and drifted
+  eight days behind the code. Frozen: `ID`, `Form`, `Route`. It keeps two columns of its
+  own, `Effort` and `Priority`, which are independent of `Status`.
+
+`FA-nn` and `FB-nn` overlap by design — FA says a form is broken, FB says what would fix it
+(e.g. FA-02 = FB-05, warranty evidence). Cross-reference; don't restate one as the other.
+
 ### 3. Search-engine visibility (hard gate — decide deliberately)
 
 Indexing is **off by default** and controlled by one env var, `SITE_INDEXABLE`:

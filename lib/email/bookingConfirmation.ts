@@ -143,9 +143,11 @@ export async function sendBookingConfirmation(input: ConfirmationInput): Promise
   // intended recipient is carried in the subject and a banner so a redirected message is
   // never ambiguous about who it was actually for.
   //
-  // Note this changes who WE ask Resend to mail, not what Resend permits: while no domain
-  // is verified, Resend's sandbox still only delivers to the account owner's address, so
-  // any other value here comes back as an error rather than an inbox.
+  // The old sandbox caveat here is obsolete: finevuaustralia.com.au was verified in Resend
+  // on 2026-08-13, so a redirect can now point at any address rather than only the account
+  // owner's. That makes leaving this set MORE dangerous, not less — it will now silently
+  // deliver every customer's booking confirmation and tax invoice to one inbox instead of
+  // failing loudly. It must be unset in production.
   const redirectTo = process.env.BOOKING_EMAIL_REDIRECT_TO?.trim();
   const to = redirectTo || input.email;
   if (redirectTo) {

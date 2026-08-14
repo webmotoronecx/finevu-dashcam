@@ -13,23 +13,35 @@
 // and the booking wizard. Both resolve through resolveCoverage() — keep it that way. If
 // you add a third place that answers a coverage question, route it through here too.
 //
-// ⚠️ ANCHOR, NOT AUTHORITY — and the dataset has known defects. Recorded so nobody
-// mistakes it for verified data (CA-78, FA-23, and {!needs approval} in
-// docs/content-sources/general.txt § INSTALLATION SERVICE):
+// ── REGENERATED 2026-08-06 — the defects below are FIXED ────────────────────
+// The dataset was rebuilt from scratch (commit 49e015e) against a rewritten generator,
+// and re-verified against the shipped JSON on 2026-08-14. Every defect previously
+// recorded here is gone. Kept as a changelog so nobody re-reports them:
 //
-//   • The supported flags are NOT reliable point-in-polygon output, whatever the file's
-//     own `note` says. Inner Sydney is a checkerboard: 2000 Sydney and 2009 Pyrmont are
-//     serviced while 2007 Ultimo — physically between them — is not, as are 2010 Surry
-//     Hills, 2011 Kings Cross and 2016 Redfern, each ringed by serviced postcodes. No
-//     radius or polygon produces that. Generation failed per-postcode and wrote the
-//     failures as 0, so an unknown number of "not serviced" answers are false negatives.
-//   • 52 flagged-serviced postcodes are non-geographic (PO boxes, mail centres): 1314
-//     Eastern Suburbs Mc, 1481 Hurstville Bc, 0200 Anu. Harmless — nobody types them.
-//   • 7151 Casey (an Antarctic base) and 9999 North Pole are flagged serviced.
-//   • The polygons came from installations.dashcamsrus.com.au; nobody has confirmed those
-//     describe AutoXtreme's installer network.
+//   • Inner-Sydney checkerboard — RESOLVED. 2000 Sydney, 2007 Ultimo, 2008 Darlington,
+//     2009 Pyrmont, 2010 Surry Hills, 2011 Kings Cross, 2016 Redfern and 2017 Zetland
+//     are all serviced. The old file marked Ultimo unserviced between two serviced
+//     neighbours, which no polygon could produce; that was a generator bug writing
+//     per-postcode failures as 0, and an unknown number of false "not serviced"
+//     answers reached customers before the rebuild.
+//   • 52 non-geographic postcodes flagged serviced — RESOLVED, one remains (6849
+//     Perth Bc). 1314 Eastern Suburbs Mc, 1481 Hurstville Bc and 0200 Anu now read
+//     unserviced. Harmless either way; nobody types them.
+//   • 7151 Casey (Antarctic base) and 9999 North Pole — RESOLVED, both unserviced.
+//   • NT — 50 rows present, none flagged serviced, matching isExcludedPostcode() below.
 //
-// Narrowing coverage is the safe direction; do not widen it without a source.
+// Provenance is now recorded in the file's own `note`: point-in-polygon against the
+// installer map's service-area polygons with a documented NSW correction, unioned with
+// the state-supplied drawings, then per-postcode overrides. ⚠️ The findings document it
+// cites, docs/coverage-findings-2026-08-06.md, lives in the separate installer-service-
+// areas repo and is NOT in this one, so the reasoning behind individual flags cannot be
+// checked from here.
+//
+// Still true, and the reason this is an ANCHOR rather than an AUTHORITY: this file is
+// where coverage claims are reconciled, and pages must agree with it rather than
+// restating coverage in their own words. Do not hand-edit the JSON — edit the CSV in the
+// generator repo and re-run its build script, or the next regeneration silently reverts
+// you. Narrowing coverage is the safe direction; do not widen it without a source.
 
 // ── METRO_COVERAGE — COMMENTED OUT 2026-07-31, DO NOT DELETE ─────────────────
 // The previous 19-range fallback table. Disabled by user decision so that au-postcodes.json

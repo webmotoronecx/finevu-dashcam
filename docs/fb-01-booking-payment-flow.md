@@ -3,6 +3,16 @@
 **Status:** built and verified in test mode, confirmation email included. Written and
 implemented 2026-08-10; **reconciled against the code 2026-08-13** — see
 [What is NOT built](#what-is-not-built) before trusting any behaviour described below.
+
+**Verified end to end 2026-08-14.** A real booking ran the whole path against test-mode
+Stripe and the live calendar: hold → payment → `checkout.session.completed` → promotion →
+tag stripped → step 6 upgrading to "Booking confirmed" off `/api/booking/status` → the
+confirmation and tax invoice arriving at **an ordinary customer address with
+`BOOKING_EMAIL_REDIRECT_TO` unset**. That last hop had never been exercised — it was
+impossible while the Resend domain was unverified, since the sandbox only delivered to the
+account owner. A second run that waited ~5 minutes at step 5 promoted correctly too, so the
+webhook's `status === "confirmed"` guard is not being tripped by anything GHL does on its
+own. Test bookings were swept afterwards and the calendar returned to zero.
 **Decision:** Stripe **Checkout**, **embedded** mode (`ui_mode: "embedded_page"` — the
 value `"embedded"` is rejected), confirmed by the user 2026-08-10 — plus booking **Option B**: hold the slot, pay, confirm on webhook.
 

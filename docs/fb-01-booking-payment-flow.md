@@ -1,7 +1,8 @@
 # FB-01 — Booking + payment flow (Option B)
 
-**Status:** built and verified in test mode except the confirmation email. Written and
-implemented 2026-08-10.
+**Status:** built and verified in test mode, confirmation email included. Written and
+implemented 2026-08-10; **reconciled against the code 2026-08-13** — see
+[What is NOT built](#what-is-not-built) before trusting any behaviour described below.
 **Decision:** Stripe **Checkout**, **embedded** mode (`ui_mode: "embedded_page"` — the
 value `"embedded"` is rejected), confirmed by the user 2026-08-10 — plus booking **Option B**: hold the slot, pay, confirm on webhook.
 
@@ -16,6 +17,30 @@ original objection no longer applies.
 
 Related: `docs/forms-backend-requirements.csv` (FB-01), **CA-36** in
 `docs/content-accuracy-changes.csv`, open item 1 in `CLAUDE.md`.
+
+---
+
+## What is NOT built
+
+Added 2026-08-13 after checking every claim in this document against the working tree.
+This file grew an as-built narrative on top of its original plan, and the two halves had
+drifted. **Four behaviours described below were never implemented, and one is implemented
+but cannot fire.** Each is marked in place; this is the index.
+
+| Described | Reality | Consequence |
+|---|---|---|
+| `POST /api/booking/release` — cancel the hold when the customer goes Back | **Never built.** `app/api/booking/` contains only `create`, `slots`, `status` | Changing slot at step 5 leaves the old hold until the session expires (32 min) |
+| Sweep of HELD appointments older than 35 minutes, on each free-slots read | **Never built.** `slots/route.ts` is a 37-line cached read. The only `sweep` matches in the tree are comments explaining why a *status-driven* sweep would be dangerous | No early reclaim. `checkout.session.expired` is the only thing that releases an abandoned hold |
+| Alert ops by email when paid-but-GHL-confirm-fails | **Never built.** `console.error` only (`webhook:57-63`) | The money-is-real-and-the-booking-is-broken case is a log line nobody watches |
+| Write amount / Stripe payment id / invoice URL back to the GHL contact | **Never built.** Zero GHL writes in the webhook beyond `confirmAppointment` | Those values live only on the Stripe session and in the customer's email |
+| `charge.refunded` → CANCELLED | **Built but dead.** `createBookingSession` sets no `payment_intent_data.metadata`, so session metadata never reaches the Charge and `metadata.appointmentId` is always undefined — **FA-32** | A refunded booking stays `confirmed`; an installer is dispatched to a refunded customer |
+
+Together the first two mean an indecisive customer can hold more than one slot at once:
+`BookingCheckout` mounts per visit to step 5 with a per-instance `started` ref, and
+`/api/booking/create` only consults `findHeldAppointment` when the slot is *not* free — so
+a Back-then-different-slot takes a second hold and nothing reclaims the first early.
+**Expected from reading the code, not yet observed at runtime** — worth confirming in the
+browser against the live calendar before it drives any priority decision.
 
 ---
 
@@ -149,9 +174,11 @@ drives whether the GST line appears at all — registration is separate from hol
 and showing GST when not registered would be worse than omitting it. Also unverified:
 `legalName` is assumed to be "AutoXtreme Pty Ltd" and needs checking against the ABR.
 
-The other launch blocker is unchanged: **Resend domain verification** (FB-08). Until
-`finevuaustralia.com.au` is verified, Resend's sandbox only delivers to the account
-owner's address, so a real customer receives nothing.
+~~The other launch blocker is unchanged: **Resend domain verification** (FB-08).~~
+**Cleared 2026-08-13** — `finevuaustralia.com.au` is verified in Resend, so the sandbox
+restriction is gone and mail can be sent to any address. FB-08 did not close, though; it
+inverted. The domain can **send** but has **no MX record**, so it cannot **receive**, and
+nobody has access to the `CONTACT_TO_EMAIL` mailbox. Sending was the half that got solved.
 
 Two Stripe API details worth knowing: **`ui_mode: "embedded"` is rejected — the value is
 now `embedded_page`** (same in-page iframe, renamed), and `expires_at` computed as exactly
@@ -196,6 +223,13 @@ A **HELD** appointment occupies the slot but is not a real booking. Only the Str
 webhook promotes it to **CONFIRMED**. Note the two different exits: an unpaid hold is
 **deleted** so it leaves no trace, while a paid booking is **cancelled** so the record
 survives — the terms promise refunds, and a refund needs something to point at.
+
+> ⚠️ **The `CONFIRMED → CANCELLED` edge does not currently work.** The handler is written,
+> but it reads `appointmentId` from `Stripe.Charge.metadata`, and `createBookingSession`
+> sets metadata only at the Checkout Session level — which does not propagate to the
+> PaymentIntent or the Charge. So `charge.refunded` always no-ops and a refunded booking
+> stays `confirmed` on the calendar. Fix is either `payment_intent_data.metadata` on the
+> session, or resolving the session via `charge.payment_intent`. Tracked as **FA-32**.
 
 ---
 
@@ -264,24 +298,31 @@ session client secret before it can mount.
 Server-side, in order:
 
 1. **Re-validate the payload.** Never trust the client: required fields present, postcode
-   serviceable, `$250` never read from the request.
-2. **Re-check the slot is still free** against GHL, bypassing the 30 s cache in
-   `app/api/booking/slots/route.ts`. This is the check that catches a slot taken between
-   step 3 and step 5. On failure return a typed error and the client bounces the customer
-   back to step 3 with a message.
-3. **Upsert the GHL contact** — name, phone, email, vehicle, address.
+   serviceable (NT rejected `422`), `$250` never read from the request.
+2. **Upsert the GHL contact** — name, phone, email, vehicle, address. Deliberately BEFORE
+   the slot check, so a blocked slot can be attributed: our own hold blocks it too, and a
+   retry must reuse that rather than be told someone else took it.
+3. **Re-check the slot is still free** against GHL, uncached — this is the check that
+   catches a slot taken between step 3 and step 5. On failure, `409` and the client bounces
+   the customer back to step 3.
 4. **Create the GHL appointment as HELD** at the chosen slot, linked to that contact.
 5. **Create the Stripe Checkout Session:**
-   - `mode: "payment"`, `ui_mode: "embedded"`
+   - `mode: "payment"`, **`ui_mode: "embedded_page"`** — `"embedded"` is rejected
    - line item **$250 AUD as a server-side constant** (`25000` minor units)
-   - `metadata: { appointmentId, contactId, bookingRef }` — this is the join key
+   - full booking payload in `metadata`, keyed by `appointmentId` — the join key
    - `invoice_creation: { enabled: true }` for the tax invoice
-   - `expires_at`: +30 minutes (Stripe's minimum)
-6. Return `{ clientSecret, bookingRef }`.
+   - **`expires_at`: +32 minutes** (`HOLD_TTL_MINUTES`) — exactly +30 sits on Stripe's
+     rejection boundary
+   - `redirect_on_completion: "never"` — the wizard renders its own step 6
+6. **Park the session id on the appointment title**, then return
+   `{ clientSecret, sessionId, appointmentId, expiresAt }`.
 
-**Idempotency:** the client sends a stable request id generated once per wizard session. A
-repeat call with the same id returns the existing session instead of creating a second
-appointment.
+> **Idempotency — the original plan here was wrong and is not what shipped.** It proposed a
+> client-generated stable request id. Stripe idempotency keys cannot work for this route at
+> all (see [Why the session id is parked on the appointment
+> title](#why-the-session-id-is-parked-on-the-appointment-title)), and no `requestId`
+> exists in the code. Retry safety comes from parking the session id in the appointment
+> title and recovering it via `findHeldAppointment` + `sessionIdFromTitle`.
 
 ### Step 5 (b) — pay
 
@@ -299,8 +340,10 @@ handled inline by Stripe.
 1. Verify the signature against `STRIPE_WEBHOOK_SECRET`.
 2. Drop the event if this session id was already processed (Stripe retries; handlers must
    be idempotent).
-3. Read `metadata.appointmentId` → flip the GHL appointment **HELD → CONFIRMED**, and note
-   the amount, Stripe payment id and invoice URL on the contact.
+3. Read `metadata.appointmentId` → flip the GHL appointment **HELD → CONFIRMED**.
+   ⚠️ The planned write-back of amount / Stripe payment id / invoice URL onto the contact
+   was **never built** — the webhook makes no GHL write beyond `confirmAppointment`. Those
+   values exist only on the Stripe session and in the customer's email.
 4. Send the confirmation + tax invoice via Resend.
 
 **The webhook is the source of truth, not the browser.** Step 6 must render "confirmed"
@@ -315,15 +358,18 @@ who refreshes gets the truth even if the webhook is running late.
 
 ## Failure paths
 
-| What happens | Handling |
-|---|---|
-| Customer abandons at step 5 | Session expires at 30 min → `checkout.session.expired` webhook → cancel the HELD appointment, slot returns to availability |
-| Payment declined | Customer retries inside Checkout; the hold stands until the session expires |
-| Customer clicks Back to change the slot | `POST /api/booking/release` cancels the hold and expires the session; a fresh one is created on re-entering step 5 |
-| Slot taken between step 3 and step 5 | Caught by the re-check in create step 2; customer returns to step 3 with a message |
-| Webhook never arrives | Stripe retries for up to 3 days. The status endpoint reconciles on demand by reading the session from Stripe |
-| **Paid, but GHL confirm fails** | Money captured, appointment stuck HELD. **Alert ops by email; do not auto-refund; resolve manually.** Log loudly |
-| Orphaned holds generally | A sweep on each free-slots read cancels HELD appointments older than 35 minutes with no paid session |
+✅ = verified in the code 2026-08-13. ❌ = described here but **not implemented**.
+
+| What happens | Handling | |
+|---|---|---|
+| Customer abandons at step 5 | Session expires at **32 min** → `checkout.session.expired` → `releaseHold` deletes the appointment, slot returns to availability | ✅ |
+| Payment declined | Customer retries inside Checkout; the hold stands until the session expires | ✅ |
+| Slot taken between step 3 and step 5 | Caught by the uncached re-check in `create`; `409` and the customer returns to step 3 with a message | ✅ |
+| Webhook never arrives | Stripe retries for up to 3 days, and `/api/booking/status` reconciles on demand by reading the session from Stripe | ✅ |
+| Customer clicks Back to change the slot | ~~`POST /api/booking/release` cancels the hold~~ — **that route was never built.** The old hold survives until its session expires, and re-entering step 5 on a different slot takes a **second** hold | ❌ |
+| Orphaned holds generally | ~~A sweep on each free-slots read cancels HELD appointments older than 35 minutes~~ — **never built.** `checkout.session.expired` is the only reclaim path, so an orphan whose webhook is lost persists until someone clears it by hand | ❌ |
+| **Paid, but GHL confirm fails** | Money captured, appointment stuck HELD. Handled as far as *detection* — the webhook logs `PAID BUT THE HOLD IS GONE` and does not auto-refund. ~~Alert ops by email~~ was **never built**, so nothing surfaces this outside the Vercel logs | ⚠️ |
+| **Refund issued** | ~~`charge.refunded` → CANCELLED~~ — the handler exists but **can never fire** (FA-32): session metadata does not propagate to the Charge, so `appointmentId` is always undefined and the booking stays `confirmed` | ❌ |
 
 ---
 
@@ -345,11 +391,13 @@ and booking on one GHL contact, which was the reason GHL was chosen.
 
 **New**
 
-- `app/api/booking/create/route.ts` — validate, re-check slot, hold, create session
-- `app/api/booking/status/route.ts` — read-through status for step 6
-- `app/api/booking/release/route.ts` — cancel a hold
-- `app/api/stripe/webhook/route.ts` — `checkout.session.completed` + `.expired`
-- `lib/stripe.ts` — server client, the $250 constant, session builder
+- ✅ `app/api/booking/create/route.ts` — validate, re-check slot, hold, create session
+- ✅ `app/api/booking/status/route.ts` — read-through status for step 6
+- ✅ `app/api/booking/slots/route.ts` — cached availability read (not in the original plan)
+- ✅ `app/api/stripe/webhook/route.ts` — `completed` + `.expired` + `charge.refunded`
+- ✅ `lib/stripe.ts` — server client, the $250 constant, session builder
+- ✅ `lib/email/bookingConfirmation.ts`, `lib/data/business.ts` — confirmation + tax invoice
+- ❌ `app/api/booking/release/route.ts` — **never built**
 
 **Modified**
 
@@ -379,10 +427,15 @@ import at `app/installation/page.tsx:7` finally goes.
 3. **ABN** for the tax invoice. `app/installation/page.tsx:84` promises a tax receipt and
    `installation-terms.ts` says prices include GST; a Stripe receipt without an ABN is not
    an Australian tax invoice.
-4. **Stripe account** — AU entity, business verification, live keys. The three keys in
-   `.env.local` are present but empty.
-5. **Resend domain verification** (FB-08) — the confirmation email can't send reliably
-   until `finevuaustralia.com.au` is verified.
+4. **Stripe account** — AU entity, business verification, **live** keys. ~~The three keys in
+   `.env.local` are present but empty.~~ Test-mode keys are populated as of 2026-08-13
+   (`sk_test_` / `pk_test_` / `whsec_`), so local and staging work end to end. Live keys and
+   a production webhook endpoint with its own `whsec_` are still outstanding.
+5. ~~**Resend domain verification** (FB-08)~~ — **done 2026-08-13.** Replaced by a different
+   FB-08: `finevuaustralia.com.au` can now send, but has **no MX record**, so it cannot
+   receive, and no one has access to the destination mailbox. That does not block the
+   booking confirmation (which goes to the customer), but it does mean every *other* form's
+   submissions go nowhere. Needs MX records via BrandShelter plus a provisioned mailbox.
 
 ## Open questions
 
@@ -453,10 +506,12 @@ Set `BOOKING_EMAIL_REDIRECT_TO` in `.env.local`. Every booking confirmation then
 that address instead of the customer, with the real recipient in the subject
 (`[TEST → sam@example.com] …`) and a banner in the body.
 
-⚠️ **This changes who we ask Resend to mail, not what Resend permits.** With no verified
-domain, the sandbox delivers **only to the Resend account owner's address** — anything
-else comes back as an error and still never arrives. Use the account address until
-FB-08 is done.
+⚠️ **The sandbox caveat that used to live here is obsolete** — the domain was verified on
+2026-08-13, so a redirect can now point at any address rather than only the Resend account
+owner's. **That makes leaving it set more dangerous, not less.** It previously failed loudly
+against any other address; it will now silently deliver every customer's confirmation and
+tax invoice to one inbox. Keep it set locally as a safety net against test bookings emailing
+a real person, and confirm it is unset in Vercel.
 
 ---
 
@@ -467,8 +522,11 @@ FB-08 is done.
 - [ ] Set `BUSINESS_ABN`; confirm `legalName` against the ABR (currently the assumed
       "AutoXtreme Pty Ltd"); confirm `BUSINESS_GST_REGISTERED`
 - [ ] Set the same ABN on the Stripe account so its invoice matches ours
-- [ ] Verify `finevuaustralia.com.au` (or a `send.` subdomain) in Resend and move
-      `CONTACT_FROM_EMAIL` off `onboarding@resend.dev` — **FB-08**
+- [x] ~~Verify `finevuaustralia.com.au` in Resend~~ — done 2026-08-13
+- [ ] Move `CONTACT_FROM_EMAIL` off `onboarding@resend.dev` in Vercel — still unset there,
+      so production is sending from the fallback despite the domain being verified
+- [ ] **Fix FA-32 before taking a live payment** — a refund currently leaves the booking
+      `confirmed` and an installer will be dispatched to a refunded customer
 - [ ] Live Stripe keys, and create the production webhook endpoint with **its own**
       `whsec_` (a test-mode secret rejects live events)
 - [ ] Decide surcharge vs absorb (recommend absorb — every page promises a flat $250)

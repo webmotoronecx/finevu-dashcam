@@ -14,7 +14,15 @@ import { Resend } from "resend";
 // accepted the send — nobody currently has access to the CONTACT_TO_EMAIL mailbox, so no
 // submission has ever been confirmed to arrive. See FB-08 before treating the forms as
 // working end to end.
-const TO_EMAIL = process.env.CONTACT_TO_EMAIL || "support@finevuaustralia.com.au";
+// CONTACT_TO_EMAIL accepts a COMMA-SEPARATED LIST, so submissions can go to more than one
+// inbox — e.g. support plus a personal address while the shared mailbox is being sorted.
+// Resend's `to` takes up to 50 recipients; they all appear on the same message, so every
+// recipient can see the others. Use a group alias instead if that isn't wanted.
+// Blank entries are dropped, so a trailing comma is harmless.
+const TO_EMAIL = (process.env.CONTACT_TO_EMAIL || "support@finevuaustralia.com.au")
+  .split(",")
+  .map((address) => address.trim())
+  .filter(Boolean);
 const FROM_EMAIL = process.env.CONTACT_FROM_EMAIL || "FineVu Website <onboarding@resend.dev>";
 
 type Payload = {

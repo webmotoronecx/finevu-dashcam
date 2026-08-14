@@ -184,6 +184,29 @@ case is indistinguishable from a working one, so the launch security gate can be
 on a deploy with no CAPTCHA. Compounded by FA-33, which makes the key easy to miss.
 **Blocks launch.**
 
+### FA-40 — An unserviced postcode can still pay $250 *(added 2026-08-14)*
+
+`isExcluded()` blocks the **Northern Territory only**. Every other postcode falls through
+to `setHint(...)` and `return true` (`installation/page.tsx:245-246`), so the coverage
+answer is a **warning, not a gate** — and `create/route.ts:94` applies the same NT-only test
+server-side. A customer in an unserviced suburb reads *"we'll confirm availability within one
+business day"*, proceeds, and pays.
+
+That was a deliberate call (FA-23: non-blocking by design, so no revenue path is closed).
+What makes it worth raising now is the combination with **FA-32**: when coverage turns out to
+be no, the refund doesn't cancel the GHL appointment. The customer is refunded, the booking
+stays `confirmed`, an installer is dispatched to someone who is no longer a customer, and the
+slot stays blocked.
+
+**1,229 of 2,765 postcodes are unserviced**, so this fires for real customers. It's raised
+only now because the coverage flags became trustworthy on 2026-08-06 (CA-78) — while they
+were unreliable, the same path existed but its trigger rate was unknowable.
+
+Three routes, all ops calls: leave it non-blocking and accept manual refunds (**only viable
+once FA-32 is fixed**); hard-block unserviced postcodes as NT is blocked; or take the booking
+without payment outside the serviced list and send a payment link once coverage is confirmed.
+**Needs approval — beyond our call. Blocks launch.**
+
 ### FA-06 — Booking wizard still has no honeypot, and is no longer moot
 
 The wizard has no `botcheck` field and `/api/booking/create` has no Turnstile check. Since
@@ -251,10 +274,10 @@ with `aria-describedby`, uses a live region, or moves focus on failure.** Four r
 
 | | Count |
 |---|---|
-| Total findings | **39** (31 carried, 8 new) |
-| Critical / High / Medium / Low | 4 / 7 / 17 / 11 |
-| Applied / Pending / Needs approval | 14 / 22 / 3 |
-| Blocks launch | **5** *(was 6 — FA-33 fixed in this pass)* |
+| Total findings | **40** (31 carried, 9 new — FA-40 added 2026-08-14) |
+| Critical / High / Medium / Low | 4 / 8 / 17 / 11 |
+| Applied / Pending / Needs approval | 14 / 22 / 4 |
+| Blocks launch | **6** *(FA-33 fixed in this pass; FA-40 added after it)* |
 
 ### Blocks launch
 
@@ -262,6 +285,7 @@ with `aria-describedby`, uses a live region, or moves focus on failure.** Four r
 |---|---|---|
 | **FA-26** | No terms acceptance or privacy notice before a real $250 charge | Legal / ops |
 | **FA-32** | `charge.refunded` never cancels the appointment | Ours — fix |
+| **FA-40** | An unserviced postcode can pay $250; the refund then leaves them booked | Ops |
 | **FA-34** | Turnstile fails open when the key is absent | Ours — fix |
 | **FA-02** | Warranty evidence sent as filenames only | Ours — fix |
 | **FA-07** | Thank-you copy promises an email that is never sent | Needs a decision (= CA-70) |
@@ -286,8 +310,9 @@ scope but launch-blocking for FB-01: **`BUSINESS_ABN` is still the placeholder
 ### Cross-references
 
 `CA-36` (booking charges nothing) is now **obsolete** — superseded by FA-01/FA-26/FA-32.
-`CA-70` is the content-side twin of FA-07. `CA-78` records that the postcode dataset FA-23
-consolidated onto is itself geometrically wrong. `/api/contact` hardening is CLAUDE.md §1.
+`CA-70` is the content-side twin of FA-07. `CA-78` is **resolved** — the dataset was regenerated
+2026-08-06 and verified 2026-08-14, and the defect warning this report first carried under
+FA-23 has been withdrawn. `/api/contact` hardening is CLAUDE.md §1.
 
 ---
 

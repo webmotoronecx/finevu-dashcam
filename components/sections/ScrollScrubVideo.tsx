@@ -478,6 +478,7 @@ export function ScrollScrubVideo({
   const wrapRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(SVGPathElement | null)[]>([]);
+  const svgRef = useRef<SVGSVGElement>(null);
   const dividerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const stageRef = useRef<HTMLDivElement>(null);
   const lineLen = useRef<number[]>([]);
@@ -661,13 +662,27 @@ export function ScrollScrubVideo({
   const syncCallouts = useCallback(() => {
     const stage = stageRef.current;
     if (!stage) return;
-    const sw = stage.clientWidth;
-    const sh = stage.clientHeight;
+    // Fractional, unlike clientWidth's rounded integers — the leader SVG's user space is pinned to
+    // this box below, and a half-pixel of rounding there is a half-pixel of scale on every dash.
+    const { width: sw, height: sh } = stage.getBoundingClientRect();
     if (!sw || !sh) return;
     // px per viewBox unit. Kept per-axis (they're equal — the stage's aspectRatio comes from the
     // viewBox — but deriving both means a true 45° on screen even if that ever drifts).
     const kx = sw / vbW;
     const ky = sh / vbH;
+
+    // The leader SVG's user space IS CSS pixels: its viewBox is the stage's own px box, so the
+    // scale is exactly 1 and every number below — path coordinates, getTotalLength(), the dash —
+    // is in the same unit the geometry was authored in. `stageViewBox` still governs `at` (via
+    // kx/ky above), which is the only value authored in footage coordinates.
+    //
+    // ⚠️ Don't "simplify" this back to viewBox={stageViewBox}. The dash reveal needs the dash
+    // pattern and `getTotalLength()` to agree to the pixel; every extra coordinate space between
+    // them is a scale factor that shortens the pattern, and a short pattern *repeats*, so the
+    // reveal paints stroke → gap → a fragment stranded at the tip rather than one growing line.
+    // Pinning user space to px kills one of those factors; dropping `non-scaling-stroke` on the
+    // path (see the note there) kills the other.
+    svgRef.current?.setAttribute("viewBox", `0 0 ${sw} ${sh}`);
 
     callouts.forEach((c, i) => {
       const line = lineRefs.current[i];
@@ -707,7 +722,7 @@ export function ScrollScrubVideo({
       // is the block's *far* edge: the first stretch is the underline, which runs flush into the
       // horizontal leg (both sit at y = by, so they're one straight line on screen).
       const startX = ex + sx * w;
-      const P = (x: number, y: number) => `${x / kx},${y / ky}`; // px → viewBox units
+      const P = (x: number, y: number) => `${x},${y}`; // already px — the svg's user space is px
 
       // Round the bend by trimming `r` off each leg and bridging them with a quadratic whose
       // control point is the corner itself — that's tangent to both legs, so the join is smooth at
@@ -728,11 +743,10 @@ export function ScrollScrubVideo({
       }
       line.setAttribute("d", d);
 
-      // `vector-effect: non-scaling-stroke` makes the browser resolve the *whole* stroke — dash
-      // pattern included — in screen space, but getTotalLength() reports viewBox user units. Scale
-      // the dash to px or the pattern no longer covers the path: under-long once the stage scales
-      // past 1:1 (big screens), which renders the connector as a floating fragment.
-      const dash = line.getTotalLength() * kx;
+      // No conversion: user space is px (see the viewBox above), so this is already the on-screen
+      // length. It must be *exactly* the path's length — one dash covering the whole path, never
+      // a repeating pattern — or the reveal grows a hole in the middle.
+      const dash = line.getTotalLength();
       lineLen.current[i] = dash;
       line.style.strokeDasharray = String(dash);
       line.style.strokeDashoffset = String(dash);
@@ -943,7 +957,10 @@ export function ScrollScrubVideo({
               className="pointer-events-none absolute left-1/2 top-[calc(50%+var(--ssv-head,0px)/2+var(--ssv-nudge,0px))] hidden -translate-x-1/2 -translate-y-1/2 lg:block"
               style={{ width: stageWidth, aspectRatio: stageAspect }}
             >
-              <svg viewBox={stageViewBox} preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">
+              {/* No `viewBox` here: `syncCallouts` sets it to the stage's px box so the leader
+                  geometry is authored and measured in one unit. Until it does, the paths have no
+                  `d` and sit at opacity 0, so there is nothing to mis-scale. */}
+              <svg ref={svgRef} preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">
                 <defs>
                   <linearGradient id={lineGradId} x1="0" y1="0" x2="1" y2="1">
                     {t.lineStops.map((s) => (
@@ -965,7 +982,14 @@ export function ScrollScrubVideo({
                     strokeWidth={1.5}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    vectorEffect="non-scaling-stroke"
+                    // ⚠️ Deliberately NOT `vector-effect: non-scaling-stroke`. It looks free here
+                    // — the user space is already CSS px (see the viewBox in `syncCallouts`), so
+                    // strokeWidth 1.5 is 1.5 px either way — but it resolves the *whole* stroke,
+                    // dash pattern included, against the full CTM, and that includes the device
+                    // pixel ratio. The dash then lands in device px while `getTotalLength()` and
+                    // the geometry are in CSS px, so on a 2× display the pattern is half the
+                    // path's length, repeats, and the reveal paints stroke → gap → a fragment
+                    // stranded at the tip. Invisible on a 1× monitor, obvious on a laptop.
                     style={{ opacity: 0 }}
                   />
                 ))}

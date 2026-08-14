@@ -29,7 +29,16 @@ export const BUSINESS = {
    * GST line at all, so this drives the template rather than decorating it.
    */
   gstRegistered: process.env.BUSINESS_GST_REGISTERED !== "false",
-  supportEmail: process.env.CONTACT_TO_EMAIL || "support@finevuaustralia.com.au",
+  /**
+   * A SINGLE address, for display and for Reply-To headers.
+   *
+   * CONTACT_TO_EMAIL may hold a comma-separated list (see app/api/contact/route.ts), so
+   * the first entry is taken rather than the raw value — a comma-joined string rendered
+   * into email copy reads as a mistake, and passing one as Reply-To is not reliably
+   * parsed. Delivery to the full list is the route's job, not this constant's.
+   */
+  supportEmail:
+    process.env.CONTACT_TO_EMAIL?.split(",")[0]?.trim() || "support@finevuaustralia.com.au",
   supportPhone: "1800 818 288",
   website: "finevuaustralia.com.au",
 } as const;

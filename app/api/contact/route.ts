@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { BUSINESS } from "@/lib/data/business";
+import { sendAutoReply } from "@/lib/email/formAutoReply";
 
 // Server-side handler for website form submissions. Sends via Resend using the
 // secret RESEND_API_KEY (never exposed to the browser). Recipient and sender are
@@ -298,6 +300,32 @@ export async function POST(req: Request) {
         { status: 502 },
       );
     }
+
+    // Acknowledge to the submitter — but only now, after support actually has the
+    // message. Sending it first would risk telling someone we received a submission we
+    // then failed to deliver.
+    //
+    // A failure here is logged and swallowed: the support copy is what makes a submission
+    // real, so a courtesy email that didn't send must never turn a successful submit into
+    // an error the customer sees. Same trade as the Stripe webhook's confirmation email.
+    //
+    // Reaching this line means the honeypot, Turnstile and the rate limit have all passed,
+    // which is what stops this being an open relay to any address a caller names.
+    if (isEmail(payload.replyTo)) {
+      const ack = await sendAutoReply({
+        to: payload.replyTo.trim(),
+        replyTo: BUSINESS.supportEmail,
+        subject,
+        rows,
+      });
+      if (!ack.ok) {
+        console.error("[contact] submission delivered but the auto-reply failed", {
+          subject,
+          error: ack.error,
+        });
+      }
+    }
+
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json(

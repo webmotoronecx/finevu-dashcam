@@ -139,27 +139,48 @@ async function isRateLimited(ip: string): Promise<boolean> {
 
 // Cloudflare Turnstile (FB-07) — the durable fix for the bypassable honeypot.
 //
-// When TURNSTILE_SECRET_KEY is UNSET, verification is skipped entirely so local dev
-// and any environment without the key keeps working. That means a production deploy
-// missing this variable silently loses CAPTCHA protection — confirm it is set in
-// Vercel, alongside NEXT_PUBLIC_TURNSTILE_SITE_KEY for the widget.
+// FAILS CLOSED IN PRODUCTION when TURNSTILE_SECRET_KEY is missing (FA-34). It used to
+// return true and wave the submission through, which is the right call for local dev and
+// the wrong one everywhere else: there was no error, no log line and no UI difference, so
+// the launch security gate could be signed off on a deploy that had no CAPTCHA at all.
+// "The forms still work" was not evidence it was on.
+//
+// The skip now depends on the ENVIRONMENT rather than on whether someone remembered the
+// variable, which is the same shape as the availability fix in FA-35: a fallback that is
+// genuinely useful in dev must never be reachable by forgetting something in production.
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY;
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
-// Fails CLOSED: a network error reaching Cloudflare rejects the submission rather than
-// waving it through. A Cloudflare outage therefore blocks the forms, which is the
-// deliberate trade — the alternative is an attacker-visible way to skip the check.
-async function verifyTurnstile(token: string | undefined, ip: string): Promise<boolean> {
-  if (!TURNSTILE_SECRET) return true;
-  if (!token || typeof token !== "string") return false;
+/** Distinguishes "the visitor failed the check" from "this deploy cannot run the check". */
+type TurnstileResult = "ok" | "failed" | "misconfigured";
+
+// Fails CLOSED on a network error too: reaching Cloudflare and not getting an answer
+// rejects the submission rather than waving it through. A Cloudflare outage therefore
+// blocks the forms, which is the deliberate trade — the alternative is an
+// attacker-visible way to skip the check.
+async function verifyTurnstile(token: string | undefined, ip: string): Promise<TurnstileResult> {
+  if (!TURNSTILE_SECRET) {
+    // Local dev and preview environments without the key stay walkable.
+    if (process.env.NODE_ENV !== "production") return "ok";
+    // Production. Loud, because this is a silent security hole otherwise, and the caller
+    // tells the customer to phone instead of asking them to retry a check that cannot
+    // render — NEXT_PUBLIC_TURNSTILE_SITE_KEY is almost certainly missing too, since the
+    // two are set together.
+    console.error(
+      "[contact] TURNSTILE_SECRET_KEY is not set in production — refusing every submission. " +
+      "Set it and NEXT_PUBLIC_TURNSTILE_SITE_KEY together, then redeploy (the public key is inlined at build time).",
+    );
+    return "misconfigured";
+  }
+  if (!token || typeof token !== "string") return "failed";
   try {
     const body = new URLSearchParams({ secret: TURNSTILE_SECRET, response: token });
     if (ip && ip !== "unknown") body.set("remoteip", ip);
     const res = await fetch(TURNSTILE_VERIFY_URL, { method: "POST", body });
     const data = (await res.json()) as { success?: boolean };
-    return data.success === true;
+    return data.success === true ? "ok" : "failed";
   } catch {
-    return false;
+    return "failed";
   }
 }
 
@@ -232,7 +253,17 @@ export async function POST(req: Request) {
   // Honeypot — silently accept and discard.
   if (payload.botcheck) return NextResponse.json({ ok: true });
 
-  if (!(await verifyTurnstile(payload.turnstileToken, ip))) {
+  const turnstile = await verifyTurnstile(payload.turnstileToken, ip);
+  if (turnstile === "misconfigured") {
+    // 503, not 403: the visitor did nothing wrong and there is no check for them to
+    // complete. Telling them to "try the check again" would be a dead end, so the message
+    // routes them to a channel that works while someone fixes the deploy.
+    return NextResponse.json(
+      { ok: false, error: "We can't accept form submissions right now. Please call 1800 818 288 or email support@finevuaustralia.com.au." },
+      { status: 503 },
+    );
+  }
+  if (turnstile === "failed") {
     return NextResponse.json(
       { ok: false, error: "Verification failed. Please complete the check and try again." },
       { status: 403 },

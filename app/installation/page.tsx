@@ -144,6 +144,33 @@ function useAvailability(): AvailabilityState {
 }
 
 /**
+ * The current local date, refreshed when the clock crosses midnight.
+ *
+ * useCalendarGrid computes `today` inside a useMemo keyed on availability, and availability
+ * is fetched exactly once at mount — so a tab left open overnight kept YESTERDAY's
+ * enabled/disabled split and went on offering a date that had already passed (FA-30).
+ * Returning a date KEY rather than a Date keeps it a stable memo dependency: a new Date
+ * object every render would defeat the memo entirely.
+ */
+function useTodayKey(): string {
+  const [key, setKey] = useState(() => dateKey(new Date()));
+  useEffect(() => {
+    let timer = 0;
+    const schedule = () => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      // +1s of margin so the timer cannot fire a hair before midnight and re-read the
+      // same date, which would leave the grid stale until the next day.
+      timer = window.setTimeout(() => { setKey(dateKey(new Date())); schedule(); }, midnight.getTime() - now.getTime() + 1000);
+    };
+    schedule();
+    return () => window.clearTimeout(timer);
+  }, []);
+  return key;
+}
+
+/**
  * Builds the month-grid of day buttons. Always starts on the Monday of the current week
  * so the layout is stable, and runs far enough to cover the furthest bookable day.
  *
@@ -156,9 +183,9 @@ function useAvailability(): AvailabilityState {
  * "unconfigured" outside production (FA-35). Previously the server's own answer decided,
  * so a production deploy with the GHL keys missing silently sold invented time slots.
  */
-function useCalendarGrid(byDate: Record<string, string[]>, fallback: boolean) {
+function useCalendarGrid(byDate: Record<string, string[]>, fallback: boolean, todayKey: string) {
   return useMemo(() => {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const today = new Date(`${todayKey}T00:00:00`);
     const start = new Date(today);
     start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
 
@@ -180,7 +207,7 @@ function useCalendarGrid(byDate: Record<string, string[]>, fallback: boolean) {
       days.push({ date: d, key, day: d.getDate(), month: MONTHS[d.getMonth()], disabled: !available });
     }
     return days;
-  }, [byDate, fallback]);
+  }, [byDate, fallback, todayKey]);
 }
 
 const INPUT = "w-full rounded-[8px] border border-[#e8e7e2] bg-white px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors focus:border-[var(--finevu-orange)]";
@@ -243,7 +270,15 @@ function BookingWizard() {
   const avail = useAvailability();
   // Local dev only — see useCalendarGrid. Production always has the keys.
   const fallbackAvailability = avail.status === "unconfigured";
-  const days = useCalendarGrid(avail.byDate, fallbackAvailability);
+  const todayKey = useTodayKey();
+  const days = useCalendarGrid(avail.byDate, fallbackAvailability, todayKey);
+  // The furthest date GHL is currently offering. The grid is already sized to reach it,
+  // so this is the true end of the bookable range, not a page boundary (FA-30).
+  const lastBookable = useMemo(() => {
+    const keys = Object.keys(avail.byDate).sort();
+    const last = keys[keys.length - 1];
+    return last ? new Date(`${last}T00:00:00`).toLocaleDateString("en-AU", { day: "numeric", month: "long" }) : "";
+  }, [avail.byDate]);
   const selectedKey = date ? dateKey(date) : "";
   // form.slot holds the ISO start time (what a booking will be created from); slotLabel
   // holds what the customer sees. In fallback mode there are no ISO times, so the label
@@ -498,6 +533,18 @@ function BookingWizard() {
                 </div>
               )}
               {invalid.date && <p className={ERR}>Select a date.</p>}
+              {/* FA-30. Deliberately NOT month navigation. The grid is sized to the furthest
+                  day GHL is offering, so a "next month" arrow could only ever page into
+                  empty space — it would look like more availability and deliver none.
+                  Naming the end of the window, and the way to book past it, is the honest
+                  version of the same affordance. */}
+              {avail.status === "ready" && lastBookable && (
+                <p className="mt-3 text-[13px] leading-[1.6] text-[#6e6e73]">
+                  Showing every date our installers are free, through {lastBookable}. Need a
+                  later booking? Call{" "}
+                  <a href="tel:1800818288" className="font-semibold text-[var(--finevu-orange)]">1800 818 288</a>.
+                </p>
+              )}
               {avail.status === "loading" && (
                 <p className="mt-3 text-[14px] text-[#6e6e73]">Loading available dates…</p>
               )}
@@ -677,11 +724,11 @@ function BookingWizard() {
 
       {/* We Accept — payment logos */}
       <div className="mt-14 flex justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {/* FA-36: PayPal, Shop Pay and UnionPay were removed from the artwork and this alt
             text. None of them were accepted — Shop Pay is a Shopify product and not a Stripe
             payment method at all. What ships now matches payment_method_types in
             lib/stripe.ts exactly; change one and you must change the other. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/installation/we-accept.svg" alt="We accept American Express, Mastercard, Visa and Apple Pay" width={301} height={48} className="h-12 w-auto" />
       </div>
     </div>

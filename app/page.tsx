@@ -120,7 +120,7 @@ function Hero({
 const reasons = [
   { img: '/home/No.1_Banner.webp', label: 'No. 1 Dash Cam in Korea' },
   { img: '/home/3YearWarranty_Tile.webp', label: '3-Year Warranty', sup: '1' },
-  { img: '/home/reason-microsd.webp', label: 'Includes 64GB & 128GB MicroSD Card', sup: '2' },
+  { img: '/home/reason-microsd.webp', label: 'Includes 64GB & 128GB microSD Cards', sup: '2' },
   { img: '/home/reason-hardwire.webp', label: 'Includes Hardwire Kit & Power Cable', sup: '3' },
 ];
 
@@ -140,7 +140,7 @@ function ReasonCard({ img, label, sup, aspect }: { img: string; label: string; s
 const reviews = [
   {
     thumb: '/products/gx4k-studio.webp', product: 'FineVu GX4K', tagline: 'Very user friendly',
-    body: "I was surprised by the quality of the video, super good in day and especially better in night! The camera doesn't overheat, and the mobile app is very user friendly, easy to change the settings and download the files I require.",
+    body: "I was surprised by the quality of the video, super good in day and especially better in night! The camera doesn’t overheat, and the mobile app is very user friendly, easy to change the settings and download the files I require.",
   },
   {
     thumb: '/products/gx35-studio.webp', product: 'FineVu GX35', tagline: 'Crispy clear image',
@@ -177,7 +177,7 @@ export default function Page() {
 
         eyebrow="FineVu GX4K · 2-Channel UHD"
         title="GX4K"
-        sub="The clearest view of the road you've ever recorded — front and rear."
+        sub="The clearest view of the road you’ve ever recorded — front and rear."
         href="/gx4k"
       />
 
@@ -212,10 +212,10 @@ export default function Page() {
         </div>
       </section>
 
-      {/* We'll come to you */}
+      {/* We’ll come to you */}
       <section className="bg-[#f7f7f7] pb-16 md:pb-24" data-nav-theme="light">
         <div className="max-w-[1705px] mx-auto px-6 text-center">
-          <motion.h2 className={HEAD} {...fadeUp}>We&apos;ll come to you</motion.h2>
+          <motion.h2 className={HEAD} {...fadeUp}>We’ll come to you</motion.h2>
           <motion.p className={`${SUB} max-w-[660px] mx-auto mt-4`} {...fadeUp}>
             Book a FineVu mobile installer to fit your dash cam at home or work, fully hardwired, fully tested, fully covered.
           </motion.p>
@@ -230,7 +230,7 @@ export default function Page() {
           <motion.div className="mt-10 overflow-hidden rounded-[24px]" {...fadeUp}>
             <ImageWithFallback
               src="/home/hero-book.webp"
-              alt="A FineVu mobile installer at a customer's home"
+              alt="A FineVu mobile installer at a customer’s home"
               className="w-full h-auto object-cover aspect-[2688/1000] object-middle"
            
             />
@@ -244,7 +244,7 @@ export default function Page() {
           <motion.div className="text-center max-w-[760px] mx-auto mb-10 md:mb-14" {...fadeUp}>
             <h2 className={HEAD}>Discover how other users<br className="hidden sm:block" /> feel about our dash cams.</h2>
             <p className={`${SUB} mt-5`}>
-              Built by FINEDIGITAL, an automotive-IT specialist since 1992, held to a standard the numbers prove.
+              FineVu is built by FINEDIGITAL, an automotive-IT specialist since 1992, and held to a standard the numbers prove.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6">

@@ -68,7 +68,7 @@ const opticsCallouts = [
     key: "front",
     title: "Front",
     sub: "QHD wide",
-    items: ["SONY STARVIS 2 IMX675", "5.12 MP sensor", "2560 × 1440 (2K QHD)", "147° field of view"],
+    items: ["SONY STARVIS 2 IMX675", "5.12MP sensor", "2560 × 1440 (2K QHD)", "147° field of view"],
   },
   {
     key: "core",
@@ -80,7 +80,7 @@ const opticsCallouts = [
     key: "rear",
     title: "Rear",
     sub: "Full-HD wide",
-    items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "23 g compact module"],
+    items: ["2MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "23 g compact module"],
   },
 ];
 
@@ -168,7 +168,7 @@ const cConnected: Card[] = [
 const cBuilt: Card[] = [
   {
     title: "Built In-House",
-    body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That's reliability you can count on.",
+    body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That’s reliability you can count on.",
     img: "/gx35/built-in-house.webp",
   },
   {
@@ -179,7 +179,7 @@ const cBuilt: Card[] = [
 
   {
     title: "Battery Protection Integrated",
-    body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
+    body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle’s profile in the FineVu app with a single tap.",
     note: "* FineVu recommends changing the low-voltage settings to “Hybrid” when using the ISG system.",
     img: "/gx35/built-battery.webp",
   },
@@ -196,7 +196,7 @@ const storageFormat = [
 const disappearTabs = [
   {
     title: "Screen-Free by Design",
-    body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it's recording, keeping your attention where it belongs, on the road.",
+    body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it’s recording, keeping your attention where it belongs, on the road.",
     image: "/gx35/disappear-screen.webp", 
   },
   {
@@ -206,7 +206,7 @@ const disappearTabs = [
   },
   {
     title: "One Cable, Clean Install",
-    body: "A single 6-metre cable links the rear camera and powers it at the same time, so there's no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
+    body: "A single 6-metre cable links the rear camera and powers it at the same time, so there’s no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
     image: "/gx35/disappear-one.webp", 
   },
   {
@@ -223,7 +223,7 @@ const disappearTabs = [
 const mDualVision: MediaSectionData = {
   title: "Dual vision. Zero compromise.",
   description:
-    "GX35 is equipped with the SONY STARVIS 2 IMX675, a 5.12MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX675 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer colour, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.",
+    "GX35 is equipped with the SONY STARVIS 2 IMX675, a 5.12MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX675 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer colour and cleaner footage in low-light and night-time driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise and reduced motion blur.",
 
   image: "/gx35/dual-vision.webp",
   mobileImage: "/gx35/dual-vision-mobile.webp",
@@ -383,8 +383,8 @@ const memoryAllocationTabs = [
 ];
 
 const specRows: [string, string][] = [
-  ["Front camera", "SONY STARVIS 2 IMX675 · 5.12 MP · 2560 × 1440 (Quad HD) · 147.4° FOV"],
-  ["Rear camera", "2 MP CMOS · 1920 × 1080 (Full HD) · 143.2° FOV"],
+  ["Front camera", "SONY STARVIS 2 IMX675 · 5.12MP · 2560 × 1440 (Quad HD) · 147.4° FOV"],
+  ["Rear camera", "2MP CMOS · 1920 × 1080 (Full HD) · 143.2° FOV"],
   ["Processor", "Dual-core"],
   ["Night vision", "HDR + Auto Night Vision with AI light-environment adjustment"],
   ["Recording modes", "Continuous · Impact · Emergency · Parking (motion + impact) · Smart Time-Lapse"],
@@ -401,7 +401,7 @@ const specRows: [string, string][] = [
 const boxItems = [
   "Front Camera",
   "Rear Camera",
-  "MicroSD Card & Adapter",
+  "microSD Card & Adapter",
   "Power Cable",
 "Hardwire Kit",
   "User Manual"
@@ -412,7 +412,7 @@ const compareRows: [string, string, string][] = [
   ["Front Resolution", "4K UHD 3840 × 2160", "2K QHD 2560 × 1440"],
   ["Rear Resolution", "Full HD 1920 × 1080", "Full HD 1920 × 1080"],
   ["Max Video", "4K 30fps", "2K 30fps"],
-  ["Field of View", "136°F · 143°R", "147°F · 143°R"],
+  ["Field of View", "136° front · 143° rear", "147° front · 143° rear"],
   ["GPS", "Built-in", "External antenna (included)"],
   ["Parking Standby", "+2,325 hrs", "+13,950 hrs"],
   ["Processor", "Allwinner V536", "Allwinner V536"],
@@ -429,7 +429,7 @@ export default function GX35Page() {
   return (
     <main className="overflow-x-clip bg-[#F5F5F7]">
       {/* Hero: scroll-pinned video. `fadeTo` is white so the pinned stage lands on the
-          light page background instead of GX4K's near-black. */}
+          light page background instead of GX4K’s near-black. */}
     
       <ScrollHero
         // Re-encoded from hero.mp4 at the same 1920×1080 — the master ran ~12.7 Mbps, which is
@@ -449,7 +449,7 @@ export default function GX35Page() {
         <motion.div {...fadeUp} className={`${SHELL} mb-12 text-center md:mb-16`}>
           <Head theme="light" pre="Every detail. " grad="In Sharp QHD." className="!text-[30px] md:!text-[46px]" />
           <p className="mx-auto mt-5 max-w-[560px] text-[18px] leading-[1.6] text-[#6E6E73]">
-            2K QHD at 30fps across two channels — licence plates, road signs, and low-light
+            2K QHD at 30fps across two channels — licence plates, road signs and low-light
             intersections rendered with uncompromised clarity.
           </p>
         </motion.div>
@@ -590,7 +590,7 @@ export default function GX35Page() {
             theme="light"
             variant="displayText"
             title="Format Free 2.0"
-            caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive."
+            caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card’s lifespan and keeping recording reliable, drive after drive."
             className="lg:col-span-5 lg:row-span-2 aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
           />
         </div>
@@ -695,7 +695,7 @@ export default function GX35Page() {
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-            <BentoCard theme="light" variant="overlayLabel" img="/gx35/microsd.webp" title="Includes 64GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+            <BentoCard theme="light" variant="overlayLabel" img="/gx35/microsd.webp" title="Includes 64GB microSD Card" sup="2" className="aspect-[640/400]" />
             <BentoCard theme="light" variant="overlayLabel" img="/gx35/cables.webp" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
           </div>
         </div>
@@ -751,7 +751,7 @@ export default function GX35Page() {
         </div>
       </section>
 
-      {/* What's in the Box */}
+      {/* What’s in the Box */}
       <section data-nav-theme="light" className=" py-16 md:py-24">
         <div className={`${SHELL} text-center`}>
           <motion.div {...fadeUp}>
@@ -866,7 +866,7 @@ export default function GX35Page() {
       {/* Warranty disclaimer — copy lives in siteConfig.disclaimers */}
       <LegalDisclaimers theme="light" />
 
-      {/* CTA + footer band (shared component matches the frame's closing) */}
+      {/* CTA + footer band (shared component matches the frame’s closing) */}
       <Footer />
     </main>
   );

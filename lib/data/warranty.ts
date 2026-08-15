@@ -106,7 +106,7 @@ export const warrantySections: PolicySection[] = [
         rows: [
           ["FineVu main dash camera unit", "3 years or 36 months"],
           ["FineVu rear camera supplied as part of a dash camera system", "3 years or 36 months"],
-          ["Genuine FineVu MicroSD card", "6 months"],
+          ["Genuine FineVu microSD card", "6 months"],
           ["Genuine FineVu hardwire kit", "6 months"],
           ["Genuine FineVu power cable", "6 months"],
           ["Genuine FineVu external GPS accessory", "6 months"],
@@ -274,11 +274,11 @@ export const warrantySections: PolicySection[] = [
   },
   {
     n: 9,
-    title: "MicroSD cards and recorded data",
+    title: "microSD cards and recorded data",
     blocks: [
       {
         type: "p",
-        text: "MicroSD cards are storage media that can deteriorate through repeated recording, overwriting, heat and ordinary use.",
+        text: "microSD cards are storage media that can deteriorate through repeated recording, overwriting, heat and ordinary use.",
       },
       { type: "p", text: "You should:" },
       {

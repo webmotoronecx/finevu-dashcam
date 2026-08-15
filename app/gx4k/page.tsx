@@ -40,7 +40,7 @@ const HERO_BEATS: HeroBeat[] = [
         end: 0.42,
         kicker: "FineVu GX4K · 2-Channel UHD",
         headline: "4K Begins Here.",
-        sub: "The clearest view of the road you've ever recorded — front and rear.",
+        sub: "The clearest view of the road you’ve ever recorded — front and rear.",
     },
     {
         start: 0.55,
@@ -139,12 +139,12 @@ const cBuilt: Card[] = [
     },
     {
         title: "Built In-House",
-        body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That's reliability you can count on.",
+        body: "FineVu builds in-house, not in generic factories, with quality control tight enough to keep defects below 0.2%. That’s reliability you can count on.",
         img: "/gx4k/built-in-house.webp",
     },
     {
         title: "Battery Protection Integrated",
-        body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle's profile in the FineVu app with a single tap.",
+        body: "Low-voltage cut-off powers the camera down before your car battery runs flat. Set your vehicle’s profile in the FineVu app with a single tap.",
         note: "* FineVu recommends changing the low-voltage settings to “Hybrid” when using the ISG system.",
         img: "/gx4k/built-battery.webp",
     },
@@ -153,7 +153,7 @@ const cBuilt: Card[] = [
 const cStorage: Card[] = [
     {
         title: "Format Free 2.0",
-        body: "Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive.",
+        body: "Format Free 2.0 ends manual card reformatting for good, extending your memory card’s lifespan and keeping recording reliable, drive after drive.",
     },
     {
         title: "Memory Allocation",
@@ -183,7 +183,7 @@ const cConnected: Card[] = [
 /* Full-bleed MediaSection dividers (title + description over image/color). */
 const mDualVision: MediaSectionData = {
     title: `Dual Vision`,
-    description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer colour, and cleaner footage in low-light and nighttime driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise, and reduced motion blur.`,
+    description: `GX4K is equipped with the SONY STARVIS IMX515, an 8.5MP flagship image sensor up front, paired with a 2MP CMOS sensor at the rear. The IMX515 delivers superior light sensitivity and a wider dynamic range than conventional sensors, capturing sharper detail, richer colour and cleaner footage in low-light and night-time driving conditions. Together, the dual-sensor setup ensures every journey is recorded front and back with exceptional clarity, less noise and reduced motion blur.`,
     image: "/gx4k/graphic-dual-vision.webp",
     // All-keyframe build (see CLAUDE.md) — required for smooth seeking.
     video: "/gx4k/dual-sensors_scrub.mp4",
@@ -301,7 +301,7 @@ const mDiscreet: MediaSectionData = {
 const disappearTabs = [
     {
         title: "Screen-Free by Design",
-        body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it's recording, keeping your attention where it belongs, on the road.",
+        body: "No LCD, no glare, no distraction. Just subtle status lights that let you know it’s recording, keeping your attention where it belongs, on the road.",
         image: "/gx4k/disappear-screen.webp",
     },
     {
@@ -311,7 +311,7 @@ const disappearTabs = [
     },
     {
         title: "One Cable, Clean Install",
-        body: "A single 6-metre cable links the rear camera and powers it at the same time, so there's no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
+        body: "A single 6-metre cable links the rear camera and powers it at the same time, so there’s no second power run and no messy wiring. A 9-metre cable is available for larger vehicles.",
         image: "/gx4k/disappear-one.webp",
     },
     {
@@ -323,34 +323,34 @@ const disappearTabs = [
 
 const detailGallery = [
     { src: "/gx4k/rich-lens.webp", alt: "GX4K lens macro", ratio: "746/562" },
-    { src: "/gx4k/rich-logo.webp", alt: "FineVu machined body", ratio: "527/562" },
-    { src: "/gx4k/rich-mic.webp", alt: "GX4K lens macro", ratio: " 527/562" },
-    { src: "/gx4k/rich-front.webp", alt: "FineVu machined body", ratio: "746/562" },
+    { src: "/gx4k/rich-logo.webp", alt: "FineVu logo on the machined body", ratio: "527/562" },
+    { src: "/gx4k/rich-mic.webp", alt: "GX4K microphone and button detail", ratio: "527/562" },
+    { src: "/gx4k/rich-front.webp", alt: "GX4K front unit and lens housing", ratio: "746/562" },
 ];
 
 const specRows: [string, string][] = [
-    ["Front camera", "SONY STARVIS IMX515 · 8.5 MP · 3840 × 2160 (4K UHD) · 136° FOV"],
-    ["Rear camera", "2 MP CMOS · 1920 × 1080 (Full HD) · 143° FOV · 18 g module"],
+    ["Front camera", "SONY STARVIS IMX515 · 8.5MP · 3840 × 2160 (4K UHD) · 136° FOV"],
+    ["Rear camera", "2MP CMOS · 1920 × 1080 (Full HD) · 143° FOV · 18 g module"],
     ["Processor", "Dual-core"],
     ["Night vision", "HDR auto night vision (AI-controlled)"],
     ["Recording modes", "Continuous · Impact · Emergency · Parking (motion + impact) · Time-lapse"],
     ["Parking mode", "Power Saving Parking — up to 98% less power, +2,325 standby hours"],
-    ["Driver assistance", "ADAS Plus — FVMA (front vehicle motion alert) · LDWS (lane departure)"],
-    ["Connectivity", "Built-in dual-band Wi-Fi (2.4 / 5 GHz) · Built-in GPS"],
+    ["Driver assistance", "ADAS Plus — FVMA (Front Vehicle Motion Alert) · LDWS (Lane Departure Warning)"],
+    ["Connectivity", "Built-in dual-band Wi-Fi (2.4/5GHz) · Built-in GPS"],
     ["Storage", "microSD up to 256 GB · Format Free 2.0 · Memory allocation"],
     ["Protection", "Low-voltage cut-off · G-sensor · AI heat monitoring"],
     ["Safety database", "Speed camera alerts, updated quarterly"],
 ];
 
 // Order follows docs/content-sources/gx4k.txt == IN THE BOX ==.
-const boxItems = ["Front Camera", "Rear Camera", "MicroSD Card & Adapter", "Power Cable", "Hardwire Kit", "User Manual"];
+const boxItems = ["Front Camera", "Rear Camera", "microSD Card & Adapter", "Power Cable", "Hardwire Kit", "User Manual"];
 
 const compareRows: [string, string, string][] = [
     ["Front Sensor", "Sony STARVIS IMX515 8.5MP", "Sony STARVIS 2 IMX675 5.12MP"],
     ["Front Resolution", "4K UHD 3840 × 2160", "2K QHD 2560 × 1440"],
     ["Rear Resolution", "Full HD 1920 × 1080", "Full HD 1920 × 1080"],
     ["Max Video", "4K 30fps", "2K 30fps"],
-    ["Field of View", "136°F · 143°R", "147°F · 143°R"],
+    ["Field of View", "136° front · 143° rear", "147° front · 143° rear"],
     ["GPS", "Built-in", "External antenna (included)"],
     ["Parking Standby", "+2,325 hrs", "+13,950 hrs"],
     ["Processor", "Allwinner V536", "Allwinner V536"],
@@ -477,7 +477,7 @@ export default function GX4KPage() {
                 <motion.div {...fadeUp} className={`${SHELL} mb-12 text-center md:mb-16`}>
                     <Head pre="Every detail. " grad="Captured in Ultra HD." className="!text-[30px] md:!text-[46px]" />
                     <p className={`mx-auto mt-5 max-w-[560px] ${BODY} text-center`}>
-                        4K UHD at 30fps across two channels — licence plates, road signs, and low-light intersections rendered with uncompromised clarity.
+                        4K UHD at 30fps across two channels — licence plates, road signs and low-light intersections rendered with uncompromised clarity.
                     </p>
                 </motion.div>
 
@@ -518,7 +518,7 @@ export default function GX4KPage() {
                         key: "front",
                         title: "Front",
                         sub: "UHD wide",
-                        items: ["SONY STARVIS IMX515", "8.5 MP sensor", "3840 × 2160 (4K UHD)", "136° field of view"],
+                        items: ["SONY STARVIS IMX515", "8.5MP sensor", "3840 × 2160 (4K UHD)", "136° field of view"],
                         start: 0.2,
                         end: 0.3,
                         // `at` is the front lens itself; the leader runs up-left off it to the block.
@@ -543,7 +543,7 @@ export default function GX4KPage() {
                         key: "rear",
                         title: "Rear",
                         sub: "Full-HD wide",
-                        items: ["2 MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "18 g compact module"],
+                        items: ["2MP CMOS sensor", "1920 × 1080 (Full HD)", "143° field of view", "18 g compact module"],
                         start: 0.4,
                         end: 0.6,
                         at: [1280, 744],
@@ -585,7 +585,7 @@ export default function GX4KPage() {
                         theme="dark"
                         variant="displayText"
                         title="Format Free 2.0"
-                        caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card's lifespan and keeping recording reliable, drive after drive."
+                        caption="Format Free 2.0 ends manual card reformatting for good, extending your memory card’s lifespan and keeping recording reliable, drive after drive."
                         className="lg:col-span-5  lg:row-span-2  aspect-[16/10] lg:aspect-auto lg:min-h-[520px]"
                     />
                     {/* <BentoCard theme="dark" img="/gx4k/bento-storage-dash.png" className="lg:col-span-12 aspect-[16/7]" /> */}
@@ -622,7 +622,7 @@ export default function GX4KPage() {
           
             {/* Slides up over the still-pinned "Discreet by Design" frame while its
                 `exitFade` dissolves underneath. `start` is on the same 0–1 pin scale as
-                that section's `exitFade.start`/`end` (0.42 → 0.8), so a value between
+                that section’s `exitFade.start`/`end` (0.42 → 0.8), so a value between
                 them means the band covers mid-dissolve. Tune it right here. */}
             <CoverTransition
                 pinHeightVh={PIN_VH}
@@ -695,7 +695,7 @@ export default function GX4KPage() {
                             />
                         </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-                            <BentoCard variant="overlayLabel" img="/gx4k/microsd.webp" title="Includes 128GB MicroSD Card" sup="2" className="aspect-[640/400]" />
+                            <BentoCard variant="overlayLabel" img="/gx4k/microsd.webp" title="Includes 128GB microSD Card" sup="2" className="aspect-[640/400]" />
                             <BentoCard variant="overlayLabel" img="/gx4k/cables.webp" title="Includes Hardwire Kit & Power Cable" sup="3" className="aspect-[640/400]" />
                         </div>
                     </div>
@@ -750,7 +750,7 @@ export default function GX4KPage() {
                     </div>
                 </section>
 
-                {/* What's in the box */}
+                {/* What’s in the box */}
                 <section data-nav-theme="dark" className="py-16 md:py-24">
                     <div className={`${SHELL} text-center`}>
                         <motion.div {...fadeUp}>

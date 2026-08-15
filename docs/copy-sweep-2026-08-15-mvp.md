@@ -164,12 +164,25 @@ No `CP` rows opened for these.
 
 | Status | Rows |
 |---|---|
-| `Pending` | 14 |
+| `Applied` | 13 — applied on request the same day |
+| `Pending` | 1 (CP-56 — blocked on a question, see below) |
 | `Needs approval` | 1 (CP-50 — quoted material) |
+
+**Applied 2026-08-15.** Verified afterwards by re-measuring: **0** straight apostrophes
+remain in prose across the ten files, **0** `MicroSD`, **0** spaced `MP`, **0** serial
+commas, **0** `nighttime`, **0** `°F ·`. Build clean; lint totals unchanged from before the
+edits (40 pre-existing problems, none in touched files).
+
+**CP-56 was NOT applied**, despite being listed `Pending`. Our own copy already matches the
+source — both product pages say "Speed Camera Alert". Every `Speed Cam` instance sits inside
+the firmware update steps, which read as a transcription of FineVu's own procedure, and
+rewriting a quoted manufacturer procedure is not a copy-sweep decision. It stays open on one
+question: **are those steps verbatim?** If yes, close as no-change; if they are ours, change
+the five instances.
 
 **Referred out:** 7, of which the `site.config.ts:223` STARVIS claim is the one to act on
 first.
 
 CSV verified: 10 columns, 56 rows, no malformed lines.
 
-**Nothing applied.** All eight MVP pages have now had a full copy sweep.
+**13 of 15 applied.** All eight MVP pages have now had a full copy sweep.

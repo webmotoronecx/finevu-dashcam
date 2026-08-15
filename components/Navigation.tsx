@@ -320,7 +320,7 @@ export function Navigation() {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         {/* Product pages move the main row with one transform — no second sticky element.
-            `relative` anchors the sub-nav, which hangs off the row's bottom edge, so the
+            `relative` anchors the sub-nav, which hangs off the row’s bottom edge, so the
             same -mainRowHeight that hides the row docks the sub-nav flush at top: 0. */}
         <motion.div
           className={subNav ? "relative" : undefined}
@@ -427,7 +427,7 @@ export function Navigation() {
               wide mode it sits inline as the last item in the full-width row.
               Product pages carry the same CTA in <ProductSubNav>, so the main row drops it
               rather than showing two identical orange pills once the sub-nav docks. The
-              sub-nav's copy is desktop-only, so the mobile menu below keeps its button. */}
+              sub-nav’s copy is desktop-only, so the mobile menu below keeps its button. */}
           {!subNav && (
             <Link
               href={primaryCta.href}
@@ -449,7 +449,7 @@ export function Navigation() {
         {/* Product-page sub-nav — the row that stays behind once the main row swipes up.
             Absolute so it can be hidden independently of the main row: it belongs to the
             page below the hero, so scrolling back to the top returns the main row alone.
-            Its position needs no animating — the main row's transform carries it. */}
+            Its position needs no animating — the main row’s transform carries it. */}
         {subNav && (
           <motion.div
             className="absolute inset-x-0 top-full"

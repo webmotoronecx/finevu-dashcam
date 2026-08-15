@@ -39,7 +39,7 @@ export const speedCamSteps: string[] = [
 ];
 
 export const firmwareWarning =
-    "Do not power off your dash cam until it begins continuous recording, as it may cause permanent damage to the dash cam.";
+    "Do not power off your dash cam until it begins continuous recording — doing so may cause permanent damage.";
 
 /** One downloadable file.
  *

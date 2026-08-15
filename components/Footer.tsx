@@ -78,8 +78,8 @@ export function Footer({ cta = true }: { cta?: boolean } = {}) {
                 <Logo variant="dark" className="h-8" />
                 <p className="text-zinc-400 leading-relaxed text-sm max-w-xs">
                   {/* STARVIS is the FRONT sensor only — the rear is a 2MP CMOS on both
-                      models. Don't reintroduce "front and rear ... STARVIS image
-                      sensors"; it claims a sensor the rear channel doesn't have. CA-61. */}
+                      models. Don’t reintroduce "front and rear ... STARVIS image
+                      sensors"; it claims a sensor the rear channel doesn’t have. CA-61. */}
                   Premium 4K &amp; 2K dash cams with SONY STARVIS front sensors, front and
                   rear recording. {contact.origin}, trusted by drivers worldwide.
                 </p>

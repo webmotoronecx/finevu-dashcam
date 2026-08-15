@@ -26,7 +26,7 @@ const channels = [
     title: "Phone Support",
     desc: "Speak directly with our team",
     big: "1800 818 288",
-    small: "Mon–Sun, 8:00 AM – 8:00 PM AEST",
+    small: "Mon–Sun, 8:00 AM–8:00 PM AEST",
     cta: "Call Now",
     href: "tel:1800818288",
   },

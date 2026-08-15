@@ -298,7 +298,7 @@ const baseConfig: SiteConfig = {
     {
       title: "SD Cards",
       body:
-        "GX35 includes a FineVu 64GB MicroSD Card and Adapter. GX4K includes a FineVu 128GB MicroSD Card and Adapter. Included MicroSD Cards and adapters are covered by a 6-month warranty.",
+        "GX35 includes a FineVu 64GB microSD Card and Adapter. GX4K includes a FineVu 128GB microSD Card and Adapter. Included microSD Cards and adapters are covered by a 6-month warranty.",
     },
     {
       // Confirmed 2026-07-27: docs/content-sources/{gx4k,gx35}.txt both list a Hardwire Kit

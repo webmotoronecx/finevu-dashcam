@@ -37,12 +37,12 @@ const whatWeBuild = [
   {
     icon: Clock,
     title: "Protection around the clock",
-    body: "Power Saving Parking Mode keeps watch over your car long after the engine's off, without draining the battery.",
+    body: "Power Saving Parking Mode keeps watch over your car long after the engine’s off, without draining the battery.",
   },
   {
     icon: CircleCheckBig,
-    title: "Quality that's tested, not assumed",
-    body: "Built in FineVu's own factories with strict in-house quality control, not assembled by a third party chasing volume over reliability.",
+    title: "Quality that’s tested, not assumed",
+    body: "Built in FineVu’s own factories with strict in-house quality control, not assembled by a third party chasing volume over reliability.",
   },
 ];
 
@@ -142,7 +142,7 @@ export default function Page() {
         subtitle={
           <>
             Since 1992, FineVu has been designing dash cams that hold up when it matters. Today,
-            we&apos;re bringing that same reliability to drivers right across Australia.
+            we’re bringing that same reliability to drivers right across Australia.
           </>
         }
       />
@@ -155,8 +155,8 @@ export default function Page() {
             alt="A FineVu engineer inspecting a dash cam over design drawings"
             heading="Over 30 years of automotive electronics, built in-house."
             paras={[
-              "FineVu is the dash cam brand of Fine Digital Inc., a South Korean electronics company that's been designing car technology since 1992, long before dash cams were mainstream.",
-              "That history matters. It's why FineVu builds its cameras in its own factories rather than outsourcing to generic manufacturers, keeping defect rates below 0.2% and making FineVu the No. 1 selling dash cam brand in Korea.",
+              "FineVu is the dash cam brand of Fine Digital Inc., a South Korean electronics company that’s been designing car technology since 1992, long before dash cams were mainstream.",
+              "That history matters. It’s why FineVu builds its cameras in its own factories rather than outsourcing to generic manufacturers, keeping defect rates below 0.2% and making FineVu the No. 1 selling dash cam brand in Korea.",
             ]}
           />
         </div>

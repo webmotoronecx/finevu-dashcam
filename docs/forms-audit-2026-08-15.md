@@ -178,6 +178,43 @@ region for errors), FA-21 (no focus management on validation failure).
 
 ---
 
+## FA-34 — Turnstile vanished silently when misconfigured
+
+`verifyTurnstile()` returned `true` the moment `TURNSTILE_SECRET_KEY` was absent. Correct
+for local dev, wrong everywhere else: with neither key set the CAPTCHA **did not exist**,
+all four forms still submitted successfully, and there was no error, no log line and no UI
+difference to say so. The launch security gate could be signed off on a deploy that had no
+CAPTCHA at all, because *"the forms still work"* looked like evidence it was on.
+
+It now returns **`ok` / `failed` / `misconfigured`** rather than a boolean, so *"the visitor
+failed the check"* and *"this deploy cannot run the check"* stop being the same answer. With
+the secret missing the skip depends on `NODE_ENV`; production refuses every submission and
+logs loudly, naming both variables and the redeploy requirement —
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY` is inlined at build time, so a saved env var alone does
+nothing.
+
+**That case answers 503, not 403.** The visitor did nothing wrong and there is no widget for
+them to complete, since the site key is almost certainly missing too. Telling them to retry
+a check that cannot render is a dead end, so the message routes them to the phone and the
+support address while someone fixes the deploy.
+
+Same shape as FA-35 above: **a fallback that is useful in dev must depend on the
+environment, never on whether someone remembered a variable in production.**
+
+### Verified against a production build
+
+| Condition | Result |
+|---|---|
+| Secret unset, production | **503** + `[contact] TURNSTILE_SECRET_KEY is not set in production…` |
+| Secret set, no token | **403** "Verification failed" |
+| Honeypot filled | **200** fake success — still evaluated *before* Turnstile, so no mail sent |
+
+`.env.example` documented the fail-open behaviour as a standing warning, which is now the
+opposite of what ships; that block and the GHL one (still describing the FA-35 fallback)
+were both rewritten.
+
+---
+
 ## FA-02 / FA-37 — the warranty form was throwing evidence away
 
 `/warranty-claim` sent its evidence files as `evidence.map((f) => f.name).join(", ")` — **a
@@ -269,6 +306,21 @@ public endpoint that creates a real record and opens a payable session. It is no
 because verification would reject **every run of `e2e-booking.mjs`**, which cannot solve a
 challenge without a browser. Adopting it needs a decision on using Cloudflare's test keys
 (`1x0000000000000000000000000000000AA` always passes) for test runs. Recorded on FA-06.
+
+---
+
+## Backend tracker impact (FB-nn)
+
+`FA` and `FB` overlap by design — FA says a form is broken, FB says what would fix it — and
+only **FB-01** has a narrative of its own (`docs/fb-01-booking-payment-flow.md`). The other
+FB rows changed today are recorded here so the overlap stays navigable.
+
+| FB row | Changed by | Now |
+|---|---|---|
+| **FB-01** | FA-32, FA-26, FA-36 | Down to two live-money blockers: the placeholder `BUSINESS_ABN`, and the FA-26 privacy confirmation. The refund path is fixed and verified; `charge.refunded` must be subscribed on the production endpoint. Its own narrative was updated in the same pass — the FA-32 failure is struck through rather than deleted, so the mode stays legible |
+| **FB-05** | **FA-02** | The *upload* half is done — evidence is genuinely attached, not listed by name. What remains is persistence: the claim still exists only as an email, with no storage, no claim id and no link to the FB-04 registration. `lib/r2.ts` still has no upload path |
+| **FB-07** | **FA-34**, FA-06 | The Turnstile fail-open caveat it carried as a standing warning is resolved. Its remaining ask is now stated as what it is — a **decision** about using Cloudflare test keys so `e2e-booking.mjs` can still run — not an amount of work |
+| **FB-08** | CA-87 | Reframed from "nobody can open the mailbox" to **"the mailbox cannot exist"** — the apex domain has no MX record. See `docs/content-accuracy-audit-2026-08-15.md` |
 
 ---
 

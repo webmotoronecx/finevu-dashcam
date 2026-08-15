@@ -33,11 +33,19 @@ identifier** — `justify-center` and `bg-color` are correct as written.
 | **dash cam** | Two words, lowercase in prose. `dashcam` is wrong in copy |
 | **FineVu**, **GX4K**, **GX35** | Exact casing, always |
 | **Wi-Fi** | Hyphen, both caps |
+| **microSD** | Lowercase `m`, caps `SD`. Repo majority (17 v 11) — the sources are internally inconsistent, so they do not settle it (CP-43) |
+| **Speed Camera Alert** | The source form. Do not shorten to "Speed Cam" in our own copy (CP-56) |
+| **Lane Departure Warning (LDWS)** | The source form, expansion included |
 | Initialisms | Caps: AI, GPS, HDR, LED, ADAS, UHD, QHD, GB, TB, PDF, API, URL, DIY, 2CH |
 
-## Storage units — unspaced
+## Spec tokens unspaced, measurements spaced
 
-`128GB`, `64GB`. Repo majority is 17 unspaced against 4 spaced.
+**Unspaced** — `128GB`, `64GB`, `8.5MP`, `5GHz`, `30fps`. These read as product-spec tokens.
+
+**Spaced** — `96.5 mm`, `123 g`, `12.0V`. These are measurements and follow SI convention.
+
+The distinction is why `96.5 mm wide` and `8.5MP` are both correct on the same page. Repo
+majority backs both: GB 17 unspaced v 4 spaced, MP 19 v 8, GHz 5 v 1 (CP-44, CP-45).
 
 > ⚠️ **Unsettled:** the 4 spaced instances are all `256 GB`, on pages outside the
 > `/installation` sweep. They contradict this rule and should be settled in a `full all`
@@ -61,8 +69,14 @@ receipt reads as imprecise.
 ## Punctuation
 
 - **Apostrophes: curly (`’`).** Not `'`, and not the `&apos;` entity — write the character.
-  Settled 2026-08-15 (CP-37): `/installation` rendered curly and straight side by side, the
-  postcode checker answering in one style and the FAQ beneath it in the other.
+  Settled 2026-08-15 (CP-37) from the `/installation` page.
+
+  > ⚠️ **Held under protest by the numbers.** The MVP-wide sweep (CP-42) measured **31
+  > straight against 16 curly** in prose, so this rule stands against the site majority. It
+  > is kept because it is typographically correct and because the files least likely to be
+  > casually edited — `lib/data/warranty.ts`, `lib/data/installation-terms.ts` and
+  > `/support` — are already uniformly curly, while the straight instances cluster in the
+  > marketing pages. Reversing it is defensible; leaving it undecided is not.
 - **Serial comma: omit.** "hardwiring, configuration and testing", not "…, and testing".
 - **Em dash (—)** for a parenthetical break, **en dash (–)** for ranges (`60–90 minutes`),
   hyphen for compounds.
@@ -70,6 +84,13 @@ receipt reads as imprecise.
 - **Compound adjectives hyphenate before a noun** and not after: "built-in GPS", "24-hour
   response", "front-and-rear install", "off-street access", "4-digit postcode" — but "the
   GPS is built in".
+
+## Section headings — the full stop is deliberate
+
+The product pages end section headings with a full stop as a voice device — "Perfectly
+Compact.", "In Sharp QHD.", "Discreet by Design.", "More reasons to choose FineVu." Other
+pages do not. **This is not an inconsistency to normalise**; imposing a global rule would
+flatten an intentional register. Match whatever the page already does.
 
 ## Headings, labels and buttons
 

@@ -103,7 +103,7 @@ These are `CA-nn` territory. **No `CP` rows were opened for them.**
 
 | Location | Issue | Route to |
 |---|---|---|
-| `:83` FAQ | *"just reply to your confirmation email or call us"* — **`finevuaustralia.com.au` has no MX record**, so a reply hard-bounces. The page instructs customers to do something that cannot work | `/content-accuracy` — overlaps **CA-70** and the uncommitted `thank-you.ts` / `formAutoReply.ts` work, which fixed exactly this wording elsewhere and left this instance behind |
+| `:83` FAQ | *"just reply to your confirmation email or call us"* — **`finevuaustralia.com.au` has no MX record**, so a reply hard-bounces. The page instructs customers to do something that cannot work | **FIXED 2026-08-15 as CA-87** — now points at 1800 818 288, consistent with `installation-terms.ts` §"Customer cancellations and rescheduling", which defers to "the details in your confirmation". Chasing it down established that the domain cannot receive mail AT ALL — see FB-08 |
 | `:81`, `:691`, `:692` | *"tax receipt"* — the system sends a **tax invoice**. Under AU GST rules these are different documents, and `installation-terms.ts` promises the invoice | `/content-accuracy` — new |
 | `:55` | *"your slot is confirmed instantly"* vs Terms §4 | Already **CA-35** (narrowed 2026-08-15) |
 | `:452` | *"a simple DIY setup with the included power cable"* | Already **CA-01 / CA-02** |

@@ -80,7 +80,7 @@ const FAQS = [
   { q: "Is it safe for my vehicle’s electronics?", a: "Yes. Our installers use non-invasive fuse-tap connections matched to your vehicle — factory wiring is never cut or spliced. Cabling is routed behind existing trim, and everything is tested before handover, so your car’s electronics and manufacturer warranty stay protected." },
   { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you’ve chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $250 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
   { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we’re expanding. If we can’t reach you right now, we’ll let you know promptly and help you find a suitable local option. Installation is not currently available in the Northern Territory." },
-  { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we’ll move it to a time that suits. There’s no fee to reschedule with notice." },
+  { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just call us on 1800 818 288 at least 24 hours before your appointment and we’ll move it to a time that suits. There’s no fee to reschedule with notice." },
 ];
 
 const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#C77700]", err: "text-[#D93816]", "": "text-[#6e6e73]" };

@@ -678,7 +678,11 @@ function BookingWizard() {
       {/* We Accept — payment logos */}
       <div className="mt-14 flex justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/installation/we-accept.svg" alt="We accept American Express, Mastercard, Visa, Apple Pay, PayPal, Shop Pay and UnionPay" width={432} height={48} className="h-12 w-auto" />
+        {/* FA-36: PayPal, Shop Pay and UnionPay were removed from the artwork and this alt
+            text. None of them were accepted — Shop Pay is a Shopify product and not a Stripe
+            payment method at all. What ships now matches payment_method_types in
+            lib/stripe.ts exactly; change one and you must change the other. */}
+        <img src="/installation/we-accept.svg" alt="We accept American Express, Mastercard, Visa and Apple Pay" width={301} height={48} className="h-12 w-auto" />
       </div>
     </div>
   );

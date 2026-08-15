@@ -92,6 +92,19 @@ export async function createBookingSession(meta: BookingMetadata): Promise<Booki
     // anywhere on success — we handle completion in-page via onComplete.
     redirect_on_completion: "never",
     expires_at: expiresAt,
+    // PINNED, so the "We Accept" strip on /installation and the actual checkout cannot
+    // drift apart (FA-36). Without this Stripe offers whatever the dashboard happens to
+    // have enabled, which no code here asserts — on 2026-08-15 that was bancontact, blik,
+    // eps, klarna, link, mb_way, pix, satispay and zip, i.e. a Belgian, Polish, Austrian,
+    // Portuguese and Brazilian set on an Australian mobile-installation booking.
+    //
+    // "card" also carries Apple Pay and Google Pay: they are wallet presentations of a
+    // card, not separate entries here, which is why the artwork can promise Apple Pay.
+    //
+    // Klarna, Zip and Link were deliberately EXCLUDED rather than overlooked — offering
+    // BNPL on a $250 service is a business decision, not a default to inherit. To add any
+    // method, update public/installation/we-accept.svg and its alt text in the same commit.
+    payment_method_types: ["card"],
     customer_email: meta.email,
     // Surfaces in the Stripe dashboard so support can tie a payment to a booking.
     client_reference_id: meta.appointmentId,

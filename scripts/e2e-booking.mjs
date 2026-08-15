@@ -228,6 +228,12 @@ async function run() {
   check("title carries the hold tag", String(heldAppt.title ?? "").includes(`[hold ${sessionId}]`), heldAppt.title ?? "");
   check("the slot is no longer offered", !(await slotIsFree(slot)));
 
+  // FA-36. The "We Accept" strip on /installation is a promise, and without a pin Stripe
+  // offers whatever the dashboard has enabled — which is invisible from the codebase and
+  // drifts silently. Asserted against the REAL session, not the request we sent.
+  const stripeSession = (await stripeApi(`/checkout/sessions/${sessionId}`)).data;
+  eq("checkout offers exactly the methods the artwork promises", JSON.stringify(stripeSession?.payment_method_types), JSON.stringify(["card"]));
+
   // 3 — retry reuses
   console.log("\nRetry safety");
   const retry = await post("/api/booking/create", payload(slot), "10.1.0.2");

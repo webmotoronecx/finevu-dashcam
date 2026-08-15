@@ -73,6 +73,7 @@ function UploadZone({
   files,
   onSelect,
   invalid,
+  describedBy,
   hint,
   ariaLabel,
 }: {
@@ -81,6 +82,8 @@ function UploadZone({
   files: File[];
   onSelect: (files: File[]) => void;
   invalid?: boolean;
+  /** Ids of the message(s) describing this control — the error, when one is showing. */
+  describedBy?: string;
   hint: string;
   ariaLabel: string;
 }) {
@@ -95,6 +98,14 @@ function UploadZone({
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}
+      // The red border alone conveyed the failure — colour-only, and invisible to a screen
+      // reader. aria-describedby carries the message instead.
+      //
+      // NOT aria-invalid: this is a role="button" drop target, and aria-invalid is not
+      // supported on button (eslint jsx-a11y/role-supports-aria-props flags it). There is
+      // no form control here to mark — the real <input type="file"> is hidden — so the
+      // description is the whole of what can be announced.
+      aria-describedby={describedBy}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -268,26 +279,26 @@ function ClaimForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={LABEL} htmlFor="first-name">First name</label>
-          <input id="first-name" className={INPUT} autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
-          {invalid.firstName && <p className={ERR}>Enter your first name.</p>}
+          <input id="first-name" aria-invalid={invalid.firstName || undefined} aria-describedby={invalid.firstName ? "first-name-err" : undefined} className={INPUT} autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
+          {invalid.firstName && <p id="first-name-err" className={ERR}>Enter your first name.</p>}
         </div>
         <div>
           <label className={LABEL} htmlFor="last-name">Last name</label>
-          <input id="last-name" className={INPUT} autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
-          {invalid.lastName && <p className={ERR}>Enter your last name.</p>}
+          <input id="last-name" aria-invalid={invalid.lastName || undefined} aria-describedby={invalid.lastName ? "last-name-err" : undefined} className={INPUT} autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
+          {invalid.lastName && <p id="last-name-err" className={ERR}>Enter your last name.</p>}
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
           <label className={LABEL} htmlFor="email">Email</label>
-          <input id="email" type="email" className={INPUT} autoComplete="email" placeholder="you@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
-          {invalid.email && <p className={ERR}>Enter a valid email address.</p>}
+          <input id="email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "email-err" : undefined} type="email" className={INPUT} autoComplete="email" placeholder="you@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
+          {invalid.email && <p id="email-err" className={ERR}>Enter a valid email address.</p>}
         </div>
         <div>
           <label className={LABEL} htmlFor="phone">Phone</label>
-          <input id="phone" type="tel" className={INPUT} autoComplete="tel" placeholder="04XX XXX XXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
-          {invalid.phone && <p className={ERR}>Enter a phone number so we can reach you about your claim.</p>}
+          <input id="phone" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "phone-err" : undefined} type="tel" className={INPUT} autoComplete="tel" placeholder="04XX XXX XXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          {invalid.phone && <p id="phone-err" className={ERR}>Enter a phone number so we can reach you about your claim.</p>}
         </div>
       </div>
 
@@ -296,30 +307,30 @@ function ClaimForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={LABEL} htmlFor="model">Dash cam model</label>
-          <select id="model" className={`${INPUT} ${SELECT_ARROW}`} value={form.model} onChange={(e) => set("model", e.target.value)}>
+          <select id="model" aria-invalid={invalid.model || undefined} aria-describedby={invalid.model ? "model-err" : undefined} className={`${INPUT} ${SELECT_ARROW}`} value={form.model} onChange={(e) => set("model", e.target.value)}>
             <option value="" disabled>Select your model</option>
             {models.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
-          {invalid.model && <p className={ERR}>Select your model.</p>}
+          {invalid.model && <p id="model-err" className={ERR}>Select your model.</p>}
         </div>
         <div>
           <label className={LABEL} htmlFor="purchase-date">Purchase date</label>
-          <input id="purchase-date" type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
-          {invalid.purchaseDate && <p className={ERR}>Enter your purchase date.</p>}
+          <input id="purchase-date" aria-invalid={invalid.purchaseDate || undefined} aria-describedby={invalid.purchaseDate ? "purchase-date-err" : undefined} type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
+          {invalid.purchaseDate && <p id="purchase-date-err" className={ERR}>Enter your purchase date.</p>}
         </div>
       </div>
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="serial">Serial number</label>
-        <input id="serial" className={INPUT} placeholder="e.g. FV4K-XXXXXXXX" value={form.serial} onChange={(e) => set("serial", e.target.value)} />
-        <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a8a92]">Printed on the sticker on the back of your camera, and on the side of the box.</p>
-        {invalid.serial && <p className={ERR}>Enter your serial number.</p>}
+        <input id="serial" aria-invalid={invalid.serial || undefined} aria-describedby={invalid.serial ? "serial-hint serial-err" : "serial-hint"} className={INPUT} placeholder="e.g. FV4K-XXXXXXXX" value={form.serial} onChange={(e) => set("serial", e.target.value)} />
+        <p id="serial-hint" className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a8a92]">Printed on the sticker on the back of your camera, and on the side of the box.</p>
+        {invalid.serial && <p id="serial-err" className={ERR}>Enter your serial number.</p>}
       </div>
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="retailer">Where did you buy it?</label>
-        <input id="retailer" className={INPUT} placeholder="Retailer or store name" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
-        {invalid.retailer && <p className={ERR}>Enter the retailer name.</p>}
+        <input id="retailer" aria-invalid={invalid.retailer || undefined} aria-describedby={invalid.retailer ? "retailer-err" : undefined} className={INPUT} placeholder="Retailer or store name" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
+        {invalid.retailer && <p id="retailer-err" className={ERR}>Enter the retailer name.</p>}
       </div>
 
       <div className="mt-4">
@@ -329,35 +340,37 @@ function ClaimForm() {
           files={receipt ? [receipt] : []}
           onSelect={chooseReceipt}
           invalid={invalid.receipt}
+          // Both messages render under the same id — only one is ever shown at a time.
+          describedBy={receiptError || invalid.receipt ? "receipt-err" : undefined}
           hint="Receipt or order confirmation — JPG, PNG, HEIC or PDF, up to 3 MB"
           ariaLabel="Upload your receipt"
         />
-        {receiptError && <p className={ERR}>{receiptError}</p>}
-        {invalid.receipt && !receiptError && <p className={ERR}>Upload your receipt — we need it to verify your warranty.</p>}
+        {receiptError && <p id="receipt-err" className={ERR}>{receiptError}</p>}
+        {invalid.receipt && !receiptError && <p id="receipt-err" className={ERR}>Upload your receipt — we need it to verify your warranty.</p>}
       </div>
 
       <p className={`${SECTION_LABEL} mb-3.5 mt-7 border-t border-dashed border-[#dddde2] pt-6`}>The problem</p>
 
       <div>
         <label className={LABEL} htmlFor="issue-type">What&apos;s the issue?</label>
-        <select id="issue-type" className={`${INPUT} ${SELECT_ARROW}`} value={form.issueType} onChange={(e) => set("issueType", e.target.value)}>
+        <select id="issue-type" aria-invalid={invalid.issueType || undefined} aria-describedby={invalid.issueType ? "issue-type-err" : undefined} className={`${INPUT} ${SELECT_ARROW}`} value={form.issueType} onChange={(e) => set("issueType", e.target.value)}>
           <option value="" disabled>Select the closest match</option>
           {issueTypes.map((i) => <option key={i.value} value={i.value}>{i.label}</option>)}
         </select>
-        {invalid.issueType && <p className={ERR}>Select the type of issue.</p>}
+        {invalid.issueType && <p id="issue-type-err" className={ERR}>Select the type of issue.</p>}
       </div>
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="description">Describe what&apos;s happening</label>
         <textarea
-          id="description"
+          id="description" aria-invalid={invalid.description || undefined} aria-describedby={invalid.description ? "description-err" : undefined}
           rows={5}
           className={`${INPUT} resize-y leading-[1.55]`}
           placeholder="What happens, when it started, and anything you've already tried — the more detail, the faster we can help."
           value={form.description}
           onChange={(e) => set("description", e.target.value)}
         />
-        {invalid.description && <p className={ERR}>Describe the issue so our technicians can assess it.</p>}
+        {invalid.description && <p id="description-err" className={ERR}>Describe the issue so our technicians can assess it.</p>}
       </div>
 
       <div className="mt-4">

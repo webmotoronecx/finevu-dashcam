@@ -177,20 +177,20 @@ function RegisterForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={LABEL} htmlFor="first-name">First name</label>
-          <input id="first-name" className={INPUT} autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
-          {invalid.firstName && <p className={ERR}>Enter your first name.</p>}
+          <input id="first-name" aria-invalid={invalid.firstName || undefined} aria-describedby={invalid.firstName ? "first-name-err" : undefined} className={INPUT} autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
+          {invalid.firstName && <p id="first-name-err" className={ERR}>Enter your first name.</p>}
         </div>
         <div>
           <label className={LABEL} htmlFor="last-name">Last name</label>
-          <input id="last-name" className={INPUT} autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
-          {invalid.lastName && <p className={ERR}>Enter your last name.</p>}
+          <input id="last-name" aria-invalid={invalid.lastName || undefined} aria-describedby={invalid.lastName ? "last-name-err" : undefined} className={INPUT} autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
+          {invalid.lastName && <p id="last-name-err" className={ERR}>Enter your last name.</p>}
         </div>
       </div>
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="email">Email</label>
-        <input id="email" type="email" className={INPUT} autoComplete="email" placeholder="you@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
-        {invalid.email && <p className={ERR}>Enter a valid email address.</p>}
+        <input id="email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "email-err" : undefined} type="email" className={INPUT} autoComplete="email" placeholder="you@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
+        {invalid.email && <p id="email-err" className={ERR}>Enter a valid email address.</p>}
       </div>
 
       <div className="mt-4">
@@ -201,30 +201,30 @@ function RegisterForm() {
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
           <label className={LABEL} htmlFor="model">Dash cam model</label>
-          <select id="model" className={`${INPUT} appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%2355555C%22%20stroke-width=%222.5%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpolyline%20points=%226%209%2012%2015%2018%209%22/%3E%3C/svg%3E')] bg-[right_14px_center] bg-no-repeat pr-9`} value={form.model} onChange={(e) => set("model", e.target.value)}>
+          <select id="model" aria-invalid={invalid.model || undefined} aria-describedby={invalid.model ? "model-err" : undefined} className={`${INPUT} appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%2355555C%22%20stroke-width=%222.5%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpolyline%20points=%226%209%2012%2015%2018%209%22/%3E%3C/svg%3E')] bg-[right_14px_center] bg-no-repeat pr-9`} value={form.model} onChange={(e) => set("model", e.target.value)}>
             <option value="" disabled>Select your model</option>
             {models.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
-          {invalid.model && <p className={ERR}>Select your model.</p>}
+          {invalid.model && <p id="model-err" className={ERR}>Select your model.</p>}
         </div>
         <div>
           <label className={LABEL} htmlFor="purchase-date">Purchase date</label>
-          <input id="purchase-date" type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
-          {invalid.purchaseDate && <p className={ERR}>Enter your purchase date.</p>}
+          <input id="purchase-date" aria-invalid={invalid.purchaseDate || undefined} aria-describedby={invalid.purchaseDate ? "purchase-date-err" : undefined} type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
+          {invalid.purchaseDate && <p id="purchase-date-err" className={ERR}>Enter your purchase date.</p>}
         </div>
       </div>
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="serial">Serial number</label>
-        <input id="serial" className={INPUT} placeholder="e.g. FV4K-XXXXXXXX" value={form.serial} onChange={(e) => set("serial", e.target.value)} />
-        <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a8a92]">Printed on the sticker on the back of your camera, and on the side of the box.</p>
-        {invalid.serial && <p className={ERR}>Enter your serial number.</p>}
+        <input id="serial" aria-invalid={invalid.serial || undefined} aria-describedby={invalid.serial ? "serial-hint serial-err" : "serial-hint"} className={INPUT} placeholder="e.g. FV4K-XXXXXXXX" value={form.serial} onChange={(e) => set("serial", e.target.value)} />
+        <p id="serial-hint" className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a8a92]">Printed on the sticker on the back of your camera, and on the side of the box.</p>
+        {invalid.serial && <p id="serial-err" className={ERR}>Enter your serial number.</p>}
       </div>
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="retailer">Where did you buy it?</label>
-        <input id="retailer" className={INPUT} placeholder="Retailer or store name" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
-        {invalid.retailer && <p className={ERR}>Enter the retailer name.</p>}
+        <input id="retailer" aria-invalid={invalid.retailer || undefined} aria-describedby={invalid.retailer ? "retailer-err" : undefined} className={INPUT} placeholder="Retailer or store name" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
+        {invalid.retailer && <p id="retailer-err" className={ERR}>Enter the retailer name.</p>}
       </div>
 
       <div className="mt-4">

@@ -28,7 +28,7 @@ the wrong page. They belong to a `full all` run.
 ## House-style decisions taken this pass
 
 No `docs/house-style.md` exists. These were derived from the repo majority and are the
-calls this sweep applied. **Recommend promoting them to `docs/house-style.md`** so the next
+calls this sweep applied. **Promoted to `docs/house-style.md` on 2026-08-15**, so the next
 sweep inherits them instead of re-deriving.
 
 | Axis | Decision | Evidence |
@@ -129,9 +129,18 @@ These are `CA-nn` territory. **No `CP` rows were opened for them.**
 
 | Status | Rows |
 |---|---|
-| `Pending` | 4 |
-| `Needs approval` | 1 (CP-39 — consent copy) |
-| `Applied` | 0 |
+| `Applied` | 4 — CP-37, CP-38, CP-40, CP-41, applied on request the same day |
+| `Needs approval` | 1 (CP-39 — consent copy, left alone) |
+
+**Applied 2026-08-15.** CP-37 converted the FAQS block and the four `&apos;` entities to
+curly (comments untouched). CP-38 dropped the serial comma. CP-41 contracted "we are".
+**CP-40 was applied as a rule, not as edits** — no currency string changed, because usage
+was already correct by context; what was missing was the written convention.
+
+All four decisions, plus the locale / product-term / unit / heading / voice calls derived
+this pass, are now recorded in **`docs/house-style.md`**, which did not previously exist.
+`/copy-sweep` reads that file first, so the next sweep inherits them instead of
+re-deriving. Build and lint clean after the edits.
 
 **Referred out:** 6 (2 new, 4 already tracked).
 

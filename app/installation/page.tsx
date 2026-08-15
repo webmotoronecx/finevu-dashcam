@@ -66,21 +66,21 @@ const INCLUDED = [
 ];
 
 const WHY = [
-  { icon: ShieldCheck, title: "Your vehicle, protected", body: "A professional hardwire uses a fused tap at the correct amperage. No risk of electrical faults, melted connectors, or void warranties from a botched DIY job." },
+  { icon: ShieldCheck, title: "Your vehicle, protected", body: "A professional hardwire uses a fused tap at the correct amperage. No risk of electrical faults, melted connectors or void warranties from a botched DIY job." },
   { icon: Clock, title: "Parking mode, done properly", body: "Parking mode only works reliably with a hardwire. Our installers configure the voltage cut-off for your specific vehicle to protect your battery." },
   { icon: Sparkles, title: "A finish that matches the camera", body: "The GX4K is a premium piece of hardware. It deserves a premium install — cables fully hidden, no dangling wires, no tape, nothing visible." },
 ];
 
 const FAQS = [
-  { q: "Do I need to buy my dash cam before booking?", a: "Yes. FineVu dash cams are sold through our authorised retailers rather than directly from FineVu, so installation is booked separately. Once your camera has arrived — or is on its way — you can book your fitting here. Just make sure it's with the vehicle on the day." },
+  { q: "Do I need to buy my dash cam before booking?", a: "Yes. FineVu dash cams are sold through our authorised retailers rather than directly from FineVu, so installation is booked separately. Once your camera has arrived — or is on its way — you can book your fitting here. Just make sure it’s with the vehicle on the day." },
   { q: "Which models are supported?", a: "Our installer network fits the FineVu GX4K and GX35. Both are front-and-rear (2CH) systems, and both are covered by the same $250 flat installation rate." },
   { q: "How long does the installation take?", a: "Most installations take 60–90 minutes — that covers the front and rear cameras, hardwiring, configuration and testing. Some vehicles with complex trim can take a little longer. Your installer will give you an accurate estimate when they confirm your booking." },
   { q: "Where does the installation take place?", a: "Our installers are fully mobile and come to your home or workplace. All they need is level, off-street access to your vehicle — a driveway, garage, carport or accessible car park — and the vehicle available for the duration of the appointment." },
-  { q: "Why is hardwire the standard install?", a: "Hardwiring connects your FineVu to the vehicle's fuse box using the hardwire kit already included in your box, so the camera can keep recording while the ignition is off. It unlocks parking mode and FineVu's battery protection system, which powers the camera down before your car's battery runs low — and it's the part that genuinely benefits from professional hands. If you only want recording while driving, the included power cable is a simple plug-in DIY setup, so there's no need to book an install for that." },
-  { q: "Is it safe for my vehicle's electronics?", a: "Yes. Our installers use non-invasive fuse-tap connections matched to your vehicle — factory wiring is never cut or spliced. Cabling is routed behind existing trim, and everything is tested before handover, so your car's electronics and manufacturer warranty stay protected." },
-  { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $250 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
-  { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we're expanding. If we can't reach you right now, we'll let you know promptly and help you find a suitable local option. Installation is not currently available in the Northern Territory." },
-  { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we'll move it to a time that suits. There's no fee to reschedule with notice." },
+  { q: "Why is hardwire the standard install?", a: "Hardwiring connects your FineVu to the vehicle’s fuse box using the hardwire kit already included in your box, so the camera can keep recording while the ignition is off. It unlocks parking mode and FineVu’s battery protection system, which powers the camera down before your car’s battery runs low — and it’s the part that genuinely benefits from professional hands. If you only want recording while driving, the included power cable is a simple plug-in DIY setup, so there’s no need to book an install for that." },
+  { q: "Is it safe for my vehicle’s electronics?", a: "Yes. Our installers use non-invasive fuse-tap connections matched to your vehicle — factory wiring is never cut or spliced. Cabling is routed behind existing trim, and everything is tested before handover, so your car’s electronics and manufacturer warranty stay protected." },
+  { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you’ve chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $250 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
+  { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we’re expanding. If we can’t reach you right now, we’ll let you know promptly and help you find a suitable local option. Installation is not currently available in the Northern Territory." },
+  { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we’ll move it to a time that suits. There’s no fee to reschedule with notice." },
 ];
 
 const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#C77700]", err: "text-[#D93816]", "": "text-[#6e6e73]" };
@@ -447,9 +447,9 @@ function BookingWizard() {
                   </button>
                 ))}
               </div>
-              {invalid.model && <p className={ERR}>Select the FineVu model we are fitting.</p>}
+              {invalid.model && <p className={ERR}>Select the FineVu model we’re fitting.</p>}
               <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-5 py-4 text-[.85rem] leading-[1.6] text-[#6e6e73]">
-                <b className="text-[#1d1d1f]">Every booking is a full professional hardwire installation — $250 flat.</b> Front and rear cameras fitted, wired to the fuse box for parking mode and battery protection, configured and tested. Prefer plug-in power for driving-only recording? That&apos;s a simple DIY setup with the included power cable — no booking needed.
+                <b className="text-[#1d1d1f]">Every booking is a full professional hardwire installation — $250 flat.</b> Front and rear cameras fitted, wired to the fuse box for parking mode and battery protection, configured and tested. Prefer plug-in power for driving-only recording? That’s a simple DIY setup with the included power cable — no booking needed.
               </div>
             </div>
           )}
@@ -508,8 +508,8 @@ function BookingWizard() {
               <span className={FLABEL} id="wiz-date-label">Date</span>
               {avail.status === "error" ? (
                 <p className="text-[15px] leading-[1.6] text-[#D93816]">
-                  We couldn&apos;t load available installation dates just now. Please try again in a moment, or call{" "}
-                  <a href="tel:1800818288" className="font-semibold underline">1800 818 288</a> and we&apos;ll book you in.
+                  We couldn’t load available installation dates just now. Please try again in a moment, or call{" "}
+                  <a href="tel:1800818288" className="font-semibold underline">1800 818 288</a> and we’ll book you in.
                 </p>
               ) : (
                 <div className="grid grid-cols-7 gap-1.5 sm:gap-2" role="group" aria-labelledby="wiz-date-label" aria-busy={avail.status === "loading"}>
@@ -573,7 +573,7 @@ function BookingWizard() {
           {step === 4 && (
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Your details</h3>
-              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Almost done. We&apos;ll use these details to confirm your booking and for your installer to reach you on the day.</p>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Almost done. We’ll use these details to confirm your booking and for your installer to reach you on the day.</p>
               {/* Every control carries a real <label htmlFor> (FA-16). A placeholder is not
                   a label: it is unreadable to a screen reader as a name, and it vanishes the
                   moment the customer types, so anyone checking their own answers on the last

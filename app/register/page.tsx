@@ -117,12 +117,18 @@ function RegisterForm() {
 
     setStatus("sending");
     setError("");
+    // A read failure ABORTS rather than submitting with attachment = undefined (FA-37).
+    // The old path still sent `receipt: <filename>` in the fields, so support received a
+    // registration naming a receipt that was not attached while the customer saw a success
+    // screen — the same end state FA-03 was raised to fix, by a different route.
     let attachment: { filename: string; contentBase64: string } | undefined;
     if (file) {
       try {
         attachment = { filename: file.name, contentBase64: await readFileAsBase64(file) };
       } catch {
-        attachment = undefined;
+        setStatus("idle");
+        setError("We couldn’t read that file — it may have been moved or renamed. Please re-select it and try again.");
+        return;
       }
     }
     const res = await submitForm(

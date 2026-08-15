@@ -33,11 +33,19 @@ type Payload = {
   botcheck?: string;
   turnstileToken?: string;
   fields?: Record<string, unknown>;
+  /** Legacy single-attachment slot. /register still sends this shape. */
   attachment?: { filename?: string; contentBase64?: string };
+  /** Multiple attachments (FA-02) — /warranty-claim sends the receipt plus its evidence. */
+  attachments?: { filename?: string; contentBase64?: string }[];
 };
 
 // Guard against Vercel's ~4.5 MB request-body limit (base64 inflates ~1/3).
 const MAX_ATTACHMENT_BASE64 = 4 * 1024 * 1024;
+// Caps on the WHOLE email, not just one file (FA-02). Per-file limits alone would let a
+// warranty claim carry a receipt plus five 3 MB photos and blow past what Resend accepts,
+// which fails the send outright — and on this form the send IS the record.
+const MAX_ATTACHMENT_COUNT = 6;
+const MAX_TOTAL_ATTACHMENT_BASE64 = 12 * 1024 * 1024;
 
 // Abuse caps. The honeypot below only stops naive bots — a scripted POST that simply
 // omits the botcheck field walks straight past it. Turnstile (FB-07) has since landed and
@@ -199,24 +207,57 @@ const prettyLabel = (key: string) => key.replace(/_/g, " ").replace(/\b\w/g, (c)
 // receipt was dropped silently and support received a claim with no evidence attached.
 const INVALID_ATTACHMENT = Symbol("invalid-attachment");
 
-type BuiltAttachment = { filename: string; content: Buffer }[] | undefined | typeof INVALID_ATTACHMENT;
+type OneAttachment = { filename: string; content: Buffer };
+type BuiltAttachment = OneAttachment[] | undefined | typeof INVALID_ATTACHMENT;
 
-function buildAttachment(att: Payload["attachment"]): BuiltAttachment {
-  if (!att?.filename && !att?.contentBase64) return undefined;
-  if (!att?.filename || !att?.contentBase64) return INVALID_ATTACHMENT;
+/** Validates a single file. Returns null when it is not acceptable. */
+function buildOne(att: { filename?: string; contentBase64?: string }): OneAttachment | null {
+  if (!att?.filename || !att?.contentBase64) return null;
 
   // Flatten any path so a crafted name can't imply a directory to a downstream client.
   const filename = sanitizeLine(att.filename.replace(/[\\/]+/g, "_"), 120);
   const ext = filename.includes(".") ? filename.split(".").pop()!.toLowerCase() : "";
-  if (!ALLOWED_ATTACHMENT_EXTS.has(ext)) return INVALID_ATTACHMENT;
+  if (!ALLOWED_ATTACHMENT_EXTS.has(ext)) return null;
 
   const b64 = att.contentBase64.trim();
-  if (b64.length === 0 || b64.length > MAX_ATTACHMENT_BASE64) return INVALID_ATTACHMENT;
+  if (b64.length === 0 || b64.length > MAX_ATTACHMENT_BASE64) return null;
   // The upload helpers strip the data: prefix before sending, so the body must be
   // plain base64. Anything else is malformed and would decode to garbage.
-  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(b64)) return INVALID_ATTACHMENT;
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(b64)) return null;
 
-  return [{ filename, content: Buffer.from(b64, "base64") }];
+  return { filename, content: Buffer.from(b64, "base64") };
+}
+
+/**
+ * Builds every attachment on the request (FA-02).
+ *
+ * Accepts the legacy single `attachment` and the plural `attachments` together, because
+ * /register still sends the singular shape and /warranty-claim sends a receipt plus its
+ * evidence files.
+ *
+ * Rejects the WHOLE submission if any one file is unacceptable, rather than sending what
+ * survived. Silently dropping a file is the exact failure FA-02 and FA-03 were both raised
+ * for: support gets a claim that names evidence nobody attached, and the customer sees a
+ * success screen.
+ */
+function buildAttachments(payload: Payload): BuiltAttachment {
+  const raw = [
+    ...(payload.attachment ? [payload.attachment] : []),
+    ...(Array.isArray(payload.attachments) ? payload.attachments : []),
+  ];
+  if (raw.length === 0) return undefined;
+  if (raw.length > MAX_ATTACHMENT_COUNT) return INVALID_ATTACHMENT;
+
+  const built: OneAttachment[] = [];
+  let totalB64 = 0;
+  for (const att of raw) {
+    const one = buildOne(att);
+    if (!one) return INVALID_ATTACHMENT;
+    totalB64 += att.contentBase64!.trim().length;
+    if (totalB64 > MAX_TOTAL_ATTACHMENT_BASE64) return INVALID_ATTACHMENT;
+    built.push(one);
+  }
+  return built;
 }
 
 const escapeHtml = (s: string) =>
@@ -292,10 +333,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Please fill in the form before submitting." }, { status: 400 });
   }
 
-  const attachments = buildAttachment(payload.attachment);
+  const attachments = buildAttachments(payload);
   if (attachments === INVALID_ATTACHMENT) {
     return NextResponse.json(
-      { ok: false, error: "That file couldn’t be attached. Please upload a JPG, PNG, HEIC or PDF under 3 MB." },
+      { ok: false, error: "One of those files couldn’t be attached. Please upload JPG, PNG, HEIC or PDF files under 3 MB each, up to 6 in total." },
       { status: 400 },
     );
   }

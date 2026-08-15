@@ -9,6 +9,13 @@ type SubmitOptions = {
   replyTo?: string;
   /** Optional single file attachment (e.g. a receipt), base64-encoded. */
   attachment?: { filename: string; contentBase64: string };
+  /**
+   * Additional attachments (FA-02). /warranty-claim sends its evidence files here, on top
+   * of the receipt in `attachment`. The route validates the two lists together against a
+   * shared count and total-size cap, and rejects the whole submission if any file fails —
+   * a partly-attached claim is worse than a refused one.
+   */
+  attachments?: { filename: string; contentBase64: string }[];
   /** Honeypot value, forwarded so the server-side check in route.ts can actually fire. */
   botcheck?: string;
   /** Cloudflare Turnstile token, verified server-side against TURNSTILE_SECRET_KEY (FB-07). */
@@ -28,6 +35,7 @@ export async function submitForm(
         replyTo: opts.replyTo,
         fields,
         attachment: opts.attachment,
+        attachments: opts.attachments,
         botcheck: opts.botcheck,
         turnstileToken: opts.turnstileToken,
       }),

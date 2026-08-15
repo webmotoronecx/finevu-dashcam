@@ -27,6 +27,13 @@ const fadeUp = {
 // then be dropped server-side, so support received a claim with no receipt attached.
 const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
 
+// Evidence caps (FA-02). Photos are now genuinely ATTACHED rather than listed by name, so
+// they have to fit inside what /api/contact accepts: 6 files and 12 MB of base64 across the
+// whole email, receipt included. Held below both so the receipt always has room.
+const MAX_EVIDENCE_FILES = 4;
+const MAX_EVIDENCE_BYTES = 3 * 1024 * 1024;
+const MAX_EVIDENCE_TOTAL_BYTES = 7 * 1024 * 1024;
+
 const models = [
   { value: "GX4K", label: "FineVu GX4K" },
   { value: "GX35", label: "FineVu GX35" },
@@ -164,6 +171,7 @@ function ClaimForm() {
   const [receipt, setReceipt] = useState<File | null>(null);
   const [receiptError, setReceiptError] = useState("");
   const [evidence, setEvidence] = useState<File[]>([]);
+  const [evidenceError, setEvidenceError] = useState("");
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
@@ -190,6 +198,24 @@ function ClaimForm() {
     if (f) setInvalid((prev) => (prev.receipt ? { ...prev, receipt: false } : prev));
   };
 
+  const chooseEvidence = (files: File[]) => {
+    if (files.length > MAX_EVIDENCE_FILES) {
+      setEvidenceError(`Please choose up to ${MAX_EVIDENCE_FILES} files. Anything more can be emailed to support@finevuaustralia.com.au after submitting.`);
+      return;
+    }
+    const oversize = files.find((f) => f.size > MAX_EVIDENCE_BYTES);
+    if (oversize) {
+      setEvidenceError(`"${oversize.name}" is over 3 MB. Please choose a smaller file, or email it to support@finevuaustralia.com.au after submitting.`);
+      return;
+    }
+    if (files.reduce((n, f) => n + f.size, 0) > MAX_EVIDENCE_TOTAL_BYTES) {
+      setEvidenceError("Those files are over 7 MB together. Please choose fewer, or email the rest to support@finevuaustralia.com.au after submitting.");
+      return;
+    }
+    setEvidenceError("");
+    setEvidence(files);
+  };
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const inv: Record<string, boolean> = {};
@@ -205,7 +231,7 @@ function ClaimForm() {
     if (!form.issueType) inv.issueType = true;
     if (!form.description.trim()) inv.description = true;
     setInvalid(inv);
-    if (Object.keys(inv).length > 0 || receiptError) return;
+    if (Object.keys(inv).length > 0 || receiptError || evidenceError) return;
     if (TURNSTILE_ENABLED && !captcha) {
       setError("Please complete the verification below.");
       return;
@@ -213,13 +239,28 @@ function ClaimForm() {
 
     setStatus("sending");
     setError("");
+
+    // Read the receipt AND every evidence file (FA-02). Evidence used to be sent as
+    // `evidence.map(f => f.name).join(", ")` — a list of filenames and no images, on the
+    // one form where that evidence IS the substance of the claim.
+    //
+    // A read failure now ABORTS instead of quietly setting attachment = undefined and
+    // submitting anyway (FA-37). The old path sent `receipt: <filename>` in the fields
+    // regardless, so support received a claim asserting a receipt that was not attached
+    // and the customer got a success screen. Rare — FileReader only fails on a file that
+    // has been moved or made unreadable since it was chosen — but silent, and the receipt
+    // is a required field here.
     let attachment: { filename: string; contentBase64: string } | undefined;
-    if (receipt) {
-      try {
-        attachment = { filename: receipt.name, contentBase64: await readFileAsBase64(receipt) };
-      } catch {
-        attachment = undefined;
-      }
+    let attachments: { filename: string; contentBase64: string }[] = [];
+    try {
+      if (receipt) attachment = { filename: receipt.name, contentBase64: await readFileAsBase64(receipt) };
+      attachments = await Promise.all(
+        evidence.map(async (f) => ({ filename: f.name, contentBase64: await readFileAsBase64(f) })),
+      );
+    } catch {
+      setStatus("idle");
+      setError("We couldn’t read one of your files — it may have been moved or renamed. Please re-select it and try again.");
+      return;
     }
     const modelLabel = models.find((m) => m.value === form.model)?.label || form.model;
     const issueLabel = issueTypes.find((i) => i.value === form.issueType)?.label || form.issueType;
@@ -236,9 +277,11 @@ function ClaimForm() {
         issue: issueLabel,
         description: form.description,
         receipt: receipt ? receipt.name : "Not provided",
-        evidence: evidence.length ? evidence.map((f) => f.name).join(", ") : "Not provided",
+        // Says ATTACHED because they now are. Anything here that the email does not carry
+        // would put us back where FA-02 started.
+        evidence: evidence.length ? `${evidence.length} file(s) attached — ${evidence.map((f) => f.name).join(", ")}` : "Not provided",
       },
-      { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment, botcheck, turnstileToken: captcha },
+      { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment, attachments, botcheck, turnstileToken: captcha },
     );
     // Stay in "sending" through the navigation so the button can't be re-submitted.
     if (res.ok) router.push(thankYouUrl("warranty-claim"));
@@ -375,14 +418,21 @@ function ClaimForm() {
 
       <div className="mt-4">
         <label className={LABEL}>Photos or video of the issue <span className="font-normal text-[#8a8a92]">(optional)</span></label>
+        {/* accept no longer offers .mp4/.mov (FA-02). The server's ALLOWED_ATTACHMENT_EXTS
+            has never included video, so a clip would now be REFUSED rather than quietly
+            reduced to a filename — offering it would be inviting a rejected submission.
+            The hint says where video should go instead. */}
         <UploadZone
-          accept=".jpg,.jpeg,.png,.heic,.mp4,.mov"
+          accept=".jpg,.jpeg,.png,.webp,.heic,.pdf"
           multiple
           files={evidence}
-          onSelect={setEvidence}
-          hint="Screenshots, photos or short clips help our technicians assess faster"
-          ariaLabel="Upload photos or video of the issue"
+          onSelect={chooseEvidence}
+          invalid={Boolean(evidenceError)}
+          describedBy={evidenceError ? "evidence-err" : undefined}
+          hint="Photos or screenshots — up to 4 files, 3 MB each. Video? Email it to support after submitting"
+          ariaLabel="Upload photos of the issue"
         />
+        {evidenceError && <p id="evidence-err" className={ERR}>{evidenceError}</p>}
       </div>
 
       <div className="mt-6">

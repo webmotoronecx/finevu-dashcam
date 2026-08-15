@@ -178,6 +178,54 @@ region for errors), FA-21 (no focus management on validation failure).
 
 ---
 
+## FA-02 / FA-37 — the warranty form was throwing evidence away
+
+`/warranty-claim` sent its evidence files as `evidence.map((f) => f.name).join(", ")` — **a
+list of filenames and no images**, on the one form where that evidence is the substance of
+the claim. The API had a single attachment slot and the receipt occupied it. With no
+database, that inbox *is* the record, so the evidence did not merely fail to arrive; it
+ceased to exist.
+
+`/api/contact` now takes a plural `attachments` array alongside the legacy single
+`attachment` (which `/register` still sends), validated together against shared caps: **6
+files and 12 MB of base64 across the whole email**. Per-file limits alone would let a claim
+carry a receipt plus five 3 MB photos and blow past what Resend accepts, failing the send
+outright.
+
+**It rejects the whole submission if any one file fails**, rather than sending what
+survived. Silently dropping a file is precisely what FA-02 and FA-03 were both raised for.
+
+Three supporting decisions:
+
+- **The evidence zone has its own caps** — 4 files, 3 MB each, 7 MB total — deliberately
+  held *below* the server's so the required receipt always has room.
+- **`accept` no longer offers `.mp4`/`.mov`.** `ALLOWED_ATTACHMENT_EXTS` has never included
+  video, so a clip would now be **refused** rather than quietly reduced to a filename.
+  Offering it would be inviting a rejected submission; the hint routes video to `support@`
+  instead. This removes nothing that ever worked.
+- **The field now reads "N file(s) attached — …"** because they now are. Anything there the
+  email does not carry would put us back where FA-02 started.
+
+**FA-37 closed with it**, because both live on the same read path. A `FileReader` failure
+now aborts the submission on **both** forms and asks the customer to re-select, instead of
+setting `attachment = undefined` and submitting anyway while the fields still reported
+`receipt: <filename>`. `/warranty-claim` reads the receipt and all evidence inside one
+`try`, so any failure stops everything.
+
+### Verified against a production build
+
+Run with Cloudflare's always-passes test secret and a **deliberately invalid Resend key**,
+so a successful attachment build stops at the send instead of emailing support:
+
+| Case | Result |
+|---|---|
+| receipt + 2 evidence photos | 502 — built fine, stopped at the send |
+| `.mov` evidence | 400 refused |
+| 8 files | 400 refused |
+| 5 MB file | 400 refused |
+
+---
+
 ## FA-30 — half fixed, half declined
 
 **The bug.** `useCalendarGrid` computed `today` inside a `useMemo` keyed on availability,
@@ -232,5 +280,6 @@ None of it is code.
 |---|---|
 | `BUSINESS_ABN` is still `00 000 000 000`, so the invoice is not a valid Australian tax invoice — `sendBookingConfirmation` logs a warning on every send. `legalName` also needs checking against the ABR | Config |
 | **FA-26** — confirm the Motor One privacy policy covers FineVu booking data, or give the site its own privacy page | Legal |
+| **FA-07 / FB-08** — nobody can open `support@finevuaustralia.com.au`, so no submission from any of the four email forms has ever been confirmed to arrive. The FA-02 evidence fix makes this sharper, not softer: the attachments now genuinely ride on an email into a mailbox no one reads | Ops |
 | **FA-40** — an unserviced postcode can still complete a booking and pay $250. Option (a), accept and refund by hand, is now genuinely viable since FA-32 makes a refund release the slot | Business decision |
 | Live Stripe keys, and a production webhook endpoint with its own `whsec_` **subscribed to `charge.refunded`** — the FA-32 fix is inert without that event | Ops |

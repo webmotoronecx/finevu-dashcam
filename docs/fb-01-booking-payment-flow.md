@@ -34,8 +34,12 @@ Related: `docs/forms-backend-requirements.csv` (FB-01), **CA-36** in
 
 Added 2026-08-13 after checking every claim in this document against the working tree.
 This file grew an as-built narrative on top of its original plan, and the two halves had
-drifted. **Four behaviours described below were never implemented, and one is implemented
-but cannot fire.** Each is marked in place; this is the index.
+drifted. **Four behaviours described below were never implemented.** Each is marked in
+place; this is the index.
+
+Revised 2026-08-15: a fifth entry — `charge.refunded` → CANCELLED, implemented but unable
+to fire — was **fixed** that day (FA-32) and is struck through below rather than removed,
+so the failure mode stays legible to anyone who meets it again.
 
 | Described | Reality | Consequence |
 |---|---|---|
@@ -43,7 +47,7 @@ but cannot fire.** Each is marked in place; this is the index.
 | Sweep of HELD appointments older than 35 minutes, on each free-slots read | **Never built.** `slots/route.ts` is a 37-line cached read. The only `sweep` matches in the tree are comments explaining why a *status-driven* sweep would be dangerous | No early reclaim. `checkout.session.expired` is the only thing that releases an abandoned hold |
 | Alert ops by email when paid-but-GHL-confirm-fails | **Never built.** `console.error` only (`webhook:57-63`) | The money-is-real-and-the-booking-is-broken case is a log line nobody watches |
 | Write amount / Stripe payment id / invoice URL back to the GHL contact | **Never built.** Zero GHL writes in the webhook beyond `confirmAppointment` | Those values live only on the Stripe session and in the customer's email |
-| `charge.refunded` → CANCELLED | **Built but dead.** `createBookingSession` sets no `payment_intent_data.metadata`, so session metadata never reaches the Charge and `metadata.appointmentId` is always undefined — **FA-32** | A refunded booking stays `confirmed`; an installer is dispatched to a refunded customer |
+| ~~`charge.refunded` → CANCELLED~~ | **FIXED 2026-08-15 (FA-32).** `createBookingSession` now sets `payment_intent_data: { metadata: { appointmentId } }`, which the Charge inherits, plus a PaymentIntent-retrieve fallback for sessions created before the fix, a partial-refund guard and a read-first idempotency check | A refund now cancels the appointment and frees the slot. Verified against real test-mode Stripe by `scripts/e2e-booking.mjs` |
 
 Together the first two mean an indecisive customer can hold more than one slot at once:
 `BookingCheckout` mounts per visit to step 5 with a per-instance `started` ref, and
@@ -234,12 +238,14 @@ webhook promotes it to **CONFIRMED**. Note the two different exits: an unpaid ho
 **deleted** so it leaves no trace, while a paid booking is **cancelled** so the record
 survives — the terms promise refunds, and a refund needs something to point at.
 
-> ⚠️ **The `CONFIRMED → CANCELLED` edge does not currently work.** The handler is written,
-> but it reads `appointmentId` from `Stripe.Charge.metadata`, and `createBookingSession`
-> sets metadata only at the Checkout Session level — which does not propagate to the
-> PaymentIntent or the Charge. So `charge.refunded` always no-ops and a refunded booking
-> stays `confirmed` on the calendar. Fix is either `payment_intent_data.metadata` on the
-> session, or resolving the session via `charge.payment_intent`. Tracked as **FA-32**.
+> ✅ **The `CONFIRMED → CANCELLED` edge works as of 2026-08-15 (FA-32).** It used to no-op:
+> the handler read `appointmentId` from `Stripe.Charge.metadata`, but `createBookingSession`
+> set metadata only at the Checkout Session level, and Stripe does not propagate that to the
+> PaymentIntent or the Charge. The session now sets `payment_intent_data.metadata`, which the
+> Charge inherits. A PaymentIntent-retrieve fallback covers sessions created before the fix —
+> they carry no inherited metadata and never will. A partial refund (`amount_refunded <
+> amount`) deliberately does NOT cancel, and an unresolvable refund logs loudly rather than
+> returning a silent 200.
 
 ---
 
@@ -379,7 +385,7 @@ who refreshes gets the truth even if the webhook is running late.
 | Customer clicks Back to change the slot | ~~`POST /api/booking/release` cancels the hold~~ — **that route was never built.** The old hold survives until its session expires, and re-entering step 5 on a different slot takes a **second** hold | ❌ |
 | Orphaned holds generally | ~~A sweep on each free-slots read cancels HELD appointments older than 35 minutes~~ — **never built.** `checkout.session.expired` is the only reclaim path, so an orphan whose webhook is lost persists until someone clears it by hand | ❌ |
 | **Paid, but GHL confirm fails** | Money captured, appointment stuck HELD. Handled as far as *detection* — the webhook logs `PAID BUT THE HOLD IS GONE` and does not auto-refund. ~~Alert ops by email~~ was **never built**, so nothing surfaces this outside the Vercel logs | ⚠️ |
-| **Refund issued** | ~~`charge.refunded` → CANCELLED~~ — the handler exists but **can never fire** (FA-32): session metadata does not propagate to the Charge, so `appointmentId` is always undefined and the booking stays `confirmed` | ❌ |
+| **Refund issued** | `charge.refunded` → CANCELLED. Fixed 2026-08-15 (FA-32) and exercised end to end against real test-mode Stripe. Cancelled rather than deleted, so the record survives for the audit trail the terms require. Partial refunds leave the booking standing | ✅ |
 
 ---
 
@@ -535,8 +541,10 @@ a real person, and confirm it is unset in Vercel.
 - [x] ~~Verify `finevuaustralia.com.au` in Resend~~ — done 2026-08-13
 - [ ] Move `CONTACT_FROM_EMAIL` off `onboarding@resend.dev` in Vercel — still unset there,
       so production is sending from the fallback despite the domain being verified
-- [ ] **Fix FA-32 before taking a live payment** — a refund currently leaves the booking
-      `confirmed` and an installer will be dispatched to a refunded customer
+- [x] ~~**Fix FA-32 before taking a live payment**~~ — done 2026-08-15; a refund now cancels
+      the appointment and frees the slot
+- [ ] **Subscribe `charge.refunded` on the production webhook endpoint** — the FA-32 fix is
+      inert if the endpoint only listens for `checkout.session.completed`/`.expired`
 - [ ] Live Stripe keys, and create the production webhook endpoint with **its own**
       `whsec_` (a test-mode secret rejects live events)
 - [ ] Decide surcharge vs absorb (recommend absorb — every page promises a flat $250)

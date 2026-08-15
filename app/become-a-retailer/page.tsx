@@ -127,6 +127,10 @@ const faqs = [
 
 const LABEL ="mb-2 block text-[13px] font-semibold uppercase tracking-[0.06em] text-[#5b5e66]";
 const INPUT = "w-full rounded-[12px] border border-[#e7e7e3] bg-white px-4 py-[13px] text-[16px] text-[#1d1d1f] placeholder:text-[#9a9da5] outline-none transition-colors focus:border-[var(--finevu-orange)]";
+// Matches /register and /warranty-claim (FA-08). Per-FIELD, not one combined message:
+// "complete the required fields marked with *" left the applicant to re-scan nine inputs
+// to find which one they missed.
+const ERR = "mt-1.5 text-[12.5px] font-medium text-[#D93025]";
 
 function SectionHead({ title, sub }: { title: string; sub: React.ReactNode }) {
   return (
@@ -143,6 +147,7 @@ function RetailerForm() {
   const router = useRouter();
   const [f, setF] = useState({ biz: "", abn: "", btype: "", cname: "", email: "", phone: "", state: "", web: "", msg: "" });
   const [err, setErr] = useState("");
+  const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
   const [botcheck, setBotcheck] = useState("");
   const [captcha, setCaptcha] = useState("");
@@ -151,13 +156,18 @@ function RetailerForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim());
-    if (!f.biz.trim() || !f.btype || !f.cname.trim() || !f.email.trim() || !f.phone.trim() || !f.state) {
-      setErr("Please complete the required fields marked with *.");
-      return;
-    }
-    if (!emailOk) {
-      setErr("Please enter a valid email address.");
+    // One pass over every field, so the applicant sees ALL the problems at once rather
+    // than fixing one and being told about the next (FA-08).
+    const inv: Record<string, boolean> = {};
+    if (!f.biz.trim()) inv.biz = true;
+    if (!f.btype) inv.btype = true;
+    if (!f.cname.trim()) inv.cname = true;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) inv.email = true;
+    if (!f.phone.trim()) inv.phone = true;
+    if (!f.state) inv.state = true;
+    setInvalid(inv);
+    if (Object.keys(inv).length > 0) {
+      setErr("");
       return;
     }
     if (TURNSTILE_ENABLED && !captcha) {
@@ -199,52 +209,58 @@ function RetailerForm() {
       <p className="mb-6 mt-1.5 text-[15.68px] text-[#5b5e66]">Tell us about your business and we&apos;ll be in touch within 1–2 business days.</p>
 
       <div className="mb-4">
-        <label className={LABEL}>Business name <span className="text-[var(--finevu-orange)]">*</span></label>
-        <input className={INPUT} placeholder="Your business or trading name" value={f.biz} onChange={(e) => set("biz", e.target.value)} />
+        <label className={LABEL} htmlFor="ret-biz">Business name <span className="text-[var(--finevu-orange)]">*</span></label>
+        <input id="ret-biz" name="businessName" className={INPUT} placeholder="Your business or trading name" aria-invalid={invalid.biz || undefined} aria-describedby={invalid.biz ? "ret-biz-err" : undefined} value={f.biz} onChange={(e) => set("biz", e.target.value)} />
+        {invalid.biz && <p id="ret-biz-err" className={ERR}>Enter your business or trading name.</p>}
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL}>ABN</label>
-          <input className={INPUT} placeholder="11 222 333 444" inputMode="numeric" value={f.abn} onChange={(e) => set("abn", e.target.value)} />
+          <label className={LABEL} htmlFor="ret-abn">ABN</label>
+          <input id="ret-abn" name="abn" className={INPUT} placeholder="11 222 333 444" inputMode="numeric" value={f.abn} onChange={(e) => set("abn", e.target.value)} />
         </div>
         <div>
-          <label className={LABEL}>Business type <span className="text-[var(--finevu-orange)]">*</span></label>
-          <select className={INPUT} value={f.btype} onChange={(e) => set("btype", e.target.value)}>
+          <label className={LABEL} htmlFor="ret-btype">Business type <span className="text-[var(--finevu-orange)]">*</span></label>
+          <select id="ret-btype" name="businessType" className={INPUT} aria-invalid={invalid.btype || undefined} aria-describedby={invalid.btype ? "ret-btype-err" : undefined} value={f.btype} onChange={(e) => set("btype", e.target.value)}>
             <option value="">Select…</option>
             {businessTypes.map((b) => <option key={b}>{b}</option>)}
           </select>
+          {invalid.btype && <p id="ret-btype-err" className={ERR}>Choose the closest business type.</p>}
         </div>
       </div>
       <div className="mb-4">
-        <label className={LABEL}>Contact name <span className="text-[var(--finevu-orange)]">*</span></label>
-        <input className={INPUT} placeholder="Your full name" value={f.cname} onChange={(e) => set("cname", e.target.value)} />
+        <label className={LABEL} htmlFor="ret-cname">Contact name <span className="text-[var(--finevu-orange)]">*</span></label>
+        <input id="ret-cname" name="contactName" autoComplete="name" className={INPUT} placeholder="Your full name" aria-invalid={invalid.cname || undefined} aria-describedby={invalid.cname ? "ret-cname-err" : undefined} value={f.cname} onChange={(e) => set("cname", e.target.value)} />
+        {invalid.cname && <p id="ret-cname-err" className={ERR}>Enter your full name.</p>}
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL}>Email <span className="text-[var(--finevu-orange)]">*</span></label>
-          <input className={INPUT} type="email" placeholder="you@business.com.au" value={f.email} onChange={(e) => set("email", e.target.value)} />
+          <label className={LABEL} htmlFor="ret-email">Email <span className="text-[var(--finevu-orange)]">*</span></label>
+          <input id="ret-email" name="email" autoComplete="email" className={INPUT} type="email" placeholder="you@business.com.au" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "ret-email-err" : undefined} value={f.email} onChange={(e) => set("email", e.target.value)} />
+          {invalid.email && <p id="ret-email-err" className={ERR}>Enter a valid email address.</p>}
         </div>
         <div>
-          <label className={LABEL}>Phone <span className="text-[var(--finevu-orange)]">*</span></label>
-          <input className={INPUT} type="tel" placeholder="0400 000 000" value={f.phone} onChange={(e) => set("phone", e.target.value)} />
+          <label className={LABEL} htmlFor="ret-phone">Phone <span className="text-[var(--finevu-orange)]">*</span></label>
+          <input id="ret-phone" name="phone" autoComplete="tel" className={INPUT} type="tel" placeholder="0400 000 000" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "ret-phone-err" : undefined} value={f.phone} onChange={(e) => set("phone", e.target.value)} />
+          {invalid.phone && <p id="ret-phone-err" className={ERR}>Enter a contact phone number.</p>}
         </div>
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL}>State <span className="text-[var(--finevu-orange)]">*</span></label>
-          <select className={INPUT} value={f.state} onChange={(e) => set("state", e.target.value)}>
+          <label className={LABEL} htmlFor="ret-state">State <span className="text-[var(--finevu-orange)]">*</span></label>
+          <select id="ret-state" name="state" autoComplete="address-level1" className={INPUT} aria-invalid={invalid.state || undefined} aria-describedby={invalid.state ? "ret-state-err" : undefined} value={f.state} onChange={(e) => set("state", e.target.value)}>
             <option value="">Select…</option>
             {STATES.map((s) => <option key={s}>{s}</option>)}
           </select>
+          {invalid.state && <p id="ret-state-err" className={ERR}>Choose your state.</p>}
         </div>
         <div>
-          <label className={LABEL}>Website / socials</label>
-          <input className={INPUT} placeholder="yourstore.com.au" value={f.web} onChange={(e) => set("web", e.target.value)} />
+          <label className={LABEL} htmlFor="ret-web">Website / socials</label>
+          <input id="ret-web" name="website" className={INPUT} placeholder="yourstore.com.au" value={f.web} onChange={(e) => set("web", e.target.value)} />
         </div>
       </div>
       <div className="mb-4">
-        <label className={LABEL}>Tell us about your business</label>
-        <textarea className={`${INPUT} min-h-[110px] resize-y`} placeholder="Where you're based, what you sell, and roughly how many units you'd expect to move." value={f.msg} onChange={(e) => set("msg", e.target.value)} />
+        <label className={LABEL} htmlFor="ret-msg">Tell us about your business</label>
+        <textarea id="ret-msg" name="message" className={`${INPUT} min-h-[110px] resize-y`} placeholder="Where you're based, what you sell, and roughly how many units you'd expect to move." value={f.msg} onChange={(e) => set("msg", e.target.value)} />
       </div>
 
       <Turnstile onToken={setCaptcha} resetKey={captchaReset} />

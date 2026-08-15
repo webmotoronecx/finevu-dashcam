@@ -186,6 +186,8 @@ function useCalendarGrid(byDate: Record<string, string[]>, fallback: boolean) {
 const INPUT = "w-full rounded-[8px] border border-[#e8e7e2] bg-white px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors focus:border-[var(--finevu-orange)]";
 const FLABEL = "mb-2.5 mt-[22px] block text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9c9ca3]";
 const FIELD_LABEL = "mb-1.5 block text-[13px] font-semibold leading-[19.5px] text-[#1d1d1f]";
+// Matches /register and /warranty-claim (FA-08).
+const ERR = "mt-1.5 text-[12.5px] font-medium text-[#D93025]";
 
 /**
  * Polls /api/booking/status until the booking is confirmed, or gives up.
@@ -221,6 +223,9 @@ function BookingWizard() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY);
   const [hint, setHint] = useState<Coverage>({ msg: "", cls: "" });
+  // Per-field errors (FA-08). Cleared on every step change so a problem you already fixed
+  // does not follow you forward.
+  const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const [date, setDate] = useState<Date | null>(null);
   const [dateLabel, setDateLabel] = useState("");
   const [slotLabel, setSlotLabel] = useState("");
@@ -250,21 +255,43 @@ function BookingWizard() {
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
   const scrollTop = () => bookRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  function fail(msg: string): false { setHint({ msg, cls: "err" }); return false; }
+  /**
+   * Per-FIELD validation (FA-08), matching /register and /warranty-claim.
+   *
+   * This used to set a single hint line naming one problem at a time, so a customer with
+   * three empty fields was told about them one Continue at a time. Every field on the step
+   * is now checked in one pass and every failure is marked at once.
+   *
+   * The hint line survives, but only for what it is actually good at: the step-2 COVERAGE
+   * answer, which is a statement about the address as a whole rather than about any one
+   * input, and which is often not an error at all.
+   */
   function validate(s: number): boolean {
-    if (s === 1 && !form.model) return fail("Please select your FineVu model.");
+    const inv: Record<string, boolean> = {};
+    if (s === 1 && !form.model) inv.model = true;
     if (s === 2) {
-      if (!form.place) return fail("Please choose home or workplace.");
-      if (!form.street || !form.suburb || !form.stateAu || !/^\d{4}$/.test(form.postcode)) return fail("Please complete your address, including a 4-digit postcode.");
-      if (isExcluded(form.stateAu, form.postcode)) return fail(COVERAGE_MESSAGES.excludedBooking);
-      setHint(resolveCoverage(form.postcode, pcRows, true)); return true;
+      if (!form.place) inv.place = true;
+      if (!form.street) inv.street = true;
+      if (!form.suburb) inv.suburb = true;
+      if (!form.stateAu) inv.stateAu = true;
+      if (!/^\d{4}$/.test(form.postcode)) inv.postcode = true;
     }
-    if (s === 3) { if (!date) return fail("Please select a date."); if (!form.slot) return fail("Please select a start time."); }
+    if (s === 3) { if (!date) inv.date = true; if (!form.slot) inv.slot = true; }
     if (s === 4) {
-      if (!form.name) return fail("Please enter your name.");
-      if (!/^[\d\s+()-]{8,}$/.test(form.phone)) return fail("Please enter a valid mobile number.");
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return fail("Please enter a valid email address.");
-      if (!form.make || !form.vmodel) return fail("Please enter your vehicle make and model.");
+      if (!form.name) inv.name = true;
+      if (!/^[\d\s+()-]{8,}$/.test(form.phone)) inv.phone = true;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) inv.email = true;
+      if (!form.make) inv.make = true;
+      if (!form.vmodel) inv.vmodel = true;
+    }
+    setInvalid(inv);
+    if (Object.keys(inv).length > 0) { setHint({ msg: "", cls: "" }); return false; }
+
+    if (s === 2) {
+      // Address is complete — now answer the coverage question. Excluded is a hard stop;
+      // anything else is a message that deliberately carries over onto step 3.
+      if (isExcluded(form.stateAu, form.postcode)) { setHint({ msg: COVERAGE_MESSAGES.excludedBooking, cls: "err" }); return false; }
+      setHint(resolveCoverage(form.postcode, pcRows, true)); return true;
     }
     // No step 5 here on purpose. Card validation belongs to Stripe, inside its own
     // iframe — the wizard never sees a card number to check.
@@ -276,7 +303,7 @@ function BookingWizard() {
     // step 2, set the coverage message — which is meant to carry over onto step 3.
     // Step 5 never comes through here: it has no Continue button, because the pay
     // button belongs to Stripe's iframe. Completion arrives via onPaid instead.
-    if (step < TOTAL) { setStep(step + 1); scrollTop(); }
+    if (step < TOTAL) { setInvalid({}); setStep(step + 1); scrollTop(); }
   }
 
   /** Stripe reports the payment succeeded. Real reference, real money — no more fake delay. */
@@ -296,7 +323,7 @@ function BookingWizard() {
     setHint({ msg: message, cls: "err" });
     scrollTop();
   }
-  function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setStep(step - 1); scrollTop(); } }
+  function back() { if (step > 1) { setHint({ msg: "", cls: "" }); setInvalid({}); setStep(step - 1); scrollTop(); } }
 
   const summaryRows = (): [string, string][] => {
     const rows: [string, string][] = [
@@ -381,6 +408,7 @@ function BookingWizard() {
                   </button>
                 ))}
               </div>
+              {invalid.model && <p className={ERR}>Select the FineVu model we are fitting.</p>}
               <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-5 py-4 text-[.85rem] leading-[1.6] text-[#6e6e73]">
                 <b className="text-[#1d1d1f]">Every booking is a full professional hardwire installation — $250 flat.</b> Front and rear cameras fitted, wired to the fuse box for parking mode and battery protection, configured and tested. Prefer plug-in power for driving-only recording? That&apos;s a simple DIY setup with the included power cable — no booking needed.
               </div>
@@ -404,6 +432,7 @@ function BookingWizard() {
                   );
                 })}
               </div>
+              {invalid.place && <p className={ERR}>Choose whether we come to your home or your workplace.</p>}
               <div className="mt-8">
                 <label htmlFor="street" className={FIELD_LABEL}>Street address</label>
                 <AddressAutocomplete
@@ -423,11 +452,12 @@ function BookingWizard() {
                     setHint({ msg: "", cls: "" });
                   }}
                 />
+                {invalid.street && <p className={ERR}>Enter your street address.</p>}
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-2"><label htmlFor="wiz-suburb" className={FIELD_LABEL}>Suburb</label><input id="wiz-suburb" name="suburb" autoComplete="address-level2" className={INPUT} placeholder="Melbourne" value={form.suburb} onChange={(e) => set("suburb", e.target.value)} /></div>
-                <div><label htmlFor="wiz-state" className={FIELD_LABEL}>State</label><select id="wiz-state" name="state" autoComplete="address-level1" className={INPUT} value={form.stateAu} onChange={(e) => set("stateAu", e.target.value)}><option value="">State</option>{STATES.map((s) => <option key={s}>{s}</option>)}</select></div>
-                <div><label htmlFor="wiz-postcode" className={FIELD_LABEL}>Postcode</label><input id="wiz-postcode" name="postcode" autoComplete="postal-code" className={INPUT} placeholder="3000" inputMode="numeric" maxLength={4} value={form.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
+                <div className="sm:col-span-2"><label htmlFor="wiz-suburb" className={FIELD_LABEL}>Suburb</label><input id="wiz-suburb" name="suburb" autoComplete="address-level2" className={INPUT} placeholder="Melbourne" aria-invalid={invalid.suburb || undefined} aria-describedby={invalid.suburb ? "wiz-suburb-err" : undefined} value={form.suburb} onChange={(e) => set("suburb", e.target.value)} />{invalid.suburb && <p id="wiz-suburb-err" className={ERR}>Enter your suburb.</p>}</div>
+                <div><label htmlFor="wiz-state" className={FIELD_LABEL}>State</label><select id="wiz-state" name="state" autoComplete="address-level1" className={INPUT} aria-invalid={invalid.stateAu || undefined} aria-describedby={invalid.stateAu ? "wiz-state-err" : undefined} value={form.stateAu} onChange={(e) => set("stateAu", e.target.value)}><option value="">State</option>{STATES.map((s) => <option key={s}>{s}</option>)}</select>{invalid.stateAu && <p id="wiz-state-err" className={ERR}>Choose your state.</p>}</div>
+                <div><label htmlFor="wiz-postcode" className={FIELD_LABEL}>Postcode</label><input id="wiz-postcode" name="postcode" autoComplete="postal-code" className={INPUT} placeholder="3000" inputMode="numeric" maxLength={4} aria-invalid={invalid.postcode || undefined} aria-describedby={invalid.postcode ? "wiz-postcode-err" : undefined} value={form.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} />{invalid.postcode && <p id="wiz-postcode-err" className={ERR}>Enter a 4-digit postcode.</p>}</div>
               </div>
             </div>
           )}
@@ -463,6 +493,7 @@ function BookingWizard() {
                   })}
                 </div>
               )}
+              {invalid.date && <p className={ERR}>Select a date.</p>}
               {avail.status === "loading" && (
                 <p className="mt-3 text-[14px] text-[#6e6e73]">Loading available dates…</p>
               )}
@@ -482,6 +513,7 @@ function BookingWizard() {
                       ))}
                     </div>
                   )}
+                  {invalid.slot && <p className={ERR}>Select a start time.</p>}
                 </>
               )}
             </div>
@@ -496,17 +528,17 @@ function BookingWizard() {
                   moment the customer types, so anyone checking their own answers on the last
                   step before paying $250 has nothing left to check them against. */}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="wiz-name" className={FIELD_LABEL}>Full name</label><input id="wiz-name" name="name" autoComplete="name" className={INPUT} placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} /></div>
-                <div><label htmlFor="wiz-phone" className={FIELD_LABEL}>Mobile number</label><input id="wiz-phone" name="phone" autoComplete="tel" className={INPUT} placeholder="Mobile number" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} /></div>
+                <div><label htmlFor="wiz-name" className={FIELD_LABEL}>Full name</label><input id="wiz-name" aria-invalid={invalid.name || undefined} aria-describedby={invalid.name ? "wiz-name-err" : undefined} name="name" autoComplete="name" className={INPUT} placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} />{invalid.name && <p id="wiz-name-err" className={ERR}>Enter your full name.</p>}</div>
+                <div><label htmlFor="wiz-phone" className={FIELD_LABEL}>Mobile number</label><input id="wiz-phone" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "wiz-phone-err" : undefined} name="phone" autoComplete="tel" className={INPUT} placeholder="Mobile number" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />{invalid.phone && <p id="wiz-phone-err" className={ERR}>Enter a valid mobile number.</p>}</div>
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="wiz-email" className={FIELD_LABEL}>Email address</label><input id="wiz-email" name="email" autoComplete="email" className={INPUT} placeholder="Email address" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} /></div>
+                <div><label htmlFor="wiz-email" className={FIELD_LABEL}>Email address</label><input id="wiz-email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "wiz-email-err" : undefined} name="email" autoComplete="email" className={INPUT} placeholder="Email address" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} />{invalid.email && <p id="wiz-email-err" className={ERR}>Enter a valid email address.</p>}</div>
                 <div><label htmlFor="wiz-retailer" className={FIELD_LABEL}>Where did you purchase? <span className="font-normal text-[#9c9ca3]">(optional)</span></label><input id="wiz-retailer" name="retailer" className={INPUT} placeholder="e.g. JB Hi-Fi, Autobarn" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} /></div>
               </div>
               <span className={FLABEL}>Your vehicle</span>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div><label htmlFor="wiz-make" className={FIELD_LABEL}>Make</label><input id="wiz-make" name="make" className={INPUT} placeholder="e.g. Toyota" value={form.make} onChange={(e) => set("make", e.target.value)} /></div>
-                <div><label htmlFor="wiz-vmodel" className={FIELD_LABEL}>Model</label><input id="wiz-vmodel" name="vehicleModel" className={INPUT} placeholder="e.g. RAV4" value={form.vmodel} onChange={(e) => set("vmodel", e.target.value)} /></div>
+                <div><label htmlFor="wiz-make" className={FIELD_LABEL}>Make</label><input id="wiz-make" aria-invalid={invalid.make || undefined} aria-describedby={invalid.make ? "wiz-make-err" : undefined} name="make" className={INPUT} placeholder="e.g. Toyota" value={form.make} onChange={(e) => set("make", e.target.value)} />{invalid.make && <p id="wiz-make-err" className={ERR}>Enter your vehicle make.</p>}</div>
+                <div><label htmlFor="wiz-vmodel" className={FIELD_LABEL}>Model</label><input id="wiz-vmodel" aria-invalid={invalid.vmodel || undefined} aria-describedby={invalid.vmodel ? "wiz-vmodel-err" : undefined} name="vehicleModel" className={INPUT} placeholder="e.g. RAV4" value={form.vmodel} onChange={(e) => set("vmodel", e.target.value)} />{invalid.vmodel && <p id="wiz-vmodel-err" className={ERR}>Enter your vehicle model.</p>}</div>
                 <div><label htmlFor="wiz-year" className={FIELD_LABEL}>Year</label><input id="wiz-year" name="year" className={INPUT} placeholder="2022" inputMode="numeric" maxLength={4} value={form.year} onChange={(e) => set("year", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
               </div>
               <label htmlFor="wiz-notes" className={FLABEL}>Anything we should know? (optional)</label>

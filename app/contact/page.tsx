@@ -64,11 +64,15 @@ const LABEL = "mb-2 block text-[11px] font-semibold uppercase tracking-[0.12em] 
 const INPUT =
   "w-full rounded-[10px] border border-[#e8e5e0] bg-white px-4 py-[13px] text-[15px] text-[#1d1d1f] placeholder:text-[#a8adb7] outline-none transition-colors focus:border-[var(--finevu-orange)]";
 
+// Matches /register and /warranty-claim (FA-08).
+const ERR = "mt-1.5 text-[12.5px] font-medium text-[#D93025]";
+
 function ContactForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", phone: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
+  const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const [botcheck, setBotcheck] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [captchaReset, setCaptchaReset] = useState(0);
@@ -76,6 +80,20 @@ function ContactForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    // Ours, not the browser's (FA-08). This form used to rely on `required` + native
+    // bubbles alone, which is a THIRD validation model on a site that already had two —
+    // and native bubbles are styled by the browser, vanish on the next interaction and
+    // surface only the first failing field.
+    const inv: Record<string, boolean> = {};
+    if (!form.name.trim()) inv.name = true;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) inv.email = true;
+    if (!form.subject) inv.subject = true;
+    if (!form.message.trim()) inv.message = true;
+    setInvalid(inv);
+    if (Object.keys(inv).length > 0) {
+      setError("");
+      return;
+    }
     if (TURNSTILE_ENABLED && !captcha) {
       setError("Please complete the verification below.");
       return;
@@ -107,6 +125,7 @@ function ContactForm() {
     <motion.form
       {...fadeUp}
       onSubmit={submit}
+      noValidate
       className="grid grid-cols-1 gap-x-4 gap-y-[18px] rounded-[16px] border border-[#e7e7ea] bg-white p-8 sm:grid-cols-2"
     >
       <input
@@ -123,19 +142,21 @@ function ContactForm() {
         <label className={LABEL} htmlFor="f-name">
           Your name <span className="text-[var(--finevu-orange)]">*</span>
         </label>
-        <input id="f-name" className={INPUT} placeholder="John Smith" required value={form.name} onChange={(e) => set("name", e.target.value)} />
+        <input id="f-name" name="name" autoComplete="name" className={INPUT} placeholder="John Smith" aria-invalid={invalid.name || undefined} aria-describedby={invalid.name ? "f-name-err" : undefined} value={form.name} onChange={(e) => set("name", e.target.value)} />
+        {invalid.name && <p id="f-name-err" className={ERR}>Enter your name.</p>}
       </div>
       <div>
         <label className={LABEL} htmlFor="f-phone">
           Phone number
         </label>
-        <input id="f-phone" className={INPUT} placeholder="0400 000 000" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+        <input id="f-phone" name="phone" autoComplete="tel" className={INPUT} placeholder="0400 000 000" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-email">
           Email address <span className="text-[var(--finevu-orange)]">*</span>
         </label>
-        <input id="f-email" className={INPUT} placeholder="you@example.com" type="email" required value={form.email} onChange={(e) => set("email", e.target.value)} />
+        <input id="f-email" name="email" autoComplete="email" className={INPUT} placeholder="you@example.com" type="email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "f-email-err" : undefined} value={form.email} onChange={(e) => set("email", e.target.value)} />
+        {invalid.email && <p id="f-email-err" className={ERR}>Enter a valid email address.</p>}
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-subject">
@@ -144,7 +165,9 @@ function ContactForm() {
         <select
           id="f-subject"
           className={`${INPUT} appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236B6B72%22%20stroke-width=%222.4%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-[right_16px_center] bg-no-repeat`}
-          required
+          name="subject"
+          aria-invalid={invalid.subject || undefined}
+          aria-describedby={invalid.subject ? "f-subject-err" : undefined}
           value={form.subject}
           onChange={(e) => set("subject", e.target.value)}
         >
@@ -155,6 +178,7 @@ function ContactForm() {
             <option key={s}>{s}</option>
           ))}
         </select>
+        {invalid.subject && <p id="f-subject-err" className={ERR}>Choose a subject.</p>}
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-msg">
@@ -164,10 +188,13 @@ function ContactForm() {
           id="f-msg"
           className={`${INPUT} min-h-[130px] resize-y`}
           placeholder="Tell us about your dash cam and what you need help with…"
-          required
+          name="message"
+          aria-invalid={invalid.message || undefined}
+          aria-describedby={invalid.message ? "f-msg-err" : undefined}
           value={form.message}
           onChange={(e) => set("message", e.target.value)}
         />
+        {invalid.message && <p id="f-msg-err" className={ERR}>Tell us how we can help.</p>}
       </div>
       <div className="col-span-full">
         <Turnstile onToken={setCaptcha} resetKey={captchaReset} />

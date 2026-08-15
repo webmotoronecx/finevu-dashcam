@@ -30,6 +30,7 @@ type Payload = {
   model?: string; place?: string; street?: string; suburb?: string; stateAu?: string;
   postcode?: string; slot?: string; name?: string; phone?: string; email?: string;
   retailer?: string; make?: string; vmodel?: string; year?: string; notes?: string;
+  botcheck?: string;
 };
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
@@ -71,6 +72,19 @@ export async function POST(req: Request) {
   } catch {
     return bad("bad_request", "Malformed request.");
   }
+
+  // Honeypot (FA-06). A hidden field no human ever sees, so anything in it is a script.
+  // Rejected BEFORE the GHL contact upsert and the Stripe session — those are the two
+  // calls that cost money and leave records, and the whole point is to not make them.
+  //
+  // Unlike /api/contact this does NOT fake a success: the wizard needs a client secret to
+  // render, so there is no believable empty-success to return. The generic 400 is the same
+  // shape a malformed body gets, which tells a prober nothing about why it was refused.
+  //
+  // Still bypassable by a script that simply omits the field — Turnstile is the durable
+  // fix and is deliberately NOT added here yet; see FA-06 for why (it would fail every
+  // run of scripts/e2e-booking.mjs, which cannot solve a challenge without a browser).
+  if (str(body.botcheck)) return bad("bad_request", "Malformed request.");
 
   const model = str(body.model);
   const street = str(body.street);

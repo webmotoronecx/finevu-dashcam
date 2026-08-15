@@ -61,10 +61,12 @@ export const thankYouVariants: Record<string, ThankYouVariant> = {
   "warranty-claim": base("Claim submitted"),
   "become-a-retailer": base("Application received"),
   services: base("Booking request sent"),
-  // /installation's 6-step wizard. Its own step-6 confirmation is bypassed, but the
-  // wizard still submits nothing and takes no payment (CA-36, awaiting ops). This copy
-  // must therefore never claim a booking is locked in or that payment was received.
-  installation: base("Booking request sent"),
+  // NO "installation" variant, deliberately (FA-38). The booking wizard renders its own
+  // step 6 from server state — a real reference, a real payment, and wording that upgrades
+  // from "Payment received" to "Booking confirmed" once the webhook promotes the
+  // appointment. It never navigates here, and the variant that used to sit here said
+  // "Booking request sent" for a customer who had just paid $250. Leaving it in place kept
+  // a reachable URL that contradicted the product, so /thank-you/installation now 404s.
 };
 
 export const thankYouSlugs = Object.keys(thankYouVariants);

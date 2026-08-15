@@ -26,6 +26,13 @@ export type BookingPayload = {
   model: string; street: string; suburb: string; stateAu: string; postcode: string;
   slot: string; name: string; phone: string; email: string;
   make: string; vmodel: string; year: string; retailer: string; notes: string;
+  /**
+   * Honeypot (FA-06). A hidden field a human never sees and never fills; anything in it
+   * marks the request as scripted. /api/booking/create is the one public endpoint that
+   * creates a real calendar record and opens a payable session, so it had no bot defence
+   * at all beyond the per-IP limiter — every other form on the site carries this.
+   */
+  botcheck: string;
 };
 
 type Props = {

@@ -40,8 +40,8 @@ type Payload = {
 const MAX_ATTACHMENT_BASE64 = 4 * 1024 * 1024;
 
 // Abuse caps. The honeypot below only stops naive bots — a scripted POST that simply
-// omits the botcheck field walks straight past it. Until Turnstile lands (FB-07) these
-// limits are what stand between the support inbox and a scripted flood. None of them
+// omits the botcheck field walks straight past it. Turnstile (FB-07) has since landed and
+// is the durable defence; these limits are the layer behind it. None of them
 // are reachable by a real submission: the largest form (/warranty-claim) sends 12
 // fields, and its longest free-text field is a short description.
 const MAX_FIELDS = 30;

@@ -128,7 +128,13 @@ function useAvailability(): AvailabilityState {
           for (const day of d.days ?? []) byDate[day.date] = day.slots ?? [];
           setState({ status: "ready", byDate });
         } else {
-          setState({ status: d?.reason === "not_configured" ? "unconfigured" : "error", byDate: {} });
+          // FA-35: "not_configured" only degrades to the walkable dev fallback in DEV.
+          // In production it is an error like any other, because the fallback fabricates
+          // availability — every future weekday, rendered identically to real slots — and
+          // a customer cannot tell an invented time from a real one. Failing closed shows
+          // the "call us" branch instead, which is honest.
+          const devFallback = d?.reason === "not_configured" && process.env.NODE_ENV !== "production";
+          setState({ status: devFallback ? "unconfigured" : "error", byDate: {} });
         }
       })
       .catch(() => { if (!cancelled) setState({ status: "error", byDate: {} }); });
@@ -145,6 +151,10 @@ function useAvailability(): AvailabilityState {
  * availability to render, so it falls back to the old client-side rule (future weekdays)
  * purely so the wizard remains walkable. It must never be the production path — those
  * days are guesses, not real availability.
+ *
+ * That "must never" is now ENFORCED rather than trusted: useAvailability only reports
+ * "unconfigured" outside production (FA-35). Previously the server's own answer decided,
+ * so a production deploy with the GHL keys missing silently sold invented time slots.
  */
 function useCalendarGrid(byDate: Record<string, string[]>, fallback: boolean) {
   return useMemo(() => {
@@ -216,6 +226,10 @@ function BookingWizard() {
   const [slotLabel, setSlotLabel] = useState("");
   const [ref, setRef] = useState("");
   const [sessionId, setSessionId] = useState("");
+  // Honeypot (FA-06) — matches the pattern the other four forms use. Lives on the wizard
+  // rather than inside BookingCheckout because the field has to be in the DOM from step 1,
+  // where a bot filling the form would meet it; step 5 is where it is finally sent.
+  const [botcheck, setBotcheck] = useState("");
   const confirmed = useBookingConfirmation(sessionId);
   const avail = useAvailability();
   // Local dev only — see useCalendarGrid. Production always has the keys.
@@ -292,15 +306,19 @@ function BookingWizard() {
       ["Date", dateLabel || "—"],
       ["Time", slotLabel || "—"],
     ];
-    // Optional step-4 fields. Shown only when filled, so the user can see they weren't
-    // dropped — they have no other destination until the wizard actually submits (CA-36).
+    // Optional step-4 fields. Shown only when filled, so the customer can see they weren't
+    // dropped. They DO have a destination now: both ride on the Checkout session metadata
+    // and reach the support team via the booking confirmation.
     if (form.retailer) rows.push(["Purchased from", form.retailer]);
     if (form.notes) rows.push(["Notes", form.notes]);
     rows.push(["Total", "$250.00 AUD — paid today"]);
     return rows;
   };
   const confirmRows = (): [string, string][] => {
-    const rows = summaryRows();
+    // REPLACES the pre-payment "Total … paid today" line rather than appending beside it
+    // (FA-39). Both rows say $250, so keeping both read as two charges on the one screen
+    // where a customer is checking exactly that.
+    const rows = summaryRows().filter(([k]) => k !== "Total");
     // No card details here any more — the wizard never receives them. The last four
     // digits could be read back off the Checkout session once /api/booking/status
     // exists; until then the payment line says only what we can actually vouch for.
@@ -316,6 +334,16 @@ function BookingWizard() {
         {/* A real <form> so Enter advances the step from any text input. Validation is
             entirely ours, hence noValidate — no browser bubbles. */}
         <form onSubmit={(e) => { e.preventDefault(); next(); }} noValidate>
+        <input
+          type="text"
+          name="botcheck"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          value={botcheck}
+          onChange={(e) => setBotcheck(e.target.value)}
+          className="hidden"
+        />
         {/* head — step indicator + price badge */}
         <div className="flex flex-col gap-5 border-b border-[#e8e7e2] bg-[#f7f6f3] px-6 pb-[25px] pt-6 md:flex-row md:items-center md:justify-between md:px-9">
           <div className="flex flex-1 items-start">
@@ -324,7 +352,7 @@ function BookingWizard() {
               return (
                 <Fragment key={label}>
                   {i > 0 && <div className={`mt-4 h-px min-w-[16px] flex-1 ${stepDone(i) ? "bg-[var(--finevu-orange)]" : "bg-[#e8e7e2]"}`} />}
-                  <div className="flex flex-col items-center gap-2 md:min-w-[90px]">
+                  <div className="flex flex-col items-center gap-2 md:min-w-[90px]" aria-current={active ? "step" : undefined}>
                     <span className={`flex size-8 items-center justify-center rounded-[16px] border-2 ${done ? "border-[var(--finevu-orange)] bg-[var(--finevu-orange)]" : active ? "border-[var(--finevu-orange)]" : "border-[#e8e7e2]"}`}>
                       {done ? <Check className="h-[15px] w-[15px] text-white" strokeWidth={2.5} /> : <span className={`text-[13px] font-bold leading-[19.5px] ${active ? "text-[var(--finevu-orange)]" : "text-[#9a9da5]"}`}>{s}</span>}
                     </span>
@@ -397,9 +425,9 @@ function BookingWizard() {
                 />
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-2"><label className={FIELD_LABEL}>Suburb</label><input className={INPUT} placeholder="Melbourne" value={form.suburb} onChange={(e) => set("suburb", e.target.value)} /></div>
-                <div><label className={FIELD_LABEL}>State</label><select className={INPUT} value={form.stateAu} onChange={(e) => set("stateAu", e.target.value)}><option value="">State</option>{STATES.map((s) => <option key={s}>{s}</option>)}</select></div>
-                <div><label className={FIELD_LABEL}>Postcode</label><input className={INPUT} placeholder="3000" inputMode="numeric" maxLength={4} value={form.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
+                <div className="sm:col-span-2"><label htmlFor="wiz-suburb" className={FIELD_LABEL}>Suburb</label><input id="wiz-suburb" name="suburb" autoComplete="address-level2" className={INPUT} placeholder="Melbourne" value={form.suburb} onChange={(e) => set("suburb", e.target.value)} /></div>
+                <div><label htmlFor="wiz-state" className={FIELD_LABEL}>State</label><select id="wiz-state" name="state" autoComplete="address-level1" className={INPUT} value={form.stateAu} onChange={(e) => set("stateAu", e.target.value)}><option value="">State</option>{STATES.map((s) => <option key={s}>{s}</option>)}</select></div>
+                <div><label htmlFor="wiz-postcode" className={FIELD_LABEL}>Postcode</label><input id="wiz-postcode" name="postcode" autoComplete="postal-code" className={INPUT} placeholder="3000" inputMode="numeric" maxLength={4} value={form.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
               </div>
             </div>
           )}
@@ -463,22 +491,26 @@ function BookingWizard() {
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Your details</h3>
               <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Almost done. We&apos;ll use these details to confirm your booking and for your installer to reach you on the day.</p>
+              {/* Every control carries a real <label htmlFor> (FA-16). A placeholder is not
+                  a label: it is unreadable to a screen reader as a name, and it vanishes the
+                  moment the customer types, so anyone checking their own answers on the last
+                  step before paying $250 has nothing left to check them against. */}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <input className={INPUT} placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} />
-                <input className={INPUT} placeholder="Mobile number" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+                <div><label htmlFor="wiz-name" className={FIELD_LABEL}>Full name</label><input id="wiz-name" name="name" autoComplete="name" className={INPUT} placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} /></div>
+                <div><label htmlFor="wiz-phone" className={FIELD_LABEL}>Mobile number</label><input id="wiz-phone" name="phone" autoComplete="tel" className={INPUT} placeholder="Mobile number" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} /></div>
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <input className={INPUT} placeholder="Email address" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
-                <input className={INPUT} placeholder="Where did you purchase? (optional)" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
+                <div><label htmlFor="wiz-email" className={FIELD_LABEL}>Email address</label><input id="wiz-email" name="email" autoComplete="email" className={INPUT} placeholder="Email address" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} /></div>
+                <div><label htmlFor="wiz-retailer" className={FIELD_LABEL}>Where did you purchase? <span className="font-normal text-[#9c9ca3]">(optional)</span></label><input id="wiz-retailer" name="retailer" className={INPUT} placeholder="e.g. JB Hi-Fi, Autobarn" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} /></div>
               </div>
               <span className={FLABEL}>Your vehicle</span>
               <div className="grid gap-4 sm:grid-cols-3">
-                <input className={INPUT} placeholder="Make (e.g. Toyota)" value={form.make} onChange={(e) => set("make", e.target.value)} />
-                <input className={INPUT} placeholder="Model (e.g. RAV4)" value={form.vmodel} onChange={(e) => set("vmodel", e.target.value)} />
-                <input className={INPUT} placeholder="Year" inputMode="numeric" maxLength={4} value={form.year} onChange={(e) => set("year", e.target.value.replace(/\D/g, "").slice(0, 4))} />
+                <div><label htmlFor="wiz-make" className={FIELD_LABEL}>Make</label><input id="wiz-make" name="make" className={INPUT} placeholder="e.g. Toyota" value={form.make} onChange={(e) => set("make", e.target.value)} /></div>
+                <div><label htmlFor="wiz-vmodel" className={FIELD_LABEL}>Model</label><input id="wiz-vmodel" name="vehicleModel" className={INPUT} placeholder="e.g. RAV4" value={form.vmodel} onChange={(e) => set("vmodel", e.target.value)} /></div>
+                <div><label htmlFor="wiz-year" className={FIELD_LABEL}>Year</label><input id="wiz-year" name="year" className={INPUT} placeholder="2022" inputMode="numeric" maxLength={4} value={form.year} onChange={(e) => set("year", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
               </div>
-              <span className={FLABEL}>Anything we should know? (optional)</span>
-              <textarea className={`${INPUT} min-h-[88px] resize-y`} placeholder="e.g. previous dash cam to remove, apartment parking access, preferred contact time…" value={form.notes} onChange={(e) => set("notes", e.target.value)} />
+              <label htmlFor="wiz-notes" className={FLABEL}>Anything we should know? (optional)</label>
+              <textarea id="wiz-notes" name="notes" className={`${INPUT} min-h-[88px] resize-y`} placeholder="e.g. previous dash cam to remove, apartment parking access, preferred contact time…" value={form.notes} onChange={(e) => set("notes", e.target.value)} />
             </div>
           )}
 
@@ -501,6 +533,7 @@ function BookingWizard() {
                   name: form.name, phone: form.phone, email: form.email,
                   make: form.make, vmodel: form.vmodel, year: form.year,
                   retailer: form.retailer, notes: form.notes,
+                  botcheck,
                 }}
                 onPaid={paid}
                 onSlotTaken={slotTaken}
@@ -540,7 +573,13 @@ function BookingWizard() {
         {step <= TOTAL && (
           <div className="flex items-center justify-between gap-4 border-t border-[#e8e7e2] px-6 py-5 md:px-9">
             <button type="button" onClick={back} disabled={step === 1} className="rounded-full border border-[#1d1d1f] px-[19px] py-[9px] text-[12px] font-semibold uppercase leading-[18px] tracking-[0.96px] text-[#1d1d1f] transition-colors disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
-            <span className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">Step {step} of {TOTAL}</span>
+            {/* aria-live so advancing a step is ANNOUNCED, not just redrawn (FA-22).
+                aria-current on the indicator marks where you are; without this a screen
+                reader user gets no signal that Continue did anything at all. */}
+            <span aria-live="polite" className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">
+              Step {step} of {TOTAL}
+              <span className="sr-only">{step <= TOTAL ? ` — ${STEP_LABELS[step - 1]}` : ""}</span>
+            </span>
             {/* Step 5 has no Continue button: Stripe's iframe renders its own pay button,
                 and a second one outside it could only ever submit an empty form. The
                 spacer keeps "Step n of 5" centred. */}

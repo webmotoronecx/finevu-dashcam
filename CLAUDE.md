@@ -50,15 +50,25 @@ environment decides, not the branch. `git diff main staging -- config/` should b
 **Raise these unprompted whenever launch, deployment, or content accuracy comes up.**
 They are unresolved decisions, not tasks that can just be done.
 
-1. **The booking checkout charges nothing and submits nothing.** `/installation` step 5
-   collects a full card number, expiry and CVC, then step 6 tells the customer *"your
-   payment of $250.00 AUD has been received"* with a paid reference — but `next()`
-   (`app/installation/page.tsx:171-174`) just fakes a 900 ms delay and generates the
-   reference client-side, and the imported `submitForm` helper is **never called**. There
-   is no payment provider and no endpoint, while `installation-terms.ts` §5 makes
-   payment-at-booking a contractual term. A customer can complete the wizard, believe they
-   are booked and paid, and no record exists anywhere. Needs a real payment + booking
-   backend, or the wizard must be visibly a demo. **CA-36.**
+1. **The booking checkout is REAL and works — what's left is three production items.**
+   Superseded 2026-08-15; the old text here said it charged nothing and faked the
+   reference, which has been untrue since the FB-01 build landed on 2026-08-10. `/installation`
+   step 5 mounts Stripe's embedded Checkout, `/api/booking/create` takes a real hold on the
+   GHL calendar, and `checkout.session.completed` promotes the appointment and sends the
+   confirmation + tax invoice. Verified end to end 2026-08-14; refunds verified 2026-08-15.
+   No card number ever enters React state (PCI SAQ A). Still outstanding, none of it the
+   integration:
+   - **`BUSINESS_ABN` is the placeholder `00 000 000 000`**, so the tax invoice is not a
+     valid Australian tax invoice — `sendBookingConfirmation` logs a warning on every send.
+     `legalName` also needs checking against the ABR.
+   - **Live Stripe keys and a production webhook endpoint** with its own `whsec_`,
+     subscribed to `charge.refunded` as well as `checkout.session.completed`/`.expired`.
+     Miss that event and refunds silently stop cancelling appointments (FA-32).
+   - **FA-26 — no terms acceptance at checkout**, while `installation-terms.ts` §5 makes
+     payment-at-booking a contractual term. Needs a consent control and a privacy notice;
+     the site has no local privacy page, only a footer link to `motoronegroup.com`.
+
+   See `docs/forms-backend-requirements.csv` **FB-01** for the full state. **CA-36.**
 2. **The site's primary CTA is a dead end.** `/retailers` is in `comingSoon`, so
    "Find Retailer" — the header button on every page, the footer CTA band, and one of the
    three `LearnMoreLinks` tiles that ship on all eight MVP pages — renders the Coming Soon

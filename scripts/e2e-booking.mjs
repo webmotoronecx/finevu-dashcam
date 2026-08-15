@@ -249,6 +249,17 @@ async function run() {
   const bad = await post("/api/booking/create", { ...payload(slot), email: "nope" }, "10.1.0.5");
   eq("invalid email is refused", bad.status, 400);
 
+  // FA-06. Sent with an OTHERWISE VALID body on a free slot, so a pass can only mean the
+  // honeypot fired — not that some other rule caught it.
+  const honeypot = await post("/api/booking/create", { ...payload(slot, "6"), botcheck: "http://spam.example" }, "10.1.0.6");
+  eq("honeypot submission is refused", honeypot.status, 400);
+  check(
+    "  and creates nothing",
+    !honeypot.data?.appointmentId && !honeypot.data?.clientSecret,
+    honeypot.data?.appointmentId ?? "",
+  );
+  if (honeypot.data?.appointmentId) created.appointments.add(honeypot.data.appointmentId);
+
   let limited = 0;
   for (let i = 0; i < 7; i++) {
     const r = await post("/api/booking/create", { model: "" }, "10.9.9.99");

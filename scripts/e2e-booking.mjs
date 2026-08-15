@@ -82,6 +82,31 @@ const stripeApi = async (path, { method = "GET", form } = {}) => {
   return { status: res.status, data: await res.json().catch(() => null) };
 };
 
+/**
+ * A real, paid, test-mode PaymentIntent carrying the appointment id — the same shape
+ * createBookingSession produces via payment_intent_data.metadata.
+ *
+ * A Checkout Session cannot be paid through the API, but a PaymentIntent can, and the
+ * PaymentIntent is the object the metadata actually rides on. So this reproduces the
+ * exact hop FA-32 depends on without needing a browser.
+ */
+async function paidCharge(appointmentId) {
+  const pi = await stripeApi("/payment_intents", {
+    method: "POST",
+    form: new URLSearchParams({
+      amount: String(25000),
+      currency: "aud",
+      "payment_method_types[]": "card",
+      payment_method: "pm_card_visa",
+      confirm: "true",
+      "metadata[appointmentId]": appointmentId,
+    }).toString(),
+  });
+  const chargeId = pi.data?.latest_charge;
+  const charge = chargeId ? (await stripeApi(`/charges/${chargeId}`)).data : null;
+  return { pi: pi.data, charge };
+}
+
 const post = async (path, payload, ip = "10.0.0.1") => {
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
@@ -301,6 +326,100 @@ async function run() {
     const gone = (await ghl(`/calendars/events/appointments/${expiringId}`)).data?.appointment ?? {};
     // GHL soft-deletes: the record still resolves, carrying deleted: true.
     eq("the hold is deleted", gone.deleted, true);
+  }
+
+  // 13 — refunds (FA-32)
+  //
+  // The one part of this suite that does NOT rely purely on synthetic payloads, and
+  // deliberately so. The fix rests on an assumption about Stripe itself — that a Charge
+  // inherits its PaymentIntent's metadata — and a hand-built Charge object would assert
+  // that assumption into existence rather than test it. So a real test-mode PaymentIntent
+  // is created and confirmed with pm_card_visa, refunded through the API, and the REAL
+  // refunded Charge is what gets signed and posted to the webhook.
+  console.log("\nRefunds");
+
+  const fresh = (await get("/api/booking/slots")).data?.days ?? [];
+  const spare = fresh.flatMap((d) => d.slots ?? []).filter((s) => s !== slot);
+  if (spare.length < 2) {
+    check("two spare slots are available for the refund tests", false, `${spare.length} found`);
+  } else {
+    const [slotA, slotB] = [spare.at(-1), spare.at(-2)];
+
+    // --- the inheritance assumption, tested against real Stripe -----------------
+    const rHold = await post("/api/booking/create", payload(slotA, "4"), "10.3.0.1");
+    const rid = rHold.data?.appointmentId;
+    check("hold taken for the refund test", Boolean(rid), rid ?? String(rHold.status));
+    if (rid) created.appointments.add(rid);
+    if (rHold.data?.sessionId) created.sessions.add(rHold.data.sessionId);
+
+    const { charge } = await paidCharge(rid ?? "");
+    check("test-mode charge was created", Boolean(charge?.id), charge?.id ?? "none");
+    // THE load-bearing assertion. If Stripe ever stops copying PaymentIntent metadata
+    // onto the Charge, the whole FA-32 fix silently reverts to a no-op and this is the
+    // only thing that would say so.
+    eq("Charge INHERITS PaymentIntent metadata (FA-32)", charge?.metadata?.appointmentId, rid);
+
+    // Promote it, so there is a confirmed booking for the refund to cancel.
+    await sendWebhook("checkout.session.completed", {
+      ...sessionObject, id: `cs_e2e_refund_${Date.now()}`, metadata: { ...sessionObject.metadata, appointmentId: rid, slot: slotA },
+    });
+
+    // --- a partial refund must NOT cancel the job ------------------------------
+    const partial = await sendWebhook("charge.refunded", {
+      ...charge, object: "charge", amount: 25000, amount_refunded: 5000,
+    });
+    eq("partial refund is accepted", partial.status, 200);
+    const afterPartial = (await ghl(`/calendars/events/appointments/${rid}`)).data?.appointment ?? {};
+    eq("  and leaves the booking confirmed", afterPartial.appointmentStatus, "confirmed");
+
+    // --- a full refund cancels it, using the REAL refunded charge --------------
+    await stripeApi("/refunds", { method: "POST", form: new URLSearchParams({ charge: charge.id }).toString() });
+    const refunded = (await stripeApi(`/charges/${charge.id}`)).data;
+    eq("Stripe reports the charge fully refunded", refunded?.amount_refunded, refunded?.amount);
+
+    const full = await sendWebhook("charge.refunded", { ...refunded, object: "charge" });
+    eq("full refund is accepted", full.status, 200);
+    const afterFull = (await ghl(`/calendars/events/appointments/${rid}`)).data?.appointment ?? {};
+    eq("  and CANCELS the booking", afterFull.appointmentStatus, "cancelled");
+    // Cancelled, never deleted — installation-terms.ts promises refunds in several
+    // scenarios, so the record has to survive for the audit trail.
+    check("  and keeps the record (not deleted)", afterFull.deleted !== true, `deleted: ${afterFull.deleted}`);
+    check("  and frees the slot", await slotIsFree(slotA));
+
+    // --- replaying a refund is harmless ---------------------------------------
+    const refundReplay = await sendWebhook("charge.refunded", { ...refunded, object: "charge" });
+    eq("replaying the refund still returns 200", refundReplay.status, 200);
+
+    // --- the pre-fix fallback path --------------------------------------------
+    // Sessions created BEFORE payment_intent_data landed carry no metadata on the
+    // Charge and never will, so the handler retrieves the PaymentIntent instead. This
+    // strips the inherited copy to reproduce exactly that shape.
+    const bHold = await post("/api/booking/create", payload(slotB, "5"), "10.3.0.2");
+    const bid = bHold.data?.appointmentId;
+    check("hold taken for the fallback test", Boolean(bid), bid ?? String(bHold.status));
+    if (bid) created.appointments.add(bid);
+    if (bHold.data?.sessionId) created.sessions.add(bHold.data.sessionId);
+
+    if (bid) {
+      const b = await paidCharge(bid);
+      await sendWebhook("checkout.session.completed", {
+        ...sessionObject, id: `cs_e2e_fallback_${Date.now()}`, metadata: { ...sessionObject.metadata, appointmentId: bid, slot: slotB },
+      });
+      await stripeApi("/refunds", { method: "POST", form: new URLSearchParams({ charge: b.charge.id }).toString() });
+      const bRefunded = (await stripeApi(`/charges/${b.charge.id}`)).data;
+
+      const viaFallback = await sendWebhook("charge.refunded", { ...bRefunded, object: "charge", metadata: {} });
+      eq("refund with no Charge metadata is accepted", viaFallback.status, 200);
+      const afterFallback = (await ghl(`/calendars/events/appointments/${bid}`)).data?.appointment ?? {};
+      eq("  and still cancels, via the PaymentIntent fallback", afterFallback.appointmentStatus, "cancelled");
+    }
+
+    // --- nothing resolvable at all --------------------------------------------
+    const orphan = await sendWebhook("charge.refunded", {
+      id: "ch_e2e_orphan", object: "charge", amount: 25000, amount_refunded: 25000, metadata: {},
+    });
+    eq("a refund we cannot trace does not crash", orphan.status, 200);
+    check("  (check the server log for 'REFUNDED BUT NO appointmentId')", true);
   }
 
   // 12 — email

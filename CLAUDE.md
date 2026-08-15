@@ -64,9 +64,14 @@ They are unresolved decisions, not tasks that can just be done.
    - **Live Stripe keys and a production webhook endpoint** with its own `whsec_`,
      subscribed to `charge.refunded` as well as `checkout.session.completed`/`.expired`.
      Miss that event and refunds silently stop cancelling appointments (FA-32).
-   - **FA-26 — no terms acceptance at checkout**, while `installation-terms.ts` §5 makes
-     payment-at-booking a contractual term. Needs a consent control and a privacy notice;
-     the site has no local privacy page, only a footer link to `motoronegroup.com`.
+   - **FA-26 — the consent control is BUILT** (2026-08-15): a required checkbox on step 5
+     linking `/terms-of-service`, gating the mount of the checkout so no hold or Stripe
+     session exists until the customer agrees, with the acceptance timestamp stored in
+     session metadata and re-checked server-side. What is left is a **legal answer, not an
+     edit**: the privacy notice points at `motoronegroup.com/privacy-policy` — the same
+     target the other forms use — and nobody has confirmed that policy covers FineVu
+     installation bookings, which collect a home address, vehicle details and a payment.
+     The site has no privacy page of its own.
 
    See `docs/forms-backend-requirements.csv` **FB-01** for the full state. **CA-36.**
 2. **The site's primary CTA is a dead end.** `/retailers` is in `comingSoon`, so

@@ -235,6 +235,10 @@ function BookingWizard() {
   // rather than inside BookingCheckout because the field has to be in the DOM from step 1,
   // where a bot filling the form would meet it; step 5 is where it is finally sent.
   const [botcheck, setBotcheck] = useState("");
+  // Terms acceptance (FA-26). Holds the moment of acceptance, not just a boolean: §5 of
+  // installation-terms.ts makes payment-at-booking a contractual term, so WHEN the customer
+  // agreed is the part worth being able to prove. Empty string = not accepted.
+  const [acceptedAt, setAcceptedAt] = useState("");
   const confirmed = useBookingConfirmation(sessionId);
   const avail = useAvailability();
   // Local dev only — see useCalendarGrid. Production always has the keys.
@@ -554,6 +558,51 @@ function BookingWizard() {
                 <span className="mb-3 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Order summary</span>
                 <dl className="space-y-2 text-[.88rem]">{summaryRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>
+              {/* Terms acceptance (FA-26) — BEFORE the payment form, not beside it.
+                  §5 of installation-terms.ts makes payment-at-booking a contractual term,
+                  and until now nothing in the five steps linked those terms, asked for
+                  agreement, or mentioned privacy, while $250 was charged against them.
+
+                  It gates the MOUNT of BookingCheckout rather than the pay button, which
+                  also means the slot hold and the Stripe session are not created until the
+                  customer has actually agreed — no held slots or open checkouts behind an
+                  unaccepted contract. */}
+              <span className={FLABEL}>Before you pay</span>
+              <div className="rounded-[12px] border border-[#e8e7e2] bg-[#fbfbfa] px-5 py-[18px]">
+                <label htmlFor="wiz-terms" className="flex cursor-pointer items-start gap-3">
+                  <input
+                    id="wiz-terms"
+                    name="termsAccepted"
+                    type="checkbox"
+                    checked={Boolean(acceptedAt)}
+                    onChange={(e) => setAcceptedAt(e.target.checked ? new Date().toISOString() : "")}
+                    className="mt-0.5 size-[18px] shrink-0 accent-[var(--finevu-orange)]"
+                  />
+                  <span className="text-[.88rem] leading-[1.6] text-[#1d1d1f]">
+                    I have read and agree to the{" "}
+                    <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--finevu-orange)] underline">
+                      installation terms of service
+                    </a>
+                    , including the cancellation and rescheduling terms, and I understand the
+                    $250 installation fee is payable now.
+                  </span>
+                </label>
+                <p className="mt-3 border-t border-[#e8e7e2] pt-3 text-[.8rem] leading-[1.6] text-[#6e6e73]">
+                  We use your details to arrange and confirm your installation and to contact
+                  you about your booking. See our{" "}
+                  <a href="https://motoronegroup.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--finevu-orange)]">
+                    privacy policy
+                  </a>
+                  .
+                </p>
+              </div>
+
+              {!acceptedAt ? (
+                <p className="mt-4 text-[.85rem] leading-[1.6] text-[#6e6e73]">
+                  Agree to the terms above and the secure payment form will appear.
+                </p>
+              ) : (
+                <>
               <span className={FLABEL}>Payment details</span>
               {/* Mounting this takes the hold and opens the Stripe session — see
                   BookingCheckout. It supplies its own pay button, which is why the
@@ -566,10 +615,13 @@ function BookingWizard() {
                   make: form.make, vmodel: form.vmodel, year: form.year,
                   retailer: form.retailer, notes: form.notes,
                   botcheck,
+                  termsAcceptedAt: acceptedAt,
                 }}
                 onPaid={paid}
                 onSlotTaken={slotTaken}
               />
+                </>
+              )}
             </div>
           )}
 

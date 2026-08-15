@@ -158,6 +158,8 @@ const customer = (n = "") => ({
 const payload = (slot, n = "") => ({
   model: "GX4K", street: "12 Test St", suburb: "Richmond", stateAu: "VIC", postcode: "3121",
   slot, make: "Toyota", vmodel: "HiLux", year: "2022", retailer: "E2E", notes: "automated test",
+  // FA-26 — the route refuses to open a payable session without it.
+  termsAcceptedAt: new Date().toISOString(),
   ...customer(n),
 });
 
@@ -248,6 +250,13 @@ async function run() {
 
   const bad = await post("/api/booking/create", { ...payload(slot), email: "nope" }, "10.1.0.5");
   eq("invalid email is refused", bad.status, 400);
+
+  // FA-26. Same shape as a real booking minus the acceptance, so a pass can only mean the
+  // terms gate fired — the one thing standing between $250 and an unagreed contract.
+  const noTerms = await post("/api/booking/create", { ...payload(slot, "7"), termsAcceptedAt: "" }, "10.1.0.7");
+  eq("booking without accepted terms is refused", noTerms.status, 422);
+  eq("  with reason terms_required", noTerms.data?.reason, "terms_required");
+  if (noTerms.data?.appointmentId) created.appointments.add(noTerms.data.appointmentId);
 
   // FA-06. Sent with an OTHERWISE VALID body on a free slot, so a pass can only mean the
   // honeypot fired — not that some other rule caught it.

@@ -31,6 +31,7 @@ type Payload = {
   postcode?: string; slot?: string; name?: string; phone?: string; email?: string;
   retailer?: string; make?: string; vmodel?: string; year?: string; notes?: string;
   botcheck?: string;
+  termsAcceptedAt?: string;
 };
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
@@ -112,6 +113,17 @@ export async function POST(req: Request) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("invalid", "Please enter a valid email address.");
   if (!make || !vmodel) return bad("invalid", "Please enter your vehicle make and model.");
 
+  // Terms acceptance (FA-26). §5 of installation-terms.ts makes payment-at-booking a
+  // contractual term, so the agreement has to exist before a payable session does — this
+  // sits with the other validation, ahead of the GHL and Stripe calls.
+  //
+  // Re-checked here even though the wizard will not mount the checkout without it: the
+  // client is not evidence, and this route is reachable directly.
+  const termsAcceptedAt = str(body.termsAcceptedAt);
+  if (!termsAcceptedAt || Number.isNaN(new Date(termsAcceptedAt).getTime())) {
+    return bad("terms_required", "Please accept the installation terms before paying.", 422);
+  }
+
   const address = [street, suburb, stateAu, postcode].filter(Boolean).join(", ");
 
   let createdAppointmentId: string | null = null;
@@ -172,6 +184,7 @@ export async function POST(req: Request) {
       vehicle: [make, vmodel, str(body.year)].filter(Boolean).join(" "),
       retailer: str(body.retailer) || undefined,
       notes: str(body.notes) || undefined,
+      termsAcceptedAt,
     });
 
     // Park the session id on the hold so a retry can find it. Best-effort: failing here

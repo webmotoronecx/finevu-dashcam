@@ -33,6 +33,12 @@ export type BookingPayload = {
    * at all beyond the per-IP limiter — every other form on the site carries this.
    */
   botcheck: string;
+  /**
+   * ISO timestamp of when the customer accepted the installation terms (FA-26). Empty
+   * means they have not, and the wizard does not mount this component at all in that
+   * case — the server re-checks anyway, since a client is not evidence of anything.
+   */
+  termsAcceptedAt: string;
 };
 
 type Props = {

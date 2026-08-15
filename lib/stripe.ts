@@ -57,6 +57,12 @@ export type BookingMetadata = {
   vehicle: string;
   retailer?: string;
   notes?: string;
+  /**
+   * ISO timestamp of terms acceptance (FA-26). Rides on the session metadata because that
+   * is the only durable record this site keeps besides the GHL appointment — there is no
+   * database, so if it is not here, the proof that the customer agreed does not exist.
+   */
+  termsAcceptedAt: string;
 };
 
 const trim500 = (v: string) => (v.length > 500 ? `${v.slice(0, 497)}…` : v);

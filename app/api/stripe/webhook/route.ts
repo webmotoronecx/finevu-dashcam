@@ -103,8 +103,48 @@ export async function POST(req: Request) {
       case "charge.refunded": {
         // Cancelled rather than deleted — the terms promise refunds in several scenarios,
         // so the record has to survive for the audit trail.
-        const refundedId = (event.data.object as Stripe.Charge).metadata?.appointmentId;
-        if (refundedId) await cancelAppointment(refundedId).catch(() => {});
+        const charge = event.data.object as Stripe.Charge;
+
+        // charge.refunded fires on EVERY refund, including partial ones. A goodwill
+        // refund of part of the fee must not cancel the whole job.
+        if (charge.amount_refunded < charge.amount) break;
+
+        // Primary path: metadata inherited from the PaymentIntent (see lib/stripe.ts).
+        let refundedId = charge.metadata?.appointmentId;
+
+        // Fallback for sessions created BEFORE payment_intent_data landed — those have no
+        // PaymentIntent metadata and never will, so without this every in-flight booking
+        // at cutover refunds into silence. Also covers a Charge that arrives without the
+        // inherited copy for any other reason.
+        if (!refundedId && charge.payment_intent) {
+          const pi = await stripe().paymentIntents.retrieve(
+            typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent.id,
+          );
+          refundedId = pi.metadata?.appointmentId;
+        }
+
+        if (!refundedId) {
+          // Money is back with the customer but we cannot tell which slot to free. Same
+          // class as a paid session with no appointmentId: a human has to reconcile it.
+          console.error("[stripe/webhook] REFUNDED BUT NO appointmentId — free the slot by hand", {
+            charge: charge.id,
+            paymentIntent: typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id,
+          });
+          break;
+        }
+
+        // Read first, exactly as the completed branch does. cancelAppointment() throws on
+        // a 404, and an appointment that staff already deleted — or that a retry already
+        // cancelled — is the outcome we wanted; letting that 500 would make Stripe retry a
+        // no-op for three days.
+        const booking = await getAppointment(refundedId).catch(() => null);
+        if (!booking || booking.deleted || booking.status === "cancelled") break;
+
+        // Anything else is deliberately NOT swallowed. A failure here means the customer
+        // has their money back and the calendar still shows them booked — the exact state
+        // this case exists to prevent — so it throws to the outer catch, which 500s and
+        // makes Stripe retry.
+        await cancelAppointment(refundedId);
         break;
       }
     }

@@ -106,6 +106,14 @@ export async function createBookingSession(meta: BookingMetadata): Promise<Booki
     // invoice (no ABN, no GST line) and /installation promises the customer one.
     // Completing that promise still needs the ABN configured on the Stripe account.
     invoice_creation: { enabled: true },
+    // Stripe metadata does NOT flow between object types — Session, PaymentIntent and
+    // Charge each carry their own bag. charge.refunded delivers a Charge, so without this
+    // the refund handler reads an empty bag, silently does nothing, and a refunded
+    // customer stays booked while an installer is dispatched (FA-32). A PaymentIntent's
+    // metadata IS inherited by its Charge, which is why the id is planted here.
+    // Only appointmentId — the refund path needs nothing else, and duplicating the whole
+    // bag would double what a leaked key exposes.
+    payment_intent_data: { metadata: { appointmentId: meta.appointmentId } },
     metadata: Object.fromEntries(
       Object.entries(meta)
         .filter(([, v]) => typeof v === "string" && v.length > 0)

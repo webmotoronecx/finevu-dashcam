@@ -43,6 +43,13 @@ export async function GET(req: Request) {
     }
 
     // Paid. Now ask GHL whether the webhook has landed yet.
+    //
+    // The bare catch is CORRECT here, and deliberately unlike the Stripe webhook, which was
+    // changed to findAppointment for exactly the opposite reason (FA-41). This is a read for
+    // display: if GHL is unreachable we answer confirmed:false, step 6 keeps saying "we're
+    // confirming your appointment now", and that stays true. Nothing is decided, nothing is
+    // discarded. In the webhook the same shape threw away a paid booking, because a 200
+    // there tells Stripe never to deliver again.
     const appointment = await getAppointment(appointmentId).catch(() => null);
 
     return NextResponse.json({

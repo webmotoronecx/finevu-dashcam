@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { cancelAppointment, confirmAppointment, getAppointment, releaseHold } from "@/lib/ghl";
+import { cancelAppointment, confirmAppointment, findAppointment, releaseHold } from "@/lib/ghl";
 import { sendBookingConfirmation } from "@/lib/email/bookingConfirmation";
 import { invoiceUrl, stripe, stripeConfigured } from "@/lib/stripe";
 
@@ -52,7 +52,14 @@ export async function POST(req: Request) {
         // the hold was swept before payment landed.
         // GHL soft-deletes, so a swept hold still resolves here with deleted: true.
         // Treating that as "found" would confirm a booking that no longer exists.
-        const found = await getAppointment(appointmentId).catch(() => null);
+        //
+        // findAppointment, NOT getAppointment(...).catch(() => null). The bare catch read a
+        // timeout or a GHL 500 as "the hold is gone", logged, and returned 200 — so Stripe
+        // never retried a session the customer had already paid for, and the booking was
+        // never confirmed. A transient failure now propagates to the outer catch, which
+        // 500s and lets Stripe deliver again. Only a real 404/400 falls through to the
+        // hand-reconcile path below.
+        const found = await findAppointment(appointmentId);
         const current = found && !found.deleted ? found : null;
         if (!current) {
           console.error(
@@ -136,8 +143,9 @@ export async function POST(req: Request) {
         // Read first, exactly as the completed branch does. cancelAppointment() throws on
         // a 404, and an appointment that staff already deleted — or that a retry already
         // cancelled — is the outcome we wanted; letting that 500 would make Stripe retry a
-        // no-op for three days.
-        const booking = await getAppointment(refundedId).catch(() => null);
+        // no-op for three days. findAppointment keeps that narrow: only a real 404/400
+        // means "already gone", while a transient GHL failure still 500s and retries.
+        const booking = await findAppointment(refundedId);
         if (!booking || booking.deleted || booking.status === "cancelled") break;
 
         // Anything else is deliberately NOT swallowed. A failure here means the customer

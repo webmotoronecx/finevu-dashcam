@@ -309,6 +309,50 @@ challenge without a browser. Adopting it needs a decision on using Cloudflare's 
 
 ---
 
+## FA-41 — added 2026-08-17: a paid booking could be dropped on a 200
+
+Found while answering a question about how a webhook gets lost, which is a better prompt
+than an audit checklist.
+
+The `checkout.session.completed` branch read the appointment with:
+
+```js
+const found = await getAppointment(appointmentId).catch(() => null);
+```
+
+A bare catch **cannot tell "GHL answered, and it is not there" from "GHL did not answer."**
+So a timeout, a 500 or an expired token was read as a deleted hold: log
+`PAID BUT THE HOLD IS GONE`, `break`, **return 200** — and a 200 tells Stripe the event is
+handled and never to deliver it again. The customer has paid, the slot stays merely held,
+and the only trace is a log line nobody watches, because the ops alerting for precisely this
+case was never built.
+
+It is the same shape as FA-32 seen from the other side. There the code was right and the
+event never arrived; here the event arrives and the code throws it away. And it sat directly
+under a comment explaining that re-reading first exists to stop a retry thrashing GHL — while
+discarding the retry.
+
+**The fix distinguishes the two answers.** `ghlFetch` now throws a typed `GhlError` carrying
+`.status`, and `findAppointment()` returns `null` only on a real 404/400, propagating
+everything else. Both webhook branches use it, so a transient GHL failure reaches the outer
+catch, 500s, and Stripe delivers again — which is what the three-day retry window is *for*.
+
+Two things came with it:
+
+- **`releaseHold()` no longer substring-matches the message.** It was recovering the status
+  with `String(err).includes(" 404")`, which reads a 404 out of any error whose body happens
+  to contain those characters. It now checks `.status`.
+- **`/api/booking/status` deliberately KEEPS its bare catch**, and now carries a comment
+  saying why. It is a read for display: if GHL is unreachable it answers `confirmed: false`,
+  step 6 keeps saying "we're confirming your appointment now", and that stays true. Nothing
+  is decided and nothing is discarded. The asymmetry is the point — flag it, don't
+  "fix" it.
+
+Verified: build clean, lint clean, e2e 54/55 with the soft-delete guard still passing, which
+is what exercises `findAppointment`'s genuine-404 path.
+
+---
+
 ## Backend tracker impact (FB-nn)
 
 `FA` and `FB` overlap by design — FA says a form is broken, FB says what would fix it — and

@@ -75,6 +75,25 @@ function config() {
  * included — these calls sit behind a customer paying money, so a silent failure is far
  * worse than a noisy one. Callers decide how to degrade.
  */
+/**
+ * A GHL response we did not get a 2xx from, carrying the STATUS as a field.
+ *
+ * The status used to live only inside the message string, and callers recovered it with
+ * `String(err).includes(" 404")`. That reads a 404 out of any error whose body happens to
+ * contain those characters, and — worse — gives a caller no way to tell "GHL answered, and
+ * the thing is not there" apart from "GHL did not answer at all". Those two must not be
+ * handled the same way anywhere money is involved.
+ */
+export class GhlError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+    this.name = "GhlError";
+  }
+}
+
+const isNotFound = (err: unknown) =>
+  err instanceof GhlError && (err.status === 404 || err.status === 400);
+
 async function ghlFetch<T>(
   path: string,
   init: { method?: string; body?: unknown; version?: string } = {},
@@ -96,7 +115,10 @@ async function ghlFetch<T>(
 
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
-    throw new Error(`GHL ${init.method ?? "GET"} ${path} failed: ${res.status} ${detail.slice(0, 300)}`);
+    throw new GhlError(
+      `GHL ${init.method ?? "GET"} ${path} failed: ${res.status} ${detail.slice(0, 300)}`,
+      res.status,
+    );
   }
   return (await res.json()) as T;
 }
@@ -325,6 +347,27 @@ export async function getAppointment(appointmentId: string): Promise<Appointment
   );
 }
 
+/**
+ * The appointment, or null ONLY because GHL said it is not there.
+ *
+ * Use this instead of `getAppointment(id).catch(() => null)` anywhere the answer decides
+ * whether to give up. A bare catch turns a timeout, a 500 or an expired token into "it is
+ * gone", and the caller then acts on a deletion that never happened — in the Stripe webhook
+ * that meant returning 200 for a booking somebody had just paid for, so Stripe never
+ * retried and the appointment was never confirmed.
+ *
+ * Anything that is not a 404/400 propagates, so a transient GHL failure stays a failure and
+ * the caller can 500 and let Stripe deliver again.
+ */
+export async function findAppointment(appointmentId: string): Promise<Appointment | null> {
+  try {
+    return await getAppointment(appointmentId);
+  } catch (err) {
+    if (isNotFound(err)) return null;
+    throw err;
+  }
+}
+
 // --- Hold ↔ Stripe session link ---------------------------------------------
 //
 // The appointment title is the only writable field on an appointment that actually
@@ -404,8 +447,10 @@ export async function releaseHold(appointmentId: string): Promise<boolean> {
     await ghlFetch(`/calendars/events/${encodeURIComponent(appointmentId)}`, { method: "DELETE" });
     return true;
   } catch (err) {
-    const msg = String(err);
-    if (msg.includes(" 404") || msg.includes(" 400")) return false;
+    // Was a substring match on the message; now the status itself. Same two codes — GHL
+    // 400s an id it has already removed — but it can no longer be fooled by an error whose
+    // body happens to contain "404".
+    if (isNotFound(err)) return false;
     throw err;
   }
 }

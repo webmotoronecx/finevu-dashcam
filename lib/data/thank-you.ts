@@ -9,13 +9,25 @@
 // design text. The per-variant structure is deliberately kept so each form can be
 // given its own wording later without touching components/ThankYou.tsx.
 //
-// ⚠️ ACCURACY, UNRESOLVED: this text says a confirmation email was sent, but
-// app/api/contact/route.ts sends ONE email, to the support inbox — the submitter
-// receives nothing. So "sent a confirmation to your email", "reply to the
-// confirmation email" and "check your spam" describe an email that does not
-// exist. Kept verbatim at the user's direction pending a decision: either add a
-// submitter auto-reply in the API route, or reword these three lines. Must be
-// settled before launch (content accuracy is a hard gate).
+// ── ACCURACY: RESOLVED 2026-08-14 by building the email, not by cutting the copy ──
+// This text used to describe an email that was never sent: /api/contact delivered ONE
+// message, to the support inbox, so "sent a confirmation to your email", "reply to the
+// confirmation email" and "check your spam" were all false. The route now sends a
+// submitter acknowledgement via lib/email/formAutoReply.ts (FA-07 / CA-70), so BODY and
+// FOOTNOTE are true as written.
+//
+// ONE line had to change anyway: "reply to the confirmation email" stayed false, because
+// finevuaustralia.com.au has NO MX RECORD — it can send but not receive, so a reply
+// hard-bounces (`dig MX finevuaustralia.com.au` → empty, re-verified 2026-08-17). The
+// bullet points at the phone number instead. Restore the reply wording ONLY once a mailbox
+// exists (FB-08) and dig shows an MX; the sending domain being verified in Resend does NOT
+// imply it can receive.
+//
+// The bullet does NOT say the inbox is unmonitored (removed 2026-08-17, at the user's
+// direction). That is a tone call and it is safe: the copy no longer invites a reply
+// anywhere, so nothing here promises something that would bounce. What it means is that the
+// page carries no visible cue either — so if the reply wording is ever restored, restore it
+// here AND in lib/email/formAutoReply.ts, which still tells the recipient not to reply.
 
 export type ThankYouVariant = {
   eyebrow: string;
@@ -33,7 +45,7 @@ const BODY = "We've received your submission and sent a confirmation to your ema
 
 const NEXT = [
   "We'll review your submission and be in touch if we need anything else.",
-  "Reply to the confirmation email any time if you have questions.",
+  "Questions? You can call us on 1800 818 288.",
 ];
 
 const FOOTNOTE =

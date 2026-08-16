@@ -14,6 +14,15 @@
 // confirmation depends on. Turnstile and the rate limit are what keep that bounded, which
 // is why FA-34 (Turnstile fails open when its key is unset) matters more now than it did.
 // Never call this before the honeypot, CAPTCHA and rate-limit checks have all passed.
+//
+// ⚠️ DON'T PROMISE A REPLY — finevuaustralia.com.au HAS NO MX RECORD. The domain can send
+// (Resend DKIM + SPF on the send. subdomain) but cannot receive: `dig MX finevuaustralia.com.au`
+// returns nothing, so a reply to either the From (noreply@) or the Reply-To (support@)
+// hard-bounces. That is why the closing line points at the phone number and /contact
+// instead of saying "just reply to this email" — a bounce reads to a customer as being
+// ignored, and on a warranty claim that is the worst possible moment for it.
+// Reply-To is still SET so the header is correct the day a mailbox exists (FB-08); the
+// COPY is what must stay silent until then. Re-check with dig before rewording this back.
 
 import { Resend } from "resend";
 import { BUSINESS } from "@/lib/data/business";
@@ -24,7 +33,10 @@ const FROM_EMAIL = process.env.CONTACT_FROM_EMAIL || "FineVu Australia <onboardi
 export type AutoReplyInput = {
   /** Where to send it — must already be validated as an email by the caller. */
   to: string;
-  /** Reply-To, so a customer replying reaches a human. Single address. */
+  /**
+   * Reply-To. Single address, set so a reply is at least ADDRESSED correctly — but the
+   * body must not invite one; see the "don't promise a reply" note in the header.
+   */
   replyTo?: string;
   /** The support-email subject, used to work out which form this was. */
   subject: string;
@@ -111,8 +123,8 @@ export function renderAutoReply(input: AutoReplyInput): { subject: string; text:
     "",
     ...input.rows.map(([label, value]) => `${label}: ${value}`),
     "",
-    `If you have questions, just reply to this email — it reaches our support team.`,
-    `You can also call ${BUSINESS.supportPhone}.`,
+    `This address isn't monitored, so please don't reply to it.`,
+    `If you have questions, call ${BUSINESS.supportPhone} or use the contact form at ${BUSINESS.website}/contact.`,
     "",
     `${BUSINESS.tradingAs} — ${BUSINESS.website}`,
   ].join("\n");
@@ -132,8 +144,9 @@ export function renderAutoReply(input: AutoReplyInput): { subject: string; text:
   </table>
 
   <p style="color:#6e6e73;line-height:1.6;margin:28px 0 0;font-size:14px">
-    If you have questions, just reply to this email — it reaches our support team.
-    You can also call <a href="tel:1800818288" style="color:#F26522">${escapeHtml(BUSINESS.supportPhone)}</a>.
+    This address isn't monitored, so please don't reply to it. If you have questions, call
+    <a href="tel:1800818288" style="color:#F26522">${escapeHtml(BUSINESS.supportPhone)}</a>
+    or use the <a href="https://${escapeHtml(BUSINESS.website)}/contact" style="color:#F26522">contact form</a>.
   </p>
   <p style="color:#9c9ca3;line-height:1.6;margin:16px 0 0;font-size:12.5px">
     ${escapeHtml(BUSINESS.tradingAs)} — ${escapeHtml(BUSINESS.website)}

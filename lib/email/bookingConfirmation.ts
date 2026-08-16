@@ -165,7 +165,9 @@ export async function sendBookingConfirmation(input: ConfirmationInput): Promise
     const { error } = await new Resend(apiKey).emails.send({
       from: FROM_EMAIL,
       to,
-      replyTo: BUSINESS.supportEmail,
+      // NO Reply-To — customer confirmations are no-reply by design (confirmed 2026-08-17),
+      // and support@ is on a domain with no MX, so the header only produced a Reply button
+      // that bounces. See lib/email/formAutoReply.ts for the full note.
       subject,
       text,
       html,

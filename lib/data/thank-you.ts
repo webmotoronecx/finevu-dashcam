@@ -16,18 +16,23 @@
 // submitter acknowledgement via lib/email/formAutoReply.ts (FA-07 / CA-70), so BODY and
 // FOOTNOTE are true as written.
 //
-// ONE line had to change anyway: "reply to the confirmation email" stayed false, because
-// finevuaustralia.com.au has NO MX RECORD — it can send but not receive, so a reply
-// hard-bounces (`dig MX finevuaustralia.com.au` → empty, re-verified 2026-08-17). The
-// bullet points at the phone number instead. Restore the reply wording ONLY once a mailbox
-// exists (FB-08) and dig shows an MX; the sending domain being verified in Resend does NOT
-// imply it can receive.
+// ONE line had to change anyway: "reply to the confirmation email" was false. Customer
+// confirmations are NO-REPLY BY DESIGN — settled 2026-08-17, not a workaround. The bullet
+// points at the phone number instead: "Questions? You can call us on 1800 818 288."
 //
-// The bullet does NOT say the inbox is unmonitored (removed 2026-08-17, at the user's
-// direction). That is a tone call and it is safe: the copy no longer invites a reply
-// anywhere, so nothing here promises something that would bounce. What it means is that the
-// page carries no visible cue either — so if the reply wording is ever restored, restore it
-// here AND in lib/email/formAutoReply.ts, which still tells the recipient not to reply.
+// Do NOT reintroduce reply wording here. It is a product decision now, not a limitation
+// waiting on DNS, so a mailbox appearing later does not license changing it back. The
+// technical fact that made it unavoidable still holds independently:
+// finevuaustralia.com.au has NO MX RECORD and cannot receive at all (`dig +short MX` →
+// empty, re-verified 2026-08-17), and being verified in Resend proves only that it can SEND.
+//
+// The page deliberately does not say the inbox is unmonitored — a tone call, and safe,
+// because no copy here invites a reply. The auto-reply itself does say so, which is where
+// a customer would actually attempt one. See lib/email/formAutoReply.ts.
+//
+// ⚠️ This settles OUTBOUND only. Mail we SEND TO customers is fine. Mail sent TO
+// support@finevuaustralia.com.au — every contact enquiry, registration, warranty claim and
+// retailer application — still lands on a domain with no MX. FB-08 is unaffected.
 
 export type ThankYouVariant = {
   eyebrow: string;

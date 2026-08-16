@@ -15,14 +15,21 @@
 // is why FA-34 (Turnstile fails open when its key is unset) matters more now than it did.
 // Never call this before the honeypot, CAPTCHA and rate-limit checks have all passed.
 //
-// ⚠️ DON'T PROMISE A REPLY — finevuaustralia.com.au HAS NO MX RECORD. The domain can send
-// (Resend DKIM + SPF on the send. subdomain) but cannot receive: `dig MX finevuaustralia.com.au`
-// returns nothing, so a reply to either the From (noreply@) or the Reply-To (support@)
-// hard-bounces. That is why the closing line points at the phone number and /contact
-// instead of saying "just reply to this email" — a bounce reads to a customer as being
-// ignored, and on a warranty claim that is the worst possible moment for it.
-// Reply-To is still SET so the header is correct the day a mailbox exists (FB-08); the
-// COPY is what must stay silent until then. Re-check with dig before rewording this back.
+// ⚠️ THIS EMAIL IS NO-REPLY BY DESIGN. Settled 2026-08-17: customers receive confirmations
+// from a no-reply address and cannot reply to them. The closing line says so and points at
+// the phone number and /contact.
+//
+// It is therefore a product decision, not a limitation waiting on DNS — a mailbox appearing
+// later does not license inviting replies. NO Reply-To header is set: it used to point at
+// support@, which only rendered a Reply button that hard-bounces, since
+// finevuaustralia.com.au has NO MX RECORD (`dig +short MX` → empty, re-verified
+// 2026-08-17). A bounce reads to a customer as being ignored, and on a warranty claim that
+// is the worst possible moment for it.
+//
+// Set CONTACT_FROM_EMAIL to an explicitly named noreply@ address so the From matches the
+// policy — the fallback is still onboarding@resend.dev.
+//
+// ⚠️ None of this touches INBOUND. Mail sent TO support@ still cannot be delivered; FB-08.
 
 import { Resend } from "resend";
 import { BUSINESS } from "@/lib/data/business";
@@ -34,8 +41,9 @@ export type AutoReplyInput = {
   /** Where to send it — must already be validated as an email by the caller. */
   to: string;
   /**
-   * Reply-To. Single address, set so a reply is at least ADDRESSED correctly — but the
-   * body must not invite one; see the "don't promise a reply" note in the header.
+   * @deprecated Ignored since 2026-08-17 — customer confirmations are no-reply by design,
+   * so sendAutoReply sets no Reply-To at all. Kept on the type so the callers that still
+   * pass it do not break; delete it once they stop.
    */
   replyTo?: string;
   /** The support-email subject, used to work out which form this was. */
@@ -172,7 +180,12 @@ export async function sendAutoReply(input: AutoReplyInput): Promise<SendResult> 
     const { error } = await new Resend(apiKey).emails.send({
       from: FROM_EMAIL,
       to: input.to,
-      replyTo: input.replyTo ?? BUSINESS.supportEmail,
+      // NO Reply-To. Confirmed 2026-08-17: customer confirmations are no-reply by design.
+      // It used to be set to support@, on the theory that the header would be correct the
+      // day a mailbox existed — but that domain has no MX, so all it did was render a Reply
+      // button in the customer's mail client that hard-bounces. With no Reply-To, a reply
+      // goes to the From address instead, which should be an explicitly named noreply@
+      // (set CONTACT_FROM_EMAIL — the fallback is still onboarding@resend.dev).
       subject,
       text,
       html,

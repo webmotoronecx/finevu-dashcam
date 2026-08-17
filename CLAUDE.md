@@ -142,11 +142,16 @@ They are unresolved decisions, not tasks that can just be done.
    - A **custom domain remains impossible** (zone on **BrandShelter** nameservers, apex A →
      `216.198.79.1` Vercel; moving it is a registrar-level ops decision). It is no longer
      needed for the downloads — only if you later want R2 cache rules.
-   - **SHA-256 checksums ship beside each download** (added 2026-08-11) — `ReleaseFile.sha256`,
-     rendered by the picker. Firmware is executable code for a device, so a corrupted or
-     substituted file can brick a camera. **Compute the digest from the OBJECT IN R2, not a
-     local copy**, or it certifies bytes nobody will download. Omitting the field just hides
-     the line, so a new file without one is safe but unverifiable.
+   - **SHA-256 checksums are stored but NO LONGER SHOWN.** `ReleaseFile.sha256` still carries
+     them and `lib/data/firmware.ts` still sets them; the picker's display was **commented
+     out on 2026-08-17** at the user's direction — a customer does not need to see it.
+     **Do not "clean up" the commented block, the field, or the digests**: restoring the
+     display should stay a one-line change, and the same tidying instinct removes all three.
+     Firmware is executable code for a device, so a corrupted or substituted file can brick a
+     camera — hiding the line does not remove that risk, it removes the customer's ability to
+     check for it. The real defence is whether the camera verifies a firmware signature before
+     flashing, which is still unconfirmed with FineVu (below). **Compute any new digest from
+     the OBJECT IN R2, not a local copy**, or it certifies bytes nobody will download.
    - **Still outstanding:** confirm with FineVu whether the camera verifies a firmware
      signature before flashing — that, not the checksum, is the real defence. Keep the R2
      token **Object Read only and scoped to the one bucket**.

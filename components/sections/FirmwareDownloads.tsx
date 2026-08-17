@@ -124,16 +124,28 @@ function DownloadPicker({ files, theme }: { files: DownloadFile[]; theme: Theme 
                     Download
                 </a>
 
-                {/* Integrity check. Firmware is executable code for a device, so a corrupted
-                    or substituted file can brick a camera — this lets a customer confirm the
-                    bytes before flashing. `break-all` because a 64-char hex string has no
-                    break opportunities and would otherwise overflow on mobile. */}
-                {file.sha256 && (
+                {/* HIDDEN 2026-08-17 at the user's direction — a customer does not need to see
+                    it. COMMENTED OUT, NOT DELETED, deliberately: restoring it should stay a
+                    one-line change, and the same instinct that would tidy this away would also
+                    delete `ReleaseFile.sha256` and the digests in lib/data/firmware.ts. Leave
+                    both alone.
+
+                    What it was for: firmware is executable code for a device, so a corrupted
+                    or substituted file can brick a camera, and this let a customer confirm the
+                    bytes before flashing. Hiding the display does NOT remove that risk — it
+                    removes the customer's ability to check for it. The real defence is whether
+                    the camera verifies a firmware signature before flashing, which is still an
+                    open question with FineVu (see CLAUDE.md). The digests remain in the data,
+                    so they can still be checked by hand or surfaced again later.
+
+                    `break-all` because a 64-char hex string has no break opportunities and
+                    would otherwise overflow on mobile. */}
+                {/* {file.sha256 && (
                     <div className={`mt-4 max-w-[420px] text-[12px] leading-relaxed ${t.body}`}>
                         <span className="font-semibold uppercase tracking-wide">SHA-256</span>
                         <code className="mt-1 block break-all font-mono text-[11px]">{file.sha256}</code>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     );

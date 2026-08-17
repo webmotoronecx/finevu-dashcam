@@ -77,8 +77,10 @@ export function renderBookingConfirmation(input: ConfirmationInput) {
     `Please have your FineVu and all in-box accessories, including the hardwire kit,`,
     `with the vehicle. Your installer will call ahead on the day.`,
     ``,
-    `Need to change your booking? Reply to this email or call ${BUSINESS.supportPhone}`,
-    `at least 24 hours before your appointment.`,
+    `Need to change your booking? Call ${BUSINESS.supportPhone} or email`,
+    `${BUSINESS.supportEmail} at least 24 hours before your appointment.`,
+    ``,
+    `This address isn't monitored, so please don't reply to it.`,
   ].filter((line): line is string => line !== null).join("\n");
 
   const row = ([k, v]: [string, string]) =>
@@ -111,8 +113,12 @@ export function renderBookingConfirmation(input: ConfirmationInput) {
     the vehicle. Your installer will call ahead on the day.
   </p>
   <p style="color:#6e6e73;line-height:1.6;margin:16px 0 0;font-size:14px">
-    Need to change your booking? Reply to this email or call ${escapeHtml(BUSINESS.supportPhone)}
+    Need to change your booking? Call ${escapeHtml(BUSINESS.supportPhone)} or email
+    <a href="mailto:${escapeHtml(BUSINESS.supportEmail)}" style="color:#F26522">${escapeHtml(BUSINESS.supportEmail)}</a>
     at least 24 hours before your appointment.
+  </p>
+  <p style="color:#9c9ca3;line-height:1.6;margin:24px 0 0;font-size:12px">
+    This address isn’t monitored, so please don’t reply to it.
   </p>
 </div>`;
 

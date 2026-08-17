@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
@@ -36,6 +36,14 @@ export const metadata: Metadata = {
         nocache: true,
         googleBot: { index: false, follow: false, noimageindex: true },
       },
+};
+
+// Tints the browser chrome — on iOS Safari this is the bar behind the URL field at
+// the bottom of the screen, which otherwise picks up the page's white background.
+// #0A0A0B is the brand near-black (--foreground); Safari flips the bar's own text to
+// light automatically off its luminance. This is site-wide, not per-page.
+export const viewport: Viewport = {
+  themeColor: "#0A0A0B",
 };
 
 export default function RootLayout({

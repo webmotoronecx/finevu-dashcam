@@ -563,8 +563,38 @@ a real person, and confirm it is unset in Vercel.
       the appointment and frees the slot
 - [ ] **Subscribe `charge.refunded` on the production webhook endpoint** — the FA-32 fix is
       inert if the endpoint only listens for `checkout.session.completed`/`.expired`
+- [ ] **ACTIVATE THE STRIPE ACCOUNT.** `charges_enabled` is `false` with empty
+      `capabilities` as of 2026-08-17 — the account is not fully onboarded, so live keys
+      will not take money no matter what else is configured. Test-mode charges work, which
+      is exactly why nothing has surfaced this: `npm run test:booking` creates real test
+      PaymentIntents quite happily. **Check this first — every other payment item below
+      depends on it.** Verify with `GET /v1/account` on the LIVE key and expect
+      `charges_enabled: true`
 - [ ] Live Stripe keys, and create the production webhook endpoint with **its own**
       `whsec_` (a test-mode secret rejects live events)
+- [ ] **Apple Pay in production — three steps, in this order.** The "We Accept" strip
+      promises Apple Pay, so until these are done the artwork is claiming a method the
+      payment form cannot offer (**FA-36**):
+      1. **Deploy**, so Stripe's association file actually serves. It ships in the repo at
+         `public/.well-known/apple-developer-merchantid-domain-association` — confirm with
+         `curl -sI https://www.finevuaustralia.com.au/.well-known/apple-developer-merchantid-domain-association`
+         and expect **200**, 9094 bytes.
+      2. **Register `www.finevuaustralia.com.au` in LIVE mode** with the live key.
+         Registration in test mode does NOT fetch the file, which is why the test-mode
+         registrations succeeded while the path still 404s — live mode does verify, so this
+         fails until step 1 is done. **Register `www`, not the apex:** the apex
+         308-redirects to www, and a redirect fails verification.
+      3. **Confirm no Vercel Deployment Protection** on the production deployment. It blocks
+         Apple and Stripe from fetching the file, and the only symptom is an Apple Pay
+         button that never appears — no error anywhere. Staging was checked and is clear.
+
+      Already done: the association file is committed, and both
+      `www.finevuaustralia.com.au` and `finevu-dashcam-staging.vercel.app` are registered in
+      **test** mode. Test that on staging from an iPhone before touching production.
+- [ ] **Verify Apple Pay by hand** — Safari or iOS with a **real card in Wallet**, over
+      HTTPS on the registered domain. It never appears in Chrome, on desktop without Touch
+      ID, or on localhost, so absence in those is not a failure signal, and the e2e suite
+      cannot cover it because a Checkout Session cannot be paid through the API
 - [ ] Decide surcharge vs absorb (recommend absorb — every page promises a flat $250)
 - [ ] `npm run test:booking` against staging
 - [ ] One real card payment end to end, then refund it

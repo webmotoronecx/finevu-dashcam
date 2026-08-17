@@ -50,22 +50,29 @@ was well-formed English making a false claim. It was the **last surviving instan
 same instruction had already been corrected in `lib/data/thank-you.ts` and
 `lib/email/formAutoReply.ts` and this one was missed.
 
-### What it uncovered — bigger than the row
+### What it uncovered — and how that was corrected
 
-Every contact enquiry, product registration, warranty claim and retailer application is
-delivered to `CONTACT_TO_EMAIL`, which **defaults to `support@finevuaustralia.com.au`**. On
-a domain with no MX, that mail cannot be delivered at all.
+The absent MX also means `support@finevuaustralia.com.au` cannot receive mail, and every
+contact enquiry, product registration, warranty claim and retailer application is delivered
+to `CONTACT_TO_EMAIL`, which defaults to that address.
 
-This reframes **FB-08** from *"nobody can open the mailbox"* to *"the mailbox cannot
-exist"*, and it is consistent with the standing note that no submission has ever been
-confirmed to arrive. **Being verified in Resend only proves the domain can *send*** —
-verification says nothing about receiving, and the two are easy to conflate.
+**This was first written up as a latent production defect — "no form has ever delivered
+anything". That overstated it, and the user corrected it on 2026-08-17.** It is an
+**expected development state**: the client's mailbox is provisioned at launch, and
+`CONTACT_TO_EMAIL` exists precisely so submissions can be delivered somewhere readable
+before it exists. In dev, pointing it at any working address is the intended workflow, not a
+workaround.
 
-> **Before launch, check what `CONTACT_TO_EMAIL` is actually set to in the Vercel production
-> project.** If it is overridden to a working address this is a non-event; if it is unset,
-> no form on the site has ever delivered anything. Recorded on FB-08 with a third
-> requirement: add an MX record, or point `CONTACT_TO_EMAIL` at a domain that has one. The
-> zone is on **BrandShelter** nameservers, so that is a registrar-level DNS change.
+What remains true and worth keeping:
+
+- **At launch**, the mailbox and the MX record both have to be in place before the site can
+  receive anything.
+- **The launch check that proves it is the existing one** — submit a form once and confirm
+  it arrives. It is the only step that tests inbound.
+- **Being verified in Resend only proves the domain can *send*.** Verification says nothing
+  about receiving, and the two are easy to conflate — which is the specific trap here.
+
+Recorded on **FB-08**, which is a launch task, not a bug.
 
 ---
 

@@ -364,7 +364,7 @@ FB rows changed today are recorded here so the overlap stays navigable.
 | **FB-01** | FA-32, FA-26, FA-36 | Down to two live-money blockers: the placeholder `BUSINESS_ABN`, and the FA-26 privacy confirmation. The refund path is fixed and verified; `charge.refunded` must be subscribed on the production endpoint. Its own narrative was updated in the same pass — the FA-32 failure is struck through rather than deleted, so the mode stays legible |
 | **FB-05** | **FA-02** | The *upload* half is done — evidence is genuinely attached, not listed by name. What remains is persistence: the claim still exists only as an email, with no storage, no claim id and no link to the FB-04 registration. `lib/r2.ts` still has no upload path |
 | **FB-07** | **FA-34**, FA-06 | The Turnstile fail-open caveat it carried as a standing warning is resolved. Its remaining ask is now stated as what it is — a **decision** about using Cloudflare test keys so `e2e-booking.mjs` can still run — not an amount of work |
-| **FB-08** | CA-87 | Reframed from "nobody can open the mailbox" to **"the mailbox cannot exist"** — the apex domain has no MX record. See `docs/content-accuracy-audit-2026-08-15.md` |
+| **FB-08** | CA-87 | The apex domain has no MX record, so `support@` cannot receive yet. **Clarified 2026-08-17 as an expected dev state, not a defect** — the client mailbox and MX are provisioned at launch, and `CONTACT_TO_EMAIL` exists so submissions reach a readable address until then. See `docs/content-accuracy-audit-2026-08-15.md` |
 
 ---
 
@@ -376,6 +376,6 @@ None of it is code.
 |---|---|
 | `BUSINESS_ABN` is still `00 000 000 000`, so the invoice is not a valid Australian tax invoice — `sendBookingConfirmation` logs a warning on every send. `legalName` also needs checking against the ABR | Config |
 | **FA-26** — confirm the Motor One privacy policy covers FineVu booking data, or give the site its own privacy page | Legal |
-| **FA-07 / FB-08** — nobody can open `support@finevuaustralia.com.au`, so no submission from any of the four email forms has ever been confirmed to arrive. The FA-02 evidence fix makes this sharper, not softer: the attachments now genuinely ride on an email into a mailbox no one reads | Ops |
+| **FA-07 / FB-08** — the client mailbox for `support@finevuaustralia.com.au` is provisioned **at launch**, along with the MX record; until then `CONTACT_TO_EMAIL` points submissions at a readable address, which is what that override is for. Not a defect — a launch task, with one verification: submit a form once and confirm it arrives | Ops, at launch |
 | **FA-40** — an unserviced postcode can still complete a booking and pay $250. Option (a), accept and refund by hand, is now genuinely viable since FA-32 makes a refund release the slot | Business decision |
 | Live Stripe keys, and a production webhook endpoint with its own `whsec_` **subscribed to `charge.refunded`** — the FA-32 fix is inert without that event | Ops |

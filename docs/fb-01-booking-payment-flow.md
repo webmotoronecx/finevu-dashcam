@@ -21,6 +21,13 @@ customer entered in steps 1–4, forcing server-side payload persistence and a
 server-rendered step 6. Embedded keeps the wizard's React state intact. The cost is a
 domain-registration step before Apple Pay works.
 
+**That step, 2026-08-17.** Stripe's association file now ships at
+`public/.well-known/apple-developer-merchantid-domain-association` (Next serves dot-folders
+from `public/` — verified). `www.finevuaustralia.com.au` is registered in **test mode**;
+test mode does not fetch the file, which is why it succeeded while the live path still 404s.
+Two things remain: **deploy**, so the file actually serves, and **register again in live
+mode**, which does verify it. Register **www**, not the apex — the apex 308-redirects.
+
 Supersedes the 2026-08-05 choice of Stripe Elements. Elements was chosen because hosted
 Checkout redirects away from the six-step wizard; embedded Checkout does not, so the
 original objection no longer applies.

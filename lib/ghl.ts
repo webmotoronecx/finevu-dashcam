@@ -341,6 +341,25 @@ export async function findHeldAppointment(contactId: string, startTime: string):
   return match ? toAppointment(match as AppointmentResponse) : null;
 }
 
+/**
+ * Every appointment on the booking calendar between now and the end of the booking window.
+ *
+ * Only the stale-hold sweep uses this, and only to find appointments carrying the
+ * "[hold cs_…]" tag. It deliberately returns everything rather than filtering by status:
+ * status is not a safe selector here — GHL gives an appointment a staff member typed into
+ * its own UI the same "new" as one of ours — so the caller filters on the TAG, which only
+ * /api/booking/create ever writes. See the warning on releaseHold().
+ */
+export async function listBookingWindowAppointments(days: number = BOOKING_WINDOW_DAYS): Promise<Appointment[]> {
+  const { calendarId, locationId } = config();
+  const now = Date.now();
+  const data = await ghlFetch<EventsResponse>(
+    `/calendars/events?locationId=${encodeURIComponent(locationId)}&calendarId=${encodeURIComponent(calendarId)}` +
+      `&startTime=${now}&endTime=${now + days * 24 * 60 * 60 * 1000}`,
+  );
+  return (data.events ?? []).map((e) => toAppointment(e as AppointmentResponse));
+}
+
 export async function getAppointment(appointmentId: string): Promise<Appointment> {
   return toAppointment(
     await ghlFetch<AppointmentResponse>(`/calendars/events/appointments/${encodeURIComponent(appointmentId)}`),

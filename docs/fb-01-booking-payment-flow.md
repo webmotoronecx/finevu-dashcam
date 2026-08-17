@@ -44,12 +44,12 @@ so the failure mode stays legible to anyone who meets it again.
 | Described | Reality | Consequence |
 |---|---|---|
 | `POST /api/booking/release` — cancel the hold when the customer goes Back | **Never built.** `app/api/booking/` contains only `create`, `slots`, `status` | Changing slot at step 5 leaves the old hold until the session expires (32 min) |
-| Sweep of HELD appointments older than 35 minutes, on each free-slots read | **Never built.** `slots/route.ts` is a 37-line cached read. The only `sweep` matches in the tree are comments explaining why a *status-driven* sweep would be dangerous | No early reclaim. `checkout.session.expired` is the only thing that releases an abandoned hold |
+| ~~Sweep of HELD appointments older than 35 minutes, on each free-slots read~~ | **BUILT 2026-08-17** as `lib/booking/sweep.ts`, piggybacked on `/api/booking/slots`. Not age-based, deliberately — it asks Stripe what each held session actually did, because an abandoned checkout and a paid-but-lost-webhook booking look identical on the calendar | Abandoned slots come back without depending on `checkout.session.expired` being delivered. Also catches paid-but-still-held and confirms it |
 | Alert ops by email when paid-but-GHL-confirm-fails | **Never built.** `console.error` only (`webhook:57-63`) | The money-is-real-and-the-booking-is-broken case is a log line nobody watches |
 | Write amount / Stripe payment id / invoice URL back to the GHL contact | **Never built.** Zero GHL writes in the webhook beyond `confirmAppointment` | Those values live only on the Stripe session and in the customer's email |
 | ~~`charge.refunded` → CANCELLED~~ | **FIXED 2026-08-15 (FA-32).** `createBookingSession` now sets `payment_intent_data: { metadata: { appointmentId } }`, which the Charge inherits, plus a PaymentIntent-retrieve fallback for sessions created before the fix, a partial-refund guard and a read-first idempotency check | A refund now cancels the appointment and frees the slot. Verified against real test-mode Stripe by `scripts/e2e-booking.mjs` |
 
-Together the first two mean an indecisive customer can hold more than one slot at once:
+The first of those two still means an indecisive customer can hold more than one slot at once — though the sweep now reclaims the strays rather than leaving them for the full 32 minutes:
 `BookingCheckout` mounts per visit to step 5 with a per-instance `started` ref, and
 `/api/booking/create` only consults `findHeldAppointment` when the slot is *not* free — so
 a Back-then-different-slot takes a second hold and nothing reclaims the first early.
@@ -382,8 +382,8 @@ who refreshes gets the truth even if the webhook is running late.
 | Payment declined | Customer retries inside Checkout; the hold stands until the session expires | ✅ |
 | Slot taken between step 3 and step 5 | Caught by the uncached re-check in `create`; `409` and the customer returns to step 3 with a message | ✅ |
 | Webhook never arrives | Stripe retries for up to 3 days, and `/api/booking/status` reconciles on demand by reading the session from Stripe | ✅ |
-| Customer clicks Back to change the slot | ~~`POST /api/booking/release` cancels the hold~~ — **that route was never built.** The old hold survives until its session expires, and re-entering step 5 on a different slot takes a **second** hold | ❌ |
-| Orphaned holds generally | ~~A sweep on each free-slots read cancels HELD appointments older than 35 minutes~~ — **never built.** `checkout.session.expired` is the only reclaim path, so an orphan whose webhook is lost persists until someone clears it by hand | ❌ |
+| Customer clicks Back to change the slot | ~~`POST /api/booking/release` cancels the hold~~ — **that route was never built.** The old hold survives until its session expires, and re-entering step 5 on a different slot takes a **second** hold. Mitigated 2026-08-17: the stale-hold sweep reclaims the stray once its session expires, without waiting on a webhook | ⚠️ |
+| Orphaned holds generally | A sweep on each free-slots read reclaims them — **built 2026-08-17**, and driven by Stripe session state rather than age. `checkout.session.expired` is no longer the only reclaim path, so an orphan whose webhook is lost is picked up on the next availability read | ✅ |
 | **Paid, but GHL confirm fails** | Money captured, appointment stuck HELD. Handled as far as *detection* — the webhook logs `PAID BUT THE HOLD IS GONE` and does not auto-refund. ~~Alert ops by email~~ was **never built**, so nothing surfaces this outside the Vercel logs | ⚠️ |
 | **Refund issued** | `charge.refunded` → CANCELLED. Fixed 2026-08-15 (FA-32) and exercised end to end against real test-mode Stripe. Cancelled rather than deleted, so the record survives for the audit trail the terms require. Partial refunds leave the booking standing | ✅ |
 

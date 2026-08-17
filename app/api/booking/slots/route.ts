@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { BOOKING_TIMEZONE, type DaySlots, fetchFreeSlots, ghlConfigured } from "@/lib/ghl";
+import { sweepStaleHolds } from "@/lib/booking/sweep";
 
 // Reads real installation availability from the GHL calendar for the /installation
 // wizard's step 3. Exists as a route because GHL_API_KEY is secret and the wizard is a
@@ -25,6 +26,19 @@ export async function GET() {
   }
 
   try {
+    // Reclaim abandoned holds before reading availability, so a slot freed on this pass
+    // shows up in THIS response rather than the next one.
+    //
+    // Piggybacked here on purpose rather than run on a schedule: this route is hit exactly
+    // when someone is looking at the calendar, which is the only moment a stale hold
+    // actually costs anything. It also sidesteps Vercel's cron frequency limits, where a
+    // daily job would be useless against a 32-minute hold.
+    //
+    // Behind the 30-second cache above, so it runs on a cache MISS at most, and
+    // rate-limited again inside sweepStaleHolds. It never throws — a sweep failure must not
+    // turn "here are your available dates" into an error.
+    await sweepStaleHolds();
+
     const days = await fetchFreeSlots();
     cache = { at: Date.now(), days };
     return NextResponse.json({ ok: true, timezone: BOOKING_TIMEZONE, days });

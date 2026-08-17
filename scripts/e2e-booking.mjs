@@ -448,6 +448,49 @@ async function run() {
     check("  (check the server log for 'REFUNDED BUT NO appointmentId')", true);
   }
 
+  // 14 — the stale-hold sweep (piggybacked on /api/booking/slots)
+  //
+  // Uses a REAL expired Stripe session, not a synthetic one: the sweep's whole job is to
+  // ask Stripe what actually happened, so faking the answer would test nothing. The hold is
+  // taken normally, its session is expired through the API, and then /api/booking/slots is
+  // polled — the same request a customer makes when they open step 3.
+  console.log("\nStale-hold sweep");
+  {
+    const fresh2 = (await get("/api/booking/slots")).data?.days ?? [];
+    const spare2 = fresh2.flatMap((d) => d.slots ?? []).filter((s) => s !== slot);
+    const target = spare2.at(-1);
+    check("a spare slot is available for the sweep test", Boolean(target), target ?? "none");
+
+    if (target) {
+      const abandoned = await post("/api/booking/create", payload(target, "8"), "10.4.0.1");
+      const staleId = abandoned.data?.appointmentId;
+      const staleSession = abandoned.data?.sessionId;
+      check("hold taken, then abandoned", Boolean(staleId), staleId ?? String(abandoned.status));
+      if (staleId) created.appointments.add(staleId);
+
+      if (staleId && staleSession) {
+        // Expire it at Stripe WITHOUT sending the webhook — this is precisely the state a
+        // lost checkout.session.expired leaves behind, and what the sweep exists to catch.
+        await stripeApi(`/checkout/sessions/${staleSession}/expire`, { method: "POST" });
+        const expired = (await stripeApi(`/checkout/sessions/${staleSession}`)).data;
+        eq("Stripe reports the session expired", expired?.status, "expired");
+
+        const stillHeld = (await ghl(`/calendars/events/appointments/${staleId}`)).data?.appointment ?? {};
+        eq("  and the hold is still on the calendar", stillHeld.appointmentStatus, "new");
+
+        // The sweep self-throttles, so give it a moment and drive the customer-facing route.
+        await new Promise((r) => setTimeout(r, 1200));
+        const afterSweep = await get("/api/booking/slots");
+        eq("availability still returns 200 with the sweep in front of it", afterSweep.status, 200);
+
+        const gone = (await ghl(`/calendars/events/appointments/${staleId}`)).data?.appointment ?? {};
+        // GHL soft-deletes, so a released hold still resolves, carrying deleted: true.
+        check("the abandoned hold was reclaimed", gone.deleted === true, `deleted: ${gone.deleted}`);
+        check("  and the slot is bookable again", await slotIsFree(target));
+      }
+    }
+  }
+
   // 12 — email
   console.log("\nEmail");
   const redirect = process.env.BOOKING_EMAIL_REDIRECT_TO?.trim();

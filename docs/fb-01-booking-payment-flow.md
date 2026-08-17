@@ -25,8 +25,19 @@ domain-registration step before Apple Pay works.
 `public/.well-known/apple-developer-merchantid-domain-association` (Next serves dot-folders
 from `public/` — verified). `www.finevuaustralia.com.au` is registered in **test mode**;
 test mode does not fetch the file, which is why it succeeded while the live path still 404s.
-Two things remain: **deploy**, so the file actually serves, and **register again in live
-mode**, which does verify it. Register **www**, not the apex — the apex 308-redirects.
+`finevu-dashcam-staging.vercel.app` is registered too, so Apple Pay is testable on staging
+as soon as this branch deploys there — it was checked for Vercel Deployment Protection
+first, which would have blocked the file fetch with no useful error.
+
+Two things remain for **production**: **deploy**, so the file actually serves, and
+**register again in live mode**, which does verify it. Register **www**, not the apex — the
+apex 308-redirects, and a redirect fails verification.
+
+Testing it: Apple Pay needs Safari or iOS with a **real card in Wallet**, over HTTPS on a
+registered domain. In test mode the sheet opens, you authenticate, and Stripe returns a test
+token — no money moves. It never appears in Chrome, on desktop without Touch ID, or on
+localhost, so its absence there is not a failure signal. The e2e suite cannot cover it: a
+Checkout Session cannot be paid through the API.
 
 Supersedes the 2026-08-05 choice of Stripe Elements. Elements was chosen because hosted
 Checkout redirects away from the six-step wizard; embedded Checkout does not, so the

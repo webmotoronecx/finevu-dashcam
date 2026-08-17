@@ -147,6 +147,18 @@ export function AddressAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const requestSeqRef = useRef(0);
+  /**
+   * Suppresses exactly one debounced fetch, set when a suggestion is chosen.
+   *
+   * Picking a suggestion writes the address back through onChange, which changes `value`,
+   * which re-runs the debounce effect below — so 250ms after the dropdown closed it
+   * reopened, showing suggestions for the address the customer had just picked. Clearing
+   * `suggestions` in handleSelect cannot help: the refetch repopulates it.
+   *
+   * A ref rather than state on purpose — flipping it must not itself trigger a render, and
+   * it has to be readable by the effect on the very next one.
+   */
+  const skipNextFetchRef = useRef(false);
 
   useEffect(() => {
     if (!apiKey) return;
@@ -219,6 +231,14 @@ export function AddressAutocomplete({
   );
 
   useEffect(() => {
+    // The value we just wrote ourselves. Clearing the pending timer still matters — the
+    // keystroke before the click scheduled one, and letting it run would reopen the
+    // dropdown just as surely as scheduling a new one.
+    if (skipNextFetchRef.current) {
+      skipNextFetchRef.current = false;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      return;
+    }
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => fetchSuggestions(value), 250);
     return () => {
@@ -257,6 +277,8 @@ export function AddressAutocomplete({
 
   const handleSelect = async (suggestion: Suggestion) => {
     const fallback = suggestion.placePrediction.text.text;
+    // Set before onChange, not after: onChange is what schedules the fetch this suppresses.
+    skipNextFetchRef.current = true;
     try {
       const place = suggestion.placePrediction.toPlace();
       await place.fetchFields({ fields: ["formattedAddress", "addressComponents"] });
@@ -301,7 +323,13 @@ export function AddressAutocomplete({
         type="text"
         id={id}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          // Typing must always fetch. Without this, a selection whose text matches what was
+          // already typed leaves `value` unchanged, so the effect never runs to consume the
+          // flag — and it would swallow the next keystroke instead.
+          skipNextFetchRef.current = false;
+          onChange(e.target.value);
+        }}
         onFocus={() => {
           if (suggestions.length > 0) {
             positionDropdown();

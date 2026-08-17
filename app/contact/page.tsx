@@ -10,6 +10,7 @@ import { Phone, Mail } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
+import { RequiredDot } from "@/components/RequiredDot";
 
 // Contact page: dark hero, support cards, message form section and learn more strip
 
@@ -140,9 +141,9 @@ function ContactForm() {
       />
       <div>
         <label className={LABEL} htmlFor="f-name">
-          Your name <span className="text-[var(--finevu-orange)]">*</span>
+          Your name <RequiredDot />
         </label>
-        <input id="f-name" name="name" autoComplete="name" className={INPUT} placeholder="John Smith" aria-invalid={invalid.name || undefined} aria-describedby={invalid.name ? "f-name-err" : undefined} value={form.name} onChange={(e) => set("name", e.target.value)} />
+        <input id="f-name" aria-required="true" name="name" autoComplete="name" className={INPUT} placeholder="John Smith" aria-invalid={invalid.name || undefined} aria-describedby={invalid.name ? "f-name-err" : undefined} value={form.name} onChange={(e) => set("name", e.target.value)} />
         {invalid.name && <p id="f-name-err" className={ERR}>Enter your name.</p>}
       </div>
       <div>
@@ -153,17 +154,17 @@ function ContactForm() {
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-email">
-          Email address <span className="text-[var(--finevu-orange)]">*</span>
+          Email address <RequiredDot />
         </label>
-        <input id="f-email" name="email" autoComplete="email" className={INPUT} placeholder="you@example.com" type="email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "f-email-err" : undefined} value={form.email} onChange={(e) => set("email", e.target.value)} />
+        <input id="f-email" aria-required="true" name="email" autoComplete="email" className={INPUT} placeholder="you@example.com" type="email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "f-email-err" : undefined} value={form.email} onChange={(e) => set("email", e.target.value)} />
         {invalid.email && <p id="f-email-err" className={ERR}>Enter a valid email address.</p>}
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-subject">
-          Subject <span className="text-[var(--finevu-orange)]">*</span>
+          Subject <RequiredDot />
         </label>
         <select
-          id="f-subject"
+          id="f-subject" aria-required="true"
           className={`${INPUT} appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236B6B72%22%20stroke-width=%222.4%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-[right_16px_center] bg-no-repeat`}
           name="subject"
           aria-invalid={invalid.subject || undefined}
@@ -182,10 +183,10 @@ function ContactForm() {
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-msg">
-          Message <span className="text-[var(--finevu-orange)]">*</span>
+          Message <RequiredDot />
         </label>
         <textarea
-          id="f-msg"
+          id="f-msg" aria-required="true"
           className={`${INPUT} min-h-[130px] resize-y`}
           placeholder="Tell us about your dash cam and what you need help with…"
           name="message"

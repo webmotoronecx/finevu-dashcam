@@ -1,6 +1,7 @@
 "use client";
 
 import { Footer } from "@/components/Footer";
+import { RequiredDot } from "@/components/RequiredDot";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { LearnMoreLinks } from "@/components/LearnMoreLinks";
 import { Accordion } from "@/components/Accordion";
@@ -209,8 +210,8 @@ function RetailerForm() {
       <p className="mb-6 mt-1.5 text-[15.68px] text-[#5b5e66]">Tell us about your business and we&apos;ll be in touch within 1–2 business days.</p>
 
       <div className="mb-4">
-        <label className={LABEL} htmlFor="ret-biz">Business name <span className="text-[var(--finevu-orange)]">*</span></label>
-        <input id="ret-biz" name="businessName" className={INPUT} placeholder="Your business or trading name" aria-invalid={invalid.biz || undefined} aria-describedby={invalid.biz ? "ret-biz-err" : undefined} value={f.biz} onChange={(e) => set("biz", e.target.value)} />
+        <label className={LABEL} htmlFor="ret-biz">Business name <RequiredDot /></label>
+        <input id="ret-biz" aria-required="true" name="businessName" className={INPUT} placeholder="Your business or trading name" aria-invalid={invalid.biz || undefined} aria-describedby={invalid.biz ? "ret-biz-err" : undefined} value={f.biz} onChange={(e) => set("biz", e.target.value)} />
         {invalid.biz && <p id="ret-biz-err" className={ERR}>Enter your business or trading name.</p>}
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
@@ -219,8 +220,8 @@ function RetailerForm() {
           <input id="ret-abn" name="abn" className={INPUT} placeholder="11 222 333 444" inputMode="numeric" value={f.abn} onChange={(e) => set("abn", e.target.value)} />
         </div>
         <div>
-          <label className={LABEL} htmlFor="ret-btype">Business type <span className="text-[var(--finevu-orange)]">*</span></label>
-          <select id="ret-btype" name="businessType" className={INPUT} aria-invalid={invalid.btype || undefined} aria-describedby={invalid.btype ? "ret-btype-err" : undefined} value={f.btype} onChange={(e) => set("btype", e.target.value)}>
+          <label className={LABEL} htmlFor="ret-btype">Business type <RequiredDot /></label>
+          <select id="ret-btype" aria-required="true" name="businessType" className={INPUT} aria-invalid={invalid.btype || undefined} aria-describedby={invalid.btype ? "ret-btype-err" : undefined} value={f.btype} onChange={(e) => set("btype", e.target.value)}>
             <option value="">Select…</option>
             {businessTypes.map((b) => <option key={b}>{b}</option>)}
           </select>
@@ -228,26 +229,26 @@ function RetailerForm() {
         </div>
       </div>
       <div className="mb-4">
-        <label className={LABEL} htmlFor="ret-cname">Contact name <span className="text-[var(--finevu-orange)]">*</span></label>
-        <input id="ret-cname" name="contactName" autoComplete="name" className={INPUT} placeholder="Your full name" aria-invalid={invalid.cname || undefined} aria-describedby={invalid.cname ? "ret-cname-err" : undefined} value={f.cname} onChange={(e) => set("cname", e.target.value)} />
+        <label className={LABEL} htmlFor="ret-cname">Contact name <RequiredDot /></label>
+        <input id="ret-cname" aria-required="true" name="contactName" autoComplete="name" className={INPUT} placeholder="Your full name" aria-invalid={invalid.cname || undefined} aria-describedby={invalid.cname ? "ret-cname-err" : undefined} value={f.cname} onChange={(e) => set("cname", e.target.value)} />
         {invalid.cname && <p id="ret-cname-err" className={ERR}>Enter your full name.</p>}
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL} htmlFor="ret-email">Email <span className="text-[var(--finevu-orange)]">*</span></label>
-          <input id="ret-email" name="email" autoComplete="email" className={INPUT} type="email" placeholder="you@business.com.au" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "ret-email-err" : undefined} value={f.email} onChange={(e) => set("email", e.target.value)} />
+          <label className={LABEL} htmlFor="ret-email">Email <RequiredDot /></label>
+          <input id="ret-email" aria-required="true" name="email" autoComplete="email" className={INPUT} type="email" placeholder="you@business.com.au" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "ret-email-err" : undefined} value={f.email} onChange={(e) => set("email", e.target.value)} />
           {invalid.email && <p id="ret-email-err" className={ERR}>Enter a valid email address.</p>}
         </div>
         <div>
-          <label className={LABEL} htmlFor="ret-phone">Phone <span className="text-[var(--finevu-orange)]">*</span></label>
-          <input id="ret-phone" name="phone" autoComplete="tel" className={INPUT} type="tel" placeholder="0400 000 000" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "ret-phone-err" : undefined} value={f.phone} onChange={(e) => set("phone", e.target.value)} />
+          <label className={LABEL} htmlFor="ret-phone">Phone <RequiredDot /></label>
+          <input id="ret-phone" aria-required="true" name="phone" autoComplete="tel" className={INPUT} type="tel" placeholder="0400 000 000" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "ret-phone-err" : undefined} value={f.phone} onChange={(e) => set("phone", e.target.value)} />
           {invalid.phone && <p id="ret-phone-err" className={ERR}>Enter a contact phone number.</p>}
         </div>
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL} htmlFor="ret-state">State <span className="text-[var(--finevu-orange)]">*</span></label>
-          <select id="ret-state" name="state" autoComplete="address-level1" className={INPUT} aria-invalid={invalid.state || undefined} aria-describedby={invalid.state ? "ret-state-err" : undefined} value={f.state} onChange={(e) => set("state", e.target.value)}>
+          <label className={LABEL} htmlFor="ret-state">State <RequiredDot /></label>
+          <select id="ret-state" aria-required="true" name="state" autoComplete="address-level1" className={INPUT} aria-invalid={invalid.state || undefined} aria-describedby={invalid.state ? "ret-state-err" : undefined} value={f.state} onChange={(e) => set("state", e.target.value)}>
             <option value="">Select…</option>
             {STATES.map((s) => <option key={s}>{s}</option>)}
           </select>

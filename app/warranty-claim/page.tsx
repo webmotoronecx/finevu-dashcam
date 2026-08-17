@@ -10,6 +10,7 @@ import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
+import { RequiredDot } from "@/components/RequiredDot";
 
 // Warranty claim page: light page-head, claim form (emailed to support via Resend)
 // with a required proof-of-purchase attachment and optional issue evidence, plus a
@@ -321,26 +322,26 @@ function ClaimForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL} htmlFor="first-name">First name</label>
-          <input id="first-name" aria-invalid={invalid.firstName || undefined} aria-describedby={invalid.firstName ? "first-name-err" : undefined} className={INPUT} autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
+          <label className={LABEL} htmlFor="first-name">First name<RequiredDot /></label>
+          <input id="first-name" aria-required="true" aria-invalid={invalid.firstName || undefined} aria-describedby={invalid.firstName ? "first-name-err" : undefined} className={INPUT} autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
           {invalid.firstName && <p id="first-name-err" className={ERR}>Enter your first name.</p>}
         </div>
         <div>
-          <label className={LABEL} htmlFor="last-name">Last name</label>
-          <input id="last-name" aria-invalid={invalid.lastName || undefined} aria-describedby={invalid.lastName ? "last-name-err" : undefined} className={INPUT} autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
+          <label className={LABEL} htmlFor="last-name">Last name<RequiredDot /></label>
+          <input id="last-name" aria-required="true" aria-invalid={invalid.lastName || undefined} aria-describedby={invalid.lastName ? "last-name-err" : undefined} className={INPUT} autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
           {invalid.lastName && <p id="last-name-err" className={ERR}>Enter your last name.</p>}
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL} htmlFor="email">Email</label>
-          <input id="email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "email-err" : undefined} type="email" className={INPUT} autoComplete="email" placeholder="you@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
+          <label className={LABEL} htmlFor="email">Email<RequiredDot /></label>
+          <input id="email" aria-required="true" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "email-err" : undefined} type="email" className={INPUT} autoComplete="email" placeholder="you@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
           {invalid.email && <p id="email-err" className={ERR}>Enter a valid email address.</p>}
         </div>
         <div>
-          <label className={LABEL} htmlFor="phone">Phone</label>
-          <input id="phone" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "phone-err" : undefined} type="tel" className={INPUT} autoComplete="tel" placeholder="04XX XXX XXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          <label className={LABEL} htmlFor="phone">Phone<RequiredDot /></label>
+          <input id="phone" aria-required="true" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "phone-err" : undefined} type="tel" className={INPUT} autoComplete="tel" placeholder="04XX XXX XXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           {invalid.phone && <p id="phone-err" className={ERR}>Enter a phone number so we can reach you about your claim.</p>}
         </div>
       </div>
@@ -349,35 +350,35 @@ function ClaimForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={LABEL} htmlFor="model">Dash cam model</label>
-          <select id="model" aria-invalid={invalid.model || undefined} aria-describedby={invalid.model ? "model-err" : undefined} className={`${INPUT} ${SELECT_ARROW}`} value={form.model} onChange={(e) => set("model", e.target.value)}>
+          <label className={LABEL} htmlFor="model">Dash cam model<RequiredDot /></label>
+          <select id="model" aria-required="true" aria-invalid={invalid.model || undefined} aria-describedby={invalid.model ? "model-err" : undefined} className={`${INPUT} ${SELECT_ARROW}`} value={form.model} onChange={(e) => set("model", e.target.value)}>
             <option value="" disabled>Select your model</option>
             {models.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
           {invalid.model && <p id="model-err" className={ERR}>Select your model.</p>}
         </div>
         <div>
-          <label className={LABEL} htmlFor="purchase-date">Purchase date</label>
-          <input id="purchase-date" aria-invalid={invalid.purchaseDate || undefined} aria-describedby={invalid.purchaseDate ? "purchase-date-err" : undefined} type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
+          <label className={LABEL} htmlFor="purchase-date">Purchase date<RequiredDot /></label>
+          <input id="purchase-date" aria-required="true" aria-invalid={invalid.purchaseDate || undefined} aria-describedby={invalid.purchaseDate ? "purchase-date-err" : undefined} type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
           {invalid.purchaseDate && <p id="purchase-date-err" className={ERR}>Enter your purchase date.</p>}
         </div>
       </div>
 
       <div className="mt-4">
-        <label className={LABEL} htmlFor="serial">Serial number</label>
-        <input id="serial" aria-invalid={invalid.serial || undefined} aria-describedby={invalid.serial ? "serial-hint serial-err" : "serial-hint"} className={INPUT} placeholder="e.g. FV4K-XXXXXXXX" value={form.serial} onChange={(e) => set("serial", e.target.value)} />
+        <label className={LABEL} htmlFor="serial">Serial number<RequiredDot /></label>
+        <input id="serial" aria-required="true" aria-invalid={invalid.serial || undefined} aria-describedby={invalid.serial ? "serial-hint serial-err" : "serial-hint"} className={INPUT} placeholder="e.g. FV4K-XXXXXXXX" value={form.serial} onChange={(e) => set("serial", e.target.value)} />
         <p id="serial-hint" className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a8a92]">Printed on the sticker on the back of your camera, and on the side of the box.</p>
         {invalid.serial && <p id="serial-err" className={ERR}>Enter your serial number.</p>}
       </div>
 
       <div className="mt-4">
-        <label className={LABEL} htmlFor="retailer">Where did you buy it?</label>
-        <input id="retailer" aria-invalid={invalid.retailer || undefined} aria-describedby={invalid.retailer ? "retailer-err" : undefined} className={INPUT} placeholder="Retailer or store name" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
+        <label className={LABEL} htmlFor="retailer">Where did you buy it?<RequiredDot /></label>
+        <input id="retailer" aria-required="true" aria-invalid={invalid.retailer || undefined} aria-describedby={invalid.retailer ? "retailer-err" : undefined} className={INPUT} placeholder="Retailer or store name" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} />
         {invalid.retailer && <p id="retailer-err" className={ERR}>Enter the retailer name.</p>}
       </div>
 
       <div className="mt-4">
-        <label className={LABEL}>Proof of purchase</label>
+        <label className={LABEL}>Proof of purchase<RequiredDot /></label>
         <UploadZone
           accept=".jpg,.jpeg,.png,.pdf,.heic"
           files={receipt ? [receipt] : []}
@@ -386,7 +387,7 @@ function ClaimForm() {
           // Both messages render under the same id — only one is ever shown at a time.
           describedBy={receiptError || invalid.receipt ? "receipt-err" : undefined}
           hint="Receipt or order confirmation — JPG, PNG, HEIC or PDF, up to 3 MB"
-          ariaLabel="Upload your receipt"
+          ariaLabel="Upload your receipt (required)"
         />
         {receiptError && <p id="receipt-err" className={ERR}>{receiptError}</p>}
         {invalid.receipt && !receiptError && <p id="receipt-err" className={ERR}>Upload your receipt — we need it to verify your warranty.</p>}
@@ -395,8 +396,8 @@ function ClaimForm() {
       <p className={`${SECTION_LABEL} mb-3.5 mt-7 border-t border-dashed border-[#dddde2] pt-6`}>The problem</p>
 
       <div>
-        <label className={LABEL} htmlFor="issue-type">What&apos;s the issue?</label>
-        <select id="issue-type" aria-invalid={invalid.issueType || undefined} aria-describedby={invalid.issueType ? "issue-type-err" : undefined} className={`${INPUT} ${SELECT_ARROW}`} value={form.issueType} onChange={(e) => set("issueType", e.target.value)}>
+        <label className={LABEL} htmlFor="issue-type">What&apos;s the issue?<RequiredDot /></label>
+        <select id="issue-type" aria-required="true" aria-invalid={invalid.issueType || undefined} aria-describedby={invalid.issueType ? "issue-type-err" : undefined} className={`${INPUT} ${SELECT_ARROW}`} value={form.issueType} onChange={(e) => set("issueType", e.target.value)}>
           <option value="" disabled>Select the closest match</option>
           {issueTypes.map((i) => <option key={i.value} value={i.value}>{i.label}</option>)}
         </select>
@@ -404,9 +405,9 @@ function ClaimForm() {
       </div>
 
       <div className="mt-4">
-        <label className={LABEL} htmlFor="description">Describe what&apos;s happening</label>
+        <label className={LABEL} htmlFor="description">Describe what&apos;s happening<RequiredDot /></label>
         <textarea
-          id="description" aria-invalid={invalid.description || undefined} aria-describedby={invalid.description ? "description-err" : undefined}
+          id="description" aria-required="true" aria-invalid={invalid.description || undefined} aria-describedby={invalid.description ? "description-err" : undefined}
           rows={5}
           className={`${INPUT} resize-y leading-[1.55]`}
           placeholder="What happens, when it started, and anything you've already tried — the more detail, the faster we can help."

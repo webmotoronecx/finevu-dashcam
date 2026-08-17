@@ -98,6 +98,7 @@ export async function POST(req: Request) {
   const email = str(body.email);
   const make = str(body.make);
   const vmodel = str(body.vmodel);
+  const year = str(body.year);
 
   // Mirrors the wizard's own step 1–4 validation. The client already checked all of this;
   // it is repeated because the client is not a trustworthy source and this route creates
@@ -112,6 +113,14 @@ export async function POST(req: Request) {
   if (!/^[\d\s+()-]{8,}$/.test(phone)) return bad("invalid", "Please enter a valid mobile number.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("invalid", "Please enter a valid email address.");
   if (!make || !vmodel) return bad("invalid", "Please enter your vehicle make and model.");
+  // Ceiling read from the clock rather than pinned, matching the wizard: next-model-year
+  // vehicles are on sale before the year turns. Safe to call new Date() here — this is a
+  // server route, so none of the prerender/hydration reasoning that shapes the client copy
+  // of this rule applies.
+  const maxYear = new Date().getFullYear() + 1;
+  if (!/^\d{4}$/.test(year) || Number(year) < 1980 || Number(year) > maxYear) {
+    return bad("invalid", `Please enter your vehicle year, between 1980 and ${maxYear}.`);
+  }
 
   // Terms acceptance (FA-26). §5 of installation-terms.ts makes payment-at-booking a
   // contractual term, so the agreement has to exist before a payable session does — this
@@ -181,7 +190,7 @@ export async function POST(req: Request) {
 
     const session = await createBookingSession({
       appointmentId, contactId, model, slot, address, name, email, phone,
-      vehicle: [make, vmodel, str(body.year)].filter(Boolean).join(" "),
+      vehicle: [make, vmodel, year].filter(Boolean).join(" "),
       retailer: str(body.retailer) || undefined,
       notes: str(body.notes) || undefined,
       termsAcceptedAt,

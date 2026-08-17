@@ -91,6 +91,17 @@ type Form = {
 };
 const EMPTY: Form = { model: null, place: null, street: "", suburb: "", stateAu: "", postcode: "", slot: null, name: "", phone: "", email: "", retailer: "", make: "", vmodel: "", year: "", notes: "" };
 
+/**
+ * Oldest vehicle year the booking form accepts.
+ *
+ * A floor rather than a guess at what is installable: the installer decides that, not this
+ * input. It exists to catch a mistyped or nonsense year (a stray "20", a transposed "1922")
+ * before it reaches the job sheet, since the year drives which fuse box and wiring the
+ * installer expects to find. The ceiling is derived from today rather than fixed, because
+ * new-model-year vehicles are sold ahead of the calendar year.
+ */
+const VEHICLE_YEAR_MIN = 1980;
+
 // ── Availability ──────────────────────────────────────────────────────────────
 // Step 3 renders whatever the GHL calendar says is bookable, fetched via
 // /api/booking/slots (the token is secret, so the browser can't ask GHL directly).
@@ -217,6 +228,25 @@ const FIELD_LABEL = "mb-1.5 block text-[13px] font-semibold leading-[19.5px] tex
 const ERR = "mt-1.5 text-[12.5px] font-medium text-[#D93025]";
 
 /**
+ * The required-field dot.
+ *
+ * aria-hidden, and deliberately so — it is decoration, and a screen reader announcing
+ * "bullet" after a field name tells nobody anything. The machine-readable half is
+ * aria-required on the input itself, which is set everywhere this renders. Do not add one
+ * without the other: the dot alone leaves a screen-reader user with no way to know a field
+ * is required, and aria-required alone leaves a sighted user guessing.
+ *
+ * The wizard already tags its two optional fields "(optional)", so the two conventions run
+ * together on purpose: required carries a dot, optional says so in words.
+ */
+const Req = () => (
+  <span
+    aria-hidden="true"
+    className="ml-1 inline-block size-[5px] rounded-full bg-[var(--finevu-orange)] align-[3px]"
+  />
+);
+
+/**
  * Polls /api/booking/status until the booking is confirmed, or gives up.
  *
  * Stripe's onComplete and the checkout.session.completed webhook race by a second or
@@ -271,6 +301,11 @@ function BookingWizard() {
   // Local dev only — see useCalendarGrid. Production always has the keys.
   const fallbackAvailability = avail.status === "unconfigured";
   const todayKey = useTodayKey();
+  // Derived from todayKey, not a fresh `new Date()`: this page is statically prerendered,
+  // so reading the clock during render would bake the build year into the HTML and then
+  // disagree with the client on 1 January. todayKey already solves that and self-corrects
+  // at midnight. +1 because next-model-year vehicles are on sale before the year turns.
+  const maxVehicleYear = Number(todayKey.slice(0, 4)) + 1;
   const days = useCalendarGrid(avail.byDate, fallbackAvailability, todayKey);
   // The furthest date GHL is currently offering. The grid is already sized to reach it,
   // so this is the true end of the bookable range, not a page boundary (FA-30).
@@ -322,6 +357,13 @@ function BookingWizard() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) inv.email = true;
       if (!form.make) inv.make = true;
       if (!form.vmodel) inv.vmodel = true;
+      // Required, and range-checked. It sits between Make and Model, both required and
+      // neither tagged "(optional)", so it already read as required — it just was not
+      // checked, which let a blank or a two-digit stub through to the installer's job
+      // sheet. The keystroke handler strips non-digits, so the only reachable failures
+      // are "too short" and "out of range".
+      const year = Number(form.year);
+      if (!/^\d{4}$/.test(form.year) || year < VEHICLE_YEAR_MIN || year > maxVehicleYear) inv.year = true;
     }
     setInvalid(inv);
     if (Object.keys(inv).length > 0) { setHint({ msg: "", cls: "" }); return false; }
@@ -437,7 +479,7 @@ function BookingWizard() {
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Which FineVu are we fitting?</h3>
               <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Both models are front-and-rear systems with the hardwire kit and power cable included in the box — so everything your installer needs arrives with your camera.</p>
-              <span className={FLABEL} id="wiz-model-label">Your model</span>
+              <span className={FLABEL} id="wiz-model-label">Your model<Req /></span>
               <div className="grid gap-3.5 sm:grid-cols-2" role="group" aria-labelledby="wiz-model-label">
                 {[{ v: "GX4K", d: "4K UHD front + Full HD rear · Sony STARVIS · 128GB card & hardwire kit included" }, { v: "GX35", d: "2K QHD front + Full HD rear · Sony STARVIS 2 · 64GB card & hardwire kit included" }].map((m) => (
                   <button key={m.v} type="button" aria-pressed={form.model === m.v} onClick={() => { set("model", m.v); setHint({ msg: "", cls: "" }); }} className={`relative rounded-[12px] border-[1.5px] px-5 py-[18px] text-left transition-colors ${form.model === m.v ? "border-[var(--finevu-orange)] bg-[#fef2e5]" : "border-[#e7e7ea] hover:border-[#9c9ca3]"}`}>
@@ -473,9 +515,10 @@ function BookingWizard() {
               </div>
               {invalid.place && <p className={ERR}>Choose whether we come to your home or your workplace.</p>}
               <div className="mt-8">
-                <label htmlFor="street" className={FIELD_LABEL}>Street address</label>
+                <label htmlFor="street" className={FIELD_LABEL}>Street address<Req /></label>
                 <AddressAutocomplete
                   id="street"
+                  required
                   className={INPUT}
                   placeholder="Start typing your address…"
                   value={form.street}
@@ -494,9 +537,9 @@ function BookingWizard() {
                 {invalid.street && <p className={ERR}>Enter your street address.</p>}
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-2"><label htmlFor="wiz-suburb" className={FIELD_LABEL}>Suburb</label><input id="wiz-suburb" name="suburb" autoComplete="address-level2" className={INPUT} placeholder="Melbourne" aria-invalid={invalid.suburb || undefined} aria-describedby={invalid.suburb ? "wiz-suburb-err" : undefined} value={form.suburb} onChange={(e) => set("suburb", e.target.value)} />{invalid.suburb && <p id="wiz-suburb-err" className={ERR}>Enter your suburb.</p>}</div>
-                <div><label htmlFor="wiz-state" className={FIELD_LABEL}>State</label><select id="wiz-state" name="state" autoComplete="address-level1" className={INPUT} aria-invalid={invalid.stateAu || undefined} aria-describedby={invalid.stateAu ? "wiz-state-err" : undefined} value={form.stateAu} onChange={(e) => set("stateAu", e.target.value)}><option value="">State</option>{STATES.map((s) => <option key={s}>{s}</option>)}</select>{invalid.stateAu && <p id="wiz-state-err" className={ERR}>Choose your state.</p>}</div>
-                <div><label htmlFor="wiz-postcode" className={FIELD_LABEL}>Postcode</label><input id="wiz-postcode" name="postcode" autoComplete="postal-code" className={INPUT} placeholder="3000" inputMode="numeric" maxLength={4} aria-invalid={invalid.postcode || undefined} aria-describedby={invalid.postcode ? "wiz-postcode-err" : undefined} value={form.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} />{invalid.postcode && <p id="wiz-postcode-err" className={ERR}>Enter a 4-digit postcode.</p>}</div>
+                <div className="sm:col-span-2"><label htmlFor="wiz-suburb" className={FIELD_LABEL}>Suburb<Req /></label><input id="wiz-suburb" aria-required="true" name="suburb" autoComplete="address-level2" className={INPUT} placeholder="Melbourne" aria-invalid={invalid.suburb || undefined} aria-describedby={invalid.suburb ? "wiz-suburb-err" : undefined} value={form.suburb} onChange={(e) => set("suburb", e.target.value)} />{invalid.suburb && <p id="wiz-suburb-err" className={ERR}>Enter your suburb.</p>}</div>
+                <div><label htmlFor="wiz-state" className={FIELD_LABEL}>State<Req /></label><select id="wiz-state" aria-required="true" name="state" autoComplete="address-level1" className={INPUT} aria-invalid={invalid.stateAu || undefined} aria-describedby={invalid.stateAu ? "wiz-state-err" : undefined} value={form.stateAu} onChange={(e) => set("stateAu", e.target.value)}><option value="">State</option>{STATES.map((s) => <option key={s}>{s}</option>)}</select>{invalid.stateAu && <p id="wiz-state-err" className={ERR}>Choose your state.</p>}</div>
+                <div><label htmlFor="wiz-postcode" className={FIELD_LABEL}>Postcode<Req /></label><input id="wiz-postcode" aria-required="true" name="postcode" autoComplete="postal-code" className={INPUT} placeholder="3000" inputMode="numeric" maxLength={4} aria-invalid={invalid.postcode || undefined} aria-describedby={invalid.postcode ? "wiz-postcode-err" : undefined} value={form.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} />{invalid.postcode && <p id="wiz-postcode-err" className={ERR}>Enter a 4-digit postcode.</p>}</div>
               </div>
             </div>
           )}
@@ -505,7 +548,7 @@ function BookingWizard() {
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Choose a date and time</h3>
               <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a date that suits you, then a start time. Only dates and times our installers are actually free are shown. Most installations take 60–90 minutes.</p>
-              <span className={FLABEL} id="wiz-date-label">Date</span>
+              <span className={FLABEL} id="wiz-date-label">Date<Req /></span>
               {avail.status === "error" ? (
                 <p className="text-[15px] leading-[1.6] text-[#D93816]">
                   We couldn’t load available installation dates just now. Please try again in a moment, or call{" "}
@@ -550,7 +593,7 @@ function BookingWizard() {
               )}
               {avail.status !== "error" && (
                 <>
-                  <span className={FLABEL} id="wiz-slot-label">Start time</span>
+                  <span className={FLABEL} id="wiz-slot-label">Start time<Req /></span>
                   {!date ? (
                     <p className="text-[14px] text-[#6e6e73]">Choose a date to see available start times.</p>
                   ) : slotOptions.length === 0 ? (
@@ -579,18 +622,18 @@ function BookingWizard() {
                   moment the customer types, so anyone checking their own answers on the last
                   step before paying $250 has nothing left to check them against. */}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="wiz-name" className={FIELD_LABEL}>Full name</label><input id="wiz-name" aria-invalid={invalid.name || undefined} aria-describedby={invalid.name ? "wiz-name-err" : undefined} name="name" autoComplete="name" className={INPUT} placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} />{invalid.name && <p id="wiz-name-err" className={ERR}>Enter your full name.</p>}</div>
-                <div><label htmlFor="wiz-phone" className={FIELD_LABEL}>Mobile number</label><input id="wiz-phone" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "wiz-phone-err" : undefined} name="phone" autoComplete="tel" className={INPUT} placeholder="Mobile number" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />{invalid.phone && <p id="wiz-phone-err" className={ERR}>Enter a valid mobile number.</p>}</div>
+                <div><label htmlFor="wiz-name" className={FIELD_LABEL}>Full name<Req /></label><input id="wiz-name" aria-required="true" aria-invalid={invalid.name || undefined} aria-describedby={invalid.name ? "wiz-name-err" : undefined} name="name" autoComplete="name" className={INPUT} placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} />{invalid.name && <p id="wiz-name-err" className={ERR}>Enter your full name.</p>}</div>
+                <div><label htmlFor="wiz-phone" className={FIELD_LABEL}>Mobile number<Req /></label><input id="wiz-phone" aria-required="true" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "wiz-phone-err" : undefined} name="phone" autoComplete="tel" className={INPUT} placeholder="Mobile number" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />{invalid.phone && <p id="wiz-phone-err" className={ERR}>Enter a valid mobile number.</p>}</div>
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="wiz-email" className={FIELD_LABEL}>Email address</label><input id="wiz-email" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "wiz-email-err" : undefined} name="email" autoComplete="email" className={INPUT} placeholder="Email address" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} />{invalid.email && <p id="wiz-email-err" className={ERR}>Enter a valid email address.</p>}</div>
+                <div><label htmlFor="wiz-email" className={FIELD_LABEL}>Email address<Req /></label><input id="wiz-email" aria-required="true" aria-invalid={invalid.email || undefined} aria-describedby={invalid.email ? "wiz-email-err" : undefined} name="email" autoComplete="email" className={INPUT} placeholder="Email address" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} />{invalid.email && <p id="wiz-email-err" className={ERR}>Enter a valid email address.</p>}</div>
                 <div><label htmlFor="wiz-retailer" className={FIELD_LABEL}>Where did you purchase? <span className="font-normal text-[#9c9ca3]">(optional)</span></label><input id="wiz-retailer" name="retailer" className={INPUT} placeholder="e.g. JB Hi-Fi, Autobarn" value={form.retailer} onChange={(e) => set("retailer", e.target.value)} /></div>
               </div>
               <span className={FLABEL}>Your vehicle</span>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div><label htmlFor="wiz-make" className={FIELD_LABEL}>Make</label><input id="wiz-make" aria-invalid={invalid.make || undefined} aria-describedby={invalid.make ? "wiz-make-err" : undefined} name="make" className={INPUT} placeholder="e.g. Toyota" value={form.make} onChange={(e) => set("make", e.target.value)} />{invalid.make && <p id="wiz-make-err" className={ERR}>Enter your vehicle make.</p>}</div>
-                <div><label htmlFor="wiz-vmodel" className={FIELD_LABEL}>Model</label><input id="wiz-vmodel" aria-invalid={invalid.vmodel || undefined} aria-describedby={invalid.vmodel ? "wiz-vmodel-err" : undefined} name="vehicleModel" className={INPUT} placeholder="e.g. RAV4" value={form.vmodel} onChange={(e) => set("vmodel", e.target.value)} />{invalid.vmodel && <p id="wiz-vmodel-err" className={ERR}>Enter your vehicle model.</p>}</div>
-                <div><label htmlFor="wiz-year" className={FIELD_LABEL}>Year</label><input id="wiz-year" name="year" className={INPUT} placeholder="2022" inputMode="numeric" maxLength={4} value={form.year} onChange={(e) => set("year", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
+                <div><label htmlFor="wiz-make" className={FIELD_LABEL}>Make<Req /></label><input id="wiz-make" aria-required="true" aria-invalid={invalid.make || undefined} aria-describedby={invalid.make ? "wiz-make-err" : undefined} name="make" className={INPUT} placeholder="e.g. Toyota" value={form.make} onChange={(e) => set("make", e.target.value)} />{invalid.make && <p id="wiz-make-err" className={ERR}>Enter your vehicle make.</p>}</div>
+                <div><label htmlFor="wiz-vmodel" className={FIELD_LABEL}>Model<Req /></label><input id="wiz-vmodel" aria-required="true" aria-invalid={invalid.vmodel || undefined} aria-describedby={invalid.vmodel ? "wiz-vmodel-err" : undefined} name="vehicleModel" className={INPUT} placeholder="e.g. RAV4" value={form.vmodel} onChange={(e) => set("vmodel", e.target.value)} />{invalid.vmodel && <p id="wiz-vmodel-err" className={ERR}>Enter your vehicle model.</p>}</div>
+                <div><label htmlFor="wiz-year" className={FIELD_LABEL}>Year<Req /></label><input id="wiz-year" aria-required="true" aria-invalid={invalid.year || undefined} aria-describedby={invalid.year ? "wiz-year-err" : undefined} name="year" autoComplete="off" className={INPUT} placeholder="2022" inputMode="numeric" maxLength={4} value={form.year} onChange={(e) => set("year", e.target.value.replace(/\D/g, "").slice(0, 4))} />{invalid.year && <p id="wiz-year-err" className={ERR}>Enter a year between {VEHICLE_YEAR_MIN} and {maxVehicleYear}.</p>}</div>
               </div>
               <label htmlFor="wiz-notes" className={FLABEL}>Anything we should know? (optional)</label>
               <textarea id="wiz-notes" name="notes" className={`${INPUT} min-h-[88px] resize-y`} placeholder="e.g. previous dash cam to remove, apartment parking access, preferred contact time…" value={form.notes} onChange={(e) => set("notes", e.target.value)} />

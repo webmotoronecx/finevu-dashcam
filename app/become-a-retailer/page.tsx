@@ -9,7 +9,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
@@ -133,6 +133,32 @@ const INPUT = "w-full rounded-[12px] border border-[#e7e7e3] bg-white px-4 py-[1
 // to find which one they missed.
 const ERR = "mt-1.5 text-[12.5px] font-medium text-[#D93025]";
 
+// The required fields in DOM order, paired with the ids their inputs already carry.
+// A failed submit moves focus to the FIRST problem instead of leaving it on the button
+// (FA-20): rendering nine error messages tells a sighted user what to fix, but a keyboard
+// or screen-reader user was left on the submit button with no announcement and nine fields
+// to hunt through. Order must match the visual order or focus jumps around the form.
+const REQUIRED_FIELD_IDS: readonly (readonly [string, string])[] = [
+  ["biz", "ret-biz"],
+  ["btype", "ret-btype"],
+  ["cname", "ret-cname"],
+  ["email", "ret-email"],
+  ["phone", "ret-phone"],
+  ["state", "ret-state"],
+];
+
+// Deliberately permissive — it rejects what cannot be a phone number, not what isn't an
+// Australian one. AU mobile and landline formats, with or without +61, spaces, dashes or
+// brackets, all pass, and so do overseas numbers: online retailers do apply from outside
+// AU. The previous check was `!f.phone.trim()`, which accepted a single character on the
+// field a wholesale account is followed up on.
+const isPhone = (v: string) => (v.match(/\d/g) ?? []).length >= 8;
+
+// If router.push() never completes, `sending` stays true and the button reads "Submitting…"
+// forever with no way back (FA-10). A successful navigation unmounts this component and the
+// cleanup clears the timer, so this only ever fires on a genuine stall.
+const REDIRECT_STALL_MS = 8000;
+
 function SectionHead({ title, sub }: { title: string; sub: React.ReactNode }) {
   return (
     <motion.div {...fadeUp} className="mb-11 text-center">
@@ -155,6 +181,15 @@ function RetailerForm() {
   const [captchaReset, setCaptchaReset] = useState(0);
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
 
+  // Cleared on unmount, which is what a successful redirect does — see REDIRECT_STALL_MS.
+  const stallTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (stallTimer.current) clearTimeout(stallTimer.current);
+    },
+    [],
+  );
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     // One pass over every field, so the applicant sees ALL the problems at once rather
@@ -164,11 +199,15 @@ function RetailerForm() {
     if (!f.btype) inv.btype = true;
     if (!f.cname.trim()) inv.cname = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) inv.email = true;
-    if (!f.phone.trim()) inv.phone = true;
+    if (!isPhone(f.phone)) inv.phone = true;
     if (!f.state) inv.state = true;
     setInvalid(inv);
     if (Object.keys(inv).length > 0) {
       setErr("");
+      // Focus the first problem. The message is already linked by aria-describedby, so
+      // moving focus is what actually reads it out.
+      const first = REQUIRED_FIELD_IDS.find(([key]) => inv[key]);
+      if (first) document.getElementById(first[1])?.focus();
       return;
     }
     if (TURNSTILE_ENABLED && !captcha) {
@@ -194,6 +233,14 @@ function RetailerForm() {
     // Leave `sending` on through the navigation so the button can't be re-submitted.
     if (res.ok) {
       router.push(thankYouUrl("become-a-retailer"));
+      // The application HAS been sent by this point, so the stall message must not invite a
+      // re-submit — that would mail support a duplicate. It tells them they're done instead.
+      stallTimer.current = setTimeout(() => {
+        setSending(false);
+        setErr(
+          "Your application was sent — this page just didn't move on. There's no need to submit it again; we'll be in touch.",
+        );
+      }, REDIRECT_STALL_MS);
     } else {
       setSending(false);
       setErr(res.error);
@@ -242,7 +289,7 @@ function RetailerForm() {
         <div>
           <label className={LABEL} htmlFor="ret-phone">Phone <RequiredDot /></label>
           <input id="ret-phone" aria-required="true" name="phone" autoComplete="tel" className={INPUT} type="tel" placeholder="0400 000 000" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "ret-phone-err" : undefined} value={f.phone} onChange={(e) => set("phone", e.target.value)} />
-          {invalid.phone && <p id="ret-phone-err" className={ERR}>Enter a contact phone number.</p>}
+          {invalid.phone && <p id="ret-phone-err" className={ERR}>Enter a valid contact phone number.</p>}
         </div>
       </div>
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
@@ -268,7 +315,9 @@ function RetailerForm() {
       <button type="submit" disabled={sending} className="cta-hover mt-2 w-full rounded-full bg-[var(--finevu-orange)] px-7 py-[15px] text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70">
         {sending ? "Submitting…" : "Submit Application"}
       </button>
-      {err && <p className="mt-3.5 text-[13px] font-medium text-[#D93816]">{err}</p>}
+      {/* role="alert" so a submit failure — a spent Turnstile token, a 429, a 503 — is
+          announced rather than appearing silently below the button (FA-20). */}
+      {err && <p role="alert" className="mt-3.5 text-[13px] font-medium text-[#D93816]">{err}</p>}
       <p className="mt-3.5 text-center text-[13.6px] text-[#9a9da5]">
         By submitting, you agree to be contacted about a FineVu wholesale account. See our{" "}
         <a

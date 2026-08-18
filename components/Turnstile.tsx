@@ -96,5 +96,5 @@ export function Turnstile({ onToken, resetKey = 0 }: { onToken: (token: string) 
   }, [resetKey]);
 
   if (!SITE_KEY) return null;
-  return <div ref={ref} className="mt-1" />;
+  return <div className="flex w-full items-center align-center"><div ref={ref} className="mt-1 mx-auto" data-theme="light" /></div>
 }

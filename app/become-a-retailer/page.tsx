@@ -9,10 +9,11 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { thankYouUrl } from "@/lib/data/thank-you";
+import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
 import {
   Star,
   BarChart3,
@@ -133,31 +134,16 @@ const INPUT = "w-full rounded-[12px] border border-[#e7e7e3] bg-white px-4 py-[1
 // to find which one they missed.
 const ERR = "mt-1.5 text-[12.5px] font-medium text-[#D93025]";
 
-// The required fields in DOM order, paired with the ids their inputs already carry.
-// A failed submit moves focus to the FIRST problem instead of leaving it on the button
-// (FA-20): rendering nine error messages tells a sighted user what to fix, but a keyboard
-// or screen-reader user was left on the submit button with no announcement and nine fields
-// to hunt through. Order must match the visual order or focus jumps around the form.
-const REQUIRED_FIELD_IDS: readonly (readonly [string, string])[] = [
+// Required fields in visual order, paired with the ids their inputs carry. Drives
+// focusFirstInvalid on a failed submit (FA-44) — see lib/formHelpers.ts.
+const FOCUS_ORDER = [
   ["biz", "ret-biz"],
   ["btype", "ret-btype"],
   ["cname", "ret-cname"],
   ["email", "ret-email"],
   ["phone", "ret-phone"],
   ["state", "ret-state"],
-];
-
-// Deliberately permissive — it rejects what cannot be a phone number, not what isn't an
-// Australian one. AU mobile and landline formats, with or without +61, spaces, dashes or
-// brackets, all pass, and so do overseas numbers: online retailers do apply from outside
-// AU. The previous check was `!f.phone.trim()`, which accepted a single character on the
-// field a wholesale account is followed up on.
-const isPhone = (v: string) => (v.match(/\d/g) ?? []).length >= 8;
-
-// If router.push() never completes, `sending` stays true and the button reads "Submitting…"
-// forever with no way back (FA-10). A successful navigation unmounts this component and the
-// cleanup clears the timer, so this only ever fires on a genuine stall.
-const REDIRECT_STALL_MS = 8000;
+] as const;
 
 function SectionHead({ title, sub }: { title: string; sub: React.ReactNode }) {
   return (
@@ -181,14 +167,7 @@ function RetailerForm() {
   const [captchaReset, setCaptchaReset] = useState(0);
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
 
-  // Cleared on unmount, which is what a successful redirect does — see REDIRECT_STALL_MS.
-  const stallTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (stallTimer.current) clearTimeout(stallTimer.current);
-    },
-    [],
-  );
+  const armStallGuard = useRedirectStallGuard();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -204,10 +183,7 @@ function RetailerForm() {
     setInvalid(inv);
     if (Object.keys(inv).length > 0) {
       setErr("");
-      // Focus the first problem. The message is already linked by aria-describedby, so
-      // moving focus is what actually reads it out.
-      const first = REQUIRED_FIELD_IDS.find(([key]) => inv[key]);
-      if (first) document.getElementById(first[1])?.focus();
+      focusFirstInvalid(FOCUS_ORDER, inv);
       return;
     }
     if (TURNSTILE_ENABLED && !captcha) {
@@ -233,14 +209,10 @@ function RetailerForm() {
     // Leave `sending` on through the navigation so the button can't be re-submitted.
     if (res.ok) {
       router.push(thankYouUrl("become-a-retailer"));
-      // The application HAS been sent by this point, so the stall message must not invite a
-      // re-submit — that would mail support a duplicate. It tells them they're done instead.
-      stallTimer.current = setTimeout(() => {
+      armStallGuard(() => {
         setSending(false);
-        setErr(
-          "Your application was sent — this page just didn't move on. There's no need to submit it again; we'll be in touch.",
-        );
-      }, REDIRECT_STALL_MS);
+        setErr(stallMessage("application"));
+      });
     } else {
       setSending(false);
       setErr(res.error);

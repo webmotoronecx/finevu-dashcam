@@ -9,6 +9,17 @@ import { useState } from "react";
 import { Phone, Mail } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
+import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
+
+// Required fields in visual order, plus the optional phone, paired with their input ids.
+// Drives focusFirstInvalid on a failed submit (FA-44) — see lib/formHelpers.ts.
+const FOCUS_ORDER = [
+  ["name", "f-name"],
+  ["phone", "f-phone"],
+  ["email", "f-email"],
+  ["subject", "f-subject"],
+  ["message", "f-msg"],
+] as const;
 import { thankYouUrl } from "@/lib/data/thank-you";
 import { RequiredDot } from "@/components/RequiredDot";
 
@@ -77,6 +88,7 @@ function ContactForm() {
   const [botcheck, setBotcheck] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [captchaReset, setCaptchaReset] = useState(0);
+  const armStallGuard = useRedirectStallGuard();
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   async function submit(e: React.FormEvent) {
@@ -87,12 +99,16 @@ function ContactForm() {
     // surface only the first failing field.
     const inv: Record<string, boolean> = {};
     if (!form.name.trim()) inv.name = true;
+    // Phone is OPTIONAL here, so it is only checked once something has been typed —
+    // blank stays valid, junk does not (FA-45).
+    if (form.phone.trim() && !isPhone(form.phone)) inv.phone = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) inv.email = true;
     if (!form.subject) inv.subject = true;
     if (!form.message.trim()) inv.message = true;
     setInvalid(inv);
     if (Object.keys(inv).length > 0) {
       setError("");
+      focusFirstInvalid(FOCUS_ORDER, inv);
       return;
     }
     if (TURNSTILE_ENABLED && !captcha) {
@@ -113,6 +129,10 @@ function ContactForm() {
     if (res.ok) {
       // Stay in "sending" through the navigation so the button can't be re-submitted.
       router.push(thankYouUrl("contact"));
+      armStallGuard(() => {
+        setStatus("idle");
+        setError(stallMessage("message"));
+      });
     } else {
       setStatus("idle");
       setError(res.error);
@@ -150,7 +170,8 @@ function ContactForm() {
         <label className={LABEL} htmlFor="f-phone">
           Phone number
         </label>
-        <input id="f-phone" name="phone" autoComplete="tel" className={INPUT} placeholder="0400 000 000" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+        <input id="f-phone" name="phone" autoComplete="tel" className={INPUT} placeholder="0400 000 000" inputMode="tel" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "f-phone-err" : undefined} value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+        {invalid.phone && <p id="f-phone-err" className={ERR}>Enter a valid phone number, or leave it blank.</p>}
       </div>
       <div className="sm:col-span-2">
         <label className={LABEL} htmlFor="f-email">
@@ -207,7 +228,9 @@ function ContactForm() {
       >
         {status === "sending" ? "Sending…" : "Send Message"}
       </button>
-      {error && <p className="col-span-full text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
+      {/* role="alert" so a submit failure is announced rather than appearing silently
+          below the button (FA-20). */}
+      {error && <p role="alert" className="col-span-full text-center text-[13px] font-medium text-[#D93816]">{error}</p>}
       <p className="col-span-full text-center text-[12.5px] text-[#707784]">
         By submitting this form, you agree to our{" "}
         <a

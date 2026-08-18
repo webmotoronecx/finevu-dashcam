@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
+import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
 import { thankYouUrl } from "@/lib/data/thank-you";
 import { RequiredDot } from "@/components/RequiredDot";
 
@@ -26,6 +27,19 @@ const fadeUp = {
 // of base64, and base64 inflates by ~1/3). Anything larger used to pass this check and
 // then be dropped server-side, so support received a registration with no receipt.
 const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
+
+// Fields in visual order, paired with their input ids. Drives focusFirstInvalid on a failed
+// submit (FA-44) — see lib/formHelpers.ts.
+const FOCUS_ORDER = [
+  ["firstName", "first-name"],
+  ["lastName", "last-name"],
+  ["email", "email"],
+  ["phone", "phone"],
+  ["model", "model"],
+  ["purchaseDate", "purchase-date"],
+  ["serial", "serial"],
+  ["retailer", "retailer"],
+] as const;
 
 const models = [
   { value: "GX4K", label: "FineVu GX4K" },
@@ -76,6 +90,7 @@ function RegisterForm() {
   const [captchaReset, setCaptchaReset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const armStallGuard = useRedirectStallGuard();
 
   const set = (k: keyof typeof form, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -105,12 +120,18 @@ function RegisterForm() {
     if (!form.firstName.trim()) inv.firstName = true;
     if (!form.lastName.trim()) inv.lastName = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) inv.email = true;
+    // Phone is OPTIONAL here, so it is only checked once something has been typed —
+    // blank stays valid, junk does not (FA-45).
+    if (form.phone.trim() && !isPhone(form.phone)) inv.phone = true;
     if (!form.model) inv.model = true;
     if (!form.purchaseDate) inv.purchaseDate = true;
     if (!form.serial.trim()) inv.serial = true;
     if (!form.retailer.trim()) inv.retailer = true;
     setInvalid(inv);
-    if (Object.keys(inv).length > 0 || fileError) return;
+    if (Object.keys(inv).length > 0 || fileError) {
+      focusFirstInvalid(FOCUS_ORDER, inv);
+      return;
+    }
     if (TURNSTILE_ENABLED && !captcha) {
       setError("Please complete the verification below.");
       return;
@@ -148,8 +169,13 @@ function RegisterForm() {
       { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment, botcheck, turnstileToken: captcha },
     );
     // Stay in "sending" through the navigation so the button can't be re-submitted.
-    if (res.ok) router.push(thankYouUrl("register"));
-    else {
+    if (res.ok) {
+      router.push(thankYouUrl("register"));
+      armStallGuard(() => {
+        setStatus("idle");
+        setError(stallMessage("registration"));
+      });
+    } else {
       setStatus("idle");
       setError(res.error);
       // The token is single-use and may already be spent, so reissue one for the retry.
@@ -202,7 +228,8 @@ function RegisterForm() {
 
       <div className="mt-4">
         <label className={LABEL} htmlFor="phone">Phone <span className="font-normal text-[#8a8a92]">(optional)</span></label>
-        <input id="phone" type="tel" className={INPUT} autoComplete="tel" placeholder="04XX XXX XXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+        <input id="phone" type="tel" aria-invalid={invalid.phone || undefined} aria-describedby={invalid.phone ? "phone-err" : undefined} className={INPUT} autoComplete="tel" placeholder="04XX XXX XXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+        {invalid.phone && <p id="phone-err" className={ERR}>Enter a valid phone number, or leave it blank.</p>}
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -291,7 +318,9 @@ function RegisterForm() {
       >
         {status === "sending" ? "Registering…" : "Register now"}
       </button>
-      {error && <p className={`${ERR} mt-3.5`}>{error}</p>}
+      {/* role="alert" so a submit failure is announced rather than appearing silently
+          below the button (FA-20). */}
+      {error && <p role="alert" className={`${ERR} mt-3.5`}>{error}</p>}
     </motion.form>
   );
 }

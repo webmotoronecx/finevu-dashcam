@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
+import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
 import { thankYouUrl } from "@/lib/data/thank-you";
 import { RequiredDot } from "@/components/RequiredDot";
 
@@ -34,6 +35,23 @@ const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
 const MAX_EVIDENCE_FILES = 4;
 const MAX_EVIDENCE_BYTES = 3 * 1024 * 1024;
 const MAX_EVIDENCE_TOTAL_BYTES = 7 * 1024 * 1024;
+
+// Fields in visual order, paired with their input ids. Drives focusFirstInvalid on a failed
+// submit (FA-44) — see lib/formHelpers.ts. `receipt` targets the UploadZone div rather than
+// an input, because the real <input type="file"> is hidden and cannot take focus.
+const FOCUS_ORDER = [
+  ["firstName", "first-name"],
+  ["lastName", "last-name"],
+  ["email", "email"],
+  ["phone", "phone"],
+  ["model", "model"],
+  ["purchaseDate", "purchase-date"],
+  ["serial", "serial"],
+  ["retailer", "retailer"],
+  ["receipt", "receipt-zone"],
+  ["issueType", "issue-type"],
+  ["description", "description"],
+] as const;
 
 const models = [
   { value: "GX4K", label: "FineVu GX4K" },
@@ -76,6 +94,7 @@ function readFileAsBase64(file: File): Promise<string> {
 }
 
 function UploadZone({
+  id,
   accept,
   multiple = false,
   files,
@@ -85,6 +104,9 @@ function UploadZone({
   hint,
   ariaLabel,
 }: {
+  /** Focus target for focusFirstInvalid (FA-44) — the zone is the control here, since the
+      real <input type="file"> is hidden and cannot be focused. */
+  id?: string;
   accept: string;
   multiple?: boolean;
   files: File[];
@@ -103,6 +125,7 @@ function UploadZone({
 
   return (
     <div
+      id={id}
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}
@@ -179,6 +202,7 @@ function ClaimForm() {
   const [botcheck, setBotcheck] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [captchaReset, setCaptchaReset] = useState(0);
+  const armStallGuard = useRedirectStallGuard();
 
   const set = (k: keyof typeof form, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -223,7 +247,9 @@ function ClaimForm() {
     if (!form.firstName.trim()) inv.firstName = true;
     if (!form.lastName.trim()) inv.lastName = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) inv.email = true;
-    if (!form.phone.trim()) inv.phone = true;
+    // Required here, and the number support calls back on — so it has to be plausible,
+    // not merely non-empty (FA-45).
+    if (!isPhone(form.phone)) inv.phone = true;
     if (!form.model) inv.model = true;
     if (!form.purchaseDate) inv.purchaseDate = true;
     if (!form.serial.trim()) inv.serial = true;
@@ -232,7 +258,10 @@ function ClaimForm() {
     if (!form.issueType) inv.issueType = true;
     if (!form.description.trim()) inv.description = true;
     setInvalid(inv);
-    if (Object.keys(inv).length > 0 || receiptError || evidenceError) return;
+    if (Object.keys(inv).length > 0 || receiptError || evidenceError) {
+      focusFirstInvalid(FOCUS_ORDER, inv);
+      return;
+    }
     if (TURNSTILE_ENABLED && !captcha) {
       setError("Please complete the verification below.");
       return;
@@ -285,8 +314,13 @@ function ClaimForm() {
       { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment, attachments, botcheck, turnstileToken: captcha },
     );
     // Stay in "sending" through the navigation so the button can't be re-submitted.
-    if (res.ok) router.push(thankYouUrl("warranty-claim"));
-    else {
+    if (res.ok) {
+      router.push(thankYouUrl("warranty-claim"));
+      armStallGuard(() => {
+        setStatus("idle");
+        setError(stallMessage("claim"));
+      });
+    } else {
       setStatus("idle");
       setError(res.error);
       // The token is single-use and may already be spent, so reissue one for the retry.
@@ -380,6 +414,7 @@ function ClaimForm() {
       <div className="mt-4">
         <label className={LABEL}>Proof of purchase<RequiredDot /></label>
         <UploadZone
+          id="receipt-zone"
           accept=".jpg,.jpeg,.png,.pdf,.heic"
           files={receipt ? [receipt] : []}
           onSelect={chooseReceipt}
@@ -447,7 +482,9 @@ function ClaimForm() {
       >
         {status === "sending" ? "Submitting…" : "Submit claim"}
       </button>
-      {error && <p className={`${ERR} mt-3.5`}>{error}</p>}
+      {/* role="alert" so a submit failure is announced rather than appearing silently
+          below the button (FA-20). */}
+      {error && <p role="alert" className={`${ERR} mt-3.5`}>{error}</p>}
     </motion.form>
   );
 }

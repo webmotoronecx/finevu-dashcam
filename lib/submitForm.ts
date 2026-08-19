@@ -20,6 +20,14 @@ type SubmitOptions = {
   botcheck?: string;
   /** Cloudflare Turnstile token, verified server-side against TURNSTILE_SECRET_KEY (FB-07). */
   turnstileToken?: string;
+  /**
+   * Which form this is, so /api/contact can forward the lead to its GHL workflow (FB-06).
+   *
+   * It names a FORM, never a destination: the route matches it against the allowlist in
+   * lib/ghlWebhook.ts, which owns both the workflow URL and the set of fields forwarded.
+   * An unknown value is ignored. Omit it and the submission is email-only, exactly as before.
+   */
+  formType?: string;
 };
 
 export async function submitForm(
@@ -38,6 +46,7 @@ export async function submitForm(
         attachments: opts.attachments,
         botcheck: opts.botcheck,
         turnstileToken: opts.turnstileToken,
+        formType: opts.formType,
       }),
     });
     const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;

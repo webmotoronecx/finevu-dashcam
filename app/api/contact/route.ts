@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { BUSINESS } from "@/lib/data/business";
 import { sendAutoReply } from "@/lib/email/formAutoReply";
+import { sendToGhlWorkflow } from "@/lib/ghlWebhook";
 
 // Server-side handler for website form submissions. Sends via Resend using the
 // secret RESEND_API_KEY (never exposed to the browser). Recipient and sender are
@@ -32,6 +33,10 @@ type Payload = {
   replyTo?: string;
   botcheck?: string;
   turnstileToken?: string;
+  /** Which form this is, for CRM routing (FB-06). Matched against the allowlist in
+      lib/ghlWebhook.ts — it names a form, never a URL or a field. Unknown values are
+      ignored, so a caller cannot invent a destination. */
+  formType?: string;
   fields?: Record<string, unknown>;
   /** Legacy single-attachment slot. /register still sends this shape. */
   attachment?: { filename?: string; contentBase64?: string };
@@ -333,6 +338,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Please fill in the form before submitting." }, { status: 400 });
   }
 
+  /* The same values as `rows`, but keyed by the ORIGINAL field name instead of the
+     prettified label: GHL maps on stable keys, and prettyLabel exists for humans reading an
+     email. Truncated by the same caps, so the CRM can never be sent more than support was. */
+  const crmFields: Record<string, string> = {};
+  for (const [k, v] of entries) {
+    if (typeof v !== "string" || !v.trim()) continue;
+    const value = v.trim();
+    crmFields[k.slice(0, MAX_KEY_CHARS)] = value.slice(0, MAX_VALUE_CHARS);
+  }
+
   const attachments = buildAttachments(payload);
   if (attachments === INVALID_ATTACHMENT) {
     return NextResponse.json(
@@ -394,6 +409,23 @@ export async function POST(req: Request) {
         console.error("[contact] submission delivered but the auto-reply failed", {
           subject,
           error: ack.error,
+        });
+      }
+    }
+
+    /* CRM copy (FB-06). Deliberately LAST and deliberately best-effort: the support email is
+       the record, so a GHL outage must never fail a submission support has already received.
+       Same trade as the auto-reply above.
+
+       Reaching this line means the honeypot, Turnstile and the rate limit have all passed —
+       which is exactly why this POST is made here rather than from the browser. A workflow
+       URL in the client bundle would be an unauthenticated write endpoint on the CRM. */
+    if (typeof payload.formType === "string") {
+      const crm = await sendToGhlWorkflow(payload.formType, crmFields);
+      if (!crm.ok && "error" in crm) {
+        console.error("[contact] submission delivered but the CRM copy failed", {
+          formType: payload.formType,
+          error: crm.error,
         });
       }
     }

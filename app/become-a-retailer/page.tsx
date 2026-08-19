@@ -204,7 +204,16 @@ function RetailerForm() {
         website: f.web,
         message: f.msg,
       },
-      { subject: `FineVu retailer application — ${f.biz}`, replyTo: f.email, botcheck, turnstileToken: captcha },
+      {
+        subject: `FineVu retailer application — ${f.biz}`,
+        replyTo: f.email,
+        botcheck,
+        turnstileToken: captcha,
+        // Routes the lead to its GHL workflow as well as the support inbox (FB-06). The
+        // POST is made server-side from /api/contact so it inherits the honeypot, Turnstile
+        // and rate limit — see lib/ghlWebhook.ts.
+        formType: "retailer",
+      },
     );
     // Leave `sending` on through the navigation so the button can't be re-submitted.
     if (res.ok) {

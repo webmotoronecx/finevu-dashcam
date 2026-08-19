@@ -13,6 +13,8 @@
 // calendar's autoConfirm: true, and still occupies the slot. That is what makes the
 // hold-then-confirm booking flow (Option B) possible.
 
+import { CRM_SOURCE, CRM_TAG, type CrmChannel } from "@/lib/crmLabels";
+
 const API_BASE = "https://services.leadconnectorhq.com";
 /** Calendars/events endpoints. */
 const API_VERSION = "2021-04-15";
@@ -189,6 +191,13 @@ export type ContactInput = {
   city?: string;
   state?: string;
   postalCode?: string;
+  /**
+   * Which website surface created this contact. REQUIRED, and deliberately not defaulted:
+   * GHL keeps every contact in one table, so this and `tags` are the only things separating
+   * a homeowner booking an install from a business applying for wholesale. A default would
+   * silently mislabel the next caller as a booking — see lib/crmLabels.ts.
+   */
+  channel: CrmChannel;
 };
 
 type UpsertContactResponse = { contact?: { id?: string } };
@@ -221,7 +230,13 @@ export async function upsertContact(input: ContactInput): Promise<string> {
       state: input.state,
       postalCode: input.postalCode,
       country: "AU",
-      source: "Website — installation booking",
+      /* Source and tag both come from lib/crmLabels.ts rather than being written here, so
+         the booking path and the retailer webhook cannot drift into two spellings of the
+         same idea — which they already had done. The tag is what a Smart List filters on,
+         and filtering is what stops a campaign aimed at "all contacts" mailing wholesale
+         pricing to homeowners. */
+      source: CRM_SOURCE[input.channel],
+      tags: [CRM_TAG[input.channel]],
     },
   });
 

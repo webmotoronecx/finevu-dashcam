@@ -142,6 +142,9 @@ export async function POST(req: Request) {
     // being asked for a second time". upsert is idempotent, so this is free to repeat.
     const contactId = await upsertContact({
       name, email, phone, address: street, city: suburb, state: stateAu, postalCode: postcode,
+      // Sources and tags the contact as a booking, so it can be told apart from a retailer
+      // application in a contacts list that holds both. See lib/crmLabels.ts.
+      channel: "booking",
     });
 
     // The slot the wizard offered at step 3 may have gone while the customer filled in

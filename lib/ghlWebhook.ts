@@ -1,5 +1,7 @@
 import "server-only";
 
+import { CRM_SOURCE, type CrmChannel } from "@/lib/crmLabels";
+
 /* Form → GHL, via a workflow inbound webhook (FB-06).
  *
  * SERVER ONLY. The webhook URL is an unauthenticated write endpoint — anyone holding it can
@@ -36,6 +38,8 @@ const WEBHOOK_TIMEOUT_MS = 5_000;
 type FormWebhook = {
   /** Env var holding this form's workflow URL. Each GHL workflow has its own. */
   env: string;
+  /** Which website surface this is, for the Source written onto the contact. */
+  channel: CrmChannel;
   /** Exactly the field keys forwarded to GHL. Anything else the caller sends is dropped. */
   fields: readonly string[];
 };
@@ -53,6 +57,7 @@ type FormWebhook = {
 const FORM_WEBHOOKS: Record<string, FormWebhook> = {
   retailer: {
     env: "GHL_WEBHOOK_RETAILER_URL",
+    channel: "retailer",
     fields: [
       "business_name",
       "abn",
@@ -107,8 +112,16 @@ export async function sendToGhlWorkflow(
       headers: { "Content-Type": "application/json" },
       /* `source` is sent on every lead so a bad run is one filter and a bulk delete in GHL
          rather than manual cleanup. It is the only meaningful mitigation for the fact that
-         this path is reachable by anyone who gets past Turnstile. */
-      body: JSON.stringify({ ...payload, form_type: formType, source: `FineVu website — ${formType}` }),
+         this path is reachable by anyone who gets past Turnstile.
+
+         It comes from lib/crmLabels.ts, shared with the booking path's REST upsert, so the
+         two cannot drift into two spellings of the same idea.
+
+         NOTE the TAG is not sent here. This posts to a workflow, and the contact does not
+         exist until that workflow's Create/Update Contact action has run — so tagging is an
+         "Add Contact Tag" action INSIDE the workflow, placed after it. CRM_TAG.retailer is
+         the string that action must use; nothing in the build can check that it matches. */
+      body: JSON.stringify({ ...payload, form_type: formType, source: CRM_SOURCE[spec.channel] }),
       signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
     });
     if (!res.ok) return { ok: false, error: `GHL workflow returned ${res.status}` };

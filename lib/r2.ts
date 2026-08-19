@@ -1,6 +1,6 @@
 import "server-only";
 
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { CopyObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 /* Cloudflare R2 access for the firmware / manual downloads.
@@ -73,4 +73,78 @@ export async function presignDownload(key: string, filename: string): Promise<st
     });
 
     return getSignedUrl(getClient(), command, { expiresIn: PRESIGN_TTL_SECONDS });
+}
+
+/* --- Uploads bucket (FB-04 / FB-05) ----------------------------------------
+
+   A SECOND private bucket for customer form uploads — registration receipts and
+   warranty-claim evidence — kept apart from the firmware bucket on purpose: this one needs
+   WRITE access, while the firmware token stays Object-Read-only and scoped to its one bucket.
+   Same account, so R2_ACCOUNT_ID is shared; the credentials below are the read+write token
+   scoped to this one bucket.
+
+   Unset ⇒ r2UploadsConfigured() is false and the sign/persist routes 503, so the forms fall
+   back to their email-only behaviour. Provisioning is therefore a pure switch-on. */
+
+const UPLOADS_BUCKET = process.env.R2_UPLOADS_BUCKET;
+const UPLOADS_ACCESS_KEY_ID = process.env.R2_UPLOADS_ACCESS_KEY_ID;
+const UPLOADS_SECRET_ACCESS_KEY = process.env.R2_UPLOADS_SECRET_ACCESS_KEY;
+
+/** How long a presigned upload URL stays valid — long enough to start a large upload on a
+    slow connection, short enough that a leaked URL is worthless within the hour. */
+export const UPLOAD_PRESIGN_TTL_SECONDS = 600;
+
+export function r2UploadsConfigured(): boolean {
+    return Boolean(ACCOUNT_ID && UPLOADS_ACCESS_KEY_ID && UPLOADS_SECRET_ACCESS_KEY && UPLOADS_BUCKET);
+}
+
+let uploadsClient: S3Client | null = null;
+
+function getUploadsClient(): S3Client {
+    if (!uploadsClient) {
+        uploadsClient = new S3Client({
+            region: "auto",
+            endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
+            credentials: {
+                accessKeyId: UPLOADS_ACCESS_KEY_ID as string,
+                secretAccessKey: UPLOADS_SECRET_ACCESS_KEY as string,
+            },
+        });
+    }
+    return uploadsClient;
+}
+
+/**
+ * A presigned PUT URL the browser uploads one file to directly — bypassing the ~4.5 MB
+ * Vercel request-body limit, which is the whole reason uploads go to R2 instead of riding
+ * on the form email.
+ *
+ * `contentType` is signed in, so the browser's PUT must send the SAME Content-Type header
+ * (the bucket's CORS policy must allow it). Callers validate the file first — a signed URL
+ * is a capability, so nothing unvalidated should ever get one.
+ */
+export async function presignUpload(key: string, contentType: string): Promise<string> {
+    if (!r2UploadsConfigured()) throw new Error("R2 uploads bucket is not configured");
+    const command = new PutObjectCommand({ Bucket: UPLOADS_BUCKET, Key: key, ContentType: contentType });
+    return getSignedUrl(getUploadsClient(), command, { expiresIn: UPLOAD_PRESIGN_TTL_SECONDS });
+}
+
+/**
+ * Server-side copy within the uploads bucket, used to promote a file from its temporary
+ * `pending/<uploadId>/…` home to the permanent `claims/…` / `registrations/…` path once the
+ * form is submitted. Anything left under `pending/` is swept by the bucket's lifecycle rule,
+ * which is how uploads from abandoned forms get purged.
+ *
+ * Keys are restricted to a safe character set by the callers, so CopySource needs no
+ * escaping.
+ */
+export async function copyObject(sourceKey: string, destinationKey: string): Promise<void> {
+    if (!r2UploadsConfigured()) throw new Error("R2 uploads bucket is not configured");
+    await getUploadsClient().send(
+        new CopyObjectCommand({
+            Bucket: UPLOADS_BUCKET,
+            CopySource: `${UPLOADS_BUCKET}/${sourceKey}`,
+            Key: destinationKey,
+        }),
+    );
 }

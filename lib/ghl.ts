@@ -245,6 +245,20 @@ export async function upsertContact(input: ContactInput): Promise<string> {
   return id;
 }
 
+/**
+ * Appends a note to a contact. Notes are how a registration or warranty claim leaves a
+ * durable, human-readable record on the customer's ONE contact (FB-04 / FB-05) — the claim
+ * fields plus the R2 object keys for its uploaded files. A repeat customer's registration
+ * and later claim land on the same contact, so support reads them together.
+ */
+export async function addContactNote(contactId: string, body: string): Promise<void> {
+  await ghlFetch(`/contacts/${encodeURIComponent(contactId)}/notes`, {
+    method: "POST",
+    version: CONTACTS_VERSION,
+    body: { body },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Appointments
 // ---------------------------------------------------------------------------

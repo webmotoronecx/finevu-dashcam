@@ -20,7 +20,7 @@
  */
 
 /** The website surfaces that create contacts. */
-export type CrmChannel = "booking" | "retailer";
+export type CrmChannel = "booking" | "retailer" | "registration" | "warranty-claim";
 
 /**
  * The Source written onto the contact record.
@@ -33,15 +33,17 @@ export type CrmChannel = "booking" | "retailer";
 export const CRM_SOURCE: Record<CrmChannel, string> = {
   booking: "FineVu website — installation booking",
   retailer: "FineVu website — retailer application",
+  registration: "FineVu website — product registration",
+  "warranty-claim": "FineVu website — warranty claim",
 };
 
 /**
  * The tag applied to the contact. Lowercase-hyphen, because GHL tags are case-insensitive
  * and a mixed convention reads as two tags in the UI even when it behaves as one.
  *
- * APPLIED IN TWO DIFFERENT PLACES, because the two paths reach GHL differently:
- *  - `booking`  — sent in the upsert payload by lib/ghl.ts, since /api/booking/create calls
- *                 the REST API directly and there is no workflow involved.
+ * APPLIED IN TWO DIFFERENT PLACES, because the paths reach GHL differently:
+ *  - `booking`, `registration`, `warranty-claim` — sent in the upsert payload by lib/ghl.ts,
+ *                 since those paths call the REST API directly and there is no workflow.
  *  - `retailer` — applied by an "Add Contact Tag" action in the GHL workflow, because that
  *                 path posts to a workflow inbound webhook and the contact does not exist
  *                 until the workflow's own Create/Update Contact action has run.
@@ -52,4 +54,6 @@ export const CRM_SOURCE: Record<CrmChannel, string> = {
 export const CRM_TAG: Record<CrmChannel, string> = {
   booking: "installation-booking",
   retailer: "retailer-application",
+  registration: "product-registration",
+  "warranty-claim": "warranty-claim",
 };

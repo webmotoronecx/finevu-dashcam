@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { persistSubmission } from "@/lib/persistSubmission";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
 import { thankYouUrl } from "@/lib/data/thank-you";
@@ -29,12 +30,18 @@ const fadeUp = {
 // then be dropped server-side, so support received a claim with no receipt attached.
 const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
 
-// Evidence caps (FA-02). Photos are now genuinely ATTACHED rather than listed by name, so
-// they have to fit inside what /api/contact accepts: 6 files and 12 MB of base64 across the
-// whole email, receipt included. Held below both so the receipt always has room.
-const MAX_EVIDENCE_FILES = 4;
-const MAX_EVIDENCE_BYTES = 3 * 1024 * 1024;
-const MAX_EVIDENCE_TOTAL_BYTES = 7 * 1024 * 1024;
+// Evidence now uploads to R2 (FB-05), which has no email-size ceiling, so the picker takes
+// many, larger files. ALL of them are stored with the claim.
+const MAX_EVIDENCE_FILES = 20;
+const MAX_EVIDENCE_BYTES = 25 * 1024 * 1024;
+const MAX_EVIDENCE_TOTAL_BYTES = 150 * 1024 * 1024;
+
+// What the FA-02 email carries: it stays under what /api/contact accepts (6 files / 12 MB of
+// base64 total, receipt included), so the email always sends. Anything past this is in R2
+// only, and the email notes the overflow.
+const EMAIL_EVIDENCE_MAX = 4;
+const EMAIL_EVIDENCE_BYTES = 3 * 1024 * 1024;
+const EMAIL_EVIDENCE_TOTAL_BYTES = 7 * 1024 * 1024;
 
 // Fields in visual order, paired with their input ids. Drives focusFirstInvalid on a failed
 // submit (FA-44) — see lib/formHelpers.ts. `receipt` targets the UploadZone div rather than
@@ -225,16 +232,16 @@ function ClaimForm() {
 
   const chooseEvidence = (files: File[]) => {
     if (files.length > MAX_EVIDENCE_FILES) {
-      setEvidenceError(`Please choose up to ${MAX_EVIDENCE_FILES} files. Anything more can be emailed to support@finevuaustralia.com.au after submitting.`);
+      setEvidenceError(`Please choose up to ${MAX_EVIDENCE_FILES} files.`);
       return;
     }
     const oversize = files.find((f) => f.size > MAX_EVIDENCE_BYTES);
     if (oversize) {
-      setEvidenceError(`"${oversize.name}" is over 3 MB. Please choose a smaller file, or email it to support@finevuaustralia.com.au after submitting.`);
+      setEvidenceError(`"${oversize.name}" is over 25 MB. Please choose a smaller file.`);
       return;
     }
     if (files.reduce((n, f) => n + f.size, 0) > MAX_EVIDENCE_TOTAL_BYTES) {
-      setEvidenceError("Those files are over 7 MB together. Please choose fewer, or email the rest to support@finevuaustralia.com.au after submitting.");
+      setEvidenceError("Those files are too large together. Please choose fewer.");
       return;
     }
     setEvidenceError("");
@@ -270,49 +277,75 @@ function ClaimForm() {
     setStatus("sending");
     setError("");
 
-    // Read the receipt AND every evidence file (FA-02). Evidence used to be sent as
-    // `evidence.map(f => f.name).join(", ")` — a list of filenames and no images, on the
-    // one form where that evidence IS the substance of the claim.
-    //
-    // A read failure now ABORTS instead of quietly setting attachment = undefined and
-    // submitting anyway (FA-37). The old path sent `receipt: <filename>` in the fields
-    // regardless, so support received a claim asserting a receipt that was not attached
-    // and the customer got a success screen. Rare — FileReader only fails on a file that
-    // has been moved or made unreadable since it was chosen — but silent, and the receipt
-    // is a required field here.
+    // The email keeps its FA-02 shape: the required receipt plus the evidence that fits its
+    // caps. EVERYTHING the customer selected goes to R2 regardless (persistSubmission below),
+    // so a claim with many or large photos is captured in full even though the email only
+    // carries a representative few, and the overflow is noted rather than dropped.
+    const emailEvidence: File[] = [];
+    let emailTotal = 0;
+    for (const f of evidence) {
+      if (emailEvidence.length >= EMAIL_EVIDENCE_MAX) break;
+      if (f.size > EMAIL_EVIDENCE_BYTES || emailTotal + f.size > EMAIL_EVIDENCE_TOTAL_BYTES) continue;
+      emailEvidence.push(f);
+      emailTotal += f.size;
+    }
+
+    // A read failure ABORTS instead of quietly submitting a receipt that was named but not
+    // attached (FA-37). Only the email subset is read here — the full set rides on R2.
     let attachment: { filename: string; contentBase64: string } | undefined;
     let attachments: { filename: string; contentBase64: string }[] = [];
     try {
       if (receipt) attachment = { filename: receipt.name, contentBase64: await readFileAsBase64(receipt) };
       attachments = await Promise.all(
-        evidence.map(async (f) => ({ filename: f.name, contentBase64: await readFileAsBase64(f) })),
+        emailEvidence.map(async (f) => ({ filename: f.name, contentBase64: await readFileAsBase64(f) })),
       );
     } catch {
       setStatus("idle");
       setError("We couldn’t read one of your files — it may have been moved or renamed. Please re-select it and try again.");
       return;
     }
+
     const modelLabel = models.find((m) => m.value === form.model)?.label || form.model;
     const issueLabel = issueTypes.find((i) => i.value === form.issueType)?.label || form.issueType;
-    const res = await submitForm(
-      {
-        first_name: form.firstName,
-        last_name: form.lastName,
-        email: form.email,
-        phone: form.phone,
-        model: modelLabel,
-        purchase_date: form.purchaseDate,
-        serial_number: form.serial,
-        retailer: form.retailer,
-        issue: issueLabel,
-        description: form.description,
-        receipt: receipt ? receipt.name : "Not provided",
-        // Says ATTACHED because they now are. Anything here that the email does not carry
-        // would put us back where FA-02 started.
-        evidence: evidence.length ? `${evidence.length} file(s) attached — ${evidence.map((f) => f.name).join(", ")}` : "Not provided",
-      },
-      { subject: `FineVu warranty claim — ${modelLabel || "product"}`, replyTo: form.email, attachment, attachments, botcheck, turnstileToken: captcha },
-    );
+    const names = evidence.map((f) => f.name).join(", ");
+    const evidenceSummary =
+      evidence.length === 0
+        ? "Not provided"
+        : evidence.length === emailEvidence.length
+          ? `${evidence.length} file(s) attached — ${names}`
+          : `${evidence.length} file(s) stored with the claim; ${emailEvidence.length} attached here — ${names}`;
+
+    const fields = {
+      first_name: form.firstName,
+      last_name: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      model: modelLabel,
+      purchase_date: form.purchaseDate,
+      serial_number: form.serial,
+      retailer: form.retailer,
+      issue: issueLabel,
+      description: form.description,
+      receipt: receipt ? receipt.name : "Not provided",
+      evidence: evidenceSummary,
+    };
+
+    // The FA-02 email (unchanged path) and durable persistence (R2 + GHL) run together and
+    // independently: persistSubmission never throws, so the customer's success still hinges
+    // on the email exactly as before, while every file is captured in R2 even if the email
+    // fails. Receipt + all evidence go to R2.
+    const [res] = await Promise.all([
+      submitForm(fields, {
+        subject: `FineVu warranty claim — ${modelLabel || "product"}`,
+        replyTo: form.email,
+        attachment,
+        attachments,
+        botcheck,
+        turnstileToken: captcha,
+      }),
+      persistSubmission("warranty-claim", fields, [...(receipt ? [receipt] : []), ...evidence]),
+    ]);
+
     // Stay in "sending" through the navigation so the button can't be re-submitted.
     if (res.ok) {
       router.push(thankYouUrl("warranty-claim"));
@@ -465,7 +498,7 @@ function ClaimForm() {
           onSelect={chooseEvidence}
           invalid={Boolean(evidenceError)}
           describedBy={evidenceError ? "evidence-err" : undefined}
-          hint="Photos or screenshots — up to 4 files, 3 MB each. Video? Email it to support after submitting"
+          hint="Photos or screenshots — up to 20 files, 25 MB each. Video? Email it to support after submitting"
           ariaLabel="Upload photos of the issue"
         />
         {evidenceError && <p id="evidence-err" className={ERR}>{evidenceError}</p>}

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
+import { persistSubmission } from "@/lib/persistSubmission";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
 import { thankYouUrl } from "@/lib/data/thank-you";
@@ -153,21 +154,31 @@ function RegisterForm() {
         return;
       }
     }
-    const res = await submitForm(
-      {
-        first_name: form.firstName,
-        last_name: form.lastName,
-        email: form.email,
-        phone: form.phone,
-        model: form.model,
-        purchase_date: form.purchaseDate,
-        serial_number: form.serial,
-        retailer: form.retailer,
-        firmware_updates: notify ? "Yes" : "No",
-        receipt: file ? file.name : "Not provided",
-      },
-      { subject: `FineVu product registration — ${form.model || "product"}`, replyTo: form.email, attachment, botcheck, turnstileToken: captcha },
-    );
+    const fields = {
+      first_name: form.firstName,
+      last_name: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      model: form.model,
+      purchase_date: form.purchaseDate,
+      serial_number: form.serial,
+      retailer: form.retailer,
+      firmware_updates: notify ? "Yes" : "No",
+      receipt: file ? file.name : "Not provided",
+    };
+    // The email (unchanged path) and durable persistence (R2 receipt + GHL contact) run
+    // together and independently; persistSubmission never throws, so success still hinges on
+    // the email. A registration with no receipt still creates the contact record.
+    const [res] = await Promise.all([
+      submitForm(fields, {
+        subject: `FineVu product registration — ${form.model || "product"}`,
+        replyTo: form.email,
+        attachment,
+        botcheck,
+        turnstileToken: captcha,
+      }),
+      persistSubmission("register", fields, file ? [file] : []),
+    ]);
     // Stay in "sending" through the navigation so the button can't be re-submitted.
     if (res.ok) {
       router.push(thankYouUrl("register"));

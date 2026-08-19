@@ -370,6 +370,42 @@ export async function POST(req: Request) {
     </table>
   </div>`;
 
+  /* CRM copy (FB-06), started BEFORE the email and awaited after, so the two run
+     concurrently.
+
+     It used to run last, which meant a Resend outage lost the lead entirely: the route
+     returned 502 and never reached this call, so support had nothing AND the CRM had
+     nothing. Firing them in parallel makes the two paths independent — email trouble no
+     longer costs a lead, and the response is no slower than the slower of the two.
+
+     THIS CHANGES WHAT A FAILED SUBMISSION MEANS, deliberately. A lead can now exist in GHL
+     for a submission the customer was told had failed. That is the right way round: a
+     retry is harmless because the GHL action matches on email and updates the same contact
+     rather than creating a second, so the worst case is a contact nobody has emailed about
+     yet — against the old worst case of losing the application outright.
+
+     The response is still gated on the SUPPORT EMAIL alone. It is the record, so ok:true
+     must keep meaning "support has this", never "the CRM has this".
+
+     Awaited before every return, including the error paths. A promise still in flight when
+     the response is sent can be killed by the platform mid-request, which would drop the
+     lead exactly when the email had already failed. */
+  const crmCopy =
+    typeof payload.formType === "string" ? sendToGhlWorkflow(payload.formType, crmFields) : null;
+
+  // Guarded so the several return paths can each call it without risking a duplicate log
+  // line — awaiting the same promise twice is harmless, logging the same failure twice is
+  // just noise in an incident.
+  let crmSettled = false;
+  async function settleCrmCopy() {
+    if (!crmCopy || crmSettled) return;
+    crmSettled = true;
+    const crm = await crmCopy;
+    if (!crm.ok && "error" in crm) {
+      console.error("[contact] CRM copy failed", { formType: payload.formType, error: crm.error });
+    }
+  }
+
   const resend = new Resend(apiKey);
   try {
     const { error } = await resend.emails.send({
@@ -382,6 +418,9 @@ export async function POST(req: Request) {
       attachments,
     });
     if (error) {
+      // The lead may still have reached GHL — see settleCrmCopy. The customer is told the
+      // send failed regardless, because support is the record and support has nothing.
+      await settleCrmCopy();
       return NextResponse.json(
         { ok: false, error: "Couldn’t send your message right now. Please try again shortly." },
         { status: 502 },
@@ -413,25 +452,20 @@ export async function POST(req: Request) {
       }
     }
 
-    /* CRM copy (FB-06). Deliberately LAST and deliberately best-effort: the support email is
-       the record, so a GHL outage must never fail a submission support has already received.
-       Same trade as the auto-reply above.
+    /* Started before the email, collected here. Best-effort either way: a GHL outage must
+       never fail a submission support has already received.
 
-       Reaching this line means the honeypot, Turnstile and the rate limit have all passed —
-       which is exactly why this POST is made here rather than from the browser. A workflow
-       URL in the client bundle would be an unauthenticated write endpoint on the CRM. */
-    if (typeof payload.formType === "string") {
-      const crm = await sendToGhlWorkflow(payload.formType, crmFields);
-      if (!crm.ok && "error" in crm) {
-        console.error("[contact] submission delivered but the CRM copy failed", {
-          formType: payload.formType,
-          error: crm.error,
-        });
-      }
-    }
+       This runs at all only because the honeypot, Turnstile and the rate limit have already
+       passed — which is exactly why the POST is made here and not from the browser. A
+       workflow URL in the client bundle would be an unauthenticated write endpoint on the
+       CRM, reachable without any of the three. */
+    await settleCrmCopy();
 
     return NextResponse.json({ ok: true });
   } catch {
+    // Resend threw rather than returning an error. Collect the CRM copy here too, or the
+    // request ends with it still in flight and the platform is free to kill it.
+    await settleCrmCopy();
     return NextResponse.json(
       { ok: false, error: "Couldn’t send your message right now. Please try again shortly." },
       { status: 502 },

@@ -51,8 +51,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /* data-scroll-behavior tells the App Router to suspend the page's smooth scrolling for the
+     duration of a route transition. globals.css sets `scroll-behavior: smooth` on <html> for
+     the in-page anchors (#apply, #why, the wizard's scrollIntoView), and without this
+     attribute the router's scroll-to-top obeys it too — so submitting a form near the footer
+     ANIMATED the entire page height up to the top of the thank-you page instead of arriving
+     there.
+
+     Next stopped disabling this automatically in 15.3; the attribute is the opt-in that
+     replaced it. Removing it brings the animation back on EVERY navigation, not just the
+     thank-you pages — it is only least bearable there, because forms sit low on the page. */
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body
         className={`${inter.variable} ${geistMono.variable} antialiased`}
       >

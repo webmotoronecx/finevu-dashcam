@@ -86,6 +86,37 @@ const FAQS = [
 
 const hintColor: Record<string, string> = { ok: "text-[#1E9E5A]", warn: "text-[#C77700]", err: "text-[#D93816]", "": "text-[#6e6e73]" };
 
+/**
+ * Announces a Coverage message to assistive tech (FA-20).
+ *
+ * The visible hint line is the wizard's only channel for several things a screen-reader
+ * user otherwise gets no signal about at all — an excluded postcode that blocks the
+ * booking, and above all "someone just took that slot", which silently throws the customer
+ * back from step 5 to step 3. Colour was carrying all of it.
+ *
+ * TWO regions, not one, because the hint is not always bad news: it also confirms coverage
+ * ("ok"). An assertive region interrupts whatever is being read, which is right for a
+ * blocked booking and wrong for good news, so the severity picks the channel — role="alert"
+ * is implicitly assertive, role="status" implicitly polite.
+ *
+ * Both are ALWAYS RENDERED and only their text changes. A live region inserted into the DOM
+ * at the same moment as its content is unreliably announced, which is exactly what
+ * `{hint.msg && <p role="alert">…}` would produce. Keeping the nodes mounted and empty is
+ * what makes the announcement fire.
+ *
+ * Visually hidden on purpose: the visible <p> beside it is unchanged and stays the sighted
+ * channel, so this cannot affect layout.
+ */
+function LiveHint({ msg, cls }: Coverage) {
+  const isError = cls === "err";
+  return (
+    <>
+      <span role="alert" className="sr-only">{isError ? msg : ""}</span>
+      <span role="status" className="sr-only">{isError ? "" : msg}</span>
+    </>
+  );
+}
+
 type Form = {
   model: string | null; place: string | null; street: string; suburb: string; stateAu: string; postcode: string; slot: string | null;
   name: string; phone: string; email: string; retailer: string; make: string; vmodel: string; year: string; notes: string;
@@ -723,6 +754,8 @@ function BookingWizard() {
             </div>
           )}
 
+          {/* Rendered unconditionally — see LiveHint. The visible line below stays guarded. */}
+          <LiveHint msg={step <= TOTAL ? hint.msg : ""} cls={hint.cls} />
           {hint.msg && step <= TOTAL && <p className={`mt-3.5 text-[.83rem] font-medium ${hintColor[hint.cls]}`}>{hint.msg}</p>}
         </div>
 
@@ -783,6 +816,9 @@ function PostcodeCheck() {
         <input value={pc} onChange={(e) => { setPc(e.target.value.replace(/\D/g, "").slice(0, 4)); if (result.msg) setResult({ msg: "", cls: "" }); }} onKeyDown={(e) => e.key === "Enter" && run()} placeholder="Enter your postcode" inputMode="numeric" maxLength={4} autoComplete="postal-code" className="w-full flex-1 rounded-[8px] border border-[#e8e7e2] bg-[#f6f6f6] px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors placeholder:text-[#17181b]/50 focus:border-[var(--finevu-orange)]" aria-label="Enter your postcode" />
         <button type="button" onClick={run} disabled={checking} className="cta-hover w-[166px] shrink-0 rounded-full bg-[var(--finevu-orange)] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70">{checking ? "Checking…" : "Check"}</button>
       </div>
+      {/* Same silent-message problem as the wizard hint: the checker's whole output is this
+          one line, so without a live region pressing Check announces nothing. */}
+      <LiveHint {...result} />
       {result.msg && <p className={`mt-3.5 text-[.83rem] font-medium ${hintColor[result.cls]}`}>{result.msg}</p>}
     </>
   );

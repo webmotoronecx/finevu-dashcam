@@ -1,6 +1,15 @@
 # FB-04 / FB-05 — Persist registrations & warranty claims to R2 + GHL
 
-**Status:** Design — 2026-08-18. Awaiting R2 provisioning + review, then implementation.
+**Status:** Design — 2026-08-18. **BUILT 2026-08-19 (`ab99360`); provisioned and verified
+working from localhost 2026-08-21.** Not yet verified on staging or production, where the
+three `R2_UPLOADS_*` vars are still unset. See `docs/forms-backend-requirements.csv`
+**FB-04 / FB-05** for the current state and **FB-09 / FA-46 / FA-48** for what is left.
+
+> **Corrections applied 2026-08-21.** This document is kept as the design record, so the
+> sections below are the plan as written. Four statements in it never matched what was
+> built and are corrected in place, marked ⚠️ — the Turnstile gating on both routes, an
+> `addContactTags()` that does not exist, the presigned-URL constraints, and which of the
+> email and the durable record decides success. Everything else still describes the code.
 
 This supersedes the stale opening premise of the FB-05 ticket ("support receives no
 images at all"). That was fixed by **FA-02** on 2026-08-15 — evidence files are genuinely
@@ -112,17 +121,27 @@ registrations/2026-08/2026-08-18_jane-doe_d4e5f6/
 4. Client `POST /api/persist` `{ form, fields, uploadId, files }` — **small payload, no
    base64**, so it never hits the body cap. Server validates, copies pending → permanent,
    `upsertContact()`, `addContactNote(fields + R2 keys/links)`, `addContactTags([...])`.
+   > ⚠️ **As built:** there is no `addContactTags()`. The tag and source come from
+   > `upsertContact({ channel })` via `lib/crmLabels.ts` (`ce80ea1`), so `/api/persist`
+   > never names either itself. The note carries R2 **keys only, not links** — see FB-09,
+   > which is the open question of how a claim handler actually opens them.
 5. Client `POST /api/contact` for the FA-02 email exactly as today (attaches the subset,
    notes any overflow). **Independent of step 4** — a big claim can fail the email and
    still be captured in R2 + GHL.
 6. Success is shown when the durable record (step 4) succeeds; the email is best-effort.
+   > ⚠️ **As built, this is the other way round.** The EMAIL decides success and the durable
+   > record is best-effort: `persistSubmission()` never throws, and both forms take the
+   > result of `submitForm()` alone out of their `Promise.all`. That was the safer trade —
+   > it means persistence can never fail a submission the customer completed — but the email
+   > still tells support the files were stored regardless of whether they were. That is
+   > **FA-46**, which blocks launch.
 
 ## Components
 
 | File | Change |
 |---|---|
 | `lib/r2.ts` | + uploads-bucket client, `presignUpload()`, `copyObject()`, `r2UploadsConfigured()`. Firmware download path untouched. |
-| `app/api/uploads/sign/route.ts` | **New.** Validates + mints presigned PUT URLs. Behind Turnstile + the rate limiter (new abuse surface). |
+| `app/api/uploads/sign/route.ts` | **New.** Validates + mints presigned PUT URLs. ⚠️ **NOT Turnstile-gated as built** — rate limiter only; see the Security note below. |
 | `lib/ghl.ts` | + `addContactNote()`, `addContactTags()` (GHL v2, via existing `ghlFetch`); `upsertContact` gains a `source`. |
 | `app/api/persist/route.ts` | **New.** Copy pending → permanent, upsert contact, write note + tags. Best-effort, logged. |
 | `app/warranty-claim/page.tsx`, `app/register/page.tsx` | On submit: sign → PUT to R2 → persist → email. |
@@ -133,8 +152,28 @@ registrations/2026-08/2026-08-18_jane-doe_d4e5f6/
 - Bucket **private**; **no public download route**. Evidence (receipts, damage photos) is
   personal data — unlike firmware, which is public-ish.
 - Presigned PUT URLs: short TTL, content-type/length constrained.
+  > ⚠️ **Half true at first, fully true now.** As built on 2026-08-19 the URL bound only the
+  > key and `Content-Type`; the size caps were checked against a `size` the CLIENT declared
+  > and nothing held it to it, so a caller could declare 1 byte and PUT any size for the
+  > URL's 10-minute TTL. **Fixed 2026-08-21 (`b4326c7`)**: `presignUpload()` takes a
+  > `contentLength`, sets `ContentLength` on the `PutObjectCommand` and passes
+  > `signableHeaders: new Set(["content-length"])` — required, or `getSignedUrl` hoists the
+  > header to the query string and silently restores the unbounded behaviour. R2 now rejects
+  > any PUT whose length differs from the declared size (verified: honest 1024 → 200; lying
+  > 1024/5 MB → 403 `SignatureDoesNotMatch`). Tracked as **FA-49**. TTL is 600 s.
 - `sign` + `persist` routes: **Turnstile + rate limit**, and **server-side** type/size
   validation — never trust the client's declared sizes.
+  > ⚠️ **NEITHER route is Turnstile-gated as built.** Both have the per-IP in-memory rate
+  > limiter and nothing else — no Turnstile, no honeypot, no origin check. `/api/uploads/sign`
+  > states the reasoning in its header comment and it is deliberate: *"the form carries ONE
+  > single-use Turnstile token and it is spent on the email submission (`/api/contact`),
+  > which stays unchanged. This route is rate-limited instead, and only ever writes to a
+  > private, lifecycle-purged bucket, so its abuse value is low."* `/api/persist` inherits
+  > that posture **without** the justification, and its blast radius is different — it writes
+  > the CRM, and its `fields` are not key-allowlisted. That is **FA-48**. Note also that the
+  > limiter is in-memory, so in production it is per lambda instance, not per site.
+  > The *type/size* half of this bullet IS true, and the declared size is now binding — see
+  > the correction above.
 - Uploads token: read + write, scoped to the one bucket; never `NEXT_PUBLIC_`.
 - Object ids unguessable (`crypto.randomUUID()`).
 

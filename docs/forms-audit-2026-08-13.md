@@ -11,6 +11,33 @@
 > reconciles the log with what actually ships and adds eight findings the new code
 > introduced.
 
+> ### ⚠️ Addendum — 2026-08-21: the blocker list below has moved
+>
+> This report is kept as written; the CSV is authoritative. Three changes to its
+> **Blocks launch** table since 2026-08-13:
+>
+> - **FA-02 is CLOSED** (2026-08-15) — evidence files are genuinely attached. §3 and the
+>   summary table still describe it as open. It has since been *amended* again: as of
+>   `ab99360` the email carries only the subset that fits its caps and the full set goes to
+>   R2, so the evidence field no longer reads "N file(s) attached" in every case.
+> - **FA-32 and FA-34 are CLOSED** (2026-08-15) — the refund now cancels the appointment
+>   and Turnstile no longer fails open. See `docs/forms-audit-2026-08-15.md`.
+> - **FA-46 is a NEW launch blocker** (2026-08-21), and it is the successor to FA-02 rather
+>   than a regression of it. FB-04/FB-05 shipped on 2026-08-19 (`ab99360`), were provisioned
+>   and verified working from localhost on 2026-08-21, and now upload every file to a private
+>   R2 bucket and record the submission on a GHL contact. But `persistSubmission()` is
+>   best-effort and never throws, while `/warranty-claim` composes the email's evidence line
+>   *before* it resolves — so the email tells support "N file(s) stored with the claim"
+>   whether or not anything was stored. Three silent routes to it: R2 unconfigured, CORS not
+>   covering the origin, and the sign route's own 429. It does not reproduce on localhost now
+>   that the bucket is configured, and it is live on staging and production, where the
+>   `R2_UPLOADS_*` vars are still unset.
+>
+> Also added this pass: **FA-47** (future purchase dates, fixed `ddf4a92`), **FA-48**
+> (`/api/persist` is an unauthenticated CRM write endpoint), **FA-49** (the presigned PUT had
+> no size constraint, fixed `b4326c7`), and **FB-09** (stored evidence is not retrievable by
+> a claim handler — needs approval).
+
 ---
 
 ## 1. Inventory

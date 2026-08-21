@@ -10,7 +10,7 @@ import { UploadCloud } from "lucide-react";
 import { submitForm } from "@/lib/submitForm";
 import { persistSubmission } from "@/lib/persistSubmission";
 import { Turnstile, TURNSTILE_ENABLED } from "@/components/Turnstile";
-import { focusFirstInvalid, isPhone, stallMessage, useRedirectStallGuard } from "@/lib/formHelpers";
+import { focusFirstInvalid, isFutureOrEmptyDate, isPhone, stallMessage, todayIso, useRedirectStallGuard } from "@/lib/formHelpers";
 import { thankYouUrl } from "@/lib/data/thank-you";
 import { RequiredDot } from "@/components/RequiredDot";
 
@@ -125,7 +125,7 @@ function RegisterForm() {
     // blank stays valid, junk does not (FA-45).
     if (form.phone.trim() && !isPhone(form.phone)) inv.phone = true;
     if (!form.model) inv.model = true;
-    if (!form.purchaseDate) inv.purchaseDate = true;
+    if (isFutureOrEmptyDate(form.purchaseDate)) inv.purchaseDate = true;
     if (!form.serial.trim()) inv.serial = true;
     if (!form.retailer.trim()) inv.retailer = true;
     setInvalid(inv);
@@ -254,8 +254,8 @@ function RegisterForm() {
         </div>
         <div>
           <label className={LABEL} htmlFor="purchase-date">Purchase date<RequiredDot /></label>
-          <input id="purchase-date" aria-required="true" aria-invalid={invalid.purchaseDate || undefined} aria-describedby={invalid.purchaseDate ? "purchase-date-err" : undefined} type="date" className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
-          {invalid.purchaseDate && <p id="purchase-date-err" className={ERR}>Enter your purchase date.</p>}
+          <input id="purchase-date" aria-required="true" aria-invalid={invalid.purchaseDate || undefined} aria-describedby={invalid.purchaseDate ? "purchase-date-err" : undefined} type="date" max={todayIso()} className={INPUT} value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
+          {invalid.purchaseDate && <p id="purchase-date-err" className={ERR}>{form.purchaseDate ? "Purchase date can’t be in the future." : "Enter your purchase date."}</p>}
         </div>
       </div>
 

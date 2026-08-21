@@ -27,6 +27,36 @@ import { useCallback, useEffect, useRef } from "react";
  */
 export const isPhone = (v: string) => (v.match(/\d/g) ?? []).length >= 8;
 
+/**
+ * Today as `YYYY-MM-DD`, the format `<input type="date">` uses for `value`, `min` and `max`.
+ *
+ * Built from the LOCAL date parts rather than `toISOString()`, which converts to UTC first —
+ * in AEST that lands on yesterday for the first 10 hours of every day, so an Australian
+ * customer buying this morning would be told their purchase date is in the future.
+ *
+ * Call it during render, never at module scope: a module constant is computed once when the
+ * bundle loads, so a tab left open overnight keeps enforcing yesterday's ceiling.
+ */
+export function todayIso(): string {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+/**
+ * True if `value` is a date the user could not have bought anything on — empty or after
+ * today. A purchase date is what decides whether a warranty period has started
+ * (lib/data/warranty.ts), so a future one makes a claim un-assessable and support has to go
+ * back to the customer for it.
+ *
+ * Needed IN ADDITION to `max` on the input: both forms are `noValidate`, so the browser's
+ * constraint is never consulted on submit and a typed-in date would otherwise sail through.
+ * No lower bound — the product's AU launch date isn't sourced, and guessing one here would
+ * bake an unverified claim into validation.
+ */
+export const isFutureOrEmptyDate = (value: string) => !value || value > todayIso();
+
 /** Field keys paired with the DOM ids their inputs carry, in visual order. */
 export type FieldFocusOrder = readonly (readonly [string, string])[];
 

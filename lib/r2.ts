@@ -122,11 +122,32 @@ function getUploadsClient(): S3Client {
  * `contentType` is signed in, so the browser's PUT must send the SAME Content-Type header
  * (the bucket's CORS policy must allow it). Callers validate the file first — a signed URL
  * is a capability, so nothing unvalidated should ever get one.
+ *
+ * `contentLength` is signed in for the SAME reason, and it is a security control rather than
+ * a nicety. The size limits in app/api/uploads/sign are checked against a `size` the CLIENT
+ * puts in the request body, so without this the caller could declare 1 byte and then PUT an
+ * object of any size for the URL's whole TTL — 20 files per request, on a public endpoint,
+ * writing storage that /api/persist can promote to a permanent prefix the `pending/`
+ * lifecycle rule never sweeps. Signing the length makes R2 itself reject any PUT whose
+ * Content-Length differs from the declared size, so the declaration becomes binding instead
+ * of advisory. Browsers set Content-Length from the real File, so honest uploads are
+ * unaffected; a lying client is rejected by R2 before a byte is stored.
  */
-export async function presignUpload(key: string, contentType: string): Promise<string> {
+export async function presignUpload(key: string, contentType: string, contentLength: number): Promise<string> {
     if (!r2UploadsConfigured()) throw new Error("R2 uploads bucket is not configured");
-    const command = new PutObjectCommand({ Bucket: UPLOADS_BUCKET, Key: key, ContentType: contentType });
-    return getSignedUrl(getUploadsClient(), command, { expiresIn: UPLOAD_PRESIGN_TTL_SECONDS });
+    const command = new PutObjectCommand({
+        Bucket: UPLOADS_BUCKET,
+        Key: key,
+        ContentType: contentType,
+        ContentLength: contentLength,
+    });
+    return getSignedUrl(getUploadsClient(), command, {
+        expiresIn: UPLOAD_PRESIGN_TTL_SECONDS,
+        // Content-Length is not signed by default — getSignedUrl hoists unrecognised headers
+        // to the query string unless they are named here, which would silently restore the
+        // unbounded behaviour this parameter exists to prevent.
+        signableHeaders: new Set(["content-length"]),
+    });
 }
 
 /**

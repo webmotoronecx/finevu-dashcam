@@ -68,7 +68,10 @@ export async function POST(req: Request) {
   }
 
   let total = 0;
-  const validated: { name: string; type: string }[] = [];
+  // `size` is carried through to presignUpload and SIGNED into the URL, which is what makes
+  // the caps below binding — see the note on presignUpload. Validate it here, then hand the
+  // same number to the signer; never re-read it from the request afterwards.
+  const validated: { name: string; type: string; size: number }[] = [];
   for (const f of rawFiles) {
     const name = typeof f.name === "string" ? f.name : "";
     const size = typeof f.size === "number" ? f.size : NaN;
@@ -80,7 +83,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "That file is too large." }, { status: 400 });
     }
     total += size;
-    validated.push({ name, type });
+    validated.push({ name, type, size });
   }
   if (total > MAX_TOTAL_BYTES) {
     return NextResponse.json({ ok: false, error: "Those files are too large together." }, { status: 400 });
@@ -92,7 +95,7 @@ export async function POST(req: Request) {
       validated.map(async (f, i) => {
         // Number the key so the folder stays in the order the customer chose.
         const key = `pending/${uploadId}/${String(i + 1).padStart(2, "0")}_${safeName(f.name)}`;
-        const url = await presignUpload(key, f.type);
+        const url = await presignUpload(key, f.type, f.size);
         return { key, url, name: f.name };
       }),
     );

@@ -564,19 +564,19 @@ export default function GX35Page() {
       <MediaSection data={mDualVision} />
 
       {/* See Every Detail carousel */}
-      <Carousel theme="light" pre="Every Detail. " grad="Day or night." cards={cSeeDetail} pinGutter />
+      <Carousel theme="light" pre="Every Detail. " grad="Day or night." imgAspect="1920 / 1080" cards={cSeeDetail} pinGutter />
 
       {/* Protected While Parked carousel */}
-      <Carousel theme="light" grad="Protected" post=" While Parked" cards={cParked} pinGutter gutterRight />
+      <Carousel theme="light" grad="Protected" post=" While Parked" cards={cParked} pinGutter imgAspect="1920 / 1080" gutterRight />
 
       {/* A Second Set of Eyes showcase (ADAS) */}
       <MediaSection data={mSecondEyes} />
 
       {/* Smarter, Safer Driving carousel */}
-      <Carousel theme="light" pre="Smarter, " grad="Safer Driving" cards={cSafer} pinGutter />
+      <Carousel theme="light" pre="Smarter, " grad="Safer Driving" cards={cSafer} imgAspect="1920 / 1080" pinGutter />
 
       {/* Built to Last carousel */}
-      <Carousel theme="light" pre="Built to Last" cards={cBuilt} pinGutter gutterRight />
+      <Carousel theme="light" pre="Built to Last" cards={cBuilt} pinGutter imgAspect="1920 / 1080" gutterRight />
 
       {/* Storage That Manages Itself */}
       <section data-nav-theme="light" className=" pt-20 md:pt-28">
@@ -616,7 +616,7 @@ export default function GX35Page() {
       <MediaSection data={mInYourHand} />
 
       {/* Connected in Your Pocket carousel */}
-      <Carousel theme="light" grad="Connected" post=" in Your Pocket" cards={cConnected} />
+      <Carousel theme="light" grad="Connected" post=" in Your Pocket" cards={cConnected} imgAspect="1920 / 1080" />
 
       {/* Discreet by Design showcase */}
       <MediaSection data={mDiscreet} />

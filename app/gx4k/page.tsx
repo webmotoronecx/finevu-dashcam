@@ -556,19 +556,19 @@ export default function GX4KPage() {
             <MediaSection data={mDualVision}  />
 
             {/* See every detail carousel */}
-            <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1047 / 562" pinGutter />
+            <Carousel pre="See Every " grad="Detail" cards={cSeeDetail} imgAspect="1920 / 1080" pinGutter />
 
             {/* Protected while parked carousel */}
-            <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1047 / 562" pinGutter gutterRight />
+            <Carousel grad="Protected" post=" While Parked" cards={cParked} imgAspect="1920 / 1080" pinGutter gutterRight />
 
             {/* Second set of eyes showcase */}
             <MediaSection data={mSecondEyes} />
 
             {/* Smarter safer driving carousel */}
-            <Carousel pre="Smarter, " grad="Safer Driving" cards={cSafer} imgAspect="1047 / 562" pinGutter />
+            <Carousel pre="Smarter, " grad="Safer Driving" cards={cSafer} imgAspect="1920 / 1080" pinGutter />
 
             {/* Built to last carousel */}
-            <Carousel pre="Built to Last" cards={cBuilt} imgAspect="1047 / 562" pinGutter gutterRight bgClassName="bg-[#101010]" />
+            <Carousel pre="Built to Last" cards={cBuilt} imgAspect="1920 / 1080" pinGutter gutterRight bgClassName="bg-[#101010]" />
 
             {/* Storage manages itself carousel */}
             {/* <Carousel pre="Storage That Manages Itself" cards={cStorage} imgAspect="1047 / 562" pinGutter /> */}
@@ -613,7 +613,7 @@ export default function GX4KPage() {
             <MediaSection data={mInYourHand} />
 
             {/* Connected in your pocket carousel */}
-            <Carousel grad="Connected" post=" in Your Pocket" cards={cConnected} imgAspect="1047 / 562" pinGutter gutterRight />
+            <Carousel grad="Connected" post=" in Your Pocket" cards={cConnected} imgAspect="1920 / 1080" pinGutter gutterRight />
 
             {/* Discreet by design showcase */}
             <MediaSection data={mDiscreet} />

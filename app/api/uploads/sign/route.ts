@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { presignUpload, r2UploadsConfigured } from "@/lib/r2";
-import { clientIp, rateLimited } from "@/lib/rateLimit";
+import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
 // Mints presigned PUT URLs so the browser can upload registration receipts and
 // warranty-claim evidence straight to the private R2 uploads bucket (FB-04 / FB-05),
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   }
 
   const ip = clientIp(req);
-  if (rateLimited(`sign:${ip}`, RATE_LIMIT)) {
+  if (await isRateLimited(`sign:${ip}`, RATE_LIMIT)) {
     return NextResponse.json({ ok: false, error: "Too many uploads. Please try again shortly." }, { status: 429 });
   }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { copyObject, r2UploadsConfigured } from "@/lib/r2";
 import { addContactNote, ghlConfigured, upsertContact } from "@/lib/ghl";
-import { clientIp, rateLimited } from "@/lib/rateLimit";
+import { clientIp, isRateLimited } from "@/lib/rateLimit";
 import type { CrmChannel } from "@/lib/crmLabels";
 
 // Promotes an uploaded set of files to its permanent R2 home and records the submission on
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   }
 
   const ip = clientIp(req);
-  if (rateLimited(`persist:${ip}`, RATE_LIMIT)) {
+  if (await isRateLimited(`persist:${ip}`, RATE_LIMIT)) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
 

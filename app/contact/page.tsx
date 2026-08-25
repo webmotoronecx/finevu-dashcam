@@ -124,6 +124,10 @@ function ContactForm() {
         replyTo: form.email,
         botcheck,
         turnstileToken: captcha,
+        // Forward the lead to its GHL workflow (FB-06). Named against the allowlist in
+        // lib/ghlWebhook.ts; the submission stays email-only until GHL_WEBHOOK_CONTACT_URL
+        // is set, so this is safe to ship ahead of the workflow being live.
+        formType: "contact",
       },
     );
     if (res.ok) {

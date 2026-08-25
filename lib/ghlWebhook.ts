@@ -55,6 +55,11 @@ type FormWebhook = {
  * names and its workflow.
  */
 const FORM_WEBHOOKS: Record<string, FormWebhook> = {
+  contact: {
+    env: "GHL_WEBHOOK_CONTACT_URL",
+    channel: "contact",
+    fields: ["name", "phone", "email", "subject", "message"],
+  },
   retailer: {
     env: "GHL_WEBHOOK_RETAILER_URL",
     channel: "retailer",

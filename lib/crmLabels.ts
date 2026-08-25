@@ -20,7 +20,7 @@
  */
 
 /** The website surfaces that create contacts. */
-export type CrmChannel = "booking" | "retailer" | "registration" | "warranty-claim";
+export type CrmChannel = "booking" | "retailer" | "registration" | "warranty-claim" | "contact";
 
 /**
  * The Source written onto the contact record.
@@ -35,6 +35,7 @@ export const CRM_SOURCE: Record<CrmChannel, string> = {
   retailer: "FineVu website — retailer application",
   registration: "FineVu website — product registration",
   "warranty-claim": "FineVu website — warranty claim",
+  contact: "FineVu website — contact enquiry",
 };
 
 /**
@@ -44,16 +45,17 @@ export const CRM_SOURCE: Record<CrmChannel, string> = {
  * APPLIED IN TWO DIFFERENT PLACES, because the paths reach GHL differently:
  *  - `booking`, `registration`, `warranty-claim` — sent in the upsert payload by lib/ghl.ts,
  *                 since those paths call the REST API directly and there is no workflow.
- *  - `retailer` — applied by an "Add Contact Tag" action in the GHL workflow, because that
- *                 path posts to a workflow inbound webhook and the contact does not exist
- *                 until the workflow's own Create/Update Contact action has run.
+ *  - `retailer`, `contact` — applied by an "Add Contact Tag" action in the GHL workflow,
+ *                 because those paths post to a workflow inbound webhook and the contact does
+ *                 not exist until the workflow's own Create/Update Contact action has run.
  *
- * So the retailer value here is the STRING THE WORKFLOW MUST USE, not something this code
- * sends. Keep the two in step — nothing in the build can check it for you.
+ * So the retailer and contact values here are the STRING THE WORKFLOW MUST USE, not something
+ * this code sends. Keep the two in step — nothing in the build can check it for you.
  */
 export const CRM_TAG: Record<CrmChannel, string> = {
   booking: "installation-booking",
   retailer: "retailer-application",
   registration: "product-registration",
   "warranty-claim": "warranty-claim",
+  contact: "contact-enquiry",
 };

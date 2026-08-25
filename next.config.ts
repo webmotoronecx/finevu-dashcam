@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { siteRedirects } from "./config/redirects";
 
 const nextConfig: NextConfig = {
   // Import *.svg as React components (SVGR). Renders <IconCheck className=... />.
@@ -26,11 +27,9 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // URL aliases and common mistypes → the real page. Edit the list in config/redirects.ts.
   async redirects() {
-    return [
-      // The "Where to buy" page was renamed to "Retailers"; keep old links working.
-      { source: "/where-to-buy", destination: "/retailers", permanent: true },
-    ];
+    return siteRedirects;
   },
   async headers() {
     // Search-engine visibility is OFF unless SITE_INDEXABLE === "true" (fail-safe: a

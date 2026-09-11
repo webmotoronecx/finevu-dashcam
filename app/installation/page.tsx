@@ -40,7 +40,18 @@ const fadeUp = {
 };
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT", "NT"];
-const SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
+/* Step 3 offers a half-day preference rather than an on-the-hour start time, at the
+   distributor's request (client email 2026-09-08: "we will update to AM or PM preference,
+   not time"). The customer picks the window; the installer calls ahead on the day to
+   confirm when they will actually arrive.
+
+   The hour ranges are the installers' real service windows, approved by ops 2026-09-10.
+   Do NOT widen or invent them — advertising a window nobody staffs is the one thing this
+   change exists to avoid. They match the 9:00 AM–5:00 PM day this page already claimed. */
+const HALF_DAYS = [
+  { label: "Morning", range: "9:00 AM – 12:00 PM" },
+  { label: "Afternoon", range: "12:00 PM – 5:00 PM" },
+];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DOWS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TOTAL = 5;
@@ -55,7 +66,7 @@ const HERO_STATS = [
 
 const THREE = [
   { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
-  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and time that suits you. $250 flat, paid at checkout — your slot is confirmed instantly.", img: "/installation/step-book.webp" },
+  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and whether a morning or afternoon suits you. $250 flat, paid at checkout — your booking is confirmed instantly.", img: "/installation/step-book.webp" },
   { n: "3.", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/installation/step-install.webp" },
 ];
 
@@ -141,7 +152,7 @@ function BookingWizard() {
       if (isExcluded(form.stateAu, form.postcode)) return fail(COVERAGE_MESSAGES.excludedBooking);
       setHint(resolveCoverage(form.postcode, pcRows, true)); return true;
     }
-    if (s === 3) { if (!date) return fail("Please select a date."); if (!form.slot) return fail("Please select a start time."); }
+    if (s === 3) { if (!date) return fail("Please select a date."); if (!form.slot) return fail("Please select a preferred time."); }
     if (s === 4) {
       if (!form.name) return fail("Please enter your name.");
       if (!/^[\d\s+()-]{8,}$/.test(form.phone)) return fail("Please enter a valid mobile number.");
@@ -184,7 +195,7 @@ function BookingWizard() {
       ["Install", "Professional hardwire install"],
       ["Location", (form.place ? form.place + " — " : "") + [form.street, form.suburb, form.stateAu, form.postcode].filter(Boolean).join(", ")],
       ["Date", dateLabel || "—"],
-      ["Time", form.slot || "—"],
+      ["Preferred time", form.slot || "—"],
     ];
     // Optional step-4 fields. Shown only when filled, so the user can see they weren't
     // dropped — they have no other destination until the wizard actually submits (CA-36).
@@ -298,7 +309,7 @@ function BookingWizard() {
           {step === 3 && (
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Choose a date and time</h3>
-              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a weekday that suits you, then a start time. Installers are available hourly from 9:00 AM to 5:00 PM, Monday to Friday. Most installations take 60–90 minutes.</p>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Select a weekday that suits you, then whether you’d prefer a morning or afternoon appointment. Installers are available Monday to Friday, 9:00 AM to 5:00 PM. Most installations take 60–90 minutes, and your installer will call ahead on the day to confirm their arrival time.</p>
               <span className={FLABEL} id="wiz-date-label">Date</span>
               <div className="grid grid-cols-7 gap-1.5 sm:gap-2" role="group" aria-labelledby="wiz-date-label">
                 {DOWS.map((d) => <div key={d} aria-hidden="true" className="pb-1 text-center text-[11px] font-semibold uppercase text-[#9c9ca3]">{d}</div>)}
@@ -313,11 +324,23 @@ function BookingWizard() {
                   );
                 })}
               </div>
-              <span className={FLABEL} id="wiz-slot-label">Start time</span>
-              <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5" role="group" aria-labelledby="wiz-slot-label">
-                {SLOTS.map((s) => (
-                  <button key={s} type="button" aria-pressed={form.slot === s} onClick={() => { set("slot", s); setHint({ msg: "", cls: "" }); }} className={`rounded-full border-[1.5px] px-3 py-2.5 text-[.85rem] font-medium transition-colors ${form.slot === s ? "border-[var(--finevu-orange)] bg-[#fef2e5] text-[var(--finevu-orange)]" : "border-[#e7e7ea] text-[#1d1d1f] hover:border-[#9c9ca3]"}`}>{s}</button>
-                ))}
+              <span className={FLABEL} id="wiz-slot-label">Preferred time</span>
+              {/* Two wide buttons rather than the old chip grid: there are only two options,
+                  and each has to carry its hour range. form.slot holds the full label —
+                  "Morning (9:00 AM – 12:00 PM)" — because that is exactly what the order
+                  summary and the confirmation screen show. */}
+              <div className="grid gap-2.5 sm:grid-cols-2" role="group" aria-labelledby="wiz-slot-label">
+                {HALF_DAYS.map((h) => {
+                  const value = `${h.label} (${h.range})`;
+                  return (
+                    <button key={h.label} type="button" aria-pressed={form.slot === value}
+                      onClick={() => { set("slot", value); setHint({ msg: "", cls: "" }); }}
+                      className={`rounded-[12px] border-[1.5px] px-4 py-3 text-left transition-colors ${form.slot === value ? "border-[var(--finevu-orange)] bg-[#fef2e5]" : "border-[#e7e7ea] hover:border-[#9c9ca3]"}`}>
+                      <span className={`block text-[.95rem] font-semibold ${form.slot === value ? "text-[var(--finevu-orange)]" : "text-[#1d1d1f]"}`}>{h.label}</span>
+                      <span className="mt-0.5 block text-[.8rem] text-[#6e6e73]">{h.range}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

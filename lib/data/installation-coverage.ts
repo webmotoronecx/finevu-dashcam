@@ -96,8 +96,14 @@ export const COVERAGE_MESSAGES = {
     "We couldn’t check your area just now — submit your booking and we’ll confirm availability within one business day.",
   serviced: (suburb: string, state: string) =>
     `Great — installation is available in ${suburb}, ${state}.`,
+  // Fitment-enquiry copy (monday 13122278576, Tony Noonan 2026-09-24) — PROPOSED, awaiting
+  // Tony's approval, incl. whether AutoXtreme can commit to "one business day". Must not
+  // promise a price or that an install is possible: out-of-network fits are quoted.
   notServiced: (suburb: string, state: string) =>
-    `We don’t have a certified installer in ${suburb}, ${state} yet. You can still submit your booking and we’ll confirm availability within one business day.`,
+    `We don’t have a certified installer in ${suburb}, ${state} yet. You can still submit your booking or ask us about fitment options, and we’ll confirm within one business day.`,
+  /** Checker variant — paired with the "Ask about fitment options" enquiry form. */
+  notServicedCheck: (suburb: string, state: string) =>
+    `We don’t have a certified installer in ${suburb}, ${state} yet — but we may still be able to help. Send us your vehicle details and we’ll look into fitment options for your area. Installs outside our network are quoted individually.`,
   unknown:
     "Sorry, we don’t currently service that postcode. Submit a booking and we’ll confirm within one business day.",
   metro: (name: string) =>
@@ -106,7 +112,8 @@ export const COVERAGE_MESSAGES = {
     "You may be within our regional coverage. Submit your booking and we’ll confirm availability within one business day.",
 } as const;
 
-export type Coverage = { msg: string; cls: "ok" | "warn" | "err" | "" };
+/** `enquire`: the checker should offer the fitment-enquiry form for this result. */
+export type Coverage = { msg: string; cls: "ok" | "warn" | "err" | ""; enquire?: boolean };
 
 /** A row of the primary dataset: [postcode, suburb, state, supportedFlag]. */
 export type PostcodeRow = [string, string, string, number];
@@ -137,7 +144,7 @@ export async function loadPostcodeRows(): Promise<PostcodeRow[] | null> {
  * resolves to a non-committal "we'll confirm" — not a refusal.
  *
  * `blocking` selects the register only, not the outcome: the checker is an information
- * widget, so an unserviced suburb reads as a flat "sorry", while the wizard must not
+ * widget, so an unserviced suburb offers a fitment enquiry instead, while the wizard must not
  * dead-end a customer mid-booking, so the same fact is phrased as a warning they can
  * proceed past. Neither variant blocks — only NT does, via isExcluded() in the caller.
  */
@@ -148,9 +155,9 @@ export function resolveCoverage(pc: string, rows: PostcodeRow[] | null, blocking
   }
   if (!rows) return { msg: COVERAGE_MESSAGES.unverified, cls: "warn" };
   const match = rows.find((r) => r[0] === pc);
-  if (!match) return { msg: COVERAGE_MESSAGES.unknown, cls: "warn" };
+  if (!match) return { msg: COVERAGE_MESSAGES.unknown, cls: "warn", enquire: !blocking };
   if (match[3]) return { msg: COVERAGE_MESSAGES.serviced(match[1], match[2]), cls: "ok" };
   return blocking
     ? { msg: COVERAGE_MESSAGES.notServiced(match[1], match[2]), cls: "warn" }
-    : { msg: `Sorry, we don’t service ${match[1]}, ${match[2]} yet.`, cls: "err" };
+    : { msg: COVERAGE_MESSAGES.notServicedCheck(match[1], match[2]), cls: "warn", enquire: true };
 }

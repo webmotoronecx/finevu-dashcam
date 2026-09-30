@@ -9,7 +9,7 @@ import { thankYouUrl } from "@/lib/data/thank-you";
 import { COVERAGE_MESSAGES, isExcluded, loadPostcodeRows, resolveCoverage, type Coverage, type PostcodeRow } from "@/lib/data/installation-coverage";
 import { Carousel } from "@/components/sections/Carousel";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
-import { motion } from "motion/react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -422,10 +422,15 @@ function BookingWizard() {
   );
 }
 
-function PostcodeCheck() {
+/**
+ * `onEnquire` opens the fitment enquiry (rendered over the map by ServiceArea) with the
+ * postcode the result was computed for; `onReset` closes it when the result goes stale.
+ */
+function PostcodeCheck({ enquiring, onEnquire, onReset }: { enquiring: boolean; onEnquire: (pc: string) => void; onReset: () => void }) {
   const [pc, setPc] = useState("");
   const [result, setResult] = useState<Coverage>({ msg: "", cls: "" });
   const [checking, setChecking] = useState(false);
+  const [checkedPc, setCheckedPc] = useState("");
 
   async function run() {
     if (!/^\d{4}$/.test(pc)) { setResult({ msg: COVERAGE_MESSAGES.invalid, cls: "err" }); return; }
@@ -435,17 +440,141 @@ function PostcodeCheck() {
     // Unlike the wizard, the checker reports the outage rather than silently falling back
     // to the coarse range table — it exists to give a precise answer or none at all.
     if (!rows) { setResult({ msg: COVERAGE_MESSAGES.unavailable, cls: "err" }); return; }
+    setCheckedPc(pc);
+    onReset();
     setResult(resolveCoverage(pc, rows));
   }
 
   return (
     <>
       <div className="mt-5 flex gap-3">
-        <input value={pc} onChange={(e) => { setPc(e.target.value.replace(/\D/g, "").slice(0, 4)); if (result.msg) setResult({ msg: "", cls: "" }); }} onKeyDown={(e) => e.key === "Enter" && run()} placeholder="Enter your postcode" inputMode="numeric" maxLength={4} autoComplete="postal-code" className="w-full flex-1 rounded-[8px] border border-[#e8e7e2] bg-[#f6f6f6] px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors placeholder:text-[#17181b]/50 focus:border-[var(--finevu-orange)]" aria-label="Enter your postcode" />
+        <input value={pc} onChange={(e) => { setPc(e.target.value.replace(/\D/g, "").slice(0, 4)); if (result.msg) { setResult({ msg: "", cls: "" }); onReset(); } }} onKeyDown={(e) => e.key === "Enter" && run()} placeholder="Enter your postcode" inputMode="numeric" maxLength={4} autoComplete="postal-code" className="w-full flex-1 rounded-[8px] border border-[#e8e7e2] bg-[#f6f6f6] px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors placeholder:text-[#17181b]/50 focus:border-[var(--finevu-orange)]" aria-label="Enter your postcode" />
         <button type="button" onClick={run} disabled={checking} className="cta-hover w-[166px] shrink-0 rounded-full bg-[var(--finevu-orange)] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70">{checking ? "Checking…" : "Check"}</button>
       </div>
       {result.msg && <p className={`mt-3.5 text-[.83rem] font-medium ${hintColor[result.cls]}`}>{result.msg}</p>}
+      {result.enquire && !enquiring && (
+        <button type="button" onClick={() => onEnquire(checkedPc)} className="cta-hover mt-4 rounded-full border border-[var(--finevu-orange)] px-[22px] py-2.5 text-[13px] font-semibold uppercase leading-[20px] text-[var(--finevu-orange)] transition-colors hover:bg-[#fff1e8]">Ask About Fitment Options</button>
+      )}
     </>
+  );
+}
+
+// Fitment enquiry for postcodes outside the installer network (monday 13122278576).
+// Some of those areas can still be fitted, just not at the flat installation rate, so this
+// collects enough to quote. Copy is PROPOSED pending Tony's approval — see
+// COVERAGE_MESSAGES.notServicedCheck.
+//
+// ⚠️ UI ONLY — this SENDS NOTHING yet. Submit validates, then shows the success state.
+// Same trap as CA-36: the customer is told "we've got your details" and no record exists.
+// Wire it to submitForm() (subject `Fitment enquiry — ${postcode}`, replyTo: email) once
+// Tony confirms the destination inbox, before launch.
+function FitmentEnquiry({ postcode, onClose }: { postcode: string; onClose: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  // On mobile the map column stacks ABOVE the checker, so the form opens off-screen
+  // behind the button that opened it. "nearest" is a no-op on desktop, where it's in view.
+  useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, []);
+  const [f, setF] = useState({ name: "", email: "", phone: "", postcode, make: "", vmodel: "", year: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sent">("idle");
+  const [error, setError] = useState("");
+  const set = (k: keyof typeof f, v: string) => setF((x) => ({ ...x, [k]: v }));
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!f.name.trim()) return setError("Please enter your name.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) return setError("Please enter a valid email address.");
+    if (!/^[\d\s+()-]{8,}$/.test(f.phone)) return setError("Please enter a valid phone number.");
+    if (!/^\d{4}$/.test(f.postcode)) return setError(COVERAGE_MESSAGES.invalid);
+    if (!f.make.trim() || !f.vmodel.trim()) return setError("Please enter your vehicle make and model.");
+    setError("");
+    setStatus("sent");
+  }
+
+  const CARD = "w-full scroll-mt-24 rounded-[16px] border border-[#e8e7e2] bg-[#f7f6f3] p-6 shadow-[0_4px_40px_rgba(0,0,0,0.06)]";
+
+  if (status === "sent") {
+    return (
+      <div ref={ref} role="status" className={CARD}>
+        <h3 className="text-[17px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">Enquiry sent</h3>
+        <p className="mt-1 text-[14px] leading-[1.5] text-[#6e6e73]">Thanks — we’ve got your details and will be in touch within one business day.</p>
+        <button type="button" onClick={onClose} className="cta-hover mt-5 rounded-full border border-[#d6d5d0] px-[22px] py-2.5 text-[13px] font-semibold uppercase leading-[20px] text-[#1d1d1f] transition-colors hover:bg-white">Close</button>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className={CARD}>
+    <form onSubmit={submit} noValidate aria-labelledby="fe-title" className="grid grid-cols-1 gap-x-3 gap-y-3.5 sm:grid-cols-2">
+      <div className="mb-1 sm:col-span-2">
+        <h3 id="fe-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">Fitment enquiry</h3>
+        <p className="mt-1 text-[14px] leading-[1.5] text-[#6e6e73]">Tell us about your vehicle and we’ll look into options for your area.</p>
+      </div>
+      <div><label htmlFor="fe-name" className={FIELD_LABEL}>Name</label><input id="fe-name" className={INPUT} autoComplete="name" value={f.name} onChange={(e) => set("name", e.target.value)} /></div>
+      <div><label htmlFor="fe-email" className={FIELD_LABEL}>Email</label><input id="fe-email" type="email" className={INPUT} autoComplete="email" value={f.email} onChange={(e) => set("email", e.target.value)} /></div>
+      <div><label htmlFor="fe-phone" className={FIELD_LABEL}>Phone</label><input id="fe-phone" type="tel" className={INPUT} autoComplete="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} /></div>
+      <div><label htmlFor="fe-pc" className={FIELD_LABEL}>Postcode</label><input id="fe-pc" className={INPUT} inputMode="numeric" maxLength={4} autoComplete="postal-code" value={f.postcode} onChange={(e) => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
+      <div className="grid grid-cols-[1fr_1fr_88px] gap-3 sm:col-span-2">
+        <div><label htmlFor="fe-make" className={FIELD_LABEL}>Make</label><input id="fe-make" className={INPUT} placeholder="Toyota" value={f.make} onChange={(e) => set("make", e.target.value)} /></div>
+        <div><label htmlFor="fe-model" className={FIELD_LABEL}>Model</label><input id="fe-model" className={INPUT} placeholder="RAV4" value={f.vmodel} onChange={(e) => set("vmodel", e.target.value)} /></div>
+        <div><label htmlFor="fe-year" className={FIELD_LABEL}>Year</label><input id="fe-year" className={INPUT} inputMode="numeric" maxLength={4} value={f.year} onChange={(e) => set("year", e.target.value.replace(/\D/g, "").slice(0, 4))} /></div>
+      </div>
+      <div className="sm:col-span-2"><label htmlFor="fe-msg" className={FIELD_LABEL}>Message <span className="font-normal text-[#9a9da5]">(optional)</span></label><textarea id="fe-msg" rows={3} className={`${INPUT} resize-y`} value={f.message} onChange={(e) => set("message", e.target.value)} /></div>
+      {error && <p role="alert" className="text-[.83rem] font-medium text-[#D93816] sm:col-span-2">{error}</p>}
+      <div className="mt-1 flex gap-3 sm:col-span-2">
+        <button type="button" onClick={onClose} className="cta-hover flex-1 rounded-full border border-[#d6d5d0] py-3 text-[14px] font-semibold uppercase leading-[20px] text-[#1d1d1f] transition-colors hover:bg-white">Cancel</button>
+        <button type="submit" className="cta-hover flex-[2] rounded-full bg-[var(--finevu-orange)] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white">Send Enquiry</button>
+      </div>
+    </form>
+    </div>
+  );
+}
+
+// Minimum height for the form panel (~the open form, 590px), so its success state doesn't
+// collapse the row. The map keeps its natural height. Desktop only; on mobile they stack.
+const PANEL_H = "md:min-h-[600px]";
+
+/**
+ * Map + checker. Opening the fitment enquiry slides the map out, moves the checker across
+ * into the left column and brings the form in on the right; closing reverses it. All three
+ * are direct grid children so `layout` can animate the checker between the two cells.
+ */
+function ServiceArea() {
+  const [enquiryPc, setEnquiryPc] = useState<string | null>(null);
+  const open = enquiryPc !== null;
+  const ease = [0.22, 1, 0.36, 1] as const;
+  const transition = { duration: 0.5, ease };
+  return (
+    <MotionConfig reducedMotion="user" transition={transition}>
+      <div className="grid items-center gap-11 md:grid-cols-2 md:gap-16">
+        {/* popLayout pulls the exiting panel out of flow at once, so the checker starts
+            moving immediately instead of waiting for the exit to finish. */}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {!open && (
+            <motion.div key="map" layout initial={{ opacity: 0, x: -48 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -48 }} className="flex justify-center">
+              <div className="relative aspect-[1102/1036] w-full max-w-[400px]">
+                <Image src="/installation/aus-map.webp" alt="Map of Australia showing FineVu installation coverage" fill sizes="(max-width:768px) 80vw, 400px" className="object-contain" />
+              </div>
+            </motion.div>
+          )}
+          {/* layout="position" — the checker keeps its width, so animate position only and
+              avoid the text stretching that a size animation would cause. */}
+          <motion.div key="checker" layout="position">
+            <h3 className="text-[22px] font-semibold leading-[33px] text-[#1d1d1f]">A growing national installer network</h3>
+            <p className="mt-3.5 text-[18px] leading-[27px] tracking-[-0.4395px] text-[#5b5e66]">FineVu certified installers operate across major metropolitan areas with regional coverage expanding monthly. Enter your postcode to check availability in your area.</p>
+            <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-[12px] leading-[18px] text-[#5b5e66]">
+              <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[var(--finevu-orange)]" />Metro coverage now</span>
+              <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[#9a9da5]" />Regional — confirmed at booking</span>
+            </div>
+            <PostcodeCheck enquiring={open} onEnquire={setEnquiryPc} onReset={() => setEnquiryPc(null)} />
+            <p className="mt-5 text-[12px] leading-[18px] text-[#9a9da5]">Installation is not currently available in the Northern Territory.</p>
+          </motion.div>
+          {open && (
+            <motion.div key="form" layout initial={{ opacity: 0, x: 48 }} animate={{ opacity: 1, x: 0, transition: { ...transition, delay: 0.12 } }} exit={{ opacity: 0, x: 48 }} className={`flex items-center ${PANEL_H}`}>
+              <FitmentEnquiry key={enquiryPc} postcode={enquiryPc} onClose={() => setEnquiryPc(null)} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </MotionConfig>
   );
 }
 
@@ -474,7 +603,7 @@ export default function Page() {
         actions={
           <>
             <a href="#book" className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[29px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] text-white">Book Installation</a>
-            <a href="#how" className="cta-hover rounded-full border border-white/60 bg-white/5 px-[29px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] text-white transition-colors hover:bg-white/10">See How It Works</a>
+            <a href="#service-area" className="cta-hover rounded-full border border-white/60 bg-white/5 px-[29px] py-[14px] text-[14px] font-semibold uppercase leading-[20px] text-white transition-colors hover:bg-white/10">Check My Postcode</a>
           </>
         }
       />
@@ -519,26 +648,10 @@ export default function Page() {
       </section>
 
       {/* Service area */}
-      <section className="bg-white pb-24 md:pb-[96px]" data-nav-theme="light">
+      <section id="service-area" className="scroll-mt-24 bg-white pb-24 md:pb-[96px]" data-nav-theme="light">
         <div className="mx-auto max-w-[1000px] px-6">
           <h2 className="mb-11 text-center text-[32px] font-semibold leading-[40px] tracking-[-0.5px] text-[#1d1d1f] md:text-[48px] md:leading-[60px]">Installers near you. Australia-wide.</h2>
-          <div className="grid items-center gap-11 md:grid-cols-2 md:gap-16">
-            <div className="flex justify-center">
-              <div className="relative aspect-[1102/1036] w-full max-w-[400px]">
-                <Image src="/installation/aus-map.webp" alt="Map of Australia showing FineVu installation coverage" fill sizes="(max-width:768px) 80vw, 400px" className="object-contain" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-[22px] font-semibold leading-[33px] text-[#1d1d1f]">A growing national installer network</h3>
-              <p className="mt-3.5 text-[18px] leading-[27px] tracking-[-0.4395px] text-[#5b5e66]">FineVu certified installers operate across major metropolitan areas with regional coverage expanding monthly. Enter your postcode to check availability in your area.</p>
-              <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-[12px] leading-[18px] text-[#5b5e66]">
-                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[var(--finevu-orange)]" />Metro coverage now</span>
-                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[#9a9da5]" />Regional — confirmed at booking</span>
-              </div>
-              <PostcodeCheck />
-              <p className="mt-5 text-[12px] leading-[18px] text-[#9a9da5]">Installation is not currently available in the Northern Territory.</p>
-            </div>
-          </div>
+          <ServiceArea />
         </div>
       </section>
 

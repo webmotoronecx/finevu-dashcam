@@ -74,8 +74,12 @@ Coverage area:    ANCHORED IN CODE — lib/data/installation-coverage.ts is the 
   it points the other way.
 
   Narrowing coverage is the safe direction; do not widen it without a source. Tracked as
-  CA-78 (data) and FA-23 (wiring). NT exclusion is separate and confirmed — it stays
-  regardless, and is the ONLY hard block in the booking flow.
+  CA-78 (data) and FA-23 (wiring).
+
+  NT: SERVICEABLE as of 2026-09-30 (Tony Noonan, monday 13122278195). The former NT hard
+  block is removed from the checker and wizard, and all 49 NT rows in au-postcodes.json are
+  flagged supported. This is a client instruction, not regenerated polygon data — the
+  exclusion was the ONLY hard block in the booking flow and there is now none.
 
   Confirmed installer service areas: (none) {!needs approval}
 

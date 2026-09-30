@@ -6,7 +6,7 @@ import { LegalDisclaimers } from "@/components/LegalDisclaimers";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { submitForm } from "@/lib/submitForm";
 import { thankYouUrl } from "@/lib/data/thank-you";
-import { COVERAGE_MESSAGES, isExcluded, loadPostcodeRows, resolveCoverage, type Coverage, type PostcodeRow } from "@/lib/data/installation-coverage";
+import { COVERAGE_MESSAGES, loadPostcodeRows, resolveCoverage, type Coverage, type PostcodeRow } from "@/lib/data/installation-coverage";
 import { Carousel } from "@/components/sections/Carousel";
 import { FullscreenHero } from "@/components/sections/FullscreenHero";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
@@ -93,7 +93,7 @@ const FAQS = [
   { q: "Why is hardwire the standard install?", a: "Hardwiring connects your FineVu to the vehicle's fuse box using the hardwire kit already included in your box, so the camera can keep recording while the ignition is off. It unlocks parking mode and FineVu's battery protection system, which powers the camera down before your car's battery runs low — and it's the part that genuinely benefits from professional hands. If you only want recording while driving, the included power cable is a simple plug-in DIY setup, so there's no need to book an install for that." },
   { q: "Is it safe for my vehicle's electronics?", a: "Yes. Our installers use non-invasive fuse-tap connections matched to your vehicle — factory wiring is never cut or spliced. Cabling is routed behind existing trim, and everything is tested before handover, so your car's electronics and manufacturer warranty stay protected." },
   { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $250 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
-  { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we're expanding. If we can't reach you right now, we'll let you know promptly and help you find a suitable local option. Installation is not currently available in the Northern Territory." },
+  { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we're expanding. If we can't reach you right now, we'll let you know promptly and help you find a suitable local option." },
   { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we'll move it to a time that suits. There's no fee to reschedule with notice." },
 ];
 
@@ -149,7 +149,6 @@ function BookingWizard() {
     if (s === 2) {
       if (!form.place) return fail("Please choose home or workplace.");
       if (!form.street || !form.suburb || !form.stateAu || !/^\d{4}$/.test(form.postcode)) return fail("Please complete your address, including a 4-digit postcode.");
-      if (isExcluded(form.stateAu, form.postcode)) return fail(COVERAGE_MESSAGES.excludedBooking);
       setHint(resolveCoverage(form.postcode, pcRows, true)); return true;
     }
     if (s === 3) { if (!date) return fail("Please select a date."); if (!form.slot) return fail("Please select a preferred time."); }
@@ -565,7 +564,6 @@ function ServiceArea() {
               <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[5px] bg-[#9a9da5]" />Regional — confirmed at booking</span>
             </div>
             <PostcodeCheck enquiring={open} onEnquire={setEnquiryPc} onReset={() => setEnquiryPc(null)} />
-            <p className="mt-5 text-[12px] leading-[18px] text-[#9a9da5]">Installation is not currently available in the Northern Territory.</p>
           </motion.div>
           {open && (
             <motion.div key="form" layout initial={{ opacity: 0, x: 48 }} animate={{ opacity: 1, x: 0, transition: { ...transition, delay: 0.12 } }} exit={{ opacity: 0, x: 48 }} className={`flex items-center ${PANEL_H}`}>

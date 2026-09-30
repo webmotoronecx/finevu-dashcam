@@ -67,28 +67,16 @@
 //   return { msg: COVERAGE_MESSAGES.regional, cls: "warn" };
 // }
 
-/**
- * The Northern Territory is excluded from the installer network. Stated to the customer
- * in three places on /installation (the postcode checker, the map caption, and step 2 of
- * the booking wizard), so the rule lives here once.
- */
-export const EXCLUDED_STATE = "NT";
-const NT_POSTCODE = /^0[89]\d\d$/;
-
-/** True if the postcode falls in the excluded Northern Territory range (0800–0999). */
-export function isExcludedPostcode(pc: string): boolean {
-  return NT_POSTCODE.test(pc);
-}
-
-/** True if this state/postcode pair is outside the installer network entirely. */
-export function isExcluded(stateAu: string, pc: string): boolean {
-  return stateAu === EXCLUDED_STATE || isExcludedPostcode(pc);
-}
+// ── NT EXCLUSION — REMOVED 2026-09-30 ─────────────────────────────────────────
+// The Northern Territory used to be a hard block (EXCLUDED_STATE / isExcludedPostcode /
+// isExcluded, plus the `excluded` messages): the checker refused NT postcodes and wizard
+// step 2 refused NT addresses. Removed at Tony Noonan's request (monday 13122278195) — NT
+// is now treated as serviceable, and all 49 NT rows in au-postcodes.json were flipped to
+// supported. NT now resolves through the dataset like every other state. Note the
+// commented-out METRO_COVERAGE restore path above still references isExcludedPostcode and
+// COVERAGE_MESSAGES.excluded; drop those lines if it is ever restored.
 
 export const COVERAGE_MESSAGES = {
-  excluded: "Installation isn’t currently available in the Northern Territory.",
-  /** Wizard-validation variant — same fact, apologetic register for a blocked submit. */
-  excludedBooking: "Sorry — installation isn’t currently available in the Northern Territory.",
   invalid: "Please enter a valid 4-digit Australian postcode.",
   unavailable: "Sorry, we couldn’t check availability just now — please try again.",
   /** Wizard variant of `unavailable`: never blocks, never promises. */
@@ -146,13 +134,10 @@ export async function loadPostcodeRows(): Promise<PostcodeRow[] | null> {
  * `blocking` selects the register only, not the outcome: the checker is an information
  * widget, so an unserviced suburb offers a fitment enquiry instead, while the wizard must not
  * dead-end a customer mid-booking, so the same fact is phrased as a warning they can
- * proceed past. Neither variant blocks — only NT does, via isExcluded() in the caller.
+ * proceed past. Neither variant blocks.
  */
 export function resolveCoverage(pc: string, rows: PostcodeRow[] | null, blocking = false): Coverage {
   if (!/^\d{4}$/.test(pc)) return { msg: COVERAGE_MESSAGES.invalid, cls: "err" };
-  if (isExcludedPostcode(pc)) {
-    return { msg: blocking ? COVERAGE_MESSAGES.excludedBooking : COVERAGE_MESSAGES.excluded, cls: "err" };
-  }
   if (!rows) return { msg: COVERAGE_MESSAGES.unverified, cls: "warn" };
   const match = rows.find((r) => r[0] === pc);
   if (!match) return { msg: COVERAGE_MESSAGES.unknown, cls: "warn", enquire: !blocking };

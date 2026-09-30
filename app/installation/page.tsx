@@ -450,7 +450,12 @@ function PostcodeCheck({ enquiring, onEnquire, onReset }: { enquiring: boolean; 
         <input value={pc} onChange={(e) => { setPc(e.target.value.replace(/\D/g, "").slice(0, 4)); if (result.msg) { setResult({ msg: "", cls: "" }); onReset(); } }} onKeyDown={(e) => e.key === "Enter" && run()} placeholder="Enter your postcode" inputMode="numeric" maxLength={4} autoComplete="postal-code" className="w-full flex-1 rounded-[8px] border border-[#e8e7e2] bg-[#f6f6f6] px-[15px] py-3 text-[15px] text-[#1d1d1f] outline-none transition-colors placeholder:text-[#17181b]/50 focus:border-[var(--finevu-orange)]" aria-label="Enter your postcode" />
         <button type="button" onClick={run} disabled={checking} className="cta-hover w-[166px] shrink-0 rounded-full bg-[var(--finevu-orange)] py-3 text-[14px] font-semibold uppercase leading-[20px] text-white disabled:opacity-70">{checking ? "Checking…" : "Check"}</button>
       </div>
-      {result.msg && <p className={`mt-3.5 text-[.83rem] font-medium ${hintColor[result.cls]}`}>{result.msg}</p>}
+      {result.msg && (
+        <p className={`mt-3.5 text-[.83rem] font-medium ${hintColor[result.cls]}`}>
+          {result.msg}
+          {result.cls === "ok" && <> <a href="#book" className="whitespace-nowrap font-semibold text-[var(--finevu-orange)] underline underline-offset-2 hover:no-underline">Book now →</a></>}
+        </p>
+      )}
       {result.enquire && !enquiring && (
         <button type="button" onClick={() => onEnquire(checkedPc)} className="cta-hover mt-4 rounded-full border border-[var(--finevu-orange)] px-[22px] py-2.5 text-[13px] font-semibold uppercase leading-[20px] text-[var(--finevu-orange)] transition-colors hover:bg-[#fff1e8]">Ask About Fitment Options</button>
       )}

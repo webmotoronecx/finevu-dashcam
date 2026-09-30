@@ -58,7 +58,7 @@ const TOTAL = 5;
 const STEP_LABELS = ["Your Dash Cam", "Location", "Date & Time", "Your Details", "Checkout"];
 
 const HERO_STATS = [
-  { value: "$250 AUD", label: "One price, every install" },
+  { value: "$275 AUD", label: "One price, every install · inc. GST" },
   { value: "Mobile service", label: "We come to home or work" },
   { value: "60–90 mins", label: "Typical install time" },
   { value: "Secure checkout", label: "Pay when you book" },
@@ -66,7 +66,7 @@ const HERO_STATS = [
 
 const THREE = [
   { n: "1.", title: "Purchase from an authorised retailer", body: "Buy the GX4K or GX35 from an authorised FineVu retailer. The hardwire kit and power cable are already in the box — nothing extra to source.", img: "/installation/step-purchase.webp" },
-  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and whether a morning or afternoon suits you. $250 flat, paid at checkout — your booking is confirmed instantly.", img: "/installation/step-book.webp" },
+  { n: "2.", title: "Book your installation online", body: "Choose your model, confirm the install location, pick a date and whether a morning or afternoon suits you. $275 flat inc. GST, paid at checkout — your booking is confirmed instantly.", img: "/installation/step-book.webp" },
   { n: "3.", title: "Your installer comes to you", body: "A certified installer arrives at your home or workplace, fits the camera cleanly, conceals all cabling, configures everything and tests it before handover.", img: "/installation/step-install.webp" },
 ];
 
@@ -87,12 +87,12 @@ const WHY = [
 
 const FAQS = [
   { q: "Do I need to buy my dash cam before booking?", a: "Yes. FineVu dash cams are sold through our authorised retailers rather than directly from FineVu, so installation is booked separately. Once your camera has arrived — or is on its way — you can book your fitting here. Just make sure it's with the vehicle on the day." },
-  { q: "Which models are supported?", a: "Our installer network fits the FineVu GX4K and GX35. Both are front-and-rear (2CH) systems, and both are covered by the same $250 flat installation rate." },
+  { q: "Which models are supported?", a: "Our installer network fits the FineVu GX4K and GX35. Both are front-and-rear (2CH) systems, and both are covered by the same $275 flat installation rate (inc. GST)." },
   { q: "How long does the installation take?", a: "Most installations take 60–90 minutes — that covers the front and rear cameras, hardwiring, configuration and testing. Some vehicles with complex trim can take a little longer. Your installer will give you an accurate estimate when they confirm your booking." },
   { q: "Where does the installation take place?", a: "Our installers are fully mobile and come to your home or workplace. All they need is level, off-street access to your vehicle — a driveway, garage, carport or accessible car park — and the vehicle available for the duration of the appointment." },
   { q: "Why is hardwire the standard install?", a: "Hardwiring connects your FineVu to the vehicle's fuse box using the hardwire kit already included in your box, so the camera can keep recording while the ignition is off. It unlocks parking mode and FineVu's battery protection system, which powers the camera down before your car's battery runs low — and it's the part that genuinely benefits from professional hands. If you only want recording while driving, the included power cable is a simple plug-in DIY setup, so there's no need to book an install for that." },
   { q: "Is it safe for my vehicle's electronics?", a: "Yes. Our installers use non-invasive fuse-tap connections matched to your vehicle — factory wiring is never cut or spliced. Cabling is routed behind existing trim, and everything is tested before handover, so your car's electronics and manufacturer warranty stay protected." },
-  { q: "How much does it cost?", a: "Installation is one flat rate of $250 — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $250 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
+  { q: "How much does it cost?", a: "Installation is one flat rate of $275, including GST — every vehicle, whether you've chosen the GX4K or GX35. It covers the full front-and-rear hardwire installation, configuration and system test. The $275 is paid at the time of booking, and your tax receipt is emailed to you as soon as payment clears." },
   { q: "What areas are covered?", a: "Our network covers all major metro areas and a growing list of regional centres, and we're expanding. If we can't reach you right now, we'll let you know promptly and help you find a suitable local option." },
   { q: "Can I reschedule or cancel my booking?", a: "Of course. Plans change — just reply to your confirmation email or call us at least 24 hours before your appointment and we'll move it to a time that suits. There's no fee to reschedule with notice." },
 ];
@@ -200,7 +200,7 @@ function BookingWizard() {
     // dropped — they have no other destination until the wizard actually submits (CA-36).
     if (form.retailer) rows.push(["Purchased from", form.retailer]);
     if (form.notes) rows.push(["Notes", form.notes]);
-    rows.push(["Total", "$250.00 AUD — paid today"]);
+    rows.push(["Total", "$275.00 AUD inc. GST — paid today"]);
     return rows;
   };
   const confirmRows = (): [string, string][] => {
@@ -235,7 +235,7 @@ function BookingWizard() {
               );
             })}
           </div>
-          <span className="shrink-0 self-center whitespace-nowrap rounded-[8px] border border-[var(--finevu-orange)] bg-[#fff1e8] px-[15px] py-[9px] text-[12px] font-bold leading-[18px] text-[var(--finevu-orange)] md:self-start">$250 AUD · Paid Today</span>
+          <span className="shrink-0 self-center whitespace-nowrap rounded-[8px] border border-[var(--finevu-orange)] bg-[#fff1e8] px-[15px] py-[9px] text-[12px] font-bold leading-[18px] text-[var(--finevu-orange)] md:self-start">$275 AUD · Paid Today</span>
         </div>
 
         {/* body */}
@@ -255,7 +255,7 @@ function BookingWizard() {
                 ))}
               </div>
               <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-5 py-4 text-[.85rem] leading-[1.6] text-[#6e6e73]">
-                <b className="text-[#1d1d1f]">Every booking is a full professional hardwire installation — $250 flat.</b> Front and rear cameras fitted, wired to the fuse box for parking mode and battery protection, configured and tested. Prefer plug-in power for driving-only recording? That&apos;s a simple DIY setup with the included power cable — no booking needed.
+                <b className="text-[#1d1d1f]">Every booking is a full professional hardwire installation — $275 flat, inc. GST.</b> Front and rear cameras fitted, wired to the fuse box for parking mode and battery protection, configured and tested. Prefer plug-in power for driving-only recording? That&apos;s a simple DIY setup with the included power cable — no booking needed.
               </div>
             </div>
           )}
@@ -370,7 +370,7 @@ function BookingWizard() {
           {step === 5 && (
             <div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Checkout</h3>
-              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Pay the $250 flat rate now to lock in your appointment. Your card is charged today and your booking is confirmed instantly.</p>
+              <p className="mt-2 max-w-[600px] text-[18px] leading-[1.6] text-[#6e6e73]">Pay the $275 flat rate (inc. GST) now to lock in your appointment. Your card is charged today and your booking is confirmed instantly.</p>
               <div className="mt-6 rounded-[12px] bg-[#f7f7f7] px-6 py-[22px]">
                 <span className="mb-3 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Order summary</span>
                 <dl className="space-y-2 text-[.88rem]">{summaryRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
@@ -391,7 +391,7 @@ function BookingWizard() {
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--finevu-orange)] text-white"><Check className="h-7 w-7" strokeWidth={2.4} /></div>
               <h3 className="text-[22px] font-semibold text-[#1d1d1f]">Booking confirmed — payment received</h3>
               <div className="my-3.5 text-[.78rem] font-semibold uppercase tracking-[0.08em] text-[var(--finevu-orange)]">Ref {ref} · Paid</div>
-              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $250.00 AUD has been received and your installation is locked in. Your confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
+              <p className="mx-auto max-w-[520px] text-[.92rem] leading-[1.7] text-[#6e6e73]">Thank you — your payment of $275.00 AUD has been received and your installation is locked in. Your confirmation and tax receipt are on their way to your email, and your installer will call ahead on the day. Please have your FineVu and all in-box accessories, including the hardwire kit, with the vehicle.</p>
               <div className="mx-auto mt-8 max-w-[580px] rounded-[12px] bg-[#f7f7f7] px-6 py-[22px] text-left">
                 <dl className="space-y-2 text-[.88rem]">{confirmRows().map(([k, v]) => <div key={k} className="flex justify-between gap-6"><dt className="text-[#6e6e73]">{k}</dt><dd className="text-right font-medium text-[#1d1d1f]">{v}</dd></div>)}</dl>
               </div>
@@ -406,7 +406,7 @@ function BookingWizard() {
           <div className="flex items-center justify-between gap-4 border-t border-[#e8e7e2] px-6 py-5 md:px-9">
             <button type="button" onClick={back} disabled={step === 1} className="rounded-full border border-[#1d1d1f] px-[19px] py-[9px] text-[12px] font-semibold uppercase leading-[18px] tracking-[0.96px] text-[#1d1d1f] transition-colors disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
             <span className="text-[13px] font-medium leading-[19.5px] text-[#9a9da5]">Step {step} of {TOTAL}</span>
-            <button type="submit" disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $250 AUD" : "Continue →"}</button>
+            <button type="submit" disabled={processing} className="cta-hover rounded-full bg-[var(--finevu-orange)] px-[18px] py-[8px] text-[12px] font-semibold uppercase leading-[18px] text-white disabled:opacity-70">{processing ? "Processing…" : step === TOTAL ? "Pay $275 AUD" : "Continue →"}</button>
           </div>
         )}
         </form>
@@ -611,7 +611,7 @@ export default function Page() {
         <div className="mx-auto max-w-[1160px] px-6">
           <div className="mx-auto mb-11 max-w-[720px] text-center">
             <h2 className="text-[32px] font-semibold leading-[40px] tracking-[-0.5px] text-[#1d1d1f] md:text-[48px] md:leading-[60px]">Book your installation</h2>
-            <p className="mt-4 text-[18px] leading-[27px] text-[#5b5e66]">Professional hardwire installation at your home or workplace. $250 flat rate, paid securely when you book.</p>
+            <p className="mt-4 text-[18px] leading-[27px] text-[#5b5e66]">Professional hardwire installation at your home or workplace. $275 flat rate inc. GST, paid securely when you book.</p>
           </div>
           <BookingWizard />
         </div>

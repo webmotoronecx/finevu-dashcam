@@ -16,7 +16,7 @@ Address:        Level 9, 3 Nexus Court, Mulgrave VIC 3170
 Only the committed FIGURES / process facts live here. The full legal wording stays in
 lib/data/installation-terms.ts (the anchor) — do not copy prose into this file.
 
-Price:            $250 AUD flat, every vehicle, GST included
+Price:            $275 AUD flat, every vehicle, GST included
 Payment timing:   UPFRONT — paid in full at the time of booking, online at checkout.
                   NOT pay-on-the-day. Confirmed 2026-07-27. This is the CA-08 resolution:
                   installation-terms.ts §5 ("Payment is required at the time of booking")
